@@ -1,5 +1,29 @@
-*.class
-*.log
+# Add any directories, files, or patterns you don't want to be tracked by version control
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+.bsp
+project/project
+project/target
+target
+.history
+dist
+.idea
+*.iml
+.idea_modules
+.classpath
+RUNNING_PID
+.settings
+.project
+out
+src_generated
+.attach*
+*.so
+.metals
+.bloop
+project/metals.sbt
+.vscode
+*.dmp
+javacore.*
+generated
+.scala-build
+
+functions-remote-generated
