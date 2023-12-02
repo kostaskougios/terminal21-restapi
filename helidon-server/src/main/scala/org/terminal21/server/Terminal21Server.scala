@@ -24,6 +24,6 @@ import java.nio.file.Path
   try
     println("Terminal 21 Server started and listening on http://localhost:8080")
     while true do
-      Thread.sleep(86400)
+      Thread.sleep(86400 * 1000)
       println("One more day passed...")
   finally server.stop()
