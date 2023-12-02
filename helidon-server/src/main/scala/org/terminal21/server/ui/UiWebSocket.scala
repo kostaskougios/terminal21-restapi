@@ -6,4 +6,4 @@ import io.helidon.websocket.{WsListener, WsSession}
 class UiWebSocket extends WsListener:
   override def onMessage(session: WsSession, text: String, last: Boolean) =
     println(s"Got text=$text")
-    session.send("Hello world", last)
+    session.send(s"Hello world $text", last)
