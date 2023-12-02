@@ -28,11 +28,12 @@ val Circe        = Seq(
   "io.circe" %% "circe-parser"
 ).map(_ % CirceVersion)
 
-val HelidonVersion       = "4.0.1"
-val HelidonServer        = "io.helidon.webserver" % "helidon-webserver-http2"     % HelidonVersion
-val HelidonWebSocket     = "io.helidon.webserver" % "helidon-webserver-websocket" % HelidonVersion
-val HelidonClient        = "io.helidon.webclient" % "helidon-webclient-http2"     % HelidonVersion
-val HelidonServerLogging = "io.helidon.logging"   % "helidon-logging-jul"         % HelidonVersion
+val HelidonVersion         = "4.0.1"
+val HelidonWebServerHttp2  = "io.helidon.webserver" % "helidon-webserver-http2"          % HelidonVersion
+val HelidonWebServerStatic = "io.helidon.webserver" % "helidon-webserver-static-content" % HelidonVersion
+val HelidonWebSocket       = "io.helidon.webserver" % "helidon-webserver-websocket"      % HelidonVersion
+val HelidonClient          = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
+val HelidonServerLogging   = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
 
 // -----------------------------------------------------------------------------------------------
 // Modules
@@ -44,8 +45,9 @@ lazy val `helidon-server` = project
       FunctionsReceiver,
       FunctionsHelidonServer,
       ScalaTest,
-      HelidonServer,
+      HelidonWebServerHttp2,
       HelidonWebSocket,
+      HelidonWebServerStatic,
       HelidonServerLogging % Test
     ) ++ Circe
   )
