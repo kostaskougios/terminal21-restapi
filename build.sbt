@@ -13,14 +13,14 @@ ThisBuild / scalacOptions ++= Seq("-unchecked", "-feature", "-deprecation")
 // Dependencies
 // -----------------------------------------------------------------------------------------------
 
-val FunctionsVersion  = "0.1-SNAPSHOT"
-val FunctionsCaller   = "org.functions-remote" %% "functions-caller"   % FunctionsVersion
-val FunctionsReceiver = "org.functions-remote" %% "functions-receiver" % FunctionsVersion
-val FunctionsAvro     = "org.functions-remote" %% "functions-avro"     % FunctionsVersion
-val FunctionsHelidonServer = "org.functions-remote" %% "helidon-server"          % FunctionsVersion
-val FunctionsHelidonClient = "org.functions-remote" %% "helidon-client"          % FunctionsVersion
+val FunctionsVersion       = "0.1-SNAPSHOT"
+val FunctionsCaller        = "org.functions-remote" %% "functions-caller"   % FunctionsVersion
+val FunctionsReceiver      = "org.functions-remote" %% "functions-receiver" % FunctionsVersion
+val FunctionsAvro          = "org.functions-remote" %% "functions-avro"     % FunctionsVersion
+val FunctionsHelidonServer = "org.functions-remote" %% "helidon-server"     % FunctionsVersion
+val FunctionsHelidonClient = "org.functions-remote" %% "helidon-client"     % FunctionsVersion
 
-val ScalaTest    = "org.scalatest"       %% "scalatest"   % "3.2.15" % Test
+val ScalaTest    = "org.scalatest" %% "scalatest" % "3.2.15" % Test
 val CirceVersion = "0.14.1"
 val Circe        = Seq(
   "io.circe" %% "circe-core",
@@ -28,10 +28,11 @@ val Circe        = Seq(
   "io.circe" %% "circe-parser"
 ).map(_ % CirceVersion)
 
-val HelidonVersion         = "4.0.1"
-val HelidonServer          = "io.helidon.webserver"  % "helidon-webserver-http2" % HelidonVersion
-val HelidonClient          = "io.helidon.webclient"  % "helidon-webclient-http2" % HelidonVersion
-val HelidonServerLogging   = "io.helidon.logging"    % "helidon-logging-jul"     % HelidonVersion
+val HelidonVersion       = "4.0.1"
+val HelidonServer        = "io.helidon.webserver" % "helidon-webserver-http2"     % HelidonVersion
+val HelidonWebSocket     = "io.helidon.webserver" % "helidon-webserver-websocket" % HelidonVersion
+val HelidonClient        = "io.helidon.webclient" % "helidon-webclient-http2"     % HelidonVersion
+val HelidonServerLogging = "io.helidon.logging"   % "helidon-logging-jul"         % HelidonVersion
 
 // -----------------------------------------------------------------------------------------------
 // Modules
@@ -44,7 +45,7 @@ lazy val `helidon-server` = project
       FunctionsHelidonServer,
       ScalaTest,
       HelidonServer,
+      HelidonWebSocket,
       HelidonServerLogging % Test
     ) ++ Circe
   )
-
