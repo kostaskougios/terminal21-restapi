@@ -21,7 +21,7 @@ val FunctionsHelidonServer = "org.functions-remote" %% "helidon-server"     % Fu
 val FunctionsHelidonClient = "org.functions-remote" %% "helidon-client"     % FunctionsVersion
 
 val ScalaTest    = "org.scalatest" %% "scalatest" % "3.2.15" % Test
-val CirceVersion = "0.14.1"
+val CirceVersion = "0.14.6"
 val Circe        = Seq(
   "io.circe" %% "circe-core",
   "io.circe" %% "circe-generic",
@@ -35,6 +35,7 @@ val HelidonWebSocket       = "io.helidon.webserver" % "helidon-webserver-websock
 val HelidonClient          = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
 val HelidonServerLogging   = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
 
+val LogBack = Seq("ch.qos.logback" % "logback-classic" % "1.4.14")
 // -----------------------------------------------------------------------------------------------
 // Modules
 // -----------------------------------------------------------------------------------------------
@@ -49,5 +50,5 @@ lazy val `helidon-server` = project
       HelidonWebSocket,
       HelidonWebServerStatic,
       HelidonServerLogging % Test
-    ) ++ Circe
+    ) ++ Circe ++ LogBack
   )
