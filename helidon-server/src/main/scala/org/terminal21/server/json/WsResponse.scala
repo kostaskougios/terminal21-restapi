@@ -5,7 +5,8 @@ import io.circe.generic.auto.*
 
 sealed trait WsResponse
 
-case class Initialized(msg: String) extends WsResponse
+// std react/html components
+case class Std(elements: Seq[StdElement]) extends WsResponse
 
 object WsResponse:
   val encoder = Encoder[WsResponse]

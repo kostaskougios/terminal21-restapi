@@ -2,7 +2,7 @@ package org.terminal21.server.ui
 
 import io.helidon.websocket.{WsListener, WsSession}
 import org.slf4j.LoggerFactory
-import org.terminal21.server.json.{Initialized, WsRequest, WsResponse}
+import org.terminal21.server.json.*
 
 // websocket: https://helidon.io/docs/v4/#/se/websocket
 class UiWebSocket extends WsListener:
@@ -12,7 +12,7 @@ class UiWebSocket extends WsListener:
     logger.info(s"Received json: $text")
     WsRequest.decoder(text) match
       case Right(WsRequest("init", None)) =>
-        val res  = Initialized("ok")
+        val res  = Std(Seq(Paragraph("Hello world!")))
         val json = WsResponse.encoder(res).noSpaces
         logger.info(s"Got an init, responding with $json")
         session.send(json, last)
