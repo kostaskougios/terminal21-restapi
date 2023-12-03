@@ -19,6 +19,7 @@ val FunctionsReceiver      = "org.functions-remote" %% "functions-receiver" % Fu
 val FunctionsAvro          = "org.functions-remote" %% "functions-avro"     % FunctionsVersion
 val FunctionsHelidonServer = "org.functions-remote" %% "helidon-server"     % FunctionsVersion
 val FunctionsHelidonClient = "org.functions-remote" %% "helidon-client"     % FunctionsVersion
+val FunctionsFibers        = "org.functions-remote" %% "fibers"             % FunctionsVersion
 
 val ScalaTest    = "org.scalatest" %% "scalatest" % "3.2.15" % Test
 val CirceVersion = "0.14.6"
@@ -49,6 +50,7 @@ lazy val `helidon-server` = project
       HelidonWebServerHttp2,
       HelidonWebSocket,
       HelidonWebServerStatic,
+      FunctionsFibers,
       HelidonServerLogging % Test
     ) ++ Circe ++ LogBack
   )
