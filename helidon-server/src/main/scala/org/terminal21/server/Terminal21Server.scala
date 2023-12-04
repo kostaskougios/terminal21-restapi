@@ -15,7 +15,12 @@ import org.terminal21.config.Config
     Routes.static(routesBuilder)
 
     LogConfig.configureRuntime()
-    val server = WebServer.builder.port(config.port).routing(routesBuilder).addRouting(dependencies.uiWebSocketWsRouting).build.start
+    val server = WebServer.builder
+      .port(config.port)
+      .routing(routesBuilder)
+      .addRouting(dependencies.uiWebSocketWsRouting)
+      .build
+      .start
     try
       println(s"Terminal 21 Server started and listening on http://localhost:${config.port}")
       while true do

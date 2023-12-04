@@ -13,10 +13,6 @@ import java.io.UncheckedIOException
 class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
-  override def onOpen(session: WsSession) =
-    logger.info(s"inOpen $session")
-    continuouslyRespond(session, true)
-
   private def continuouslyRespond(session: WsSession, last: Boolean) =
     fiberExecutor.submit:
       try
@@ -30,7 +26,7 @@ class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
           c += 1
       catch
         case s: UncheckedIOException if s.getCause.getMessage == "Socket closed" =>
-          logger.info("Client disconnected")
+          logger.info(s"Client disconnected :$session")
         case t: Throwable                                                        =>
           logger.error("fiber error occurred", t)
 
@@ -38,6 +34,7 @@ class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
     logger.info(s"Received json: $text")
     WsRequest.decoder(text) match
       case Right(WsRequest("init", None)) =>
+        continuouslyRespond(session, last)
         logger.info("init processed successfully")
       case x                              =>
         logger.error(s"Invalid request : $x")
