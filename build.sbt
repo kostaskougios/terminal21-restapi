@@ -83,3 +83,9 @@ lazy val `terminal21-ui-std` = project
   )
   .dependsOn(`terminal21-ui-std-exports`, `terminal21-server-client-common`)
   .enablePlugins(FunctionsRemotePlugin)
+
+lazy val examples = project
+  .settings(
+    libraryDependencies ++= Seq(ScalaTest)
+  )
+  .dependsOn(`terminal21-ui-std`)
