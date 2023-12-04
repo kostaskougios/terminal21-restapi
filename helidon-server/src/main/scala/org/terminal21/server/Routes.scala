@@ -3,15 +3,15 @@ package org.terminal21.server
 import io.helidon.webserver.http.HttpRouting
 import io.helidon.webserver.staticcontent.StaticContentService
 import io.helidon.webserver.websocket.WsRouting
-import org.terminal21.ui.std.SessionsServiceReceiverFactory
+import org.terminal21.ui.std.{SessionsServiceReceiverFactory, StdUiReceiverFactory}
 
 import java.nio.file.Path
 
 object Routes:
   def register(dependencies: Dependencies, rb: HttpRouting.Builder): Unit =
     import dependencies.*
-    val sessionRoutes = SessionsServiceReceiverFactory.newJsonSessionsServiceHelidonRoutes(sessionsService)
-    sessionRoutes.routes(rb)
+    SessionsServiceReceiverFactory.newJsonSessionsServiceHelidonRoutes(sessionsService).routes(rb)
+    StdUiReceiverFactory.newJsonStdUiHelidonRoutes(stdUi).routes(rb)
 
   def static(rb: HttpRouting.Builder): Unit =
     val staticContent = StaticContentService
