@@ -6,3 +6,4 @@ import org.terminal21.ui.std.model.Session
   */
 trait SessionsService:
   def createSession(id: String, name: String): Session
+  def terminateSession(session: Session): Unit

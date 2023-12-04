@@ -5,13 +5,19 @@ import org.terminal21.server.model.SessionState
 import org.terminal21.ui.std.SessionsService
 import org.terminal21.ui.std.model.Session
 
+import java.util.UUID
+
 class ServerSessionsService extends SessionsService:
-  private val logger                                            = LoggerFactory.getLogger(getClass)
-  private val sessions                                          = collection.concurrent.TrieMap.empty[String, SessionState]
+  private val logger   = LoggerFactory.getLogger(getClass)
+  private val sessions = collection.concurrent.TrieMap.empty[Session, SessionState]
+
+  override def terminateSession(session: Session): Unit =
+    logger.info(s"Terminating session $session")
+
   override def createSession(id: String, name: String): Session =
-    val s = Session(id, name)
+    val s = Session(id, name, UUID.randomUUID().toString)
     logger.info(s"Creating session $s")
-    sessions += id -> SessionState(s)
+    sessions += s -> SessionState(s)
     s
 
 trait ServerSessionsServiceBeans:
