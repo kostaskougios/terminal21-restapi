@@ -14,10 +14,13 @@ class SessionsWebSocket(fiberExecutor: FiberExecutor, sessionsService: ServerSes
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   private def continuouslyRespond(session: WsSession, last: Boolean) =
-    val sessions = sessionsService.allSessions.map(_.copy(secret = "***"))
-    val json     = sessions.asJson.noSpaces
-    logger.info(s"Sending sessions = $json to $session")
-    session.send(json, last)
+    fiberExecutor.submit:
+      DoWhileSessionOpen.doWhileSessionOpen:
+        val sessions = sessionsService.allSessions.map(_.copy(secret = "***"))
+        val json     = sessions.asJson.noSpaces
+        logger.info(s"Sending sessions = $json to $session")
+        session.send(json, last)
+        sessionsService.waitForSessionsChange()
 
   override def onMessage(session: WsSession, text: String, last: Boolean): Unit =
     logger.info(s"Received json: $text")

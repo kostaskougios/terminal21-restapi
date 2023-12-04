@@ -17,10 +17,17 @@ class ServerSessionsService extends SessionsService:
   override def createSession(id: String, name: String): Session =
     val s = Session(id, name, UUID.randomUUID().toString)
     logger.info(s"Creating session $s")
+    sessions.keys.toList.foreach(s => if s.id == id then sessions.remove(s))
     sessions += s -> SessionState(s)
+    notifySessionChanged()
     s
 
   def allSessions: Seq[Session] = sessions.keySet.toList
+
+  private val waitObj                = new Object
+  private def notifySessionChanged() = waitObj.synchronized { waitObj.notifyAll() }
+  def waitForSessionsChange(): Unit  =
+    waitObj.synchronized { waitObj.wait() }
 
 trait ServerSessionsServiceBeans:
   val sessionsService: ServerSessionsService = new ServerSessionsService
