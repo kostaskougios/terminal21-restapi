@@ -1,4 +1,4 @@
-package org.terminal21.server.json
+package org.terminal21.ui.std.json
 
 sealed trait StdElement
 

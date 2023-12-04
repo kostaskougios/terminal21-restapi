@@ -2,6 +2,7 @@ package org.terminal21.server.json
 
 import io.circe.*
 import io.circe.generic.auto.*
+import org.terminal21.ui.std.json.StdElement
 
 sealed trait WsResponse
 

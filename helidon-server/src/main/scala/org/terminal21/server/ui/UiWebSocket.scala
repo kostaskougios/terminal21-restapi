@@ -4,6 +4,7 @@ import functions.fibers.FiberExecutor
 import io.helidon.websocket.{WsListener, WsSession}
 import org.slf4j.LoggerFactory
 import org.terminal21.server.json.*
+import org.terminal21.ui.std.json.{Header1, Paragraph}
 
 import java.io.UncheckedIOException
 

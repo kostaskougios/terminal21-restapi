@@ -54,3 +54,23 @@ lazy val `helidon-server` = project
       HelidonServerLogging % Test
     ) ++ Circe ++ LogBack
   )
+  .dependsOn(`terminal21-ui-std-exports`)
+
+lazy val `terminal21-ui-std-exports` = project
+  .settings(
+    libraryDependencies ++= Seq(ScalaTest),
+    // make sure exportedArtifact points to the full artifact name of the receiver.
+    buildInfoKeys    := Seq[BuildInfoKey](organization, name, version, scalaVersion, "exportedArtifact" -> "none"),
+    buildInfoPackage := "org.terminal21.ui.std"
+  )
+  .enablePlugins(BuildInfoPlugin)
+
+lazy val `terminal21-ui-std` = project
+  .settings(
+    callerExports                := Seq(s"org.terminal21:terminal21-ui-std-exports_3:${version.value}"),
+    callerJsonSerialization      := true,
+    callerHelidonClientTransport := true,
+    libraryDependencies ++= Seq(ScalaTest, HelidonClient, FunctionsCaller, FunctionsHelidonClient) ++ Circe
+  )
+  .dependsOn(`terminal21-ui-std-exports`)
+  .enablePlugins(FunctionsRemotePlugin)
