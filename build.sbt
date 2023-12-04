@@ -43,6 +43,9 @@ val LogBack = Seq("ch.qos.logback" % "logback-classic" % "1.4.14")
 
 lazy val `helidon-server` = project
   .settings(
+    receiverExports           := Seq(s"org.terminal21:terminal21-ui-std-exports_3:${version.value}"),
+    receiverJsonSerialization := true,
+    receiverHelidonRoutes     := true,
     libraryDependencies ++= Seq(
       FunctionsReceiver,
       FunctionsHelidonServer,
@@ -50,11 +53,13 @@ lazy val `helidon-server` = project
       HelidonWebServerHttp2,
       HelidonWebSocket,
       HelidonWebServerStatic,
+      FunctionsHelidonServer,
       FunctionsFibers,
       HelidonServerLogging % Test
     ) ++ Circe ++ LogBack
   )
   .dependsOn(`terminal21-ui-std-exports`)
+  .enablePlugins(FunctionsRemotePlugin)
 
 lazy val `terminal21-ui-std-exports` = project
   .settings(
