@@ -30,13 +30,17 @@ class ServerSessionsService extends SessionsService:
   def waitForSessionsChange(): Unit =
     waitObj.synchronized { waitObj.wait() }
 
-  def sessionState(session: Session): SessionState = sessions.getOrElse(session, throw new IllegalArgumentException())
+  def sessionState(session: Session): SessionState  = sessions.getOrElse(session, throw new IllegalArgumentException(s"can't find session $session"))
+  def sessionState(sessionId: String): SessionState =
+    val s = sessions.keys.find(_.id == sessionId).getOrElse(throw new IllegalArgumentException(s"can't find session id $sessionId"))
+    sessionState(s)
 
   def modifySessionState(session: Session)(f: SessionState => SessionState): Unit =
-    val newState = f(sessionState(session))
+    val oldState = sessionState(session)
+    val newState = f(oldState)
     sessions += session -> newState
+    oldState.notifyChanged()
     logger.info(s"Session $session new state $newState")
-    notifySessionChanged()
 
 trait ServerSessionsServiceBeans:
   val sessionsService: ServerSessionsService = new ServerSessionsService

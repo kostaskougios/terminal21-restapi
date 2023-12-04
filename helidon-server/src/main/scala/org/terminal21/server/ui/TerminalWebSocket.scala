@@ -1,25 +1,25 @@
 package org.terminal21.server.ui
 
 import functions.fibers.FiberExecutor
+import io.circe.*
+import io.circe.generic.auto.*
+import io.circe.syntax.*
 import io.helidon.websocket.{WsListener, WsSession}
 import org.slf4j.LoggerFactory
 import org.terminal21.server.json.*
+import org.terminal21.server.service.ServerSessionsService
 import org.terminal21.ui.std.json.{Header1, Paragraph}
 
 // websocket: https://helidon.io/docs/v4/#/se/websocket
-class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
+class TerminalWebSocket(fiberExecutor: FiberExecutor, sessionsService: ServerSessionsService) extends WsListener:
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   private def continuouslyRespond(session: WsSession, last: Boolean, sessionId: String) =
     fiberExecutor.submit:
-      var c = 0
       DoWhileSessionOpen.doWhileSessionOpen:
-        val res  = Std(Seq(Header1("Notes"), Paragraph(s"$c : Hello world! $sessionId")))
-        val json = WsResponse.encoder(res).noSpaces
-        logger.info(s"responding with $json")
-        session.send(json, last)
-        Thread.sleep(2000)
-        c += 1
+        val sessionState = sessionsService.sessionState(sessionId)
+        for response <- sessionState.responses do session.send(response.asJson.noSpaces, last)
+        sessionState.waitChange()
 
   override def onMessage(session: WsSession, text: String, last: Boolean): Unit =
     logger.info(s"Received json: $text")
@@ -30,5 +30,6 @@ class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
       case x                                                    =>
         logger.error(s"Invalid request : $x")
 
-trait UiWebSocketBeans(fiberExecutor: FiberExecutor):
-  lazy val uiWebSocket = new UiWebSocket(fiberExecutor)
+trait TerminalWebSocketBeans(fiberExecutor: FiberExecutor):
+  def sessionsService: ServerSessionsService
+  lazy val terminalWebSocket = new TerminalWebSocket(fiberExecutor, sessionsService)
