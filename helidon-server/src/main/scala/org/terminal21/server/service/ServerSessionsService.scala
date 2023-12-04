@@ -24,9 +24,10 @@ class ServerSessionsService extends SessionsService:
 
   def allSessions: Seq[Session] = sessions.keySet.toList
 
-  private val waitObj                = new Object
-  private def notifySessionChanged() = waitObj.synchronized { waitObj.notifyAll() }
-  def waitForSessionsChange(): Unit  =
+  private val waitObj                      = new Object
+  private def notifySessionChanged(): Unit = waitObj.synchronized { waitObj.notifyAll() }
+
+  def waitForSessionsChange(): Unit =
     waitObj.synchronized { waitObj.wait() }
 
 trait ServerSessionsServiceBeans:

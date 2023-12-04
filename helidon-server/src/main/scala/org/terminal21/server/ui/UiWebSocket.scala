@@ -10,11 +10,11 @@ import org.terminal21.ui.std.json.{Header1, Paragraph}
 class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
-  private def continuouslyRespond(session: WsSession, last: Boolean) =
+  private def continuouslyRespond(session: WsSession, last: Boolean, sessionId: String) =
     fiberExecutor.submit:
       var c = 0
       DoWhileSessionOpen.doWhileSessionOpen:
-        val res  = Std(Seq(Header1("Notes"), Paragraph(s"$c : Hello world!")))
+        val res  = Std(Seq(Header1("Notes"), Paragraph(s"$c : Hello world! $sessionId")))
         val json = WsResponse.encoder(res).noSpaces
         logger.info(s"responding with $json")
         session.send(json, last)
@@ -24,10 +24,10 @@ class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
   override def onMessage(session: WsSession, text: String, last: Boolean): Unit =
     logger.info(s"Received json: $text")
     WsRequest.decoder(text) match
-      case Right(WsRequest("init", None)) =>
-        continuouslyRespond(session, last)
+      case Right(WsRequest("init", Some(SessionId(sessionId)))) =>
+        continuouslyRespond(session, last, sessionId)
         logger.info("init processed successfully")
-      case x                              =>
+      case x                                                    =>
         logger.error(s"Invalid request : $x")
 
 trait UiWebSocketBeans(fiberExecutor: FiberExecutor):
