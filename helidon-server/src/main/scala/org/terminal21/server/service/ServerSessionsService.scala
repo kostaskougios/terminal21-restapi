@@ -20,5 +20,7 @@ class ServerSessionsService extends SessionsService:
     sessions += s -> SessionState(s)
     s
 
+  def allSessions: Seq[Session] = sessions.keySet.toList
+
 trait ServerSessionsServiceBeans:
   val sessionsService: ServerSessionsService = new ServerSessionsService

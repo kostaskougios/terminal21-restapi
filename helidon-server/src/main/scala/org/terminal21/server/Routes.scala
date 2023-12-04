@@ -2,6 +2,7 @@ package org.terminal21.server
 
 import io.helidon.webserver.http.HttpRouting
 import io.helidon.webserver.staticcontent.StaticContentService
+import io.helidon.webserver.websocket.WsRouting
 import org.terminal21.ui.std.SessionsServiceReceiverFactory
 
 import java.nio.file.Path
@@ -18,3 +19,9 @@ object Routes:
       .welcomeFileName("index.html")
       .build
     rb.register("/ui", staticContent)
+
+  def ws(dependencies: Dependencies): WsRouting.Builder =
+    val b = WsRouting.builder()
+    b.endpoint("/ui/session", dependencies.uiWebSocket)
+      .endpoint("/ui/sessions", dependencies.sessionsWebSocket)
+    b

@@ -4,6 +4,7 @@ import functions.fibers.FiberExecutor
 import io.helidon.logging.common.LogConfig
 import io.helidon.webserver.WebServer
 import io.helidon.webserver.http.HttpRouting
+import io.helidon.webserver.websocket.WsRouting
 import org.terminal21.config.Config
 
 @main def terminal21Server(): Unit =
@@ -18,7 +19,7 @@ import org.terminal21.config.Config
     val server = WebServer.builder
       .port(config.port)
       .routing(routesBuilder)
-      .addRouting(dependencies.uiWebSocketWsRouting)
+      .addRouting(Routes.ws(dependencies))
       .build
       .start
     try

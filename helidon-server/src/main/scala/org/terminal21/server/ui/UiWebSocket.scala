@@ -1,7 +1,6 @@
 package org.terminal21.server.ui
 
 import functions.fibers.FiberExecutor
-import io.helidon.webserver.websocket.WsRouting
 import io.helidon.websocket.{WsListener, WsSession}
 import org.slf4j.LoggerFactory
 import org.terminal21.server.json.*
@@ -41,7 +40,3 @@ class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
 
 trait UiWebSocketBeans(fiberExecutor: FiberExecutor):
   lazy val uiWebSocket = new UiWebSocket(fiberExecutor)
-
-  def uiWebSocketWsRouting: WsRouting.Builder = WsRouting
-    .builder()
-    .endpoint("/ui/session", uiWebSocket)
