@@ -11,12 +11,14 @@ import java.io.UncheckedIOException
 class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
+  override def onOpen(session: WsSession) = continuouslyRespond(session, true)
+
   private def continuouslyRespond(session: WsSession, last: Boolean) =
     fiberExecutor.submit:
       try
         var c = 0
         while true do
-          val res  = Std(Seq(Paragraph(s"$c : Hello world!")))
+          val res  = Std(Seq(Header1("Notes"), Paragraph(s"$c : Hello world!")))
           val json = WsResponse.encoder(res).noSpaces
           logger.info(s"responding with $json")
           session.send(json, last)
@@ -32,7 +34,6 @@ class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
     logger.info(s"Received json: $text")
     WsRequest.decoder(text) match
       case Right(WsRequest("init", None)) =>
-        continuouslyRespond(session, last)
         logger.info("init processed successfully")
       case x                              =>
         logger.error(s"Invalid request : $x")
