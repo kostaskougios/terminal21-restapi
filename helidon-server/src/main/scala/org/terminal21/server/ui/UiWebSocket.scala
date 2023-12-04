@@ -14,13 +14,17 @@ class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
     WsRequest.decoder(text) match
       case Right(WsRequest("init", None)) =>
         fiberExecutor.submit:
-          var c = 0
-          while true do
-            val res  = Std(Seq(Paragraph(s"$c : Hello world!")))
-            val json = WsResponse.encoder(res).noSpaces
-            logger.info(s"Got an init, responding with $json")
-            session.send(json, last)
-            Thread.sleep(2000)
-            c += 1
+          try
+            var c = 0
+            while true do
+              val res  = Std(Seq(Paragraph(s"$c : Hello world!")))
+              val json = WsResponse.encoder(res).noSpaces
+              logger.info(s"Got an init, responding with $json")
+              session.send(json, last)
+              Thread.sleep(2000)
+              c += 1
+          catch
+            case t: Throwable =>
+              logger.error("fiber error occurred", t)
       case x                              =>
         logger.error(s"Invalid request : $x")
