@@ -1,5 +1,7 @@
 package org.terminal21.server
 
-import org.terminal21.server.service.{ServerSessionsService, ServerSessionsServiceBeans}
+import functions.fibers.FiberExecutor
+import org.terminal21.server.service.ServerSessionsServiceBeans
+import org.terminal21.server.ui.UiWebSocketBeans
 
-class Dependencies extends ServerSessionsServiceBeans
+class Dependencies(fiberExecutor: FiberExecutor) extends ServerSessionsServiceBeans with UiWebSocketBeans(fiberExecutor)

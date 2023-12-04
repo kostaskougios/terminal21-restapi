@@ -1,6 +1,7 @@
 package org.terminal21.server.ui
 
 import functions.fibers.FiberExecutor
+import io.helidon.webserver.websocket.WsRouting
 import io.helidon.websocket.{WsListener, WsSession}
 import org.slf4j.LoggerFactory
 import org.terminal21.server.json.*
@@ -12,7 +13,9 @@ import java.io.UncheckedIOException
 class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
-  override def onOpen(session: WsSession) = continuouslyRespond(session, true)
+  override def onOpen(session: WsSession) =
+    logger.info(s"inOpen $session")
+    continuouslyRespond(session, true)
 
   private def continuouslyRespond(session: WsSession, last: Boolean) =
     fiberExecutor.submit:
@@ -38,3 +41,10 @@ class UiWebSocket(fiberExecutor: FiberExecutor) extends WsListener:
         logger.info("init processed successfully")
       case x                              =>
         logger.error(s"Invalid request : $x")
+
+trait UiWebSocketBeans(fiberExecutor: FiberExecutor):
+  lazy val uiWebSocket = new UiWebSocket(fiberExecutor)
+
+  def uiWebSocketWsRouting: WsRouting.Builder = WsRouting
+    .builder()
+    .endpoint("/ui/session", uiWebSocket)
