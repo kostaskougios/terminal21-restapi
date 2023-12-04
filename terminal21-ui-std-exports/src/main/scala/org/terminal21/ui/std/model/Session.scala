@@ -1,3 +1,3 @@
 package org.terminal21.ui.std.model
 
-case class Session(id: String)
+case class Session(id: String, name: String)

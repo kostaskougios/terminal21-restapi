@@ -12,7 +12,10 @@ import java.nio.file.Path
 
 @main def terminal21Server(): Unit =
   FiberExecutor.withFiberExecutor: executor =>
+    val dependencies  = new Dependencies
     val routesBuilder = HttpRouting.builder()
+    Routes.register(dependencies, routesBuilder)
+
     val staticContent = StaticContentService
       .builder(Path.of("../../terminal21-ui/build"))
       .welcomeFileName("index.html")
