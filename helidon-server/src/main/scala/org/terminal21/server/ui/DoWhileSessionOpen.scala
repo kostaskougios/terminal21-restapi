@@ -11,5 +11,6 @@ object DoWhileSessionOpen:
     try while true do f
     catch
       case s: UncheckedIOException if s.getCause.getMessage == "Socket closed" =>
+        logger.info("Socket closed")
       // ignore
       case t: Throwable                                                        => logger.error("An error occurred", t)
