@@ -15,8 +15,7 @@ class TerminalWebSocket(sessionsService: ServerSessionsService) extends WsListen
 
   private def continuouslyRespond(session: WsSession, last: Boolean, sessionId: String): Unit =
     sessionsService
-      .sessionState(sessionId)
-      .notifyMeNowAndOnChange: sessionState =>
+      .notifyMeWhenSessionChanges(sessionId): sessionState =>
         DoWhileSessionOpen.returnTrueWhileSessionOpen:
           logger.info(s"Sending ${sessionState.responses.size} events for session $sessionId")
           session.send(sessionState.responses.asJson.noSpaces, last)
