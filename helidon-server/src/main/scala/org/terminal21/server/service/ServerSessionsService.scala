@@ -39,8 +39,8 @@ class ServerSessionsService extends SessionsService:
     val oldState = sessionState(session)
     val newState = f(oldState)
     sessions += session -> newState
-    oldState.notifyChanged()
-    logger.info(s"Session $session new state $newState")
+    val listenerCount = newState.notifyChanged()
+    logger.info(s"Session $session new state $newState , listeners: $listenerCount")
 
 trait ServerSessionsServiceBeans:
   val sessionsService: ServerSessionsService = new ServerSessionsService

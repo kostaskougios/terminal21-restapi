@@ -7,7 +7,7 @@ import org.terminal21.server.ui.{SessionsWebSocketBeans, TerminalWebSocketBeans}
 
 class Dependencies(fiberExecutor: FiberExecutor)
     extends ServerSessionsServiceBeans
-    with TerminalWebSocketBeans(fiberExecutor)
+    with TerminalWebSocketBeans
     with SessionsWebSocketBeans(fiberExecutor)
     with StdUiImplBeans
     with ChakraUiImplBeans
