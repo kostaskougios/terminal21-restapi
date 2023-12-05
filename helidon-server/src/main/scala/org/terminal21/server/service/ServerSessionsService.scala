@@ -12,8 +12,12 @@ class ServerSessionsService extends SessionsService:
   private val logger = LoggerFactory.getLogger(getClass)
 
   private case class MapValue(notificationRegistry: NotificationRegistry[SessionState], sessionState: SessionState)
-
   private val sessions = collection.concurrent.TrieMap.empty[Session, MapValue]
+
+  private val sessionChangeNotificationRegistry = new NotificationRegistry[Seq[Session]]
+
+  def notifyMeWhenSessionsChange(listener: ListenerFunction[Seq[Session]]): Unit =
+    sessionChangeNotificationRegistry.addAndNotify(allSessions)(listener)
 
   override def terminateSession(session: Session): Unit =
     logger.info(s"Terminating session $session")
@@ -23,16 +27,10 @@ class ServerSessionsService extends SessionsService:
     logger.info(s"Creating session $s")
     sessions.keys.toList.foreach(s => if s.id == id then sessions.remove(s))
     sessions += s -> MapValue(new NotificationRegistry, SessionState(s))
-    notifySessionChanged()
+    sessionChangeNotificationRegistry.notifyAll(allSessions)
     s
 
   def allSessions: Seq[Session] = sessions.keySet.toList
-
-  private val waitObj                      = new Object
-  private def notifySessionChanged(): Unit = waitObj.synchronized { waitObj.notifyAll() }
-
-  def waitForSessionsChange(): Unit =
-    waitObj.synchronized { waitObj.wait() }
 
   private def mapValueOf(session: Session): MapValue =
     sessions.getOrElse(session, throw new IllegalArgumentException(s"can't find session $session"))
