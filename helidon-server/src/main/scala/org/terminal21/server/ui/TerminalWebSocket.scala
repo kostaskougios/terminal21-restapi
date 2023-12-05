@@ -16,9 +16,11 @@ class TerminalWebSocket(fiberExecutor: FiberExecutor, sessionsService: ServerSes
 
   private def continuouslyRespond(session: WsSession, last: Boolean, sessionId: String) =
     fiberExecutor.submit:
+      var alreadySend = 0
       DoWhileSessionOpen.doWhileSessionOpen:
         val sessionState = sessionsService.sessionState(sessionId)
-        for response <- sessionState.responses do session.send(response.asJson.noSpaces, last)
+        for response <- sessionState.responses.drop(alreadySend) do session.send(response.asJson.noSpaces, last)
+        alreadySend = sessionState.responses.size
         sessionState.waitChange()
 
   override def onMessage(session: WsSession, text: String, last: Boolean): Unit =
