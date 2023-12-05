@@ -4,7 +4,6 @@ import functions.fibers.FiberExecutor
 import io.helidon.logging.common.LogConfig
 import io.helidon.webserver.WebServer
 import io.helidon.webserver.http.HttpRouting
-import io.helidon.webserver.websocket.WsRouting
 import org.terminal21.config.Config
 
 @main def terminal21Server(): Unit =
@@ -27,4 +26,6 @@ import org.terminal21.config.Config
       while true do
         Thread.sleep(86400 * 1000)
         println("One more day passed...")
-    finally server.stop()
+    finally
+      println("Server stopping....")
+      server.stop()
