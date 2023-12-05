@@ -4,7 +4,9 @@ import io.circe.*
 import io.circe.generic.auto.*
 import org.terminal21.ui.std.json.StdElement
 
-sealed trait WsResponse
+sealed trait WsResponse:
+  def key: String
 
 // std react/html components
-case class Std(elements: Seq[StdElement]) extends WsResponse
+case class Std(element: StdElement) extends WsResponse:
+  override def key: String = element.key

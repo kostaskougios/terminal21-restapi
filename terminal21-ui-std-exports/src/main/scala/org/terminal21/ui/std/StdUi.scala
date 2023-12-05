@@ -6,4 +6,4 @@ import org.terminal21.ui.std.model.Session
 /** //> exported
   */
 trait StdUi:
-  def elements(session: Session, elements: Seq[StdElement]): Unit
+  def element(session: Session, element: StdElement): Unit

@@ -7,9 +7,9 @@ import org.terminal21.ui.std.json.StdElement
 import org.terminal21.ui.std.model.Session
 
 class StdUiImpl(sessionsService: ServerSessionsService) extends StdUi:
-  override def elements(session: Session, elements: Seq[StdElement]): Unit =
+  override def element(session: Session, element: StdElement): Unit =
     sessionsService.modifySessionState(session): state =>
-      state.addResponse(Std(elements))
+      state.addResponse(Std(element))
 
 trait StdUiImplBeans:
   def sessionsService: ServerSessionsService
