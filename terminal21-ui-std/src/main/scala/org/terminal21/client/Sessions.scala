@@ -20,4 +20,3 @@ object Sessions:
       f(ConnectedSession(session, transport, sessionsService))
     finally sessionsService.terminateSession(session)
 
-case class ConnectedSession(session: Session, transport: HelidonTransport, sessionsService: SessionsService)

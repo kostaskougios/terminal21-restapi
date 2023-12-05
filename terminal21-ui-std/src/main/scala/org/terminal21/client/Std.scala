@@ -6,20 +6,16 @@ import org.terminal21.ui.std.model.Session
 import org.terminal21.ui.std.{StdUi, StdUiCallerFactory}
 
 class Std(session: Session, stdUi: StdUi):
-  def paragraph(text: String): Unit =
-    paragraph(Keys.randomKey, text)
 
-  def paragraph(key: String, text: String): Unit =
+  def paragraph(text: String, key: String = Keys.randomKey): Unit =
     add(Paragraph(key, text))
 
-  def header1(text: String): Unit = header1(Keys.randomKey, text)
-
-  def header1(key: String, text: String): Unit =
+  def header1(text: String, key: String = Keys.randomKey): Unit =
     add(Header1(key, text))
 
   private def add(e: StdElement) = stdUi.element(session, e)
 
 object Std:
-  def newStd(session: ConnectedSession): Std =
+  given (ConnectedSession => Std) = session =>
     val stdUi = StdUiCallerFactory.newHelidonJsonStdUi(session.transport)
     new Std(session.session, stdUi)

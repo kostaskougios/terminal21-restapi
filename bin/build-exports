@@ -1,2 +1,2 @@
 #!/bin/sh
-sbt clean terminal21-ui-std-exports/publishLocal compile
+sbt clean terminal21-ui-exports-common/publishLocal terminal21-ui-std-exports/publishLocal compile
