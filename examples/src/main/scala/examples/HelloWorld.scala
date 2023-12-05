@@ -15,7 +15,7 @@ import java.util.UUID
     std.header1("Big news!", key = "header")
     std.paragraph(s"Hello there mr $r")
     chakra.button("Click Me!")
-    for i <- 1 to 10 do
+    for i <- 1 to 100 do
       std.paragraph(s"$r = $i", key = "progress")
       Thread.sleep(1000)
 
