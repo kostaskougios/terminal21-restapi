@@ -25,5 +25,7 @@ import java.net.URI
     sendAndReceive.send("dude")
     println("Receiving")
     println(sendAndReceive.receive)
+
+    twoWayListener.close()
     Thread.sleep(1000)
     println("terminating")

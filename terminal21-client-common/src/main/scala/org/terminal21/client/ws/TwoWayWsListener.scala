@@ -2,8 +2,10 @@ package org.terminal21.client.ws
 
 import functions.fibers.FiberExecutor
 import io.helidon.websocket.{WsListener, WsSession}
+import org.terminal21.client.ws.TwoWayWsListener.PoisonPill
 
 import java.util.concurrent.LinkedBlockingQueue
+import scala.annotation.tailrec
 
 class TwoWayWsListener(fiberExecutor: FiberExecutor) extends WsListener:
   private val toSend    = new LinkedBlockingQueue[String](64)
@@ -16,10 +18,18 @@ class TwoWayWsListener(fiberExecutor: FiberExecutor) extends WsListener:
 
   override def onOpen(session: WsSession): Unit =
     fiberExecutor.submit:
-      while true do
+      @tailrec def cont(): Unit =
         val msg = toSend.take()
-        session.send(msg, true)
+        if !msg.eq(PoisonPill) then
+          session.send(msg, true)
+          cont()
+      cont()
+
+  def close(): Unit = toSend.put(PoisonPill)
 
 class SenderAndReceiver(toSend: LinkedBlockingQueue[String], toReceive: LinkedBlockingQueue[String]):
   def send(a: String): Unit = toSend.put(a)
   def receive: String       = toReceive.take()
+
+object TwoWayWsListener:
+  val PoisonPill = "##PoisonPill##"
