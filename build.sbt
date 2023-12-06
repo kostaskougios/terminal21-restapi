@@ -83,7 +83,7 @@ lazy val `terminal21-ui-std-exports` = project
 
 lazy val `terminal21-client-common` = project
   .settings(
-    libraryDependencies ++= Seq(ScalaTest, HelidonWebClientWebSocket) ++ Circe
+    libraryDependencies ++= Seq(ScalaTest, FunctionsFibers, HelidonWebClientWebSocket) ++ Circe
   )
 
 lazy val `terminal21-ui-std` = project

@@ -1,24 +1,25 @@
 package org.terminal21.client.ws
 
+import functions.fibers.FiberExecutor
 import io.helidon.websocket.{WsListener, WsSession}
 
 import java.util.concurrent.LinkedBlockingQueue
 
-class TwoWayWsListener[A, B](toString: A => String, fromString: String => B) extends WsListener:
-  private val toSend    = new LinkedBlockingQueue[A](64)
-  private val toReceive = new LinkedBlockingQueue[B](64)
+class TwoWayWsListener(fiberExecutor: FiberExecutor) extends WsListener:
+  private val toSend    = new LinkedBlockingQueue[String](64)
+  private val toReceive = new LinkedBlockingQueue[String](64)
 
-  def senderAndReceiver: SenderAndReceiver[A, B] = new SenderAndReceiver(toSend, toReceive)
+  def senderAndReceiver: SenderAndReceiver = new SenderAndReceiver(toSend, toReceive)
 
   override def onMessage(session: WsSession, text: String, last: Boolean): Unit =
-    val b = fromString(text)
-    toReceive.put(b)
+    toReceive.put(text)
 
   override def onOpen(session: WsSession): Unit =
-    while true do
-      val msg = toSend.take()
-      session.send(toString(msg), true)
+    fiberExecutor.submit:
+      while true do
+        val msg = toSend.take()
+        session.send(msg, true)
 
-class SenderAndReceiver[A, B](toSend: LinkedBlockingQueue[A], toReceive: LinkedBlockingQueue[B]):
-  def send(a: A): Unit = toSend.put(a)
-  def receive: B       = toReceive.take()
+class SenderAndReceiver(toSend: LinkedBlockingQueue[String], toReceive: LinkedBlockingQueue[String]):
+  def send(a: String): Unit = toSend.put(a)
+  def receive: String       = toReceive.take()
