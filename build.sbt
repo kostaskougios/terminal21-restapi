@@ -81,6 +81,11 @@ lazy val `terminal21-ui-std-exports` = project
   .enablePlugins(BuildInfoPlugin)
   .dependsOn(`terminal21-ui-exports-common`)
 
+lazy val `terminal21-client-common` = project
+  .settings(
+    libraryDependencies ++= Seq(ScalaTest, HelidonWebClientWebSocket) ++ Circe
+  )
+
 lazy val `terminal21-ui-std` = project
   .settings(
     callerExports                := Seq(s"org.terminal21:terminal21-ui-std-exports_3:${version.value}"),
@@ -88,7 +93,7 @@ lazy val `terminal21-ui-std` = project
     callerHelidonClientTransport := true,
     libraryDependencies ++= Seq(ScalaTest, HelidonClient, FunctionsCaller, FunctionsHelidonClient, HelidonWebClientWebSocket) ++ Circe
   )
-  .dependsOn(`terminal21-ui-std-exports`, `terminal21-server-client-common`)
+  .dependsOn(`terminal21-ui-std-exports`, `terminal21-server-client-common`, `terminal21-client-common`)
   .enablePlugins(FunctionsRemotePlugin)
 
 lazy val examples = project
