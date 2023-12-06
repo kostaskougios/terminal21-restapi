@@ -16,10 +16,17 @@ import java.net.URI
     .build()
 
   webClient.connect("/api/client-ws", MyListener)
-  Thread.sleep(2000)
+  Thread.sleep(86400 * 1000)
   println("terminating")
 
 object MyListener extends WsListener:
+  var c                                                                   = 0
+  override def onMessage(session: WsSession, text: String, last: Boolean) =
+    println(s"Received : $text")
+    Thread.sleep(1000)
+    session.send(s"c = $c", true)
+    c += 1
+
   override def onOpen(session: WsSession) =
     println(s"onOpen: $session")
     session.send("Hello!", false)
