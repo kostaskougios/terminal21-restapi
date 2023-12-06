@@ -29,12 +29,13 @@ val Circe        = Seq(
   "io.circe" %% "circe-parser"
 ).map(_ % CirceVersion)
 
-val HelidonVersion         = "4.0.1"
-val HelidonWebServerHttp2  = "io.helidon.webserver" % "helidon-webserver-http2"          % HelidonVersion
-val HelidonWebServerStatic = "io.helidon.webserver" % "helidon-webserver-static-content" % HelidonVersion
-val HelidonWebSocket       = "io.helidon.webserver" % "helidon-webserver-websocket"      % HelidonVersion
-val HelidonClient          = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
-val HelidonServerLogging   = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
+val HelidonVersion            = "4.0.1"
+val HelidonWebServerHttp2     = "io.helidon.webserver" % "helidon-webserver-http2"          % HelidonVersion
+val HelidonWebServerStatic    = "io.helidon.webserver" % "helidon-webserver-static-content" % HelidonVersion
+val HelidonWebServerWebSocket = "io.helidon.webserver" % "helidon-webserver-websocket"      % HelidonVersion
+val HelidonWebClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websocket"      % HelidonVersion
+val HelidonClient             = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
+val HelidonServerLogging      = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
 
 val LogBack                                = Seq("ch.qos.logback" % "logback-classic" % "1.4.14")
 // -----------------------------------------------------------------------------------------------
@@ -55,7 +56,7 @@ lazy val `helidon-server` = project
       FunctionsHelidonServer,
       ScalaTest,
       HelidonWebServerHttp2,
-      HelidonWebSocket,
+      HelidonWebServerWebSocket,
       HelidonWebServerStatic,
       FunctionsHelidonServer,
       FunctionsFibers,
@@ -85,7 +86,7 @@ lazy val `terminal21-ui-std` = project
     callerExports                := Seq(s"org.terminal21:terminal21-ui-std-exports_3:${version.value}"),
     callerJsonSerialization      := true,
     callerHelidonClientTransport := true,
-    libraryDependencies ++= Seq(ScalaTest, HelidonClient, FunctionsCaller, FunctionsHelidonClient) ++ Circe
+    libraryDependencies ++= Seq(ScalaTest, HelidonClient, FunctionsCaller, FunctionsHelidonClient, HelidonWebClientWebSocket) ++ Circe
   )
   .dependsOn(`terminal21-ui-std-exports`, `terminal21-server-client-common`)
   .enablePlugins(FunctionsRemotePlugin)

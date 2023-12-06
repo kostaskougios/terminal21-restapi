@@ -3,8 +3,7 @@ package org.terminal21.client
 import functions.helidon.transport.HelidonTransport
 import io.helidon.webclient.api.WebClient
 import org.terminal21.config.Config
-import org.terminal21.ui.std.model.Session
-import org.terminal21.ui.std.{SessionsService, SessionsServiceCallerFactory}
+import org.terminal21.ui.std.SessionsServiceCallerFactory
 
 object Sessions:
   def withNewSession[R](id: String, name: String)(f: ConnectedSession => R): R =
@@ -19,4 +18,3 @@ object Sessions:
     try
       f(ConnectedSession(session, transport, sessionsService))
     finally sessionsService.terminateSession(session)
-

@@ -1,6 +1,5 @@
 package org.terminal21.server
 
-import functions.fibers.FiberExecutor
 import io.helidon.logging.common.LogConfig
 import io.helidon.webserver.WebServer
 import io.helidon.webserver.http.HttpRouting
