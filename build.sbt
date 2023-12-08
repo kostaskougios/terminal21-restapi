@@ -29,13 +29,13 @@ val Circe        = Seq(
   "io.circe" %% "circe-parser"
 ).map(_ % CirceVersion)
 
-val HelidonVersion            = "4.0.1"
-val HelidonWebServerHttp2     = "io.helidon.webserver" % "helidon-webserver-http2"          % HelidonVersion
-val HelidonWebServerStatic    = "io.helidon.webserver" % "helidon-webserver-static-content" % HelidonVersion
-val HelidonWebServerWebSocket = "io.helidon.webserver" % "helidon-webserver-websocket"      % HelidonVersion
-val HelidonWebClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websocket"      % HelidonVersion
-val HelidonClient             = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
-val HelidonServerLogging      = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
+val HelidonVersion         = "4.0.1"
+val HelidonWebServerHttp2  = "io.helidon.webserver" % "helidon-webserver-http2"          % HelidonVersion
+val HelidonWebServerStatic = "io.helidon.webserver" % "helidon-webserver-static-content" % HelidonVersion
+val HelidonServerWebSocket = "io.helidon.webserver" % "helidon-webserver-websocket"      % HelidonVersion
+val HelidonClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websocket"      % HelidonVersion
+val HelidonClient          = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
+val HelidonServerLogging   = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
 
 val LogBack                                = Seq("ch.qos.logback" % "logback-classic" % "1.4.14")
 // -----------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ lazy val `helidon-server` = project
       FunctionsHelidonServer,
       ScalaTest,
       HelidonWebServerHttp2,
-      HelidonWebServerWebSocket,
+      HelidonServerWebSocket,
       HelidonWebServerStatic,
       FunctionsHelidonServer,
       FunctionsFibers,
@@ -83,7 +83,7 @@ lazy val `terminal21-ui-std-exports` = project
 
 lazy val `terminal21-client-common` = project
   .settings(
-    libraryDependencies ++= Seq(ScalaTest, FunctionsFibers, HelidonWebClientWebSocket) ++ Circe
+    libraryDependencies ++= Seq(ScalaTest, FunctionsFibers, HelidonClientWebSocket) ++ Circe
   )
 
 lazy val `terminal21-ui-std` = project
@@ -91,7 +91,7 @@ lazy val `terminal21-ui-std` = project
     callerExports                := Seq(s"org.terminal21:terminal21-ui-std-exports_3:${version.value}"),
     callerJsonSerialization      := true,
     callerHelidonClientTransport := true,
-    libraryDependencies ++= Seq(ScalaTest, HelidonClient, FunctionsCaller, FunctionsHelidonClient, HelidonWebClientWebSocket) ++ Circe
+    libraryDependencies ++= Seq(ScalaTest, HelidonClient, FunctionsCaller, FunctionsHelidonClient, HelidonClientWebSocket) ++ Circe
   )
   .dependsOn(`terminal21-ui-std-exports`, `terminal21-server-client-common`, `terminal21-client-common`)
   .enablePlugins(FunctionsRemotePlugin)

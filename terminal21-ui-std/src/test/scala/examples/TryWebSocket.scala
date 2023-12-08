@@ -6,6 +6,7 @@ import org.terminal21.client.ws.TwoWayWsListener
 import org.terminal21.config.Config
 
 import java.net.URI
+import scala.util.Using
 
 @main def tryWebSocket(): Unit =
   FiberExecutor.withFiberExecutor: executor =>
@@ -17,15 +18,15 @@ import java.net.URI
       .baseUri(uri)
       .build()
 
-    val twoWayListener = new TwoWayWsListener(executor)
-    webClient.connect("/api/client-ws", twoWayListener)
+    Using.resource(new TwoWayWsListener(executor)): twoWayListener =>
+      webClient.connect("/api/client-ws", twoWayListener)
 
-    val sendAndReceive = twoWayListener.senderAndReceiver
-    println("Sending")
-    sendAndReceive.send("dude")
-    println("Receiving")
-    println(sendAndReceive.receive)
+      val sendAndReceive = twoWayListener.senderAndReceiver
+      println("Sending")
+      sendAndReceive.send("dude")
+      println("Receiving")
+      println(sendAndReceive.receive)
 
-    twoWayListener.close()
-    Thread.sleep(1000)
-    println("terminating")
+      twoWayListener.close()
+      Thread.sleep(1000)
+      println("terminating")

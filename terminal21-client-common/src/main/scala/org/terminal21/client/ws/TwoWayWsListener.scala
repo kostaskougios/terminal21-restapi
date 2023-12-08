@@ -6,6 +6,7 @@ import org.terminal21.client.ws.TwoWayWsListener.PoisonPill
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.annotation.tailrec
+import scala.util.Using.Releasable
 
 class TwoWayWsListener(fiberExecutor: FiberExecutor) extends WsListener:
   private val toSend    = new LinkedBlockingQueue[String](64)
@@ -33,3 +34,5 @@ class SenderAndReceiver(toSend: LinkedBlockingQueue[String], toReceive: LinkedBl
 
 object TwoWayWsListener:
   val PoisonPill = "##PoisonPill##"
+
+  given Releasable[TwoWayWsListener] = twl => twl.close()
