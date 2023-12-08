@@ -26,7 +26,7 @@ class ServerSessionsService extends SessionsService:
     val s = Session(id, name, UUID.randomUUID().toString)
     logger.info(s"Creating session $s")
     sessions.keys.toList.foreach(s => if s.id == id then sessions.remove(s))
-    sessions += s -> MapValue(new NotificationRegistry, SessionState(s))
+    sessions += s -> MapValue(new NotificationRegistry, SessionState("""{ "elements" : [] }"""))
     sessionChangeNotificationRegistry.notifyAll(allSessions)
     s
 
@@ -46,13 +46,13 @@ class ServerSessionsService extends SessionsService:
     val mv = sessionMapValue(sessionId)
     mv.notificationRegistry.addAndNotify(mv.sessionState)(f)
 
-  def modifySessionState(session: Session)(f: SessionState => SessionState): Unit =
+  override def setSessionJsonState(session: Session, newStateJson: String): Unit =
     val oldV     = mapValueOf(session)
-    val newState = f(oldV.sessionState)
+    val newState = SessionState(newStateJson)
     val newV     = oldV.copy(sessionState = newState)
     sessions += session -> newV
     val listenerCount = newV.notificationRegistry.notifyAll(newState)
-    logger.info(s"Session $session new state $newState , listeners: $listenerCount")
+    logger.info(s"Session $session new state $newStateJson , listeners: $listenerCount")
 
 trait ServerSessionsServiceBeans:
   val sessionsService: ServerSessionsService = new ServerSessionsService

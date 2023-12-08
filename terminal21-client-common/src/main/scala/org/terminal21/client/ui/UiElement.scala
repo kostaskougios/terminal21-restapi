@@ -1,4 +1,4 @@
-package org.terminal21.ui.common
+package org.terminal21.client.ui
 
 trait UiElement:
   def key: String

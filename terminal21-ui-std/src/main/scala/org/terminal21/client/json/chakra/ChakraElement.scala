@@ -1,6 +1,6 @@
-package org.terminal21.ui.std.json.chakra
+package org.terminal21.client.json.chakra
 
-import org.terminal21.ui.common.UiElement
+import org.terminal21.client.ui.UiElement
 
 sealed trait ChakraElement extends UiElement
 

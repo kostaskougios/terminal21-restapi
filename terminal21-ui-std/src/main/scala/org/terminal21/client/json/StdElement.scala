@@ -1,6 +1,6 @@
-package org.terminal21.ui.std.json
+package org.terminal21.client.json
 
-import org.terminal21.ui.common.UiElement
+import org.terminal21.client.ui.UiElement
 
 sealed trait StdElement extends UiElement
 

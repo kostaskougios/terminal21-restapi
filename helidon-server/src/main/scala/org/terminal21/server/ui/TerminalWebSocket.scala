@@ -2,12 +2,10 @@ package org.terminal21.server.ui
 
 import io.circe.*
 import io.circe.generic.auto.*
-import io.circe.syntax.*
 import io.helidon.websocket.{WsListener, WsSession}
 import org.slf4j.LoggerFactory
 import org.terminal21.server.json.*
 import org.terminal21.server.service.ServerSessionsService
-import org.terminal21.ui.std.json.{Header1, Paragraph}
 
 // websocket: https://helidon.io/docs/v4/#/se/websocket
 class TerminalWebSocket(sessionsService: ServerSessionsService) extends WsListener:
@@ -17,8 +15,8 @@ class TerminalWebSocket(sessionsService: ServerSessionsService) extends WsListen
     sessionsService
       .notifyMeWhenSessionChanges(sessionId): sessionState =>
         DoWhileSessionOpen.returnTrueWhileSessionOpen:
-          logger.info(s"Sending ${sessionState.responses.size} events for session $sessionId")
-          session.send(sessionState.responses.asJson.noSpaces, last)
+          logger.info(s"Sending session state for session $sessionId")
+          session.send(sessionState.json, last)
 
   override def onMessage(session: WsSession, text: String, last: Boolean): Unit =
     try
