@@ -18,11 +18,13 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
 
   private var elements = List.empty[UiElement]
 
-  def add(e: UiElement): Unit = synchronized:
-    if elements.exists(_.key == e.key) then
-      elements.map: el =>
-        if el.key == e.key then e else el
-    else elements = e :: elements
+  def add(e: UiElement): Unit =
+    synchronized:
+      elements =
+        if elements.exists(_.key == e.key) then
+          elements.map: el =>
+            if el.key == e.key then e else el
+        else e :: elements
     send()
 
   private def send(): Unit =
@@ -31,8 +33,9 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
 
   private def toJson: JsonObject =
     val usingLibsCopy = synchronized(usingLibs)
+    val elementsCopy  = synchronized(elements).reverse
     val json          = for
-      e   <- elements
+      e   <- elementsCopy
       lib <- usingLibsCopy
       j   <- lib.toJson(e)
     yield j
