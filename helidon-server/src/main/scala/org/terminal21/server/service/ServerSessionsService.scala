@@ -1,10 +1,10 @@
 package org.terminal21.server.service
 
 import org.slf4j.LoggerFactory
+import org.terminal21.model.Session
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.utils.{ListenerFunction, NotificationRegistry}
 import org.terminal21.ui.std.SessionsService
-import org.terminal21.ui.std.model.Session
 
 import java.util.UUID
 

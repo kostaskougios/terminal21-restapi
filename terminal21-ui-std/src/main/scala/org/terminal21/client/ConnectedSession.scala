@@ -1,8 +1,7 @@
 package org.terminal21.client
 
 import functions.helidon.transport.HelidonTransport
-import org.terminal21.ui.std.SessionsService
-import org.terminal21.ui.std.model.Session
+import org.terminal21.model.Session
 
-case class ConnectedSession(session: Session, transport: HelidonTransport, sessionsService: SessionsService):
+class ConnectedSession(val session: Session, val transport: HelidonTransport):
   def use[T](using factory: ConnectedSession => T): T = factory(this)

@@ -79,12 +79,13 @@ lazy val `terminal21-ui-std-exports` = project
     buildInfoPackage := "org.terminal21.ui.std"
   )
   .enablePlugins(BuildInfoPlugin)
-  .dependsOn(`terminal21-ui-exports-common`)
+  .dependsOn(`terminal21-ui-exports-common`, `terminal21-server-client-common`)
 
 lazy val `terminal21-client-common` = project
   .settings(
     libraryDependencies ++= Seq(ScalaTest, FunctionsFibers, HelidonClientWebSocket) ++ Circe
   )
+  .dependsOn(`terminal21-server-client-common`)
 
 lazy val `terminal21-ui-std` = project
   .settings(

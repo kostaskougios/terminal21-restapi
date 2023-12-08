@@ -16,5 +16,5 @@ object Sessions:
     val sessionsService = SessionsServiceCallerFactory.newHelidonJsonSessionsService(transport)
     val session         = sessionsService.createSession(id, name)
     try
-      f(ConnectedSession(session, transport, sessionsService))
+      f(ConnectedSession(session, transport))
     finally sessionsService.terminateSession(session)

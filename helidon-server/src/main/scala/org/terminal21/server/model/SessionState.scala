@@ -1,7 +1,7 @@
 package org.terminal21.server.model
 
+import org.terminal21.model.Session
 import org.terminal21.server.json.WsResponse
-import org.terminal21.ui.std.model.Session
 
 case class SessionState(
     session: Session,
