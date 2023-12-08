@@ -1,6 +1,7 @@
 package org.terminal21.common
 
-import java.util.UUID
+import java.util.concurrent.atomic.AtomicInteger
 
 object Keys:
-  def randomKey: String = UUID.randomUUID().toString
+  private val keyId   = new AtomicInteger(0)
+  def nextKey: String = s"key${keyId.incrementAndGet()}"

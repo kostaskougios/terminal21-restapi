@@ -8,7 +8,7 @@ import org.terminal21.client.ui.{UiElement, UiLib}
 import org.terminal21.common.Keys
 
 class Chakra(session: ConnectedSession) extends UiLib:
-  def button(text: String, key: String = Keys.randomKey): Unit =
+  def button(text: String, key: String = Keys.nextKey): Unit =
     session.add(Button(key, text))
 
   override def toJson(e: UiElement) = e match

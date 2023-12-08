@@ -8,10 +8,10 @@ import org.terminal21.client.ui.{UiElement, UiLib}
 import org.terminal21.common.Keys
 
 class Std(session: ConnectedSession) extends UiLib:
-  def paragraph(text: String, key: String = Keys.randomKey): Unit =
+  def paragraph(text: String, key: String = Keys.nextKey): Unit =
     session.add(Paragraph(key, text))
 
-  def header1(text: String, key: String = Keys.randomKey): Unit =
+  def header1(text: String, key: String = Keys.nextKey): Unit =
     session.add(Header1(key, text))
 
   override def toJson(e: UiElement) = e match
