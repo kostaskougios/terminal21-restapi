@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 
 import java.io.UncheckedIOException
 
-object DoWhileSessionOpen:
+object WsSessionOps:
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   def returnTrueWhileSessionOpen(f: => Unit): Boolean =

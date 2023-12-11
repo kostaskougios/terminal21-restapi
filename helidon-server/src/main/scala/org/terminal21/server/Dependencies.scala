@@ -1,6 +1,6 @@
 package org.terminal21.server
 
 import org.terminal21.server.service.{ClientWebSocketBeans, ServerSessionsServiceBeans}
-import org.terminal21.server.ui.{SessionsWebSocketBeans, TerminalWebSocketBeans}
+import org.terminal21.server.ui.SessionsWebSocketBeans
 
-class Dependencies extends ServerSessionsServiceBeans with TerminalWebSocketBeans with SessionsWebSocketBeans with ClientWebSocketBeans
+class Dependencies extends ServerSessionsServiceBeans with SessionsWebSocketBeans with ClientWebSocketBeans
