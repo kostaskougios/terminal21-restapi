@@ -22,5 +22,5 @@ object Routes:
   def ws(dependencies: Dependencies): WsRouting.Builder =
     val b = WsRouting.builder()
     b.endpoint("/ui/sessions", dependencies.sessionsWebSocket)
-      .endpoint("/api/client-ws", dependencies.clientWebSocket)
+      .endpoint("/api/client-ws", dependencies.commandWebSocket)
     b
