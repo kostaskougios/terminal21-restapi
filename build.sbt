@@ -13,13 +13,15 @@ ThisBuild / scalacOptions ++= Seq("-unchecked", "-feature", "-deprecation")
 // Dependencies
 // -----------------------------------------------------------------------------------------------
 
-val FunctionsVersion       = "0.1-SNAPSHOT"
-val FunctionsCaller        = "org.functions-remote" %% "functions-caller"   % FunctionsVersion
-val FunctionsReceiver      = "org.functions-remote" %% "functions-receiver" % FunctionsVersion
-val FunctionsAvro          = "org.functions-remote" %% "functions-avro"     % FunctionsVersion
-val FunctionsHelidonServer = "org.functions-remote" %% "helidon-server"     % FunctionsVersion
-val FunctionsHelidonClient = "org.functions-remote" %% "helidon-client"     % FunctionsVersion
-val FunctionsFibers        = "org.functions-remote" %% "fibers"             % FunctionsVersion
+val FunctionsVersion         = "0.1-SNAPSHOT"
+val FunctionsCaller          = "org.functions-remote" %% "functions-caller"   % FunctionsVersion
+val FunctionsReceiver        = "org.functions-remote" %% "functions-receiver" % FunctionsVersion
+val FunctionsAvro            = "org.functions-remote" %% "functions-avro"     % FunctionsVersion
+val FunctionsHelidonServer   = "org.functions-remote" %% "helidon-server"     % FunctionsVersion
+val FunctionsHelidonWsServer = "org.functions-remote" %% "helidon-ws-server"  % FunctionsVersion
+val FunctionsHelidonClient   = "org.functions-remote" %% "helidon-client"     % FunctionsVersion
+val FunctionsHelidonWsClient = "org.functions-remote" %% "helidon-ws-client"  % FunctionsVersion
+val FunctionsFibers          = "org.functions-remote" %% "fibers"             % FunctionsVersion
 
 val ScalaTest    = "org.scalatest" %% "scalatest" % "3.2.15" % Test
 val CirceVersion = "0.14.6"
@@ -59,6 +61,7 @@ lazy val `helidon-server` = project
       HelidonServerWebSocket,
       HelidonWebServerStatic,
       FunctionsHelidonServer,
+      FunctionsHelidonWsServer,
       FunctionsFibers,
       HelidonServerLogging % Test
     ) ++ Circe ++ LogBack
@@ -87,7 +90,7 @@ lazy val `terminal21-ui-std` = project
     callerExports                := Seq(s"org.terminal21:terminal21-ui-std-exports_3:${version.value}"),
     callerJsonSerialization      := true,
     callerHelidonClientTransport := true,
-    libraryDependencies ++= Seq(ScalaTest, HelidonClient, FunctionsCaller, FunctionsHelidonClient, HelidonClientWebSocket) ++ Circe
+    libraryDependencies ++= Seq(ScalaTest, HelidonClient, FunctionsCaller, FunctionsHelidonClient, FunctionsHelidonWsClient, HelidonClientWebSocket) ++ Circe
   )
   .dependsOn(`terminal21-ui-std-exports`, `terminal21-server-client-common`, `terminal21-client-common`)
   .enablePlugins(FunctionsRemotePlugin)
