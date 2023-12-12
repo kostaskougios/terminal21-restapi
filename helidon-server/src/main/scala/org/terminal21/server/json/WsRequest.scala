@@ -8,7 +8,10 @@ case class WsRequest(operation: String, body: Option[Body])
 
 sealed trait Body
 
-case class OnClick(sessionId: String, key: String) extends Body
+sealed trait UiEvent extends Body:
+  def sessionId: String
+
+case class OnClick(sessionId: String, key: String) extends UiEvent
 
 object WsRequest:
   val decoder = decode[WsRequest]

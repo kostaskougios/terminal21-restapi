@@ -2,10 +2,12 @@ package org.terminal21.server.service
 
 import io.helidon.websocket.{WsListener, WsSession}
 
-class ClientWebSocket extends WsListener:
-  override def onMessage(session: WsSession, text: String, last: Boolean): Unit =
-    println(s"got [$text] , $last")
-    session.send(s"ok got $text", true)
+class ClientWebSocket(serverSessionsService: ServerSessionsService) extends WsListener:
+  override def onMessage(wsSession: WsSession, text: String, last: Boolean): Unit =
+    text.split(":") match
+      case Array("subscribe", sessionId) =>
+//        serverSessionsService.subscribeToSessionEvents(sessionId)
 
 trait ClientWebSocketBeans:
-  lazy val clientWebSocket = new ClientWebSocket
+  def sessionsService: ServerSessionsService
+  lazy val clientWebSocket = new ClientWebSocket(sessionsService)

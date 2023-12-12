@@ -1,3 +1,10 @@
 package org.terminal21.server.model
 
-case class SessionState(json: String)
+import org.terminal21.model.CommandEvent
+import org.terminal21.server.utils.NotificationRegistry
+
+case class SessionState(
+    json: String,
+    eventsNotificationRegistry: NotificationRegistry[CommandEvent]
+):
+  def withNewState(newJson: String): SessionState = copy(json = newJson)
