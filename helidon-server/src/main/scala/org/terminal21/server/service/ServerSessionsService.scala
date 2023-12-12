@@ -1,7 +1,7 @@
 package org.terminal21.server.service
 
 import org.slf4j.LoggerFactory
-import org.terminal21.model.{OnClick, Session}
+import org.terminal21.model.{CommandEvent, OnClick, Session}
 import org.terminal21.server.json.UiEvent
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.utils.{ListenerFunction, NotificationRegistry}
@@ -55,6 +55,10 @@ class ServerSessionsService extends SessionsService:
     val session = sessionById(event.sessionId)
     val state   = sessions(session)
     state.eventsNotificationRegistry.notifyAll(e)
+
+  def notifyMeOnSessionEvents(session: Session)(listener: ListenerFunction[CommandEvent]) =
+    val state = sessions(session)
+    state.eventsNotificationRegistry.add(listener)
 
 trait ServerSessionsServiceBeans:
   val sessionsService: ServerSessionsService = new ServerSessionsService

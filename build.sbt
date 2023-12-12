@@ -9,6 +9,8 @@ name                     := "rest-api"
 ThisBuild / scalaVersion := scala3Version
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-feature", "-deprecation")
 
+ThisBuild / resolvers += "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository"
+
 // -----------------------------------------------------------------------------------------------
 // Dependencies
 // -----------------------------------------------------------------------------------------------
@@ -35,7 +37,7 @@ val HelidonVersion         = "4.0.1"
 val HelidonWebServerHttp2  = "io.helidon.webserver" % "helidon-webserver-http2"          % HelidonVersion
 val HelidonWebServerStatic = "io.helidon.webserver" % "helidon-webserver-static-content" % HelidonVersion
 val HelidonServerWebSocket = "io.helidon.webserver" % "helidon-webserver-websocket"      % HelidonVersion
-val HelidonClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websocket"      % HelidonVersion
+val HelidonClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websocket"      % "4.0.2-SNAPSHOT"
 val HelidonClient          = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
 val HelidonServerLogging   = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
 

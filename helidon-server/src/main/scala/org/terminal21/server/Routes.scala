@@ -20,7 +20,7 @@ object Routes:
     rb.register("/ui", staticContent)
 
   def ws(dependencies: Dependencies): WsRouting.Builder =
-    val b = WsRouting.builder()
+    val b = WsRouting.builder
     b.endpoint("/ui/sessions", dependencies.sessionsWebSocket)
-      .endpoint("/api/client-ws", dependencies.commandWebSocket)
+      .endpoint("/api/command-ws", dependencies.commandWebSocket)
     b
