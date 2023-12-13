@@ -15,3 +15,19 @@ case class Box(key: String = Keys.nextKey, var text: String = "", var props: Cha
   def withChildren(cn: UiElement*): Box =
     children = cn
     this
+
+case class SimpleGrid(
+    key: String = Keys.nextKey,
+    var spacing: String = "",
+    var spacingX: String = "",
+    var spacingY: String = "",
+    var columns: Int = 2,
+    var children: Seq[UiElement] = Nil
+) extends ChakraElement:
+  def withChildren(cn: UiElement*) =
+    children = cn
+    this
+
+  def addChildren(e: UiElement*) =
+    children = children ++ e
+    this
