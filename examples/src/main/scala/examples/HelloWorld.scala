@@ -1,12 +1,12 @@
 package examples
 
+import org.slf4j.LoggerFactory
 import org.terminal21.client.{Chakra, Sessions, Std}
 
 import java.util.UUID
-import java.util.logging.Logger
 
 @main def helloWorld(): Unit =
-  val logger = Logger.getLogger(getClass.getName)
+  val logger = LoggerFactory.getLogger(getClass)
   val r      = UUID.randomUUID().toString.substring(0, 4)
   logger.info(s"Session unique id = $r")
   Sessions.withNewSession(s"hello-world-$r", s"Hello World $r"): session =>

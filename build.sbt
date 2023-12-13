@@ -41,7 +41,8 @@ val HelidonClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websock
 val HelidonClient          = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
 val HelidonServerLogging   = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
 
-val LogBack                                = Seq("ch.qos.logback" % "logback-classic" % "1.4.14")
+val LogBack                                = "ch.qos.logback" % "logback-classic" % "1.4.14"
+val Slf4jApi                               = "org.slf4j"      % "slf4j-api"       % "2.0.9"
 // -----------------------------------------------------------------------------------------------
 // Modules
 // -----------------------------------------------------------------------------------------------
@@ -65,8 +66,9 @@ lazy val `helidon-server` = project
       FunctionsHelidonServer,
       FunctionsHelidonWsServer,
       FunctionsFibers,
-      HelidonServerLogging % Test
-    ) ++ Circe ++ LogBack
+      HelidonServerLogging % Test,
+      LogBack
+    ) ++ Circe
   )
   .dependsOn(`terminal21-ui-std-exports`, `terminal21-server-client-common`)
   .enablePlugins(FunctionsRemotePlugin)
@@ -92,13 +94,21 @@ lazy val `terminal21-ui-std` = project
     callerExports                := Seq(s"org.terminal21:terminal21-ui-std-exports_3:${version.value}"),
     callerJsonSerialization      := true,
     callerHelidonClientTransport := true,
-    libraryDependencies ++= Seq(ScalaTest, HelidonClient, FunctionsCaller, FunctionsHelidonClient, FunctionsHelidonWsClient, HelidonClientWebSocket) ++ Circe
+    libraryDependencies ++= Seq(
+      ScalaTest,
+      Slf4jApi,
+      HelidonClient,
+      FunctionsCaller,
+      FunctionsHelidonClient,
+      FunctionsHelidonWsClient,
+      HelidonClientWebSocket
+    ) ++ Circe
   )
   .dependsOn(`terminal21-ui-std-exports`, `terminal21-server-client-common`, `terminal21-client-common`)
   .enablePlugins(FunctionsRemotePlugin)
 
 lazy val examples = project
   .settings(
-    libraryDependencies ++= Seq(ScalaTest)
+    libraryDependencies ++= Seq(ScalaTest, LogBack)
   )
   .dependsOn(`terminal21-ui-std`)
