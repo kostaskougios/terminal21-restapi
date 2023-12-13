@@ -19,9 +19,10 @@ object Sessions:
       .baseUri(s"ws://${config.host}:${config.port}")
       .build
 
-    val eventsWsListener = new EventsWsListener(session)
+    val connectedSession = ConnectedSession(session, sessionsService)
+    val eventsWsListener = new EventsWsListener(connectedSession)
     wsClient.connect("/api/command-ws", eventsWsListener)
 
-    try
-      f(ConnectedSession(session, sessionsService))
-    finally sessionsService.terminateSession(session)
+    try {
+      f(connectedSession)
+    } finally sessionsService.terminateSession(session)

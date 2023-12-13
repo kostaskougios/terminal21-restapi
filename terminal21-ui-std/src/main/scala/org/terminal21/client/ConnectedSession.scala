@@ -4,7 +4,7 @@ import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.terminal21.client.ui.{UiElement, UiLib}
-import org.terminal21.model.Session
+import org.terminal21.model.{CommandEvent, OnClick, Session}
 import org.terminal21.ui.std.SessionsService
 
 class ConnectedSession(val session: Session, sessionsService: SessionsService):
@@ -26,6 +26,18 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
             if el.key == e.key then e else el
         else e :: elements
     send()
+
+  private val eventHandlers = collection.concurrent.TrieMap.empty[String, EventHandler]
+
+  def add(key: String, handler: EventHandler): Unit =
+    if eventHandlers.contains(key) then throw new IllegalArgumentException(s"There is already an event handler for $key")
+    eventHandlers += key -> handler
+
+  def fireEvent(event: CommandEvent): Unit =
+    eventHandlers.get(event.key) match
+      case Some(handler) =>
+        (event, handler) match
+          case (e: OnClick, h: OnClickEventHandler) => h.onClick()
 
   private def send(): Unit =
     val j = toJson
