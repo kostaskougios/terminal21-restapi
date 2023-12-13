@@ -11,7 +11,7 @@ case class Button(key: String = Keys.nextKey, text: String) extends ChakraElemen
     session.addEventHandler(key, h)
     this
 
-case class Box(key: String = Keys.nextKey, var text: String, var props: ChakraProps, var children: Seq[UiElement] = Nil) extends ChakraElement:
+case class Box(key: String = Keys.nextKey, var text: String = "", var props: ChakraProps, var children: Seq[UiElement] = Nil) extends ChakraElement:
   def withChildren(cn: UiElement*): Box =
     children = cn
     this

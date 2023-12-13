@@ -1,7 +1,7 @@
 package examples
 
 import org.terminal21.client.json.chakra.{Box, Button, ChakraProps}
-import org.terminal21.client.json.{Header1, Paragraph}
+import org.terminal21.client.json.{Header1, NewLine, Paragraph, Text}
 import org.terminal21.client.{ConnectedSession, Sessions}
 
 import java.util.UUID
@@ -12,7 +12,7 @@ import java.util.UUID
     given ConnectedSession = session
     println(session.session.id)
 
-    val h1 = Header1(key = "header", text = "Big news!")
+    val h1 = Header1(key = "header", text = "Welcome to the Hello World Program!")
     val b1 = Box(text = "First box", props = ChakraProps(bg = "green", p = 4, color = "black"))
     b1.withChildren(
       Button(text = "Click me!").onClick: () =>
@@ -23,12 +23,14 @@ import java.util.UUID
       b1,
       Box(text = "Second box", props = ChakraProps(bg = "tomato", p = 4, color = "black"))
     )
-    session.add(h1, p1)
+    val p2 = Paragraph()
+    session.add(h1, p1, p2)
     session.renderChanges()
 
     for i <- 1 to 25 do
       Thread.sleep(1000)
       p1.text = s"i = $i"
+      p2.addChildren(Text(text = s"counting i = $i"), NewLine())
       session.renderChanges()
 
     h1.text = "Done!"
