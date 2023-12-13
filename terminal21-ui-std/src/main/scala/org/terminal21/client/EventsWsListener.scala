@@ -16,7 +16,6 @@ class EventsWsListener(session: ConnectedSession) extends WsListener:
       case Left(e)      =>
         logger.error(s"An invalid json was received as an event. json=$text , error = $e")
       case Right(event) =>
-        logger.info(s"Firing event $event")
         session.fireEvent(event)
 
   override def onOpen(wsSession: WsSession): Unit =
