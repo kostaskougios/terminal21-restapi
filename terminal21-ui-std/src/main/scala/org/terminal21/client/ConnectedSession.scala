@@ -21,14 +21,9 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
 
   private var elements = List.empty[UiElement]
 
-  def add(e: UiElement): Unit =
+  def add(es: UiElement*): Unit =
     synchronized:
-      elements =
-        if elements.exists(_.key == e.key) then
-          elements.map: el =>
-            if el.key == e.key then e else el
-        else e :: elements
-    send()
+      elements = es.toList ::: elements
 
   private val eventHandlers = collection.concurrent.TrieMap.empty[String, EventHandler]
 
@@ -45,12 +40,12 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
       case None          =>
         logger.warn(s"There is no event handler for event $event")
 
-  private def send(): Unit =
+  def renderChanges(): Unit =
     val j = toJson
     sessionsService.setSessionJsonState(session, j.toJson.noSpaces)
 
   private def toJson: JsonObject =
-    val elementsCopy = synchronized(elements).reverse
+    val elementsCopy = synchronized(elements)
     val json         =
       for e <- elementsCopy
       yield e.asJson
