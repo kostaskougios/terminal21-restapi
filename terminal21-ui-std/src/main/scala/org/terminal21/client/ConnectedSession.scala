@@ -4,6 +4,7 @@ import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.slf4j.LoggerFactory
+import org.terminal21.client.json.UiElementEncoding.uiElementEncoder
 import org.terminal21.client.ui.{UiElement, UiLib}
 import org.terminal21.model.{CommandEvent, OnClick, Session}
 import org.terminal21.ui.std.SessionsService
@@ -49,11 +50,8 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
     sessionsService.setSessionJsonState(session, j.toJson.noSpaces)
 
   private def toJson: JsonObject =
-    val usingLibsCopy = synchronized(usingLibs)
-    val elementsCopy  = synchronized(elements).reverse
-    val json          = for
-      e   <- elementsCopy
-      lib <- usingLibsCopy
-      j   <- lib.toJson(e)
-    yield j
+    val elementsCopy = synchronized(elements).reverse
+    val json         =
+      for e <- elementsCopy
+      yield e.asJson
     JsonObject(("elements", json.asJson))

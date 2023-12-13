@@ -20,7 +20,7 @@ import java.util.UUID
 
     chakra.box("This is a box", props = ChakraProps(bg = "green", p = 4, color = "black"))
 
-    for i <- 1 to 1 do
+    for i <- 1 to 10 do
       std.paragraph(s"$r = $i", key = "progress")
       Thread.sleep(1000)
 
