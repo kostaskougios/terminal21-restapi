@@ -31,7 +31,7 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
 
   private val eventHandlers = collection.concurrent.TrieMap.empty[String, EventHandler]
 
-  def add(key: String, handler: EventHandler): Unit =
+  def addEventHandler(key: String, handler: EventHandler): Unit =
     if eventHandlers.contains(key) then throw new IllegalArgumentException(s"There is already an event handler for $key")
     eventHandlers += key -> handler
 

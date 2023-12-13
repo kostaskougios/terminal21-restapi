@@ -1,5 +1,6 @@
 package examples
 
+import org.terminal21.client.json.chakra.ChakraProps
 import org.terminal21.client.{Chakra, Sessions, Std}
 
 import java.util.UUID
@@ -17,7 +18,9 @@ import java.util.UUID
     chakra.button("Click Me!"): () =>
       std.paragraph(s"Button clicked", key = "status")
 
-    for i <- 1 to 100 do
+    chakra.box("This is a box", props = ChakraProps(bg = "green", p = 4, color = "black"))
+
+    for i <- 1 to 1 do
       std.paragraph(s"$r = $i", key = "progress")
       Thread.sleep(1000)
 
