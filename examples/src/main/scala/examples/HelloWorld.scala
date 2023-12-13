@@ -1,27 +1,32 @@
 package examples
 
-import org.terminal21.client.Sessions
 import org.terminal21.client.json.chakra.{Box, Button, ChakraProps}
 import org.terminal21.client.json.{Header1, Paragraph}
+import org.terminal21.client.{ConnectedSession, Sessions}
 
 import java.util.UUID
 
 @main def helloWorld(): Unit =
   val r = UUID.randomUUID().toString.substring(0, 4)
   Sessions.withNewSession(s"hello-world-$r", s"Hello World $r"): session =>
+    given ConnectedSession = session
     println(session.session.id)
 
     val h1 = Header1(key = "header", text = "Big news!")
+    val b1 = Box(text = "First box", props = ChakraProps(bg = "green", p = 4, color = "black"))
+    b1.withChildren(
+      Button(text = "Click me!").onClick: () =>
+        b1.text = "Clicked!"
+        session.renderChanges()
+    )
     val p1 = Paragraph(key = "status", text = s"Hello there mr $r").withChildren(
-      Box(text = "First box", props = ChakraProps(bg = "green", p = 4, color = "black")).withChildren(
-        Button(text = "Click me!")
-      ),
+      b1,
       Box(text = "Second box", props = ChakraProps(bg = "tomato", p = 4, color = "black"))
     )
     session.add(h1, p1)
     session.renderChanges()
 
-    for i <- 1 to 10 do
+    for i <- 1 to 25 do
       Thread.sleep(1000)
       p1.text = s"i = $i"
       session.renderChanges()
