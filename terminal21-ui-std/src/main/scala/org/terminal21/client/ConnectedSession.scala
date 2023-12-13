@@ -5,20 +5,12 @@ import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.json.UiElementEncoding.uiElementEncoder
-import org.terminal21.client.ui.{UiElement, UiLib}
+import org.terminal21.client.ui.UiElement
 import org.terminal21.model.{CommandEvent, OnClick, Session}
 import org.terminal21.ui.std.SessionsService
 
 class ConnectedSession(val session: Session, sessionsService: SessionsService):
-  private val logger                                           = LoggerFactory.getLogger(getClass)
-  private var usingLibs                                        = List.empty[UiLib]
-  def use[T <: UiLib](using factory: ConnectedSession => T): T =
-    val lib = factory(this)
-    synchronized:
-      if usingLibs.contains(lib) then throw new IllegalStateException(s"Please use $lib only once.")
-      usingLibs = lib :: usingLibs
-    lib
-
+  private val logger   = LoggerFactory.getLogger(getClass)
   private var elements = List.empty[UiElement]
 
   def add(es: UiElement*): Unit =
