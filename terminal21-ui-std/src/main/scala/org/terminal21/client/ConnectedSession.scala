@@ -3,11 +3,13 @@ package org.terminal21.client
 import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
+import org.slf4j.LoggerFactory
 import org.terminal21.client.ui.{UiElement, UiLib}
 import org.terminal21.model.{CommandEvent, OnClick, Session}
 import org.terminal21.ui.std.SessionsService
 
 class ConnectedSession(val session: Session, sessionsService: SessionsService):
+  private val logger                                           = LoggerFactory.getLogger(getClass)
   private var usingLibs                                        = List.empty[UiLib]
   def use[T <: UiLib](using factory: ConnectedSession => T): T =
     val lib = factory(this)
@@ -37,7 +39,10 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
     eventHandlers.get(event.key) match
       case Some(handler) =>
         (event, handler) match
-          case (e: OnClick, h: OnClickEventHandler) => h.onClick()
+          case (_: OnClick, h: OnClickEventHandler) => h.onClick()
+          case x                                    => logger.error(s"Unknown event handling combination : $x")
+      case None          =>
+        logger.warn(s"There is no event handler for event $event")
 
   private def send(): Unit =
     val j = toJson
