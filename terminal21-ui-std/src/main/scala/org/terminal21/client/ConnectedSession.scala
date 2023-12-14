@@ -18,12 +18,16 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
     val withEvents = allDeep(es).collect:
       case h: HasEventHandler => h
 
-    for e <- withEvents do addEventHandler(e.key, e.defaultEventHandler)
+    for e <- withEvents do addEventHandlerAtTheTop(e.key, e.defaultEventHandler)
 
     synchronized:
       elements = elements ::: es.toList
 
   private val eventHandlers = collection.concurrent.TrieMap.empty[String, List[EventHandler]]
+
+  private def addEventHandlerAtTheTop(key: String, handler: EventHandler): Unit =
+    val handlers = eventHandlers.getOrElse(key, Nil)
+    eventHandlers += key -> (handler :: handlers)
 
   def addEventHandler(key: String, handler: EventHandler): Unit =
     val handlers = eventHandlers.getOrElse(key, Nil)

@@ -25,7 +25,9 @@ val FunctionsHelidonClient   = "org.functions-remote" %% "helidon-client"     % 
 val FunctionsHelidonWsClient = "org.functions-remote" %% "helidon-ws-client"  % FunctionsVersion
 val FunctionsFibers          = "org.functions-remote" %% "fibers"             % FunctionsVersion
 
-val ScalaTest    = "org.scalatest" %% "scalatest" % "3.2.15" % Test
+val ScalaTest = "org.scalatest" %% "scalatest"   % "3.2.15"     % Test
+val Mockito   = "org.mockito"    % "mockito-all" % "2.0.2-beta" % Test
+
 val CirceVersion = "0.14.6"
 val Circe        = Seq(
   "io.circe" %% "circe-core",
@@ -60,6 +62,7 @@ lazy val `helidon-server` = project
       FunctionsReceiver,
       FunctionsHelidonServer,
       ScalaTest,
+      Mockito,
       HelidonWebServerHttp2,
       HelidonServerWebSocket,
       HelidonWebServerStatic,
@@ -85,7 +88,7 @@ lazy val `terminal21-ui-std-exports` = project
 
 lazy val `terminal21-client-common` = project
   .settings(
-    libraryDependencies ++= Seq(ScalaTest, FunctionsFibers, HelidonClientWebSocket) ++ Circe
+    libraryDependencies ++= Seq(ScalaTest, Mockito, FunctionsFibers, HelidonClientWebSocket) ++ Circe
   )
   .dependsOn(`terminal21-server-client-common`)
 
@@ -96,6 +99,7 @@ lazy val `terminal21-ui-std` = project
     callerHelidonClientTransport := true,
     libraryDependencies ++= Seq(
       ScalaTest,
+      Mockito,
       Slf4jApi,
       HelidonClient,
       FunctionsCaller,
@@ -104,7 +108,11 @@ lazy val `terminal21-ui-std` = project
       HelidonClientWebSocket
     ) ++ Circe
   )
-  .dependsOn(`terminal21-ui-std-exports`, `terminal21-server-client-common`, `terminal21-client-common`)
+  .dependsOn(
+    `terminal21-ui-std-exports`,
+    `terminal21-server-client-common` % "compile->compile;test->test",
+    `terminal21-client-common`        % "compile->compile;test->test"
+  )
   .enablePlugins(FunctionsRemotePlugin)
 
 lazy val examples = project
