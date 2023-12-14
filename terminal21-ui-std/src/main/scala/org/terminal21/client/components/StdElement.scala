@@ -13,14 +13,7 @@ case class Header1(key: String = Keys.nextKey, @volatile var text: String) exten
 
 case class Paragraph(key: String = Keys.nextKey, @volatile var text: String = "", @volatile var children: Seq[UiElement] = Nil)
     extends StdElement
-    with HasChildren:
-  def withChildren(cn: UiElement*): Paragraph =
-    children = cn
-    this
-
-  def addChildren(e: UiElement*): Paragraph =
-    children = children ++ e
-    this
+    with HasChildren[Paragraph]
 
 case class Input(key: String = Keys.nextKey, `type`: String = "text", defaultValue: String = "", @volatile var value: String = "")
     extends StdElement

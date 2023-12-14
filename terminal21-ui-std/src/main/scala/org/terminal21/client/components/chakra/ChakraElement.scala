@@ -17,10 +17,7 @@ case class Box(
     @volatile var props: ChakraProps = ChakraProps(),
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren:
-  def withChildren(cn: UiElement*): Box =
-    children = cn
-    this
+    with HasChildren[Box]
 
 case class SimpleGrid(
     key: String = Keys.nextKey,
@@ -30,15 +27,10 @@ case class SimpleGrid(
     @volatile var columns: Int = 2,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren:
-  def withChildren(cn: UiElement*) =
-    children = cn
-    this
+    with HasChildren[SimpleGrid]
 
-  def addChildren(e: UiElement*) =
-    children = children ++ e
-    this
-
+/** https://chakra-ui.com/docs/components/editable
+  */
 case class Editable(
     key: String = Keys.nextKey,
     defaultValue: String = "",
@@ -50,3 +42,36 @@ case class Editable(
   def onChange(h: OnChangeEventHandler)(using session: ConnectedSession): Editable =
     session.addEventHandler(key, h)
     this
+
+/** https://chakra-ui.com/docs/components/form-control
+  */
+case class FormControl(key: String = Keys.nextKey, as: String = "", @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasChildren[FormControl]
+
+/** https://chakra-ui.com/docs/components/form-control
+  */
+case class FormLabel(key: String = Keys.nextKey, @volatile var text: String, @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasChildren[FormLabel]
+
+/** https://chakra-ui.com/docs/components/form-control
+  */
+case class FormHelperText(key: String = Keys.nextKey, @volatile var text: String, @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasChildren[FormHelperText]
+
+/** https://chakra-ui.com/docs/components/input
+  */
+case class Input(
+    key: String = Keys.nextKey,
+    `type`: String,
+    placeholder: String = "",
+    size: String = "md",
+    @volatile var variant: String = "Flushed",
+    @volatile var value: String = "",
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
+    with HasEventHandler
+    with HasChildren[Input]:
+  override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue

@@ -13,11 +13,20 @@ object UiElement:
   def allDeep(elements: Seq[UiElement]): Seq[UiElement] =
     elements ++ elements
       .collect:
-        case hc: HasChildren => allDeep(hc.children)
+        case hc: HasChildren[_] => allDeep(hc.children)
       .flatten
 
-  trait HasChildren:
-    def children: Seq[UiElement]
+  trait HasChildren[A]:
+    this: A =>
+    var children: Seq[UiElement]
+
+    def withChildren(cn: UiElement*): A =
+      children = cn
+      this
+
+    def addChildren(e: UiElement*): A =
+      children = children ++ e
+      this
 
   trait HasEventHandler:
     def defaultEventHandler: EventHandler

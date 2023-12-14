@@ -2,8 +2,8 @@ package tests
 
 import functions.fibers.FiberExecutor
 import org.terminal21.client.*
-import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.client.components.{Paragraph, render}
 
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 
@@ -18,6 +18,7 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
       editable1.onChange: newValue =>
         println(s"editable1 newValue = $newValue")
         println(editable1)
+      val email     = Input(`type` = "email")
       Seq(
         box1,
         SimpleGrid(spacing = "8px", columns = 4).withChildren(
@@ -33,13 +34,19 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
         SimpleGrid(spacing = "8px", columns = 2).withChildren(
           Box(text = "Name"),
           editable1
+        ),
+        Box(text = "And now a Form", props = ChakraProps(bg = "green", color = "black")),
+        FormControl().withChildren(
+          FormLabel(text = "Email address"),
+          email,
+          FormHelperText(text = "We'll never share your email.")
         )
       ).render()
 
       executor.submit:
         while true do
           Thread.sleep(1000)
-          println(s"editable value = ${editable1.value}")
+          println(s"editable value = ${editable1.value}, email = ${email.value}")
 
       println("Waiting for button to be pressed for 1 hour")
       latch.await(1, TimeUnit.HOURS)
