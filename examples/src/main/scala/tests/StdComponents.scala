@@ -11,6 +11,7 @@ import org.terminal21.client.components.*
       Paragraph(text = "Hello World!").withChildren(
         NewLine(),
         Text(text = "Some more text"),
+        Em(text = " emphasized!"),
         NewLine(),
         Text(text = "And the last line")
       )

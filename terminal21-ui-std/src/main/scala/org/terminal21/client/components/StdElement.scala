@@ -4,6 +4,7 @@ sealed trait StdElement extends UiElement
 
 case class Text(key: String = Keys.nextKey, var text: String) extends StdElement
 case class NewLine(key: String = Keys.nextKey)                extends StdElement
+case class Em(key: String = Keys.nextKey, var text: String)   extends StdElement
 
 case class Header1(key: String = Keys.nextKey, var text: String) extends StdElement
 

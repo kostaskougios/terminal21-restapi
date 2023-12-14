@@ -29,7 +29,7 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
     wsSession.send(response, last)
 
   private def sendSessions(wsSession: WsSession, last: Boolean, allSessions: Seq[Session]): Unit =
-    val sessions = allSessions.map(_.hideSecret)
+    val sessions = allSessions.map(_.hideSecret).sortBy(_.name)
     val json     = SessionsWsResponse(sessions).asJson.noSpaces
     logger.info(s"Sending sessions $json")
     wsSession.send(json, last)
@@ -37,13 +37,13 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
   override def onMessage(session: WsSession, text: String, last: Boolean): Unit =
     logger.info(s"Received json: $text")
     WsRequest.decoder(text) match
-      case Right(WsRequest("sessions", None))              =>
+      case Right(WsRequest("sessions", None))                =>
         continuouslyRespond(session, last)
         logger.info("sessions processed successfully")
       case Right(WsRequest(eventName, Some(event: UiEvent))) =>
         logger.info(s"Received event $eventName = $event")
         sessionsService.addEvent(event)
-      case x                                               =>
+      case x                                                 =>
         logger.error(s"Invalid request : $x")
 
 trait SessionsWebSocketBeans:
