@@ -4,8 +4,8 @@ import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.slf4j.LoggerFactory
+import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.UiElementEncoding.uiElementEncoder
-import org.terminal21.client.ui.UiElement
 import org.terminal21.model.{CommandEvent, OnClick, Session}
 import org.terminal21.ui.std.SessionsService
 
@@ -15,7 +15,7 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
 
   def add(es: UiElement*): Unit =
     synchronized:
-      elements = es.toList ::: elements
+      elements = elements ::: es.toList
 
   private val eventHandlers = collection.concurrent.TrieMap.empty[String, EventHandler]
 

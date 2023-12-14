@@ -4,11 +4,8 @@ import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.{ConnectedSession, Sessions}
 
-import java.util.UUID
-
 @main def helloWorld(): Unit =
-  val r = UUID.randomUUID().toString.substring(0, 4)
-  Sessions.withNewSession(s"hello-world-$r", s"Hello World $r"): session =>
+  Sessions.withNewSession("hello-world", "Hello World"): session =>
     given ConnectedSession = session
     println(session.session.id)
 
@@ -21,7 +18,7 @@ import java.util.UUID
     )
     val p1   = Paragraph(
       key = "status",
-      text = s"Hello there mr $r",
+      text = s"Hello there mr X",
       children = Seq(
         b1,
         Box(text = "Second box", props = ChakraProps(bg = "tomato", p = 4, color = "black"))

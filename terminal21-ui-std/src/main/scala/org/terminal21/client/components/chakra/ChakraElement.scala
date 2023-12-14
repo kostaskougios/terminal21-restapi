@@ -1,6 +1,6 @@
 package org.terminal21.client.components.chakra
 
-import org.terminal21.client.ui.UiElement
+import org.terminal21.client.components.UiElement
 import org.terminal21.client.{ConnectedSession, OnClickEventHandler}
 import org.terminal21.common.Keys
 

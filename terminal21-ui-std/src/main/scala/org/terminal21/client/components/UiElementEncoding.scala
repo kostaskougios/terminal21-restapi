@@ -4,7 +4,6 @@ import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.terminal21.client.components.chakra.ChakraElement
-import org.terminal21.client.ui.UiElement
 
 object UiElementEncoding:
   given uiElementEncoder: Encoder[UiElement] =
