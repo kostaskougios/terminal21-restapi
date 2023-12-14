@@ -7,4 +7,4 @@ trait UiElement:
 
   def render()(using session: ConnectedSession): Unit =
     session.add(this)
-    session.renderChanges()
+    session.render()

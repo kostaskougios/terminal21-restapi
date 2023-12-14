@@ -32,7 +32,7 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
       case None          =>
         logger.warn(s"There is no event handler for event $event")
 
-  def renderChanges(): Unit =
+  def render(): Unit =
     val j = toJson
     sessionsService.setSessionJsonState(session, j.toJson.noSpaces)
 

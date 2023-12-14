@@ -14,7 +14,7 @@ import org.terminal21.client.{ConnectedSession, Sessions}
     b1.withChildren(
       Button(text = "Click me!").onClick: () =>
         b1.text = "Clicked!"
-        session.renderChanges()
+        session.render()
     )
     val p1   = Paragraph(
       key = "status",
@@ -26,13 +26,13 @@ import org.terminal21.client.{ConnectedSession, Sessions}
     )
     val grid = SimpleGrid(spacing = "8px", columns = 4)
     session.add(h1, p1, grid)
-    session.renderChanges()
+    session.render()
 
     for i <- 1 to 25 do
       Thread.sleep(1000)
       p1.text = s"i = $i"
       grid.addChildren(Box(text = s"counting i = $i", props = ChakraProps(bg = "green")))
-      session.renderChanges()
+      session.render()
 
     h1.text = "Done!"
-    session.renderChanges()
+    session.render()
