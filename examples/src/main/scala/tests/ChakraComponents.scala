@@ -15,6 +15,9 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
       val latch     = new CountDownLatch(1)
       val box1      = Box(text = "First box", props = ChakraProps(bg = "green", p = 4, color = "black"))
       val editable1 = Editable(defaultValue = "Please type here")
+      editable1.onChange: newValue =>
+        println(s"editable1 newValue = $newValue")
+        println(editable1)
       Seq(
         box1,
         SimpleGrid(spacing = "8px", columns = 4).withChildren(

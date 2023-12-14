@@ -11,8 +11,12 @@ case class Button(key: String = Keys.nextKey, text: String) extends ChakraElemen
     session.addEventHandler(key, h)
     this
 
-case class Box(key: String = Keys.nextKey, var text: String = "", var props: ChakraProps = ChakraProps(), var children: Seq[UiElement] = Nil)
-    extends ChakraElement
+case class Box(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "",
+    @volatile var props: ChakraProps = ChakraProps(),
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
     with HasChildren:
   def withChildren(cn: UiElement*): Box =
     children = cn
@@ -20,11 +24,11 @@ case class Box(key: String = Keys.nextKey, var text: String = "", var props: Cha
 
 case class SimpleGrid(
     key: String = Keys.nextKey,
-    var spacing: String = "",
-    var spacingX: String = "",
-    var spacingY: String = "",
-    var columns: Int = 2,
-    var children: Seq[UiElement] = Nil
+    @volatile var spacing: String = "",
+    @volatile var spacingX: String = "",
+    @volatile var spacingY: String = "",
+    @volatile var columns: Int = 2,
+    @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren:
   def withChildren(cn: UiElement*) =
@@ -38,7 +42,11 @@ case class SimpleGrid(
 case class Editable(
     key: String = Keys.nextKey,
     defaultValue: String = "",
-    var value: String = ""
+    @volatile var value: String = ""
 ) extends ChakraElement
     with HasEventHandler:
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
+
+  def onChange(h: OnChangeEventHandler)(using session: ConnectedSession): Editable =
+    session.addEventHandler(key, h)
+    this
