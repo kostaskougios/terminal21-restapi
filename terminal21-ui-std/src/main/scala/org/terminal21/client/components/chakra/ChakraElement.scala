@@ -1,8 +1,7 @@
 package org.terminal21.client.components.chakra
 
-import org.terminal21.client.components.UiElement
+import org.terminal21.client.components.{Keys, UiElement}
 import org.terminal21.client.{ConnectedSession, OnClickEventHandler}
-import org.terminal21.common.Keys
 
 sealed trait ChakraElement extends UiElement
 

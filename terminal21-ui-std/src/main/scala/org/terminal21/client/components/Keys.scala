@@ -1,4 +1,4 @@
-package org.terminal21.common
+package org.terminal21.client.components
 
 import java.util.concurrent.atomic.AtomicInteger
 

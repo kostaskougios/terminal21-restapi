@@ -1,7 +1,5 @@
 package org.terminal21.client.components
 
-import org.terminal21.common.Keys
-
 sealed trait StdElement extends UiElement
 
 case class Text(key: String = Keys.nextKey, var text: String) extends StdElement
