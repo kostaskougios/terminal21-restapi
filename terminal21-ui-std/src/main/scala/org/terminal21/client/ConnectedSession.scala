@@ -14,6 +14,9 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
   private val logger   = LoggerFactory.getLogger(getClass)
   private var elements = List.empty[UiElement]
 
+  def clear(): Unit = synchronized:
+    elements = Nil
+
   def add(es: UiElement*): Unit =
     val withEvents = allDeep(es).collect:
       case h: HasEventHandler => h

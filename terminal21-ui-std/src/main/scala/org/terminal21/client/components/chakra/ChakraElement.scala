@@ -11,6 +11,8 @@ case class Button(key: String = Keys.nextKey, text: String) extends ChakraElemen
     session.addEventHandler(key, h)
     this
 
+/** https://chakra-ui.com/docs/components/box
+  */
 case class Box(
     key: String = Keys.nextKey,
     @volatile var text: String = "",
@@ -18,6 +20,15 @@ case class Box(
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[Box]
+
+/** https://chakra-ui.com/docs/components/stack
+  */
+case class HStack(key: String = Keys.nextKey, @volatile var spacing: String = "", @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasChildren[HStack]
+case class VStack(key: String = Keys.nextKey, @volatile var spacing: String = "", @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasChildren[VStack]
 
 case class SimpleGrid(
     key: String = Keys.nextKey,

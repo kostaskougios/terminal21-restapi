@@ -35,6 +35,18 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
           Box(text = "Name"),
           editable1
         ),
+        Box(text = "VStack", props = ChakraProps(bg = "green", color = "black")),
+        VStack(spacing = "24px").withChildren(
+          Box(text = "1", props = ChakraProps(bg = "green", p = 2, color = "black")),
+          Box(text = "2", props = ChakraProps(bg = "red", p = 2, color = "black")),
+          Box(text = "3", props = ChakraProps(bg = "blue", p = 2, color = "black"))
+        ),
+        Box(text = "HStack", props = ChakraProps(bg = "green", color = "black")),
+        HStack(spacing = "24px").withChildren(
+          Box(text = "1", props = ChakraProps(bg = "green", p = 2, color = "black")),
+          Box(text = "2", props = ChakraProps(bg = "red", p = 2, color = "black")),
+          Box(text = "3", props = ChakraProps(bg = "blue", p = 2, color = "black"))
+        ),
         Box(text = "And now a Form", props = ChakraProps(bg = "green", color = "black")),
         FormControl().withChildren(
           FormLabel(text = "Email address"),
@@ -50,4 +62,5 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
 
       println("Waiting for button to be pressed for 1 hour")
       latch.await(1, TimeUnit.HOURS)
-      Paragraph(text = "Exited").render()
+      session.clear()
+      Paragraph(text = s"Terminated with editable = ${editable1.value} and email = ${email.value}").render()
