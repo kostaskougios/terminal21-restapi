@@ -7,9 +7,12 @@ import org.terminal21.client.components.*
   Sessions.withNewSession("std-components", "Std Components"): session =>
     given ConnectedSession = session
 
-    val input = Input(defaultValue = "Please enter your name")
+    val input  = Input(defaultValue = "Please enter your name")
+    val output = Paragraph(text = "This will reflect what you type in the input")
     input.onChange: newValue =>
-      println(s"input new value = $newValue")
+      output.text = newValue
+      session.render()
+
     Seq(
       Header1(text = "Welcome to the std components demo/test"),
       Paragraph(text = "Hello World!").withChildren(
@@ -21,7 +24,8 @@ import org.terminal21.client.components.*
       ),
       Paragraph(text = "A Form ").withChildren(
         input
-      )
+      ),
+      output
     ).render()
 
     for i <- 1 to 400 do
