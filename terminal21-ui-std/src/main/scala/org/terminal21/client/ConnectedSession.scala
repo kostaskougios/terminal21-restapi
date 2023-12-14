@@ -23,20 +23,21 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
     synchronized:
       elements = elements ::: es.toList
 
-  private val eventHandlers = collection.concurrent.TrieMap.empty[String, EventHandler]
+  private val eventHandlers = collection.concurrent.TrieMap.empty[String, List[EventHandler]]
 
   def addEventHandler(key: String, handler: EventHandler): Unit =
-    if eventHandlers.contains(key) then throw new IllegalArgumentException(s"There is already an event handler for $key")
-    eventHandlers += key -> handler
+    val handlers = eventHandlers.getOrElse(key, Nil)
+    eventHandlers += key -> (handlers :+ handler)
 
   def fireEvent(event: CommandEvent): Unit =
     eventHandlers.get(event.key) match
-      case Some(handler) =>
-        (event, handler) match
-          case (_: OnClick, h: OnClickEventHandler)          => h.onClick()
-          case (onChange: OnChange, h: OnChangeEventHandler) => h.onChange(onChange.value)
-          case x                                             => logger.error(s"Unknown event handling combination : $x")
-      case None          =>
+      case Some(handlers) =>
+        for handler <- handlers do
+          (event, handler) match
+            case (_: OnClick, h: OnClickEventHandler)          => h.onClick()
+            case (onChange: OnChange, h: OnChangeEventHandler) => h.onChange(onChange.value)
+            case x                                             => logger.error(s"Unknown event handling combination : $x")
+      case None           =>
         logger.warn(s"There is no event handler for event $event")
 
   def render(): Unit =
