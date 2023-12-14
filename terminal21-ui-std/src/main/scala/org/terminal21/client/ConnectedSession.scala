@@ -5,8 +5,9 @@ import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement
+import org.terminal21.client.components.UiElement.{HasEventHandler, allDeep}
 import org.terminal21.client.components.UiElementEncoding.uiElementEncoder
-import org.terminal21.model.{CommandEvent, OnClick, Session}
+import org.terminal21.model.{CommandEvent, OnChange, OnClick, Session}
 import org.terminal21.ui.std.SessionsService
 
 class ConnectedSession(val session: Session, sessionsService: SessionsService):
@@ -14,6 +15,11 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
   private var elements = List.empty[UiElement]
 
   def add(es: UiElement*): Unit =
+    val withEvents = allDeep(es).collect:
+      case h: HasEventHandler => h
+
+    for e <- withEvents do addEventHandler(e.key, e.defaultEventHandler)
+
     synchronized:
       elements = elements ::: es.toList
 
@@ -27,8 +33,9 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
     eventHandlers.get(event.key) match
       case Some(handler) =>
         (event, handler) match
-          case (_: OnClick, h: OnClickEventHandler) => h.onClick()
-          case x                                    => logger.error(s"Unknown event handling combination : $x")
+          case (_: OnClick, h: OnClickEventHandler)          => h.onClick()
+          case (onChange: OnChange, h: OnChangeEventHandler) => h.onChange(onChange.value)
+          case x                                             => logger.error(s"Unknown event handling combination : $x")
       case None          =>
         logger.warn(s"There is no event handler for event $event")
 

@@ -11,7 +11,8 @@ sealed trait Body
 sealed trait UiEvent extends Body:
   def sessionId: String
 
-case class OnClick(sessionId: String, key: String) extends UiEvent
+case class OnClick(sessionId: String, key: String)                 extends UiEvent
+case class OnChange(sessionId: String, key: String, value: String) extends UiEvent
 
 object WsRequest:
   val decoder = decode[WsRequest]

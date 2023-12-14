@@ -4,3 +4,6 @@ trait EventHandler
 
 trait OnClickEventHandler extends EventHandler:
   def onClick(): Unit
+
+trait OnChangeEventHandler extends EventHandler:
+  def onChange(newValue: String): Unit

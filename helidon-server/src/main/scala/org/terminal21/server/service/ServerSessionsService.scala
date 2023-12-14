@@ -1,7 +1,7 @@
 package org.terminal21.server.service
 
 import org.slf4j.LoggerFactory
-import org.terminal21.model.{CommandEvent, OnClick, Session}
+import org.terminal21.model.{CommandEvent, OnChange, OnClick, Session}
 import org.terminal21.server.json.UiEvent
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.utils.{ListenerFunction, NotificationRegistry}
@@ -50,13 +50,14 @@ class ServerSessionsService extends SessionsService:
 
   def addEvent(event: UiEvent): Unit =
     val e = event match
-      case org.terminal21.server.json.OnClick(_, key) => OnClick(key)
+      case org.terminal21.server.json.OnClick(_, key)         => OnClick(key)
+      case org.terminal21.server.json.OnChange(_, key, value) => OnChange(key, value)
 
     val session = sessionById(event.sessionId)
     val state   = sessions(session)
     state.eventsNotificationRegistry.notifyAll(e)
 
-  def notifyMeOnSessionEvents(session: Session)(listener: ListenerFunction[CommandEvent]) =
+  def notifyMeOnSessionEvents(session: Session)(listener: ListenerFunction[CommandEvent]): Unit =
     val state = sessions(session)
     state.eventsNotificationRegistry.add(listener)
 
