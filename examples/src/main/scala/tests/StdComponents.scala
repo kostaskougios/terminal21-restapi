@@ -10,10 +10,10 @@ import org.terminal21.client.components.*
       Header1(text = "Welcome to the std components demo/test"),
       Paragraph(text = "Hello World!").withChildren(
         NewLine(),
-        Text(text = "Some more text"),
+        Span(text = "Some more text"),
         Em(text = " emphasized!"),
         NewLine(),
-        Text(text = "And the last line")
+        Span(text = "And the last line")
       )
     ).render()
 
