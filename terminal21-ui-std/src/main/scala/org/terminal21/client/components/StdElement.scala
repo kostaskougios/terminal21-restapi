@@ -1,4 +1,4 @@
-package org.terminal21.client.json
+package org.terminal21.client.components
 
 import org.terminal21.client.ui.UiElement
 import org.terminal21.common.Keys

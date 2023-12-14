@@ -4,7 +4,7 @@ import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.slf4j.LoggerFactory
-import org.terminal21.client.json.UiElementEncoding.uiElementEncoder
+import org.terminal21.client.components.UiElementEncoding.uiElementEncoder
 import org.terminal21.client.ui.UiElement
 import org.terminal21.model.{CommandEvent, OnClick, Session}
 import org.terminal21.ui.std.SessionsService

@@ -1,7 +1,7 @@
 package examples
 
-import org.terminal21.client.json.*
-import org.terminal21.client.json.chakra.*
+import org.terminal21.client.components.*
+import org.terminal21.client.components.chakra.*
 import org.terminal21.client.{ConnectedSession, Sessions}
 
 import java.util.UUID

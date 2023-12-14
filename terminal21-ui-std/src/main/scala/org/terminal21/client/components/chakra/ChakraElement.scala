@@ -1,4 +1,4 @@
-package org.terminal21.client.json.chakra
+package org.terminal21.client.components.chakra
 
 import org.terminal21.client.ui.UiElement
 import org.terminal21.client.{ConnectedSession, OnClickEventHandler}
