@@ -14,31 +14,31 @@ import org.terminal21.server.service.ServerSessionsService
 class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListener:
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
-  private def continuouslyRespond(wsSession: WsSession, last: Boolean): Unit =
+  private def continuouslyRespond(wsSession: WsSession): Unit =
     sessionsService.notifyMeWhenSessionsChange: allSessions =>
       WsSessionOps.returnTrueWhileSessionOpen:
-        sendSessions(wsSession, last, allSessions)
+        sendSessions(wsSession,  allSessions)
 
     sessionsService.notifyMeWhenSessionChanges: (session, sessionState) =>
       WsSessionOps.returnTrueWhileSessionOpen:
-        sendSessionState(wsSession, last, session, sessionState)
+        sendSessionState(wsSession, session, sessionState)
 
-  private def sendSessionState(wsSession: WsSession, last: Boolean, session: Session, sessionState: SessionState): Unit =
+  private def sendSessionState(wsSession: WsSession, session: Session, sessionState: SessionState): Unit =
     val response = StateWsResponse(session.hideSecret, sessionState.json.asJson).asJson.noSpaces
     logger.info(s"$wsSession: Sending session state response $response")
-    wsSession.send(response, last)
+    wsSession.send(response, true)
 
-  private def sendSessions(wsSession: WsSession, last: Boolean, allSessions: Seq[Session]): Unit =
+  private def sendSessions(wsSession: WsSession,  allSessions: Seq[Session]): Unit =
     val sessions = allSessions.map(_.hideSecret).sortBy(_.name)
     val json     = SessionsWsResponse(sessions).asJson.noSpaces
     logger.info(s"$wsSession: Sending sessions $json")
-    wsSession.send(json, last)
+    wsSession.send(json, true)
 
   override def onMessage(wsSession: WsSession, text: String, last: Boolean): Unit =
     logger.info(s"$wsSession: Received json: $text")
     WsRequest.decoder(text) match
       case Right(WsRequest("sessions", None))                =>
-        continuouslyRespond(wsSession, last)
+        continuouslyRespond(wsSession)
         logger.info(s"$wsSession: sessions processed successfully")
       case Right(WsRequest(eventName, Some(event: UiEvent))) =>
         logger.info(s"$wsSession: Received event $eventName = $event")
