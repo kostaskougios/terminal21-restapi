@@ -4,7 +4,7 @@
 val scala3Version = "3.3.1"
 
 ThisBuild / version      := "0.1-SNAPSHOT"
-ThisBuild / organization := "org.terminal21"
+ThisBuild / organization := "io.github.kostaskougios"
 name                     := "rest-api"
 ThisBuild / scalaVersion := scala3Version
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-feature", "-deprecation")
@@ -15,15 +15,15 @@ ThisBuild / resolvers += "Local Maven Repository" at "file://" + Path.userHome.a
 // Dependencies
 // -----------------------------------------------------------------------------------------------
 
-val FunctionsVersion         = "0.1-SNAPSHOT"
-val FunctionsCaller          = "org.functions-remote" %% "functions-caller"   % FunctionsVersion
-val FunctionsReceiver        = "org.functions-remote" %% "functions-receiver" % FunctionsVersion
-val FunctionsAvro            = "org.functions-remote" %% "functions-avro"     % FunctionsVersion
-val FunctionsHelidonServer   = "org.functions-remote" %% "helidon-server"     % FunctionsVersion
-val FunctionsHelidonWsServer = "org.functions-remote" %% "helidon-ws-server"  % FunctionsVersion
-val FunctionsHelidonClient   = "org.functions-remote" %% "helidon-client"     % FunctionsVersion
-val FunctionsHelidonWsClient = "org.functions-remote" %% "helidon-ws-client"  % FunctionsVersion
-val FunctionsFibers          = "org.functions-remote" %% "fibers"             % FunctionsVersion
+val FunctionsVersion         = "0.51-SNAPSHOT"
+val FunctionsCaller          = "io.github.kostaskougios" %% "functions-caller"   % FunctionsVersion
+val FunctionsReceiver        = "io.github.kostaskougios" %% "functions-receiver" % FunctionsVersion
+val FunctionsAvro            = "io.github.kostaskougios" %% "functions-avro"     % FunctionsVersion
+val FunctionsHelidonServer   = "io.github.kostaskougios" %% "helidon-server"     % FunctionsVersion
+val FunctionsHelidonWsServer = "io.github.kostaskougios" %% "helidon-ws-server"  % FunctionsVersion
+val FunctionsHelidonClient   = "io.github.kostaskougios" %% "helidon-client"     % FunctionsVersion
+val FunctionsHelidonWsClient = "io.github.kostaskougios" %% "helidon-ws-client"  % FunctionsVersion
+val FunctionsFibers          = "io.github.kostaskougios" %% "fibers"             % FunctionsVersion
 
 val ScalaTest = "org.scalatest" %% "scalatest"   % "3.2.15"     % Test
 val Mockito   = "org.mockito"    % "mockito-all" % "2.0.2-beta" % Test
@@ -39,7 +39,7 @@ val HelidonVersion         = "4.0.1"
 val HelidonWebServerHttp2  = "io.helidon.webserver" % "helidon-webserver-http2"          % HelidonVersion
 val HelidonWebServerStatic = "io.helidon.webserver" % "helidon-webserver-static-content" % HelidonVersion
 val HelidonServerWebSocket = "io.helidon.webserver" % "helidon-webserver-websocket"      % HelidonVersion
-val HelidonClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websocket"      % "4.0.2-SNAPSHOT"
+val HelidonClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websocket"      % "4.0.2-SNAPSHOT" // FIX-ME
 val HelidonClient          = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
 val HelidonServerLogging   = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
 
@@ -53,14 +53,13 @@ lazy val `terminal21-server-client-common` = project
     libraryDependencies ++= Seq(ScalaTest)
   )
 
-lazy val `helidon-server` = project
+lazy val `terminal21-server` = project
   .settings(
     receiverExports           := Seq(s"org.terminal21:terminal21-ui-std-exports_3:${version.value}"),
     receiverJsonSerialization := true,
     receiverHelidonRoutes     := true,
     libraryDependencies ++= Seq(
       FunctionsReceiver,
-      FunctionsHelidonServer,
       ScalaTest,
       Mockito,
       HelidonWebServerHttp2,
