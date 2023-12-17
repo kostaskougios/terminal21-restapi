@@ -25,26 +25,32 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
 
   private def sendSessionState(wsSession: WsSession, last: Boolean, session: Session, sessionState: SessionState): Unit =
     val response = StateWsResponse(session.hideSecret, sessionState.json.asJson).asJson.noSpaces
-    logger.info(s"Sending session state response $response")
+    logger.info(s"$wsSession: Sending session state response $response")
     wsSession.send(response, last)
 
   private def sendSessions(wsSession: WsSession, last: Boolean, allSessions: Seq[Session]): Unit =
     val sessions = allSessions.map(_.hideSecret).sortBy(_.name)
     val json     = SessionsWsResponse(sessions).asJson.noSpaces
-    logger.info(s"Sending sessions $json")
+    logger.info(s"$wsSession: Sending sessions $json")
     wsSession.send(json, last)
 
-  override def onMessage(session: WsSession, text: String, last: Boolean): Unit =
-    logger.info(s"Received json: $text")
+  override def onMessage(wsSession: WsSession, text: String, last: Boolean): Unit =
+    logger.info(s"$wsSession: Received json: $text")
     WsRequest.decoder(text) match
       case Right(WsRequest("sessions", None))                =>
-        continuouslyRespond(session, last)
-        logger.info("sessions processed successfully")
+        continuouslyRespond(wsSession, last)
+        logger.info(s"$wsSession: sessions processed successfully")
       case Right(WsRequest(eventName, Some(event: UiEvent))) =>
-        logger.info(s"Received event $eventName = $event")
+        logger.info(s"$wsSession: Received event $eventName = $event")
         sessionsService.addEvent(event)
       case x                                                 =>
         logger.error(s"Invalid request : $x")
+
+  override def onOpen(wsSession: WsSession) =
+    logger.info(s"session $wsSession opened")
+
+  override def onClose(wsSession: WsSession, status: Int, reason: String) =
+    logger.info(s"Session $wsSession closed with status $status and reason=$reason.")
 
 trait SessionsWebSocketBeans:
   def sessionsService: ServerSessionsService
