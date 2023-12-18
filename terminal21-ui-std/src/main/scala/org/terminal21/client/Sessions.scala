@@ -22,7 +22,7 @@ object Sessions:
 
     val connectedSession = ConnectedSession(session, sessionsService)
     FiberExecutor.withFiberExecutor: fiberExecutor =>
-      val eventsWsListener = new EventsWsListener(wsClient, connectedSession, fiberExecutor)
+      val eventsWsListener = new ClientEventsWsListener(wsClient, connectedSession, fiberExecutor)
       eventsWsListener.connect()
 
       try {

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 import org.terminal21.model.{ClientToServer, CommandEvent, Session, SubscribeTo}
 import org.terminal21.utils.ErrorLogger
 
-class EventsWsListener(wsClient: WsClient, session: ConnectedSession, fiberExecutor: FiberExecutor) extends WsListener:
+class ClientEventsWsListener(wsClient: WsClient, session: ConnectedSession, fiberExecutor: FiberExecutor) extends WsListener:
   private val logger      = LoggerFactory.getLogger(getClass)
   private val errorLogger = new ErrorLogger(logger)
 
