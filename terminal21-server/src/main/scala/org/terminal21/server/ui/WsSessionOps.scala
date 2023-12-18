@@ -7,7 +7,7 @@ import java.io.UncheckedIOException
 object WsSessionOps:
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
-  def returnTrueWhileSessionOpen(f: => Unit): Boolean =
+  def returnTrueIfSessionIsNotClosed(f: => Unit): Boolean =
     try
       f
       true

@@ -1,5 +1,6 @@
 package org.terminal21.client
 
+import functions.fibers.FiberExecutor
 import functions.helidon.transport.HelidonTransport
 import io.helidon.webclient.api.WebClient
 import io.helidon.webclient.websocket.WsClient
@@ -20,9 +21,10 @@ object Sessions:
       .build
 
     val connectedSession = ConnectedSession(session, sessionsService)
-    val eventsWsListener = new EventsWsListener(connectedSession)
-    wsClient.connect("/api/command-ws", eventsWsListener)
+    FiberExecutor.withFiberExecutor: fiberExecutor =>
+      val eventsWsListener = new EventsWsListener(wsClient, connectedSession, fiberExecutor)
+      eventsWsListener.connect()
 
-    try {
-      f(connectedSession)
-    } finally sessionsService.terminateSession(session)
+      try {
+        f(connectedSession)
+      } finally sessionsService.terminateSession(session)

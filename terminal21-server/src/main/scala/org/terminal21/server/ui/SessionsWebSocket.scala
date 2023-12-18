@@ -9,18 +9,20 @@ import org.terminal21.model.Session
 import org.terminal21.server.json.*
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.service.ServerSessionsService
+import org.terminal21.utils.ErrorLogger
 
 // websocket: https://helidon.io/docs/v4/#/se/websocket
 class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListener:
-  private val logger = LoggerFactory.getLogger(getClass.getName)
+  private val logger      = LoggerFactory.getLogger(getClass.getName)
+  private val errorLogger = new ErrorLogger(logger)
 
   private def continuouslyRespond(wsSession: WsSession): Unit =
     sessionsService.notifyMeWhenSessionsChange: allSessions =>
-      WsSessionOps.returnTrueWhileSessionOpen:
+      WsSessionOps.returnTrueIfSessionIsNotClosed:
         sendSessions(wsSession, allSessions)
 
     sessionsService.notifyMeWhenSessionChanges: (session, sessionState) =>
-      WsSessionOps.returnTrueWhileSessionOpen:
+      WsSessionOps.returnTrueIfSessionIsNotClosed:
         sendSessionState(wsSession, session, sessionState)
 
   private def sendSessionState(wsSession: WsSession, session: Session, sessionState: SessionState): Unit =
@@ -36,17 +38,18 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
 
   override def onMessage(wsSession: WsSession, text: String, last: Boolean): Unit =
     logger.info(s"$wsSession: Received json: $text , last = $last")
-    WsRequest.decoder(text) match
-      case Right(WsRequest("sessions", None))                =>
-        continuouslyRespond(wsSession)
-        logger.info(s"$wsSession: sessions processed successfully")
-      case Right(WsRequest(eventName, Some(event: UiEvent))) =>
-        logger.info(s"$wsSession: Received event $eventName = $event")
-        sessionsService.addEvent(event)
-      case Right(WsRequest("ping", None))                    =>
-        logger.info(s"$wsSession: ping received")
-      case x                                                 =>
-        logger.error(s"Invalid request : $x")
+    errorLogger.logErrors:
+      WsRequest.decoder(text) match
+        case Right(WsRequest("sessions", None))                =>
+          continuouslyRespond(wsSession)
+          logger.info(s"$wsSession: sessions processed successfully")
+        case Right(WsRequest(eventName, Some(event: UiEvent))) =>
+          logger.info(s"$wsSession: Received event $eventName = $event")
+          sessionsService.addEvent(event)
+        case Right(WsRequest("ping", None))                    =>
+          logger.info(s"$wsSession: ping received")
+        case x                                                 =>
+          logger.error(s"Invalid request : $x")
 
   override def onOpen(wsSession: WsSession): Unit =
     logger.info(s"session $wsSession opened")
