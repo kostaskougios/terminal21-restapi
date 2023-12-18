@@ -17,7 +17,7 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
   private def continuouslyRespond(wsSession: WsSession): Unit =
     sessionsService.notifyMeWhenSessionsChange: allSessions =>
       WsSessionOps.returnTrueWhileSessionOpen:
-        sendSessions(wsSession,  allSessions)
+        sendSessions(wsSession, allSessions)
 
     sessionsService.notifyMeWhenSessionChanges: (session, sessionState) =>
       WsSessionOps.returnTrueWhileSessionOpen:
@@ -28,14 +28,14 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
     logger.info(s"$wsSession: Sending session state response $response")
     wsSession.send(response, true)
 
-  private def sendSessions(wsSession: WsSession,  allSessions: Seq[Session]): Unit =
+  private def sendSessions(wsSession: WsSession, allSessions: Seq[Session]): Unit =
     val sessions = allSessions.map(_.hideSecret).sortBy(_.name)
     val json     = SessionsWsResponse(sessions).asJson.noSpaces
     logger.info(s"$wsSession: Sending sessions $json")
     wsSession.send(json, true)
 
   override def onMessage(wsSession: WsSession, text: String, last: Boolean): Unit =
-    logger.info(s"$wsSession: Received json: $text")
+    logger.info(s"$wsSession: Received json: $text , last = $last")
     WsRequest.decoder(text) match
       case Right(WsRequest("sessions", None))                =>
         continuouslyRespond(wsSession)
@@ -43,13 +43,15 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
       case Right(WsRequest(eventName, Some(event: UiEvent))) =>
         logger.info(s"$wsSession: Received event $eventName = $event")
         sessionsService.addEvent(event)
+      case Right(WsRequest("ping", None))                    =>
+        logger.info(s"$wsSession: ping received")
       case x                                                 =>
         logger.error(s"Invalid request : $x")
 
-  override def onOpen(wsSession: WsSession) =
+  override def onOpen(wsSession: WsSession): Unit =
     logger.info(s"session $wsSession opened")
 
-  override def onClose(wsSession: WsSession, status: Int, reason: String) =
+  override def onClose(wsSession: WsSession, status: Int, reason: String): Unit =
     logger.info(s"Session $wsSession closed with status $status and reason=$reason.")
 
 trait SessionsWebSocketBeans:
