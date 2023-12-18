@@ -50,7 +50,15 @@ val Slf4jApi                               = "org.slf4j"      % "slf4j-api"     
 // -----------------------------------------------------------------------------------------------
 lazy val `terminal21-server-client-common` = project
   .settings(
-    libraryDependencies ++= Seq(ScalaTest, Slf4jApi, HelidonClientWebSocket, FunctionsFibers, HelidonWebServerHttp2 % Test, HelidonServerWebSocket % Test)
+    libraryDependencies ++= Seq(
+      ScalaTest,
+      Slf4jApi,
+      HelidonClientWebSocket,
+      FunctionsFibers,
+      HelidonWebServerHttp2  % Test,
+      HelidonServerWebSocket % Test,
+      LogBack                % Test
+    )
   )
 
 lazy val `terminal21-server` = project

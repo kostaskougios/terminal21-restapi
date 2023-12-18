@@ -4,6 +4,7 @@ import functions.fibers.{Fiber, FiberExecutor}
 import io.helidon.common.buffers.BufferData
 import io.helidon.webclient.websocket.WsClient
 import io.helidon.websocket.{WsCloseCodes, WsSession}
+import org.terminal21.collections.{LazyBlockingIterator, ProducerConsumerCollections}
 
 import java.io.UncheckedIOException
 import java.util.concurrent.atomic.AtomicBoolean
@@ -60,6 +61,7 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
           val wasSend = wsSession.exists: s =>
             tryOnSocketClosedReconnect:
               s.send(d, true)
+
           if !wasSend then sendIt()
 
         sendIt()
@@ -69,7 +71,8 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
     toSendQueue.put(d)
 
   override def onMessage(wsSession: WsSession, data: BufferData, last: Boolean): Unit =
-    receive(data)
+    errorLogger.logErrors:
+      receive(data)
 
   override def onClose(wsSession: WsSession, status: Int, reason: String): Unit =
     logger.info(s"session $wsSession closed with status $status and reason $reason, reconnecting ....")
@@ -79,8 +82,10 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
     logger.error(s"an error occurred for $wsSession", t)
 
   override def onOpen(wsSession: WsSession): Unit =
-    this.wsSession = Some(wsSession)
-    wsSessionReady.countDown()
+    errorLogger.logErrors:
+      this.wsSession = Some(wsSession)
+      wsSessionReady.countDown()
+      send(BufferData.empty()) // make sure the server has our id
 
   protected def tryOnSocketClosedReconnect(f: => Unit): Boolean =
     try
@@ -92,16 +97,16 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
         connect()
         false
 
-case class ClientWsListener(listener: ReliableClientWsListener, sender: BufferData => Unit)
+type ReceivedClientData = BufferData
+case class ClientWsListener(listener: ReliableClientWsListener, receivedIterator: LazyBlockingIterator[ReceivedClientData], sender: BufferData => Unit)
 
 object ClientWsListener:
   given Releasable[ClientWsListener] = _.listener.close()
 
 object ReliableClientWsListener:
 
-  def client(id: String, wsClient: WsClient, remotePath: String, fiberExecutor: FiberExecutor, pingEveryMs: Long = 1000)(
-      onReceive: BufferData => Unit
-  ): ClientWsListener =
-    val listener = new ReliableClientWsListener(id, wsClient, remotePath, fiberExecutor, pingEveryMs):
-      override protected def receive(data: BufferData): Unit = onReceive(data)
-    ClientWsListener(listener, listener.send)
+  def client(id: String, wsClient: WsClient, remotePath: String, fiberExecutor: FiberExecutor, pingEveryMs: Long = 1000): ClientWsListener =
+    val (it, producer) = ProducerConsumerCollections.lazyIterator[ReceivedClientData]()
+    val listener       = new ReliableClientWsListener(id, wsClient, remotePath, fiberExecutor, pingEveryMs):
+      override protected def receive(data: BufferData): Unit = producer(data)
+    ClientWsListener(listener, it, listener.send)
