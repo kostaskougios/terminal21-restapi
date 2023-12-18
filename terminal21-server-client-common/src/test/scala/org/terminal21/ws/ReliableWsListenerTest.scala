@@ -12,7 +12,7 @@ import scala.util.Using
 
 class ReliableWsListenerTest extends AnyFunSuiteLike:
   def withServer[R](executor: FiberExecutor, onReceive: (String, BufferData) => Unit)(f: (WebServer, ServerWsListener) => R): R =
-    Using.resource(ReliableServerWsListener.server(executor)(onReceive)): serverWsListener =>
+    Using.resource(ReliableServerWsListener.server(executor)): serverWsListener =>
       val wsB    = WsRouting.builder().endpoint("/ws-test", serverWsListener.listener)
       val server = WebServer.builder
         .port(0)
