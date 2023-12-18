@@ -6,6 +6,7 @@ import io.helidon.webclient.websocket.WsClient
 import io.helidon.webserver.WebServer
 import io.helidon.webserver.websocket.WsRouting
 import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers.*
 
 import java.net.URI
 import scala.util.Using
@@ -40,4 +41,8 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
   test("client-server msg"):
     runServerClient("client-1"): (serverWsListener, clientWsListener) =>
       clientWsListener.sender(BufferData.create("Hello"))
-      Thread.sleep(2000)
+      serverWsListener.receivedIterator
+        .map: (id, buf) =>
+          (id, new String(buf.readBytes()))
+        .take(1)
+        .toList should be(Seq(("client-1", "Hello")))
