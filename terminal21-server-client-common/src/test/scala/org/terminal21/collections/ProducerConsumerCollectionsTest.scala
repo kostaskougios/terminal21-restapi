@@ -8,13 +8,13 @@ class ProducerConsumerCollectionsTest extends AnyFunSuiteLike:
   val executor = FiberExecutor()
   test("producing/consuming"):
     val (list, producer) = ProducerConsumerCollections.lazyIterator[Int]()
-    producer.put(2)
+    producer(2)
     list.take(1).toList should be(Seq(2))
 
   test("consuming blocks until an item is available"):
     val (list, producer) = ProducerConsumerCollections.lazyIterator[Int]()
     executor.submit:
       Thread.sleep(5)
-      producer.put(10)
+      producer(10)
 
     list.take(1).toList should be(Seq(10))

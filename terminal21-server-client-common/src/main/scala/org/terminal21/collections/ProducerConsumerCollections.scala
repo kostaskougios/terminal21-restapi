@@ -8,7 +8,7 @@ class LazyBlockingIterator[A](q: LinkedBlockingQueue[A]) extends Iterator[A]:
     q.take()
 
 object ProducerConsumerCollections:
-  def lazyIterator[A](initialSize: Int = 64): (LazyBlockingIterator[A], LinkedBlockingQueue[A]) =
+  def lazyIterator[A](initialSize: Int = 64): (LazyBlockingIterator[A], A => Unit) =
     val queue = new LinkedBlockingQueue[A](initialSize)
     val it    = new LazyBlockingIterator[A](queue)
-    (it, queue)
+    (it, a => queue.put(a))
