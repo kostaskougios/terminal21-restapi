@@ -98,7 +98,7 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
         false
 
 type ReceivedClientData = BufferData
-case class ClientWsListener(listener: ReliableClientWsListener, receivedIterator: LazyBlockingIterator[ReceivedClientData], sender: BufferData => Unit)
+case class ClientWsListener(listener: ReliableClientWsListener, receivedIterator: LazyBlockingIterator[ReceivedClientData], send: BufferData => Unit)
 
 object ClientWsListener:
   given Releasable[ClientWsListener] = _.listener.close()

@@ -40,7 +40,7 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
 
   test("client sends server a msg"):
     runServerClient("client-1"): (serverWsListener, clientWsListener) =>
-      clientWsListener.sender(BufferData.create("Hello"))
+      clientWsListener.send(BufferData.create("Hello"))
       serverWsListener.receivedIterator
         .map: (id, buf) =>
           (id, new String(buf.readBytes()))
@@ -49,8 +49,8 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
 
   test("server sends client a msg"):
     runServerClient("client-1"): (serverWsListener, clientWsListener) =>
-      Thread.sleep(100)
-      serverWsListener.sender("client-1", BufferData.create("Hello"))
+      while !serverWsListener.listener.hasClientId("client-1") do Thread.sleep(5)
+      serverWsListener.send("client-1", BufferData.create("Hello"))
       clientWsListener.receivedIterator
         .map: buf =>
           new String(buf.readBytes())

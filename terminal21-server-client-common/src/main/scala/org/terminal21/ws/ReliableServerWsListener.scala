@@ -13,6 +13,8 @@ abstract class ReliableServerWsListener(fiberExecutor: FiberExecutor) extends Ab
 
   protected def receive(id: String, data: BufferData): Unit
 
+  def hasClientId(id: String): Boolean = perClientIdWsSession.contains(id)
+
   def send(id: String, data: BufferData): Unit =
     val wsSession = perClientIdWsSession.getOrElse(id, throw new IllegalArgumentException(s"No client with id = $id has a session"))
     wsSession.send(data, true)
@@ -39,7 +41,7 @@ abstract class ReliableServerWsListener(fiberExecutor: FiberExecutor) extends Ab
     perClientIdWsSession.clear()
 
 type ReceivedServerData = (String, BufferData)
-case class ServerWsListener(listener: ReliableServerWsListener, receivedIterator: LazyBlockingIterator[ReceivedServerData], sender: ReceivedServerData => Unit)
+case class ServerWsListener(listener: ReliableServerWsListener, receivedIterator: LazyBlockingIterator[ReceivedServerData], send: ReceivedServerData => Unit)
 
 object ServerWsListener:
   given Releasable[ServerWsListener] = s =>
