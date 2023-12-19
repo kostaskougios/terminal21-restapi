@@ -1,39 +1,74 @@
 package org.terminal21.server.service
 
+import functions.fibers.FiberExecutor
 import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.parser.*
 import io.circe.syntax.*
-import io.helidon.websocket.{WsListener, WsSession}
+import io.helidon.common.buffers.BufferData
 import org.slf4j.LoggerFactory
 import org.terminal21.model.{ClientToServer, CommandEvent, SubscribeTo}
 import org.terminal21.server.ui.WsSessionOps
-import org.terminal21.utils.ErrorLogger
+import org.terminal21.ws.{ReliableServerWsListener, ServerValue}
 
-class CommandWebSocket(sessionsService: ServerSessionsService) extends WsListener:
-  private val logger      = LoggerFactory.getLogger(getClass.getName)
-  private val errorLogger = new ErrorLogger(logger)
+//class CommandWebSocket(sessionsService: ServerSessionsService) extends WsListener:
+//  private val logger      = LoggerFactory.getLogger(getClass.getName)
+//  private val errorLogger = new ErrorLogger(logger)
+//
+//  override def onOpen(wsSession: WsSession): Unit =
+//    errorLogger.logErrors:
+//      logger.info(s"Session $wsSession opened")
+//      wsSession.send("init", true)
+//
+//  override def onClose(wsSession: WsSession, status: Int, reason: String): Unit =
+//    logger.info(s"Session $wsSession closed")
+//
+//  override def onMessage(wsSession: WsSession, text: String, last: Boolean): Unit =
+//    errorLogger.logErrors:
+//      decode[ClientToServer](text) match
+//        case Right(SubscribeTo(session)) =>
+//          logger.info(s"Command subscribes to events of session ${session.id}")
+//          sessionsService.notifyMeOnSessionEvents(session): event =>
+//            WsSessionOps.returnTrueIfSessionIsNotClosed:
+//              wsSession.send(event.asJson.noSpaces, true)
+//        case Left(e)                     => throw new IllegalStateException(s"Invalid json : json = $text  error = $e")
 
-  override def onOpen(wsSession: WsSession): Unit =
-    errorLogger.logErrors:
-      logger.info(s"Session $wsSession opened")
-      wsSession.send("init", true)
+class CommandWebSocket(fiberExecutor: FiberExecutor, sessionsService: ServerSessionsService):
+  private val logger = LoggerFactory.getLogger(getClass.getName)
 
-  override def onClose(wsSession: WsSession, status: Int, reason: String): Unit =
-    logger.info(s"Session $wsSession closed")
+  private def decoder(buf: BufferData): ClientToServer = {
+    val json = new String(buf.readBytes(), "UTF-8")
+    decode[ClientToServer](json) match
+      case Right(msg) => msg
+      case Left(e)    => throw new IllegalStateException(s"Invalid json : json = $json  error = $e")
+  }
 
-  override def onMessage(wsSession: WsSession, text: String, last: Boolean): Unit =
-    errorLogger.logErrors:
-      decode[ClientToServer](text) match
-        case Right(SubscribeTo(session)) =>
-          logger.info(s"Command subscribes to events of session ${session.id}")
-          sessionsService.notifyMeOnSessionEvents(session): event =>
-            WsSessionOps.returnTrueIfSessionIsNotClosed:
-              wsSession.send(event.asJson.noSpaces, true)
-        case Left(e)                     => throw new IllegalStateException(s"Invalid json : json = $text  error = $e")
+  private def encoder(event: CommandEvent): BufferData =
+    val j = event.asJson.noSpaces
+    BufferData.create(j.getBytes("UTF-8"))
+
+  val commandWebSocketListener = ReliableServerWsListener
+    .server(fiberExecutor)
+    .transformValue(
+      decoder,
+      encoder
+    )
+
+  start()
+
+  def start(): Unit =
+    fiberExecutor.submit:
+      val send = commandWebSocketListener.send
+      for sv <- commandWebSocketListener.receivedIterator do
+        sv.value match
+          case SubscribeTo(session) =>
+            logger.info(s"Command subscribes to events of session ${session.id}")
+            sessionsService.notifyMeOnSessionEvents(session): event =>
+              WsSessionOps.returnTrueIfSessionIsNotClosed:
+                val e = ServerValue(sv.id, event)
+                send(e)
 
 trait CommandWebSocketBeans:
   def sessionsService: ServerSessionsService
-//  def fiberExecutor: FiberExecutor
-//  lazy val commandWebSocketListener = ReliableServerWsListener.server(fiberExecutor)
-  lazy val commandWebSocket = new CommandWebSocket(sessionsService)
+  def fiberExecutor: FiberExecutor
+  lazy val commandWebSocket = new CommandWebSocket(fiberExecutor, sessionsService)
