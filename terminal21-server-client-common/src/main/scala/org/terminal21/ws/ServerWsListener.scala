@@ -25,6 +25,17 @@ object ServerWsListener:
         sv => l.send(sendTransformer(sv))
       )
 
+    def transformValue[NR, NS](
+        receiveTransformer: BufferData => NR,
+        sendTransformer: NS => BufferData
+    ): ServerWsListener[ServerValue[NR], ServerValue[NS]] =
+      ServerWsListener(
+        l.listener,
+        l.dataIterator,
+        l.receivedIterator.map(sv => sv.copy(value = receiveTransformer(sv.value))),
+        sv => l.send(sv.copy(value = sendTransformer(sv.value)))
+      )
+
   given Releasable[ServerWsListener[_, _]] = s =>
     s.listener.close()
     s.dataIterator.close()

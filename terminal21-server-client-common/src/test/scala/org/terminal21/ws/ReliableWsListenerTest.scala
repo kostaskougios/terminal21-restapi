@@ -13,10 +13,8 @@ import scala.util.Using
 
 class ReliableWsListenerTest extends AnyFunSuiteLike:
 
-  private def serverValueAsString(sv: ServerValue[BufferData]) = ServerValue(sv.id, buffDataToString(sv.value))
-  private def serverValueAsBuffData(sv: ServerValue[String])   = ServerValue(sv.id, stringToBuffData(sv.value))
-  def buffDataToString(buf: BufferData)                        = new String(buf.readBytes(), "UTF-8")
-  def stringToBuffData(s: String)                              = BufferData.create(s.getBytes("UTF-8"))
+  def buffDataToString(buf: BufferData) = new String(buf.readBytes(), "UTF-8")
+  def stringToBuffData(s: String)       = BufferData.create(s.getBytes("UTF-8"))
 
   def withServer[R](executor: FiberExecutor)(f: (WebServer, ServerWsListener[ServerValue[String], ServerValue[String]]) => R): R =
     Using.resource(ReliableServerWsListener.server(executor)): serverWsListener =>
@@ -26,7 +24,7 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
         .addRouting(wsB)
         .build
         .start
-      val stringListener = serverWsListener.transform(serverValueAsString, serverValueAsBuffData)
+      val stringListener = serverWsListener.transformValue(buffDataToString, stringToBuffData)
       try
         f(server, stringListener)
       finally server.stop()
