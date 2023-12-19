@@ -7,45 +7,33 @@ import io.circe.parser.*
 import io.circe.syntax.*
 import io.helidon.common.buffers.BufferData
 import io.helidon.webclient.websocket.WsClient
-import io.helidon.websocket.{WsListener, WsSession}
 import org.slf4j.LoggerFactory
 import org.terminal21.model.{ClientToServer, CommandEvent, Session, SubscribeTo}
-import org.terminal21.utils.ErrorLogger
+import org.terminal21.ws.ReliableClientWsListener
 
-class ClientEventsWsListener(wsClient: WsClient, session: ConnectedSession, fiberExecutor: FiberExecutor) extends WsListener:
-  private val logger      = LoggerFactory.getLogger(getClass)
-  private val errorLogger = new ErrorLogger(logger)
+import java.util.UUID
 
-  def connect(): Unit =
-    wsClient.connect("/api/command-ws", this)
+class ClientEventsWsListener(wsClient: WsClient, session: ConnectedSession, executor: FiberExecutor):
+  private val logger         = LoggerFactory.getLogger(getClass)
+  private val id             = UUID.randomUUID().toString
+  private val eventsListener = ReliableClientWsListener.client(id, wsClient, "/api/command-ws", executor, pingEveryMs = 500).transform(decoder, encoder)
 
-  private def setupPeriodicalPing(wsSession: WsSession) =
-    fiberExecutor.submit:
-      while true do
-        errorLogger.logErrors:
-          Thread.sleep(2000)
-          wsSession.ping(BufferData.empty())
+  private def decoder(buf: BufferData): Either[Error, CommandEvent] = decode[CommandEvent](new String(buf.readBytes(), "UTF-8"))
+  private def encoder(cts: ClientToServer): BufferData              =
+    val j = cts.asJson.noSpaces
+    BufferData.create(j.getBytes("UTF-8"))
 
-  override def onMessage(wsSession: WsSession, text: String, last: Boolean): Unit =
-    errorLogger.logErrors:
-      if text == "init" then
-        logger.info("init received, subscribing to events")
-        setupPeriodicalPing(wsSession)
-        val s: ClientToServer = SubscribeTo(session.session)
-        val j                 = s.asJson.noSpaces
-        wsSession.send(j, true)
-      else
-        decode[CommandEvent](text) match
+  def start(): Unit =
+    executor.submit:
+      val send = eventsListener.send
+      val it   = eventsListener.receivedIterator
+      send(SubscribeTo(session.session))
+      for msg <- it do
+        msg match
           case Left(e)      =>
-            logger.error(s"An invalid json was received as an event. json=$text , error = $e")
+            logger.error(s"An invalid json was received as an event. error = $e")
           case Right(event) =>
             session.fireEvent(event)
 
-  override def onOpen(wsSession: WsSession): Unit =
-    logger.info(s"session $wsSession opened")
-
-  override def onClose(wsSession: WsSession, status: Int, reason: String): Unit =
-    logger.info(s"client session $wsSession closed with status $status and reason $reason")
-
-  override def onError(wsSession: WsSession, t: Throwable): Unit =
-    logger.error(s"client session $wsSession closed with this error.", t)
+  def close(): Unit =
+    eventsListener.close()

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 import org.terminal21.model.{ClientToServer, CommandEvent, SubscribeTo}
 import org.terminal21.ws.{ReliableServerWsListener, ServerValue}
 
-class CommandWebSocket(fiberExecutor: FiberExecutor, sessionsService: ServerSessionsService):
+class CommandWebSocket(executor: FiberExecutor, sessionsService: ServerSessionsService):
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   private def decoder(buf: BufferData): ClientToServer = {
@@ -25,7 +25,7 @@ class CommandWebSocket(fiberExecutor: FiberExecutor, sessionsService: ServerSess
     BufferData.create(j.getBytes("UTF-8"))
 
   val commandWebSocketListener = ReliableServerWsListener
-    .server(fiberExecutor)
+    .server(executor)
     .transformValue(
       decoder,
       encoder
@@ -34,7 +34,7 @@ class CommandWebSocket(fiberExecutor: FiberExecutor, sessionsService: ServerSess
   start()
 
   def start(): Unit =
-    fiberExecutor.submit:
+    executor.submit:
       val send = commandWebSocketListener.send
       for sv <- commandWebSocketListener.receivedIterator do
         sv.value match

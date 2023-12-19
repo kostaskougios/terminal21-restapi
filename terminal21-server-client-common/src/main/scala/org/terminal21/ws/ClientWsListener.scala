@@ -11,11 +11,12 @@ case class ClientWsListener[R, S](
     receivedIterator: Iterator[R],
     send: S => Unit
 ):
+  def close(): Unit =
+    dataIterator.close()
+    listener.close()
+
   def transform[NR, NS](receiveTransformer: R => NR, sendTransformer: NS => S): ClientWsListener[NR, NS] =
     ClientWsListener(listener, dataIterator, receivedIterator.map(receiveTransformer), b => send(sendTransformer(b)))
 
 object ClientWsListener:
-  given Releasable[ClientWsListener[_, _]] =
-    l =>
-      l.listener.close()
-      l.dataIterator.close()
+  given Releasable[ClientWsListener[_, _]] = _.close()

@@ -21,10 +21,12 @@ object Sessions:
       .build
 
     val connectedSession = ConnectedSession(session, sessionsService)
-    FiberExecutor.withFiberExecutor: fiberExecutor =>
-      val eventsWsListener = new ClientEventsWsListener(wsClient, connectedSession, fiberExecutor)
-      eventsWsListener.connect()
+    FiberExecutor.withFiberExecutor: executor =>
+      val listener = new ClientEventsWsListener(wsClient, connectedSession, executor)
+      listener.start()
 
       try {
         f(connectedSession)
-      } finally sessionsService.terminateSession(session)
+      } finally
+        sessionsService.terminateSession(session)
+        listener.close()

@@ -10,7 +10,10 @@ case class ServerWsListener[R, S](
     dataIterator: LazyBlockingIterator[ServerValue[BufferData]],
     receivedIterator: Iterator[R],
     send: S => Unit
-)
+):
+  def close(): Unit =
+    listener.close()
+    dataIterator.close()
 
 object ServerWsListener:
   extension (l: ServerWsListener[ServerValue[BufferData], ServerValue[BufferData]])
@@ -36,6 +39,4 @@ object ServerWsListener:
         sv => l.send(sv.copy(value = sendTransformer(sv.value)))
       )
 
-  given Releasable[ServerWsListener[_, _]] = s =>
-    s.listener.close()
-    s.dataIterator.close()
+  given Releasable[ServerWsListener[_, _]] = _.close()
