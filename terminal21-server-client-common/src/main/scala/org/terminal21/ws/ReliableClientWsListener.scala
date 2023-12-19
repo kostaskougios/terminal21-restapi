@@ -97,7 +97,13 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
         false
 
 object ReliableClientWsListener:
-  def client(id: String, wsClient: WsClient, remotePath: String, fiberExecutor: FiberExecutor, pingEveryMs: Long = 1000): ClientWsListener[BufferData] =
+  def client(
+      id: String,
+      wsClient: WsClient,
+      remotePath: String,
+      fiberExecutor: FiberExecutor,
+      pingEveryMs: Long = 1000
+  ): ClientWsListener[BufferData, BufferData] =
     val (it, producer) = ProducerConsumerCollections.lazyIterator[BufferData]()
     val listener       = new ReliableClientWsListener(id, wsClient, remotePath, fiberExecutor, pingEveryMs):
       override protected def receive(data: BufferData): Unit = producer(data)

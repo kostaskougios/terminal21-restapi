@@ -12,7 +12,13 @@ import java.net.URI
 import scala.util.Using
 
 class ReliableWsListenerTest extends AnyFunSuiteLike:
-  def withServer[R](executor: FiberExecutor)(f: (WebServer, ServerWsListener[ServerValue[String]]) => R): R =
+
+  private def serverValueAsString(sv: ServerValue[BufferData]) = ServerValue(sv.id, buffDataToString(sv.value))
+  private def serverValueAsBuffData(sv: ServerValue[String])   = ServerValue(sv.id, stringToBuffData(sv.value))
+  def buffDataToString(buf: BufferData)                        = new String(buf.readBytes(), "UTF-8")
+  def stringToBuffData(s: String)                              = BufferData.create(s.getBytes("UTF-8"))
+
+  def withServer[R](executor: FiberExecutor)(f: (WebServer, ServerWsListener[ServerValue[String], ServerValue[String]]) => R): R =
     Using.resource(ReliableServerWsListener.server(executor)): serverWsListener =>
       val wsB            = WsRouting.builder().endpoint("/ws-test", serverWsListener.listener)
       val server         = WebServer.builder
@@ -20,12 +26,12 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
         .addRouting(wsB)
         .build
         .start
-      val stringListener = serverWsListener.transform(stringTransformer)
+      val stringListener = serverWsListener.transform(serverValueAsString, serverValueAsBuffData)
       try
         f(server, stringListener)
       finally server.stop()
 
-  def withClient[R](id: String, serverPort: Int, executor: FiberExecutor)(f: ClientWsListener[String] => R): R =
+  def withClient[R](id: String, serverPort: Int, executor: FiberExecutor)(f: ClientWsListener[String, String] => R): R =
     val wsClient = newWsClient(serverPort)
     createClient(id, wsClient, executor)(f)
 
@@ -36,18 +42,14 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
       .baseUri(uri)
       .build()
 
-  def createClient[R](id: String, wsClient: WsClient, executor: FiberExecutor)(f: ClientWsListener[String] => R) =
+  def createClient[R](id: String, wsClient: WsClient, executor: FiberExecutor)(f: ClientWsListener[String, String] => R) =
     Using.resource(ReliableClientWsListener.client(id, wsClient, "/ws-test", executor)): clientWsListener =>
       f(stringClient(clientWsListener))
 
-  val stringTransformer = new BufferDataTransformer[String]:
-    override def transform(a: BufferData): String = new String(a.readBytes(), "UTF-8")
-    override def reverse(b: String): BufferData   = BufferData.create(b.getBytes("UTF-8"))
+  def stringClient(clientWsListener: ClientWsListener[BufferData, BufferData]) =
+    clientWsListener.transform(buffDataToString, stringToBuffData)
 
-  def stringClient(clientWsListener: ClientWsListener[BufferData]) =
-    clientWsListener.transform(stringTransformer)
-
-  def runServerClient[R](clientId: String)(test: (ServerWsListener[ServerValue[String]], ClientWsListener[String]) => R): R =
+  def runServerClient[R](clientId: String)(test: (ServerWsListener[ServerValue[String], ServerValue[String]], ClientWsListener[String, String]) => R): R =
     FiberExecutor.withFiberExecutor: executor =>
       withServer(executor): (server, serverWsListener) =>
         withClient(clientId, server.port, executor)(clientWsListener => test(serverWsListener, clientWsListener))

@@ -5,23 +5,26 @@ import org.terminal21.collections.LazyBlockingIterator
 
 import scala.util.Using.Releasable
 
-case class ServerWsListener[A](
+case class ServerWsListener[R, S](
     listener: ReliableServerWsListener,
     dataIterator: LazyBlockingIterator[ServerValue[BufferData]],
-    receivedIterator: Iterator[A],
-    send: A => Unit
+    receivedIterator: Iterator[R],
+    send: S => Unit
 )
 
 object ServerWsListener:
-  extension (l: ServerWsListener[ServerValue[BufferData]])
-    def transform[B](transformer: Transformer[BufferData, B]): ServerWsListener[ServerValue[B]] =
+  extension (l: ServerWsListener[ServerValue[BufferData], ServerValue[BufferData]])
+    def transform[NR, NS](
+        receiveTransformer: ServerValue[BufferData] => NR,
+        sendTransformer: NS => ServerValue[BufferData]
+    ): ServerWsListener[NR, NS] =
       ServerWsListener(
         l.listener,
         l.dataIterator,
-        l.receivedIterator.map(sv => ServerValue(sv.id, transformer.transform(sv.value))),
-        sv => l.send(ServerValue(sv.id, transformer.reverse(sv.value)))
+        l.receivedIterator.map(receiveTransformer),
+        sv => l.send(sendTransformer(sv))
       )
 
-  given Releasable[ServerWsListener[_]] = s =>
+  given Releasable[ServerWsListener[_, _]] = s =>
     s.listener.close()
     s.dataIterator.close()

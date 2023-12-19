@@ -39,10 +39,8 @@ abstract class ReliableServerWsListener(fiberExecutor: FiberExecutor) extends Ab
   def close(): Unit =
     perClientIdWsSession.clear()
 
-case class ServerValue[A](id: String, value: A)
-
 object ReliableServerWsListener:
-  def server(fiberExecutor: FiberExecutor): ServerWsListener[ServerValue[BufferData]] =
+  def server(fiberExecutor: FiberExecutor): ServerWsListener[ServerValue[BufferData], ServerValue[BufferData]] =
     val (it, producer) = ProducerConsumerCollections.lazyIterator[ServerValue[BufferData]]()
     val listener       = new ReliableServerWsListener(fiberExecutor):
       override protected def receive(id: String, data: BufferData): Unit = producer(ServerValue(id, data))

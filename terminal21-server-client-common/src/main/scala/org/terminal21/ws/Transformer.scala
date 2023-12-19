@@ -3,7 +3,6 @@ package org.terminal21.ws
 import io.helidon.common.buffers.BufferData
 
 trait Transformer[A, B]:
-  def transform(a: A): B
-  def reverse(b: B): A
+  def map(a: A): B
 
-trait BufferDataTransformer[B] extends Transformer[BufferData, B]
+trait BufferDataTransformer[A] extends Transformer[BufferData, A]

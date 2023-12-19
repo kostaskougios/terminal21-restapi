@@ -34,4 +34,6 @@ class CommandWebSocket(sessionsService: ServerSessionsService) extends WsListene
 
 trait CommandWebSocketBeans:
   def sessionsService: ServerSessionsService
+//  def fiberExecutor: FiberExecutor
+//  lazy val commandWebSocketListener = ReliableServerWsListener.server(fiberExecutor)
   lazy val commandWebSocket = new CommandWebSocket(sessionsService)
