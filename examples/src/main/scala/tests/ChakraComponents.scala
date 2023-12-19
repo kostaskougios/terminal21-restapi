@@ -12,13 +12,14 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
     Sessions.withNewSession("chakra-components", "Chakra Components"): session =>
       given ConnectedSession = session
 
-      val latch     = new CountDownLatch(1)
-      val box1      = Box(text = "First box", props = ChakraProps(bg = "green", p = 4, color = "black"))
-      val editable1 = Editable(defaultValue = "Please type here")
+      val latch      = new CountDownLatch(1)
+      val box1       = Box(text = "First box", props = ChakraProps(bg = "green", p = 4, color = "black"))
+      val editable1  = Editable(defaultValue = "Please type here")
       editable1.onChange: newValue =>
         println(s"editable1 newValue = $newValue")
         println(editable1)
-      val email     = Input(`type` = "email")
+      val email      = Input(`type` = "email")
+      val exitButton = Button(text = "Exit Program", colorScheme = "red")
       Seq(
         box1,
         SimpleGrid(spacing = "8px", columns = 4).withChildren(
@@ -26,9 +27,12 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
           Box(text = "Two", props = ChakraProps(bg = "tomato", color = "black")),
           Box(text = "Three", props = ChakraProps(bg = "blue", color = "black"))
         ),
-        Button(text = "Exit Program").onClick: () =>
+        exitButton.onClick: () =>
           box1.text = "Exit Clicked!"
+          exitButton.text = "Stopping..."
+          exitButton.colorScheme = "green"
           session.render()
+          Thread.sleep(1000)
           latch.countDown()
         ,
         SimpleGrid(spacing = "8px", columns = 2).withChildren(
