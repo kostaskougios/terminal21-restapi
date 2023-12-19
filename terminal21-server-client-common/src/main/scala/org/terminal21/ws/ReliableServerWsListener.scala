@@ -6,7 +6,6 @@ import io.helidon.websocket.WsSession
 import org.terminal21.collections.{LazyBlockingIterator, ProducerConsumerCollections}
 
 import scala.collection.concurrent.TrieMap
-import scala.util.Using.Releasable
 
 abstract class ReliableServerWsListener(fiberExecutor: FiberExecutor) extends AbstractWsListener:
   private val perClientIdWsSession = TrieMap.empty[String, WsSession]
@@ -41,26 +40,6 @@ abstract class ReliableServerWsListener(fiberExecutor: FiberExecutor) extends Ab
     perClientIdWsSession.clear()
 
 case class ServerValue[A](id: String, value: A)
-case class ServerWsListener[A](
-    listener: ReliableServerWsListener,
-    dataIterator: LazyBlockingIterator[ServerValue[BufferData]],
-    receivedIterator: Iterator[A],
-    send: A => Unit
-)
-
-object ServerWsListener:
-  extension (l: ServerWsListener[ServerValue[BufferData]])
-    def transform[B](transformer: Transformer[BufferData, B]): ServerWsListener[ServerValue[B]] =
-      ServerWsListener(
-        l.listener,
-        l.dataIterator,
-        l.receivedIterator.map(sv => ServerValue(sv.id, transformer.transform(sv.value))),
-        sv => l.send(ServerValue(sv.id, transformer.reverse(sv.value)))
-      )
-
-  given Releasable[ServerWsListener[_]] = s =>
-    s.listener.close()
-    s.dataIterator.close()
 
 object ReliableServerWsListener:
   def server(fiberExecutor: FiberExecutor): ServerWsListener[ServerValue[BufferData]] =

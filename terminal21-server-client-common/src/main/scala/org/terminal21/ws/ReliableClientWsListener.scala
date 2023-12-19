@@ -10,7 +10,6 @@ import java.io.UncheckedIOException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.{CountDownLatch, LinkedBlockingQueue}
 import scala.annotation.tailrec
-import scala.util.Using.Releasable
 
 abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePath: String, fiberExecutor: FiberExecutor, pingEveryMs: Long)
     extends AbstractWsListener:
@@ -96,13 +95,6 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
         logger.info("Socket closed, reconnecting...")
         connect()
         false
-
-case class ClientWsListener[A](listener: ReliableClientWsListener, receivedIterator: Iterator[A], send: A => Unit):
-  def transform[B](transformer: Transformer[A, B]): ClientWsListener[B] =
-    ClientWsListener[B](listener, receivedIterator.map(transformer.transform), b => send(transformer.reverse(b)))
-
-object ClientWsListener:
-  given Releasable[ClientWsListener[_]] = _.listener.close()
 
 object ReliableClientWsListener:
 
