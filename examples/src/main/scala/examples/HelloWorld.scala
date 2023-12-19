@@ -24,7 +24,7 @@ import org.terminal21.client.{ConnectedSession, Sessions}
         Box(text = "Second box", props = ChakraProps(bg = "tomato", p = 4, color = "black"))
       )
     )
-    val grid = SimpleGrid(spacing = "8px", columns = 4)
+    val grid = SimpleGrid(spacing = Some("8px"), columns = 4)
     session.add(h1, p1, grid)
     session.render()
 

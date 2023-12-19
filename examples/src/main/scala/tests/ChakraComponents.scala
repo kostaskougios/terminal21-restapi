@@ -22,7 +22,7 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
       val exitButton = Button(text = "Exit Program", colorScheme = Some("red"))
       Seq(
         box1,
-        SimpleGrid(spacing = "8px", columns = 4).withChildren(
+        SimpleGrid(spacing = Some("8px"), columns = 4).withChildren(
           Box(text = "One", props = ChakraProps(bg = "green", color = "black")),
           Box(text = "Two", props = ChakraProps(bg = "tomato", color = "black")),
           Box(text = "Three", props = ChakraProps(bg = "blue", color = "black"))
@@ -35,18 +35,18 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
           Thread.sleep(1000)
           latch.countDown()
         ,
-        SimpleGrid(spacing = "8px", columns = 2).withChildren(
+        SimpleGrid(columns = 2).withChildren(
           Box(text = "Name"),
           editable1
         ),
         Box(text = "VStack", props = ChakraProps(bg = "green", color = "black")),
-        VStack(spacing = "24px").withChildren(
+        VStack(spacing = Some("24px")).withChildren(
           Box(text = "1", props = ChakraProps(bg = "green", p = 2, color = "black")),
           Box(text = "2", props = ChakraProps(bg = "red", p = 2, color = "black")),
           Box(text = "3", props = ChakraProps(bg = "blue", p = 2, color = "black"))
         ),
         Box(text = "HStack", props = ChakraProps(bg = "green", color = "black")),
-        HStack(spacing = "24px").withChildren(
+        HStack(spacing = Some("24px")).withChildren(
           Box(text = "1", props = ChakraProps(bg = "green", p = 2, color = "black")),
           Box(text = "2", props = ChakraProps(bg = "red", p = 2, color = "black")),
           Box(text = "3", props = ChakraProps(bg = "blue", p = 2, color = "black"))
