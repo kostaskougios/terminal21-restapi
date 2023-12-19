@@ -1,5 +1,7 @@
 package org.terminal21.client
 
+import org.terminal21.client.components.UiElement
+
 trait EventHandler
 
 trait OnClickEventHandler extends EventHandler:
@@ -7,3 +9,20 @@ trait OnClickEventHandler extends EventHandler:
 
 trait OnChangeEventHandler extends EventHandler:
   def onChange(newValue: String): Unit
+
+object OnChangeEventHandler:
+  trait CanHandleOnChangeEvent[A <: UiElement]:
+    this: A =>
+    def onChange(h: OnChangeEventHandler)(using session: ConnectedSession): A =
+      session.addEventHandler(key, h)
+      this
+
+trait OnChangeBooleanEventHandler extends EventHandler:
+  def onChange(newValue: Boolean): Unit
+
+object OnChangeBooleanEventHandler:
+  trait CanHandleOnChangeEvent[A <: UiElement]:
+    this: A =>
+    def onChange(h: OnChangeBooleanEventHandler)(using session: ConnectedSession): A =
+      session.addEventHandler(key, h)
+      this

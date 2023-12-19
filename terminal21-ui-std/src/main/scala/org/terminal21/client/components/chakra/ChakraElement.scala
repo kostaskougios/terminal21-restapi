@@ -2,7 +2,7 @@ package org.terminal21.client.components.chakra
 
 import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler}
 import org.terminal21.client.components.{Keys, UiElement}
-import org.terminal21.client.{ConnectedSession, OnChangeEventHandler, OnClickEventHandler}
+import org.terminal21.client.{ConnectedSession, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler}
 
 sealed trait ChakraElement extends UiElement
 
@@ -70,12 +70,9 @@ case class Editable(
     defaultValue: String = "",
     @volatile var value: String = ""
 ) extends ChakraElement
-    with HasEventHandler:
+    with HasEventHandler
+    with OnChangeEventHandler.CanHandleOnChangeEvent[Editable]:
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
-
-  def onChange(h: OnChangeEventHandler)(using session: ConnectedSession): Editable =
-    session.addEventHandler(key, h)
-    this
 
 /** https://chakra-ui.com/docs/components/form-control
   */
@@ -110,7 +107,12 @@ case class Input(
     with HasChildren[Input]:
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
 
-case class Checkbox(key: String = Keys.nextKey, @volatile var text: String = "", defaultChecked: Boolean = false) extends ChakraElement with HasEventHandler:
+/** https://chakra-ui.com/docs/components/checkbox
+  */
+case class Checkbox(key: String = Keys.nextKey, @volatile var text: String = "", defaultChecked: Boolean = false, @volatile var isDisabled: Boolean = false)
+    extends ChakraElement
+    with HasEventHandler
+    with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Checkbox]:
   @volatile private var checkedV: Option[Boolean]        = None
   def checked: Boolean                                   = checkedV.getOrElse(defaultChecked)
   override def defaultEventHandler: OnChangeEventHandler = newValue => checkedV = Some(newValue.toBoolean)

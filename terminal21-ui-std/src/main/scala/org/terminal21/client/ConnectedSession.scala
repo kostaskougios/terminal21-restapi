@@ -41,9 +41,10 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
       case Some(handlers) =>
         for handler <- handlers do
           (event, handler) match
-            case (_: OnClick, h: OnClickEventHandler)          => h.onClick()
-            case (onChange: OnChange, h: OnChangeEventHandler) => h.onChange(onChange.value)
-            case x                                             => logger.error(s"Unknown event handling combination : $x")
+            case (_: OnClick, h: OnClickEventHandler)                 => h.onClick()
+            case (onChange: OnChange, h: OnChangeEventHandler)        => h.onChange(onChange.value)
+            case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
+            case x                                                    => logger.error(s"Unknown event handling combination : $x")
       case None           =>
         logger.warn(s"There is no event handler for event $event")
 

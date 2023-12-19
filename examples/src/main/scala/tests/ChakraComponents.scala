@@ -20,8 +20,15 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
         println(editable1)
       val email      = Input(`type` = "email")
       val exitButton = Button(text = "Exit Program", colorScheme = Some("red"))
-      val checkbox1  = Checkbox(text = "Check 1")
-      val checkbox2  = Checkbox(text = "Check 2", defaultChecked = true)
+
+      val checkbox2 = Checkbox(text = "Check 2", defaultChecked = true)
+
+      val checkbox1 = Checkbox(text = "Check 1")
+      checkbox1.onChange: newValue =>
+        println(s"checkbox1 = $newValue")
+        checkbox2.isDisabled = newValue
+        session.render()
+
       Seq(
         box1,
         SimpleGrid(spacing = Some("8px"), columns = 4).withChildren(
