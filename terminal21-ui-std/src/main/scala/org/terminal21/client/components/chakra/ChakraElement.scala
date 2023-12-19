@@ -95,10 +95,10 @@ case class FormHelperText(key: String = Keys.nextKey, @volatile var text: String
   */
 case class Input(
     key: String = Keys.nextKey,
-    `type`: String,
+    `type`: String = "text",
     placeholder: String = "",
     size: String = "md",
-    @volatile var variant: String = "Flushed",
+    @volatile var variant: Option[String] = None,
     @volatile var value: String = "",
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
