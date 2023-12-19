@@ -20,16 +20,16 @@ abstract class ReliableServerWsListener(fiberExecutor: FiberExecutor) extends Ab
     wsSession.send(data, true)
 
   override def onMessage(wsSession: WsSession, data: BufferData, last: Boolean): Unit =
-    errorLogger.logErrors:
-      if data.available() > 0 then
-        val len    = data.read()
-        val strDat = new Array[Byte](len)
-        data.read(strDat)
-        val id     = new String(strDat, "UTF-8")
-        println(s"Server receiving ${data.available()} from $id, last=$last")
-        perClientIdWsSession.put(id, wsSession)
-        if data.available() > 0 then receive(id, data)
-      else logger.warn(s"Received empty message for $wsSession")
+    fiberExecutor.submit:
+      errorLogger.logErrors:
+        if data.available() > 0 then
+          val len    = data.read()
+          val strDat = new Array[Byte](len)
+          data.read(strDat)
+          val id     = new String(strDat, "UTF-8")
+          perClientIdWsSession.put(id, wsSession)
+          if data.available() > 0 then receive(id, data)
+        else logger.warn(s"Received empty message for $wsSession")
 
   override def onClose(wsSession: WsSession, status: Int, reason: String): Unit =
     logger.info(s"Server session $wsSession closed with status $status and reason $reason")

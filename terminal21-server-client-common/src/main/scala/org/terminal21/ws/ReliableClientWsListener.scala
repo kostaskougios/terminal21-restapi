@@ -87,7 +87,7 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
       wsSessionReady.countDown()
       send(BufferData.empty()) // make sure the server has our id
 
-  protected def tryOnSocketClosedReconnect(f: => Unit): Boolean =
+  private def tryOnSocketClosedReconnect(f: => Unit): Boolean =
     try
       f
       true
