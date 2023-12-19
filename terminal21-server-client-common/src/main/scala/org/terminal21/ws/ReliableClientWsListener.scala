@@ -14,9 +14,9 @@ import scala.util.Using.Releasable
 
 abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePath: String, fiberExecutor: FiberExecutor, pingEveryMs: Long)
     extends AbstractWsListener:
-  private val idDataStr = BufferData.create(id.getBytes("UTF-8"))
-  private val idData    = BufferData.create(BufferData.create(Array[Byte](idDataStr.available().toByte)), idDataStr)
-  if (idDataStr.available() > 255) throw new IllegalArgumentException("id must be less than 255 bytes")
+  private val idDataStr = id.getBytes("UTF-8")
+  private def idData    = BufferData.create(BufferData.create(Array[Byte](idDataStr.length.toByte)), BufferData.create(idDataStr))
+  if (idDataStr.length > 255) throw new IllegalArgumentException("id must be less than 255 bytes")
 
   private val toSendQueue                = new LinkedBlockingQueue[BufferData](64)
   @volatile protected var wsSession      = Option.empty[WsSession]
@@ -92,7 +92,7 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
       f
       true
     catch
-      case _: UncheckedIOException =>
+      case _: UncheckedIOException | _: IllegalStateException =>
         logger.info("Socket closed, reconnecting...")
         connect()
         false
