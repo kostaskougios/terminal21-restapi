@@ -31,12 +31,15 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
       finally server.stop()
 
   def withClient[R](id: String, serverPort: Int, executor: FiberExecutor)(f: ClientWsListener[String] => R): R =
-    val uri      = URI.create(s"ws://localhost:$serverPort")
-    val wsClient = WsClient
+    val wsClient = newWsClient(serverPort)
+    createClient(id, wsClient, executor)(f)
+
+  def newWsClient(serverPort: Int) =
+    val uri = URI.create(s"ws://localhost:$serverPort")
+    WsClient
       .builder()
       .baseUri(uri)
       .build()
-    createClient(id, wsClient, executor)(f)
 
   def createClient[R](id: String, wsClient: WsClient, executor: FiberExecutor)(f: ClientWsListener[String] => R) =
     Using.resource(ReliableClientWsListener.client(id, wsClient, "/ws-test", executor)): clientWsListener =>
@@ -60,15 +63,12 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
   test("multiple clients sends server messages"):
     FiberExecutor.withFiberExecutor: executor =>
       withServer(executor): (server, serverWsListener) =>
-        val uri      = URI.create(s"ws://localhost:${server.port}")
-        val wsClient = WsClient
-          .builder()
-          .baseUri(uri)
-          .build()
-        val fibers   = for i <- 1 to 10 yield executor.submit:
+        val wsClient = newWsClient(server.port)
+        val fibers   = for i <- 1 to 40 yield executor.submit:
           createClient(s"client-$i", wsClient, executor): client =>
-            client.send(s"hello-$i")
-            client.receivedIterator.next() should be(s"got hello-$i")
+            for j <- 1 to 100 do
+              client.send(s"hello-$i-$j")
+              client.receivedIterator.next() should be(s"got hello-$i-$j")
 
         val serverFiber = executor.submit:
           for sv <- serverWsListener.receivedIterator do serverWsListener.send(ServerValue(sv.id, s"got ${sv.value}"))
