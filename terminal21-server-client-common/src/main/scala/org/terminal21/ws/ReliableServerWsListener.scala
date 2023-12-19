@@ -41,17 +41,24 @@ abstract class ReliableServerWsListener(fiberExecutor: FiberExecutor) extends Ab
     perClientIdWsSession.clear()
 
 type ReceivedServerData = (String, BufferData)
-case class ServerWsListener(listener: ReliableServerWsListener, receivedIterator: LazyBlockingIterator[ReceivedServerData], send: ReceivedServerData => Unit)
+case class ServerWsListener[A](
+    listener: ReliableServerWsListener,
+    dataIterator: LazyBlockingIterator[ReceivedServerData],
+    receivedIterator: Iterator[A],
+    send: A => Unit
+):
+  def transform[B](mapper: Iterator[A] => Iterator[B], sender: B => A): ServerWsListener[B] =
+    ServerWsListener[B](listener, dataIterator, mapper(receivedIterator), b => send(sender(b)))
 
 object ServerWsListener:
-  given Releasable[ServerWsListener] = s =>
+  given Releasable[ServerWsListener[_]] = s =>
     s.listener.close()
-    s.receivedIterator.close()
+    s.dataIterator.close()
 
 object ReliableServerWsListener:
-  def server(fiberExecutor: FiberExecutor): ServerWsListener =
+  def server(fiberExecutor: FiberExecutor): ServerWsListener[ReceivedServerData] =
     val (it, producer) = ProducerConsumerCollections.lazyIterator[(String, BufferData)]()
     val listener       = new ReliableServerWsListener(fiberExecutor):
       override protected def receive(id: String, data: BufferData): Unit = producer(id, data)
 
-    ServerWsListener(listener, it, listener.send)
+    ServerWsListener(listener, it, it, listener.send)

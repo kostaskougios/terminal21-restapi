@@ -12,16 +12,22 @@ import java.net.URI
 import scala.util.Using
 
 class ReliableWsListenerTest extends AnyFunSuiteLike:
-  def withServer[R](executor: FiberExecutor)(f: (WebServer, ServerWsListener) => R): R =
+  case class ServerValue(id: String, value: String)
+  def withServer[R](executor: FiberExecutor)(f: (WebServer, ServerWsListener[ServerValue]) => R): R =
     Using.resource(ReliableServerWsListener.server(executor)): serverWsListener =>
-      val wsB    = WsRouting.builder().endpoint("/ws-test", serverWsListener.listener)
-      val server = WebServer.builder
+      val wsB            = WsRouting.builder().endpoint("/ws-test", serverWsListener.listener)
+      val server         = WebServer.builder
         .port(0)
         .addRouting(wsB)
         .build
         .start
+      val stringListener =
+        serverWsListener.transform(
+          _.map((id, value) => ServerValue(id, new String(value.readBytes(), "UTF-8"))),
+          sv => (sv.id, BufferData.create(sv.value.getBytes))
+        )
       try
-        f(server, serverWsListener)
+        f(server, stringListener)
       finally server.stop()
 
   def withClient[R](id: String, serverPort: Int, executor: FiberExecutor)(f: ClientWsListener[String] => R): R =
@@ -39,7 +45,7 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
   def stringClient(clientWsListener: ClientWsListener[BufferData]) =
     clientWsListener.transform(_.map(buf => new String(buf.readBytes(), "UTF-8")), s => BufferData.create(s.getBytes("UTF-8")))
 
-  def runServerClient[R](clientId: String)(test: (ServerWsListener, ClientWsListener[String]) => R): R =
+  def runServerClient[R](clientId: String)(test: (ServerWsListener[ServerValue], ClientWsListener[String]) => R): R =
     FiberExecutor.withFiberExecutor: executor =>
       withServer(executor): (server, serverWsListener) =>
         withClient(clientId, server.port, executor)(clientWsListener => test(serverWsListener, clientWsListener))
@@ -48,10 +54,8 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
     runServerClient("client-1"): (serverWsListener, clientWsListener) =>
       clientWsListener.send("Hello")
       serverWsListener.receivedIterator
-        .map: (id, buf) =>
-          (id, new String(buf.readBytes()))
         .take(1)
-        .toList should be(Seq(("client-1", "Hello")))
+        .toList should be(Seq(ServerValue("client-1", "Hello")))
 
   test("multiple clients sends server messages"):
     FiberExecutor.withFiberExecutor: executor =>
@@ -67,7 +71,7 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
             client.receivedIterator.next() should be(s"got hello-$i")
 
         val serverFiber = executor.submit:
-          for (id, msg) <- serverWsListener.receivedIterator do serverWsListener.send(id, BufferData.create(s"got $msg".getBytes))
+          for sv <- serverWsListener.receivedIterator do serverWsListener.send(ServerValue(sv.id, s"got ${sv.value}"))
 
         // make sure no exceptions
         try for f <- fibers yield f.get()
@@ -76,7 +80,7 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
   test("server sends client a msg"):
     runServerClient("client-1"): (serverWsListener, clientWsListener) =>
       while !serverWsListener.listener.hasClientId("client-1") do Thread.sleep(5)
-      serverWsListener.send("client-1", BufferData.create("Hello"))
+      serverWsListener.send(ServerValue("client-1", "Hello"))
       clientWsListener.receivedIterator
         .take(1)
         .toList should be(Seq("Hello"))
