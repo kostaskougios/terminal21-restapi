@@ -98,8 +98,8 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
         false
 
 case class ClientWsListener[A](listener: ReliableClientWsListener, receivedIterator: Iterator[A], send: A => Unit):
-  def transform[B](mapper: Iterator[A] => Iterator[B], sender: B => A): ClientWsListener[B] =
-    ClientWsListener[B](listener, mapper(receivedIterator), b => send(sender(b)))
+  def transform[B](transformer: Transformer[A, B]): ClientWsListener[B] =
+    ClientWsListener[B](listener, receivedIterator.map(transformer.transform), b => send(transformer.reverse(b)))
 
 object ClientWsListener:
   given Releasable[ClientWsListener[_]] = _.listener.close()

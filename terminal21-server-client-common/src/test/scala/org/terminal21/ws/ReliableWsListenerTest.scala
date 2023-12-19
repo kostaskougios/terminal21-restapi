@@ -45,8 +45,12 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
     Using.resource(ReliableClientWsListener.client(id, wsClient, "/ws-test", executor)): clientWsListener =>
       f(stringClient(clientWsListener))
 
+  val stringTransformer = new BufferDataTransformer[String]:
+    override def transform(a: BufferData): String = new String(a.readBytes(), "UTF-8")
+    override def reverse(b: String): BufferData   = BufferData.create(b.getBytes("UTF-8"))
+
   def stringClient(clientWsListener: ClientWsListener[BufferData]) =
-    clientWsListener.transform(_.map(buf => new String(buf.readBytes(), "UTF-8")), s => BufferData.create(s.getBytes("UTF-8")))
+    clientWsListener.transform(stringTransformer)
 
   def runServerClient[R](clientId: String)(test: (ServerWsListener[ServerValue], ClientWsListener[String]) => R): R =
     FiberExecutor.withFiberExecutor: executor =>
