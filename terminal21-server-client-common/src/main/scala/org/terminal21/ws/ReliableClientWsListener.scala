@@ -17,12 +17,12 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
   private def idData    = BufferData.create(BufferData.create(Array[Byte](idDataStr.length.toByte)), BufferData.create(idDataStr))
   if (idDataStr.length > 255) throw new IllegalArgumentException("id must be less than 255 bytes")
 
-  private val toSendQueue                = new LinkedBlockingQueue[BufferData](64)
-  @volatile protected var wsSession      = Option.empty[WsSession]
-  @volatile protected var wsSessionReady = new CountDownLatch(1)
-  protected val isRunning                = new AtomicBoolean(true)
+  private val toSendQueue              = new LinkedBlockingQueue[BufferData](64)
+  @volatile private var wsSession      = Option.empty[WsSession]
+  @volatile private var wsSessionReady = new CountDownLatch(1)
+  private val isRunning                = new AtomicBoolean(true)
   setupPeriodicalPing()
-  private val senderFiber                = setupSender()
+  private val senderFiber              = setupSender()
   connect()
 
   def close(): Unit =
@@ -97,9 +97,8 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
         false
 
 object ReliableClientWsListener:
-
   def client(id: String, wsClient: WsClient, remotePath: String, fiberExecutor: FiberExecutor, pingEveryMs: Long = 1000): ClientWsListener[BufferData] =
     val (it, producer) = ProducerConsumerCollections.lazyIterator[BufferData]()
     val listener       = new ReliableClientWsListener(id, wsClient, remotePath, fiberExecutor, pingEveryMs):
       override protected def receive(data: BufferData): Unit = producer(data)
-    ClientWsListener(listener, it, listener.send)
+    ClientWsListener(listener, it, it, listener.send)
