@@ -20,6 +20,8 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
         println(editable1)
       val email      = Input(`type` = "email")
       val exitButton = Button(text = "Exit Program", colorScheme = Some("red"))
+      val checkbox1  = Checkbox(text = "Check 1")
+      val checkbox2  = Checkbox(text = "Check 2", defaultChecked = true)
       Seq(
         box1,
         SimpleGrid(spacing = Some("8px"), columns = 4).withChildren(
@@ -57,6 +59,10 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
           email,
           FormHelperText(text = "We'll never share your email.")
         ),
+        HStack().withChildren(
+          checkbox1,
+          checkbox2
+        ),
         ButtonGroup(variant = Some("outline"), spacing = Some("24")).withChildren(
           Button(text = "Save", colorScheme = Some("red")),
           Button(text = "Cancel")
@@ -66,7 +72,7 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
       executor.submit:
         while true do
           Thread.sleep(1000)
-          println(s"editable value = ${editable1.value}, email = ${email.value}")
+          println(s"editable value = ${editable1.value}, email = ${email.value}, checkbox1=${checkbox1.checked}, checkbox2=${checkbox2.checked}")
 
       println("Waiting for button to be pressed for 1 hour")
       latch.await(1, TimeUnit.HOURS)

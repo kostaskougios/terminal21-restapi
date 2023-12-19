@@ -109,3 +109,8 @@ case class Input(
     with HasEventHandler
     with HasChildren[Input]:
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
+
+case class Checkbox(key: String = Keys.nextKey, @volatile var text: String = "", defaultChecked: Boolean = false) extends ChakraElement with HasEventHandler:
+  @volatile private var checkedV: Option[Boolean]        = None
+  def checked: Boolean                                   = checkedV.getOrElse(defaultChecked)
+  override def defaultEventHandler: OnChangeEventHandler = newValue => checkedV = Some(newValue.toBoolean)
