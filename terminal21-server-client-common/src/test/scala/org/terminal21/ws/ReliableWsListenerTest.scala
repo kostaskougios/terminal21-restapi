@@ -12,8 +12,7 @@ import java.net.URI
 import scala.util.Using
 
 class ReliableWsListenerTest extends AnyFunSuiteLike:
-  case class ServerValue(id: String, value: String)
-  def withServer[R](executor: FiberExecutor)(f: (WebServer, ServerWsListener[ServerValue]) => R): R =
+  def withServer[R](executor: FiberExecutor)(f: (WebServer, ServerWsListener[ServerValue[String]]) => R): R =
     Using.resource(ReliableServerWsListener.server(executor)): serverWsListener =>
       val wsB            = WsRouting.builder().endpoint("/ws-test", serverWsListener.listener)
       val server         = WebServer.builder
@@ -21,11 +20,7 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
         .addRouting(wsB)
         .build
         .start
-      val stringListener =
-        serverWsListener.transform(
-          _.map((id, value) => ServerValue(id, new String(value.readBytes(), "UTF-8"))),
-          sv => (sv.id, BufferData.create(sv.value.getBytes))
-        )
+      val stringListener = serverWsListener.transform(stringTransformer)
       try
         f(server, stringListener)
       finally server.stop()
@@ -52,7 +47,7 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
   def stringClient(clientWsListener: ClientWsListener[BufferData]) =
     clientWsListener.transform(stringTransformer)
 
-  def runServerClient[R](clientId: String)(test: (ServerWsListener[ServerValue], ClientWsListener[String]) => R): R =
+  def runServerClient[R](clientId: String)(test: (ServerWsListener[ServerValue[String]], ClientWsListener[String]) => R): R =
     FiberExecutor.withFiberExecutor: executor =>
       withServer(executor): (server, serverWsListener) =>
         withClient(clientId, server.port, executor)(clientWsListener => test(serverWsListener, clientWsListener))

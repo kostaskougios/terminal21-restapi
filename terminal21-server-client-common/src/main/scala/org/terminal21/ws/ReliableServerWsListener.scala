@@ -40,25 +40,32 @@ abstract class ReliableServerWsListener(fiberExecutor: FiberExecutor) extends Ab
   def close(): Unit =
     perClientIdWsSession.clear()
 
-type ReceivedServerData = (String, BufferData)
+case class ServerValue[A](id: String, value: A)
 case class ServerWsListener[A](
     listener: ReliableServerWsListener,
-    dataIterator: LazyBlockingIterator[ReceivedServerData],
+    dataIterator: LazyBlockingIterator[ServerValue[BufferData]],
     receivedIterator: Iterator[A],
     send: A => Unit
-):
-  def transform[B](mapper: Iterator[A] => Iterator[B], sender: B => A): ServerWsListener[B] =
-    ServerWsListener[B](listener, dataIterator, mapper(receivedIterator), b => send(sender(b)))
+)
 
 object ServerWsListener:
+  extension (l: ServerWsListener[ServerValue[BufferData]])
+    def transform[B](transformer: Transformer[BufferData, B]): ServerWsListener[ServerValue[B]] =
+      ServerWsListener(
+        l.listener,
+        l.dataIterator,
+        l.receivedIterator.map(sv => ServerValue(sv.id, transformer.transform(sv.value))),
+        sv => l.send(ServerValue(sv.id, transformer.reverse(sv.value)))
+      )
+
   given Releasable[ServerWsListener[_]] = s =>
     s.listener.close()
     s.dataIterator.close()
 
 object ReliableServerWsListener:
-  def server(fiberExecutor: FiberExecutor): ServerWsListener[ReceivedServerData] =
-    val (it, producer) = ProducerConsumerCollections.lazyIterator[(String, BufferData)]()
+  def server(fiberExecutor: FiberExecutor): ServerWsListener[ServerValue[BufferData]] =
+    val (it, producer) = ProducerConsumerCollections.lazyIterator[ServerValue[BufferData]]()
     val listener       = new ReliableServerWsListener(fiberExecutor):
-      override protected def receive(id: String, data: BufferData): Unit = producer(id, data)
+      override protected def receive(id: String, data: BufferData): Unit = producer(ServerValue(id, data))
 
-    ServerWsListener(listener, it, it, listener.send)
+    ServerWsListener(listener, it, it, sv => listener.send(sv.id, sv.value))
