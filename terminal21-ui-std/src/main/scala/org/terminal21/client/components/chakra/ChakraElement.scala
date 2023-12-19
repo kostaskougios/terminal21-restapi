@@ -6,6 +6,8 @@ import org.terminal21.client.{ConnectedSession, OnChangeEventHandler, OnClickEve
 
 sealed trait ChakraElement extends UiElement
 
+/** https://chakra-ui.com/docs/components/button
+  */
 case class Button(
     key: String = Keys.nextKey,
     @volatile var text: String = "Ok",
@@ -17,6 +19,8 @@ case class Button(
     session.addEventHandler(key, h)
     this
 
+/** https://chakra-ui.com/docs/components/button
+  */
 case class ButtonGroup(
     key: String = Keys.nextKey,
     @volatile var variant: Option[String] = None,
