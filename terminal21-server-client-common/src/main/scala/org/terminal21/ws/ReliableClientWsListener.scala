@@ -98,14 +98,16 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
         false
 
 type ReceivedClientData = BufferData
-case class ClientWsListener(listener: ReliableClientWsListener, receivedIterator: LazyBlockingIterator[ReceivedClientData], send: BufferData => Unit)
+case class ClientWsListener[A](listener: ReliableClientWsListener, receivedIterator: Iterator[A], send: A => Unit):
+  def transform[B](mapper: Iterator[A] => Iterator[B], sender: B => A): ClientWsListener[B] =
+    ClientWsListener[B](listener, mapper(receivedIterator), b => send(sender(b)))
 
 object ClientWsListener:
-  given Releasable[ClientWsListener] = _.listener.close()
+  given Releasable[ClientWsListener[_]] = _.listener.close()
 
 object ReliableClientWsListener:
 
-  def client(id: String, wsClient: WsClient, remotePath: String, fiberExecutor: FiberExecutor, pingEveryMs: Long = 1000): ClientWsListener =
+  def client(id: String, wsClient: WsClient, remotePath: String, fiberExecutor: FiberExecutor, pingEveryMs: Long = 1000): ClientWsListener[ReceivedClientData] =
     val (it, producer) = ProducerConsumerCollections.lazyIterator[ReceivedClientData]()
     val listener       = new ReliableClientWsListener(id, wsClient, remotePath, fiberExecutor, pingEveryMs):
       override protected def receive(data: BufferData): Unit = producer(data)
