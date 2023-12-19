@@ -59,7 +59,7 @@ class ReliableWsListenerTest extends AnyFunSuiteLike:
         .take(1)
         .toList should be(Seq(ServerValue("client-1", "Hello")))
 
-  test("multiple clients sends server messages"):
+  test("multiple clients / server messages"):
     FiberExecutor.withFiberExecutor: executor =>
       withServer(executor): (server, serverWsListener) =>
         val wsClient = newWsClient(server.port)
