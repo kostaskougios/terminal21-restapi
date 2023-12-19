@@ -55,5 +55,5 @@ class ConnectedSession(val session: Session, sessionsService: SessionsService):
     val elementsCopy = synchronized(elements)
     val json         =
       for e <- elementsCopy
-      yield e.asJson
+      yield e.asJson.deepDropNullValues
     JsonObject(("elements", json.asJson))

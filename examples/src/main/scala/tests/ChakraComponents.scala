@@ -19,7 +19,7 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
         println(s"editable1 newValue = $newValue")
         println(editable1)
       val email      = Input(`type` = "email")
-      val exitButton = Button(text = "Exit Program", colorScheme = "red")
+      val exitButton = Button(text = "Exit Program", colorScheme = Some("red"))
       Seq(
         box1,
         SimpleGrid(spacing = "8px", columns = 4).withChildren(
@@ -30,7 +30,7 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
         exitButton.onClick: () =>
           box1.text = "Exit Clicked!"
           exitButton.text = "Stopping..."
-          exitButton.colorScheme = "green"
+          exitButton.colorScheme = Some("green")
           session.render()
           Thread.sleep(1000)
           latch.countDown()
@@ -56,6 +56,10 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
           FormLabel(text = "Email address"),
           email,
           FormHelperText(text = "We'll never share your email.")
+        ),
+        ButtonGroup(variant = Some("outline"), spacing = Some("24")).withChildren(
+          Button(text = "Save", colorScheme = Some("red")),
+          Button(text = "Cancel")
         )
       ).render()
 

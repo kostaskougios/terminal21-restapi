@@ -8,14 +8,27 @@ sealed trait ChakraElement extends UiElement
 
 case class Button(
     key: String = Keys.nextKey,
-    @volatile var text: String,
-    @volatile var size: String = "md",
-    @volatile var variant: String = "solid",
-    @volatile var colorScheme: String = "gray"
+    @volatile var text: String = "Ok",
+    @volatile var size: Option[String] = None,
+    @volatile var variant: Option[String] = None,
+    @volatile var colorScheme: Option[String] = None
 ) extends ChakraElement:
   def onClick(h: OnClickEventHandler)(using session: ConnectedSession): Button =
     session.addEventHandler(key, h)
     this
+
+case class ButtonGroup(
+    key: String = Keys.nextKey,
+    @volatile var variant: Option[String] = None,
+    @volatile var spacing: Option[String] = None,
+    @volatile var size: Option[String] = None,
+    @volatile var width: Option[String] = None,
+    @volatile var height: Option[String] = None,
+    @volatile var border: Option[String] = None,
+    @volatile var borderColor: Option[String] = None,
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
+    with HasChildren[ButtonGroup]
 
 /** https://chakra-ui.com/docs/components/box
   */
