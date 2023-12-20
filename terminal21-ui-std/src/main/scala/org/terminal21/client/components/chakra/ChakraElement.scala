@@ -72,6 +72,7 @@ case class Editable(
 ) extends ChakraElement
     with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Editable]:
+  if value == "" then value = defaultValue
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
 
 /** https://chakra-ui.com/docs/components/form-control
@@ -98,7 +99,7 @@ case class Input(
     key: String = Keys.nextKey,
     `type`: String = "text",
     placeholder: String = "",
-    size: String = "md",
+    @volatile var size: String = "md",
     @volatile var variant: Option[String] = None,
     @volatile var value: String = "",
     @volatile var children: Seq[UiElement] = Nil

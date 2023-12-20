@@ -18,7 +18,7 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
       editable1.onChange: newValue =>
         println(s"editable1 newValue = $newValue")
         println(editable1)
-      val email      = Input(`type` = "email")
+      val email      = Input(`type` = "email", value = "Hello world!")
       val exitButton = Button(text = "Exit Program", colorScheme = Some("red"))
 
       val checkbox2 = Checkbox(text = "Check 2", defaultChecked = true)
