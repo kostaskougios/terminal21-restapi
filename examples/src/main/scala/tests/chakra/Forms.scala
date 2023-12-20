@@ -7,10 +7,16 @@ import tests.chakra.Common.greenProps
 
 object Forms:
   def components(using session: ConnectedSession): Seq[UiElement] =
-    val status = Box(text = "This will reflect any changes in the form.")
-    val email  = Input(`type` = "email", value = "Hello world!")
+    val status    = Box(text = "This will reflect any changes in the form.")
+    val okIcon    = CheckCircleIcon(color = Some("green"))
+    val notOkIcon = WarningTwoIcon(color = Some("red"))
+
+    val emailRightAddOn = InputRightAddon().withChildren(okIcon)
+
+    val email = Input(`type` = "email", value = "my@email.com")
     email.onChange: newValue =>
       status.text = s"email input new value = $newValue, verify email.value = ${email.value}"
+      if newValue.contains("@") then emailRightAddOn.children = Seq(okIcon) else emailRightAddOn.children = Seq(notOkIcon)
       session.render()
 
     val checkbox2 = Checkbox(text = "Check 2", defaultChecked = true)
@@ -40,7 +46,11 @@ object Forms:
       Box(text = "Forms", props = greenProps),
       FormControl().withChildren(
         FormLabel(text = "Email address"),
-        email,
+        InputGroup().withChildren(
+          InputLeftAddon().withChildren(EmailIcon()),
+          email,
+          emailRightAddOn
+        ),
         FormHelperText(text = "We'll never share your email.")
       ),
       HStack().withChildren(

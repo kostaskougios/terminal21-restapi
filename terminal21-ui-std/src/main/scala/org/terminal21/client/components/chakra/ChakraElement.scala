@@ -107,13 +107,32 @@ case class Input(
     placeholder: String = "",
     @volatile var size: String = "md",
     @volatile var variant: Option[String] = None,
-    @volatile var value: String = "",
-    @volatile var children: Seq[UiElement] = Nil
+    @volatile var value: String = ""
 ) extends ChakraElement
     with HasEventHandler
-    with HasChildren[Input]
     with OnChangeEventHandler.CanHandleOnChangeEvent[Input]:
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
+
+case class InputGroup(
+    key: String = Keys.nextKey,
+    @volatile var size: String = "md",
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
+    with HasChildren[InputGroup]
+
+case class InputLeftAddon(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "",
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
+    with HasChildren[InputLeftAddon]
+
+case class InputRightAddon(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "",
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
+    with HasChildren[InputRightAddon]
 
 /** https://chakra-ui.com/docs/components/checkbox
   */

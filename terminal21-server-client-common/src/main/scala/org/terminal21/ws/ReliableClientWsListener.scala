@@ -92,7 +92,7 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
       true
     catch
       case _: UncheckedIOException | _: IllegalStateException =>
-        logger.info("Socket closed, reconnecting...")
+        //        logger.info("Socket closed, reconnecting...")
         connect()
         false
 
