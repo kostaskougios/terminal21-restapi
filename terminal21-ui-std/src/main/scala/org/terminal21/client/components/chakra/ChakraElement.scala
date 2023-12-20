@@ -137,3 +137,7 @@ case class RadioGroup(key: String = Keys.nextKey, defaultValue: String = "", @vo
   if value == "" then value = defaultValue
 
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
+
+case class Center(key: String = Keys.nextKey, @volatile var text: String = "", @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasChildren[Center]
