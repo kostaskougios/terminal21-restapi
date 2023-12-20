@@ -2,9 +2,8 @@ package tests
 
 import functions.fibers.FiberExecutor
 import org.terminal21.client.*
-import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.{Paragraph, render}
-import tests.chakra.{Editables, Forms}
+import tests.chakra.*
 
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 
@@ -13,41 +12,9 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
     Sessions.withNewSession("chakra-components", "Chakra Components"): session =>
       given ConnectedSession = session
 
-      val latch      = new CountDownLatch(1)
-      val greenProps = ChakraProps(bg = "green", p = 4, color = "black")
-      val box1       = Box(text = "Simple grid", props = greenProps)
-      
-      val exitButton = Button(text = "Click to exit program", colorScheme = Some("red"))
+      val latch = new CountDownLatch(1)
 
-      (Forms.components ++ Editables.components ++ Seq(
-        box1,
-        SimpleGrid(spacing = Some("8px"), columns = 4).withChildren(
-          Box(text = "One", props = ChakraProps(bg = "yellow", color = "black")),
-          Box(text = "Two", props = ChakraProps(bg = "tomato", color = "black")),
-          Box(text = "Three", props = ChakraProps(bg = "blue", color = "black"))
-        ),
-        Box(text = "Buttons", props = greenProps),
-        exitButton.onClick: () =>
-          box1.text = "Exit Clicked!"
-          exitButton.text = "Stopping..."
-          exitButton.colorScheme = Some("green")
-          session.render()
-          Thread.sleep(1000)
-          latch.countDown()
-        ,
-        Box(text = "VStack", props = greenProps),
-        VStack(spacing = Some("24px")).withChildren(
-          Box(text = "1", props = ChakraProps(bg = "green", p = 2, color = "black")),
-          Box(text = "2", props = ChakraProps(bg = "red", p = 2, color = "black")),
-          Box(text = "3", props = ChakraProps(bg = "blue", p = 2, color = "black"))
-        ),
-        Box(text = "HStack", props = greenProps),
-        HStack(spacing = Some("24px")).withChildren(
-          Box(text = "1", props = ChakraProps(bg = "green", p = 2, color = "black")),
-          Box(text = "2", props = ChakraProps(bg = "red", p = 2, color = "black")),
-          Box(text = "3", props = ChakraProps(bg = "blue", p = 2, color = "black"))
-        )
-      )).render()
+      (Forms.components ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components(latch)).render()
 
       println("Waiting for button to be pressed for 1 hour")
       latch.await(1, TimeUnit.HOURS)
