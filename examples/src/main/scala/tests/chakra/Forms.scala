@@ -19,6 +19,8 @@ object Forms:
       if newValue.contains("@") then emailRightAddOn.children = Seq(okIcon) else emailRightAddOn.children = Seq(notOkIcon)
       session.render()
 
+    val password = Input(`type` = "password", value = "mysecret")
+
     val checkbox2 = Checkbox(text = "Check 2", defaultChecked = true)
     checkbox2.onChange: newValue =>
       status.text = s"checkbox2 checked is $newValue , verify checkbox2.checked = ${checkbox2.checked}"
@@ -53,6 +55,14 @@ object Forms:
         ),
         FormHelperText(text = "We'll never share your email.")
       ),
+      FormControl().withChildren(
+        FormLabel(text = "Password"),
+        InputGroup().withChildren(
+          InputLeftAddon().withChildren(ViewOffIcon()),
+          password
+        ),
+        FormHelperText(text = "We'll never share your email.")
+      ),
       HStack().withChildren(
         checkbox1,
         checkbox2
@@ -60,7 +70,8 @@ object Forms:
       ButtonGroup(variant = Some("outline"), spacing = Some("24")).withChildren(
         Button(text = "Save", colorScheme = Some("red"))
           .onClick: () =>
-            status.text = "Saved clicked"
+            status.text =
+              s"Saved clicked. Email = ${email.value}, password = ${password.value}, check1 = ${checkbox1.checked}, check2 = ${checkbox2.checked}, radio = ${radioGroup.value}"
             session.render()
         ,
         Button(text = "Cancel")
