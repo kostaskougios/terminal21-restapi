@@ -4,7 +4,7 @@ import functions.fibers.FiberExecutor
 import org.terminal21.client.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.{Paragraph, render}
-import tests.chakra.Forms
+import tests.chakra.{Editables, Forms}
 
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 
@@ -16,16 +16,10 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
       val latch      = new CountDownLatch(1)
       val greenProps = ChakraProps(bg = "green", p = 4, color = "black")
       val box1       = Box(text = "Simple grid", props = greenProps)
-      val editable1  = Editable(defaultValue = "Please type here").withChildren(
-        EditablePreview(),
-        EditableInput()
-      )
-      editable1.onChange: newValue =>
-        println(s"editable1 newValue = $newValue")
-        println(editable1)
+      
       val exitButton = Button(text = "Click to exit program", colorScheme = Some("red"))
 
-      (Forms.components ++ Seq(
+      (Forms.components ++ Editables.components ++ Seq(
         box1,
         SimpleGrid(spacing = Some("8px"), columns = 4).withChildren(
           Box(text = "One", props = ChakraProps(bg = "yellow", color = "black")),
@@ -41,11 +35,6 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
           Thread.sleep(1000)
           latch.countDown()
         ,
-        Box(text = "Editables", props = greenProps),
-        SimpleGrid(columns = 2).withChildren(
-          Box(text = "Name"),
-          editable1
-        ),
         Box(text = "VStack", props = greenProps),
         VStack(spacing = Some("24px")).withChildren(
           Box(text = "1", props = ChakraProps(bg = "green", p = 2, color = "black")),

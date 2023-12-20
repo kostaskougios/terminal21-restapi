@@ -77,8 +77,9 @@ case class Editable(
   if value == "" then value = defaultValue
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
 
-case class EditablePreview(key: String = Keys.nextKey) extends ChakraElement
-case class EditableInput(key: String = Keys.nextKey)   extends ChakraElement
+case class EditablePreview(key: String = Keys.nextKey)  extends ChakraElement
+case class EditableInput(key: String = Keys.nextKey)    extends ChakraElement
+case class EditableTextarea(key: String = Keys.nextKey) extends ChakraElement
 
 /** https://chakra-ui.com/docs/components/form-control
   */
