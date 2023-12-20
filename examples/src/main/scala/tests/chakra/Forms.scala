@@ -20,6 +20,10 @@ object Forms:
       session.render()
 
     val password = Input(`type` = "password", value = "mysecret")
+    val dob      = Input(`type` = "datetime-local")
+    dob.onChange: newValue =>
+      status.text = s"dob = $newValue , verify dob.value = ${dob.value}"
+      session.render()
 
     val checkbox2 = Checkbox(text = "Check 2", defaultChecked = true)
     checkbox2.onChange: newValue =>
@@ -61,7 +65,14 @@ object Forms:
           InputLeftAddon().withChildren(ViewOffIcon()),
           password
         ),
-        FormHelperText(text = "We'll never share your email.")
+        FormHelperText(text = "Don't share with anyone")
+      ),
+      FormControl().withChildren(
+        FormLabel(text = "Date of birth"),
+        InputGroup().withChildren(
+          InputLeftAddon().withChildren(CalendarIcon()),
+          dob
+        )
       ),
       HStack().withChildren(
         checkbox1,
@@ -71,7 +82,7 @@ object Forms:
         Button(text = "Save", colorScheme = Some("red"))
           .onClick: () =>
             status.text =
-              s"Saved clicked. Email = ${email.value}, password = ${password.value}, check1 = ${checkbox1.checked}, check2 = ${checkbox2.checked}, radio = ${radioGroup.value}"
+              s"Saved clicked. Email = ${email.value}, password = ${password.value}, dob = ${dob.value}, check1 = ${checkbox1.checked}, check2 = ${checkbox2.checked}, radio = ${radioGroup.value}"
             session.render()
         ,
         Button(text = "Cancel")
