@@ -68,12 +68,17 @@ case class SimpleGrid(
 case class Editable(
     key: String = Keys.nextKey,
     defaultValue: String = "",
-    @volatile var value: String = ""
+    @volatile var value: String = "",
+    @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasEventHandler
+    with HasChildren[Editable]
     with OnChangeEventHandler.CanHandleOnChangeEvent[Editable]:
   if value == "" then value = defaultValue
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
+
+case class EditablePreview(key: String = Keys.nextKey) extends ChakraElement
+case class EditableInput(key: String = Keys.nextKey)   extends ChakraElement
 
 /** https://chakra-ui.com/docs/components/form-control
   */
