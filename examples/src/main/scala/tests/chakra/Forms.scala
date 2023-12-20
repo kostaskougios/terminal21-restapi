@@ -7,14 +7,21 @@ import tests.chakra.Common.greenProps
 
 object Forms:
   def components(using session: ConnectedSession): Seq[UiElement] =
-    val email = Input(`type` = "email", value = "Hello world!")
+    val status = Box(text = "This will reflect any changes in the form.")
+    val email  = Input(`type` = "email", value = "Hello world!")
+    email.onChange: newValue =>
+      status.text = s"email input new value = $newValue, verify email.value = ${email.value}"
+      session.render()
 
     val checkbox2 = Checkbox(text = "Check 2", defaultChecked = true)
+    checkbox2.onChange: newValue =>
+      status.text = s"checkbox2 checked is $newValue , verify checkbox2.checked = ${checkbox2.checked}"
+      session.render()
 
     val checkbox1 = Checkbox(text = "Check 1")
     checkbox1.onChange: newValue =>
-      println(s"checkbox1 = $newValue")
       checkbox2.isDisabled = newValue
+      status.text = s"checkbox1 checked is $newValue , verify checkbox1.checked = ${checkbox1.checked}"
       session.render()
 
     val radioGroup = RadioGroup(defaultValue = "2").withChildren(
@@ -26,7 +33,8 @@ object Forms:
     )
 
     radioGroup.onChange: newValue =>
-      println(s"radioGroup value=$newValue , radioGroup.value=${radioGroup.value}")
+      status.text = s"radioGroup newValue=$newValue , verify radioGroup.value=${radioGroup.value}"
+      session.render()
 
     Seq(
       Box(text = "Forms", props = greenProps),
@@ -40,8 +48,16 @@ object Forms:
         checkbox2
       ),
       ButtonGroup(variant = Some("outline"), spacing = Some("24")).withChildren(
-        Button(text = "Save", colorScheme = Some("red")),
+        Button(text = "Save", colorScheme = Some("red"))
+          .onClick: () =>
+            status.text = "Saved clicked"
+            session.render()
+        ,
         Button(text = "Cancel")
+          .onClick: () =>
+            status.text = "Cancel clicked"
+            session.render()
       ),
-      radioGroup
+      radioGroup,
+      status
     )

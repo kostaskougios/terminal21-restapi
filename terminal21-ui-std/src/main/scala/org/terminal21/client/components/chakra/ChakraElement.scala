@@ -110,7 +110,8 @@ case class Input(
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasEventHandler
-    with HasChildren[Input]:
+    with HasChildren[Input]
+    with OnChangeEventHandler.CanHandleOnChangeEvent[Input]:
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
 
 /** https://chakra-ui.com/docs/components/checkbox
