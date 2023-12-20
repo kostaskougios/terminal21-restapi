@@ -148,3 +148,25 @@ case class Center(
     @volatile var color: Option[String] = None
 ) extends ChakraElement
     with HasChildren[Center]
+
+case class Circle(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "",
+    @volatile var children: Seq[UiElement] = Nil,
+    @volatile var bg: Option[String] = None,
+    @volatile var w: Option[String] = None,
+    @volatile var h: Option[String] = None,
+    @volatile var color: Option[String] = None
+) extends ChakraElement
+    with HasChildren[Circle]
+
+case class Square(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "",
+    @volatile var children: Seq[UiElement] = Nil,
+    @volatile var bg: Option[String] = None,
+    @volatile var w: Option[String] = None,
+    @volatile var h: Option[String] = None,
+    @volatile var color: Option[String] = None
+) extends ChakraElement
+    with HasChildren[Square]
