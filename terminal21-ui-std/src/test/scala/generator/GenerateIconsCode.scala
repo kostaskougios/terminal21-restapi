@@ -75,7 +75,8 @@ package generator
         |) extends ChakraElement
         |
         |""".stripMargin)
-
+  println("// ------------------------ SCALA USING CODE -------------------------------------")
+  println(icons.map(i => s"$i()").mkString(","))
   println("// ------------------------ TSX CODE -------------------------------------")
   println(s"import { ${icons.mkString(",")} } from '@chakra-ui/icons';")
   for clz <- icons do println(s"$clz: (b:any) => (<$clz {...b}/>),")
