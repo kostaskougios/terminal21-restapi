@@ -25,6 +25,12 @@ object Forms:
       status.text = s"dob = $newValue , verify dob.value = ${dob.value}"
       session.render()
 
+    val color = Input(`type` = "color")
+
+    color.onChange: newValue =>
+      status.text = s"color = $newValue , verify color.value = ${color.value}"
+      session.render()
+
     val checkbox2 = Checkbox(text = "Check 2", defaultChecked = true)
     checkbox2.onChange: newValue =>
       status.text = s"checkbox2 checked is $newValue , verify checkbox2.checked = ${checkbox2.checked}"
@@ -72,6 +78,13 @@ object Forms:
         InputGroup().withChildren(
           InputLeftAddon().withChildren(CalendarIcon()),
           dob
+        )
+      ),
+      FormControl().withChildren(
+        FormLabel(text = "Color"),
+        InputGroup().withChildren(
+          InputLeftAddon().withChildren(DragHandleIcon()),
+          color
         )
       ),
       HStack().withChildren(
