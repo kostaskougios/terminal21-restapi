@@ -7,7 +7,7 @@ ThisBuild / version      := "0.1-SNAPSHOT"
 ThisBuild / organization := "io.github.kostaskougios"
 name                     := "rest-api"
 ThisBuild / scalaVersion := scala3Version
-ThisBuild / scalacOptions ++= Seq("-unchecked", "-feature", "-deprecation", "-Xmax-inlines", "64")
+ThisBuild / scalacOptions ++= Seq("-unchecked", "-feature", "-deprecation", "-Xmax-inlines", "256")
 
 ThisBuild / resolvers += "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository"
 
