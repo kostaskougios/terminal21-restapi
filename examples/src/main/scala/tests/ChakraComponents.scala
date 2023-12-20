@@ -29,6 +29,16 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
         checkbox2.isDisabled = newValue
         session.render()
 
+      val radioGroup = RadioGroup(defaultValue = "2").withChildren(
+        HStack().withChildren(
+          Radio(value = "1", text = "first"),
+          Radio(value = "2", text = "second"),
+          Radio(value = "3", text = "third")
+        )
+      )
+      radioGroup.onChange: newValue =>
+        println(s"radioGroup value=$newValue , radioGroup.value=${radioGroup.value}")
+
       Seq(
         box1,
         SimpleGrid(spacing = Some("8px"), columns = 4).withChildren(
@@ -73,7 +83,8 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
         ButtonGroup(variant = Some("outline"), spacing = Some("24")).withChildren(
           Button(text = "Save", colorScheme = Some("red")),
           Button(text = "Cancel")
-        )
+        ),
+        radioGroup
       ).render()
 
       executor.submit:

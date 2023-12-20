@@ -116,3 +116,16 @@ case class Checkbox(key: String = Keys.nextKey, @volatile var text: String = "",
   @volatile private var checkedV: Option[Boolean]        = None
   def checked: Boolean                                   = checkedV.getOrElse(defaultChecked)
   override def defaultEventHandler: OnChangeEventHandler = newValue => checkedV = Some(newValue.toBoolean)
+
+/** https://chakra-ui.com/docs/components/radio
+  */
+case class Radio(key: String = Keys.nextKey, value: String, @volatile var text: String = "", @volatile var colorScheme: Option[String] = None)
+    extends ChakraElement
+case class RadioGroup(key: String = Keys.nextKey, defaultValue: String = "", @volatile var value: String = "", @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasEventHandler
+    with HasChildren[RadioGroup]
+    with OnChangeEventHandler.CanHandleOnChangeEvent[RadioGroup]:
+  if value == "" then value = defaultValue
+
+  override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
