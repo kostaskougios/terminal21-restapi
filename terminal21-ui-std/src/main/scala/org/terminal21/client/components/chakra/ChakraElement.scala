@@ -138,6 +138,13 @@ case class RadioGroup(key: String = Keys.nextKey, defaultValue: String = "", @vo
 
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
 
-case class Center(key: String = Keys.nextKey, @volatile var text: String = "", @volatile var children: Seq[UiElement] = Nil)
-    extends ChakraElement
+case class Center(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "",
+    @volatile var children: Seq[UiElement] = Nil,
+    @volatile var bg: Option[String] = None,
+    @volatile var w: Option[String] = None,
+    @volatile var h: Option[String] = None,
+    @volatile var color: Option[String] = None
+) extends ChakraElement
     with HasChildren[Center]
