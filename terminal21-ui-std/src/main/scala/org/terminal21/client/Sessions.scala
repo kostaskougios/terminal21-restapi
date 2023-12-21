@@ -10,8 +10,9 @@ import org.terminal21.ui.std.SessionsServiceCallerFactory
 object Sessions:
   def withNewSession[R](id: String, name: String)(f: ConnectedSession => R): R =
     val config          = Config.Default
+    val serverUrl       = s"http://${config.host}:${config.port}"
     val client          = WebClient.builder
-      .baseUri(s"http://${config.host}:${config.port}")
+      .baseUri(serverUrl)
       .build
     val transport       = new HelidonTransport(client)
     val sessionsService = SessionsServiceCallerFactory.newHelidonJsonSessionsService(transport)
@@ -20,7 +21,7 @@ object Sessions:
       .baseUri(s"ws://${config.host}:${config.port}")
       .build
 
-    val connectedSession = ConnectedSession(session, sessionsService)
+    val connectedSession = ConnectedSession(session, serverUrl, sessionsService)
     FiberExecutor.withFiberExecutor: executor =>
       val listener = new ClientEventsWsListener(wsClient, connectedSession, executor)
       listener.start()

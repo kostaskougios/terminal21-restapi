@@ -10,10 +10,11 @@ import org.terminal21.client.components.UiElementEncoding.uiElementEncoder
 import org.terminal21.model.{CommandEvent, OnChange, OnClick, Session}
 import org.terminal21.ui.std.SessionsService
 
-class ConnectedSession(val session: Session, sessionsService: SessionsService):
+class ConnectedSession(val session: Session, val serverUrl: String, sessionsService: SessionsService):
   private val logger   = LoggerFactory.getLogger(getClass)
   private var elements = List.empty[UiElement]
 
+  def uiUrl: String = serverUrl + "/ui"
   def clear(): Unit = synchronized:
     elements = Nil
 
