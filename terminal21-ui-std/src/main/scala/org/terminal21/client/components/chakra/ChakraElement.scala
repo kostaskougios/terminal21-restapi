@@ -769,3 +769,17 @@ case class WarningTwoIcon(
     @volatile var boxSize: Option[String] = None,
     @volatile var color: Option[String] = None
 ) extends ChakraElement
+
+/** https://chakra-ui.com/docs/components/textarea
+  */
+case class Textarea(
+    key: String = Keys.nextKey,
+    `type`: String = "text",
+    placeholder: String = "",
+    @volatile var size: String = "md",
+    @volatile var variant: Option[String] = None,
+    @volatile var value: String = ""
+) extends ChakraElement
+    with HasEventHandler
+    with OnChangeEventHandler.CanHandleOnChangeEvent[Textarea]:
+  override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue

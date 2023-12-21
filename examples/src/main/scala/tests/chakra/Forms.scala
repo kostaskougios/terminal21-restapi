@@ -19,6 +19,11 @@ object Forms:
       if newValue.contains("@") then emailRightAddOn.children = Seq(okIcon) else emailRightAddOn.children = Seq(notOkIcon)
       session.render()
 
+    val description = Textarea(placeholder = "Please enter a few things about you")
+    description.onChange: newValue =>
+      status.text = s"description input new value = $newValue, verify description.value = ${description.value}"
+      session.render()
+
     val password = Input(`type` = "password", value = "mysecret")
     val dob      = Input(`type` = "datetime-local")
     dob.onChange: newValue =>
@@ -62,6 +67,14 @@ object Forms:
           InputLeftAddon().withChildren(EmailIcon()),
           email,
           emailRightAddOn
+        ),
+        FormHelperText(text = "We'll never share your email.")
+      ),
+      FormControl().withChildren(
+        FormLabel(text = "Description"),
+        InputGroup().withChildren(
+          InputLeftAddon().withChildren(EditIcon()),
+          description
         ),
         FormHelperText(text = "We'll never share your email.")
       ),

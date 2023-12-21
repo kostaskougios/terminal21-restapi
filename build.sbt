@@ -35,11 +35,11 @@ val Circe        = Seq(
   "io.circe" %% "circe-parser"
 ).map(_ % CirceVersion)
 
-val HelidonVersion         = "4.0.1"
+val HelidonVersion         = "4.0.2"
 val HelidonWebServerHttp2  = "io.helidon.webserver" % "helidon-webserver-http2"          % HelidonVersion
 val HelidonWebServerStatic = "io.helidon.webserver" % "helidon-webserver-static-content" % HelidonVersion
 val HelidonServerWebSocket = "io.helidon.webserver" % "helidon-webserver-websocket"      % HelidonVersion
-val HelidonClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websocket"      % "4.0.2-SNAPSHOT" // FIX-ME
+val HelidonClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websocket"      % HelidonVersion
 val HelidonClient          = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
 val HelidonServerLogging   = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
 
