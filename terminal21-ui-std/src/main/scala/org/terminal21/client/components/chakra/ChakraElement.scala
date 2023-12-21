@@ -825,6 +825,7 @@ case class TableContainer(key: String = Keys.nextKey, @volatile var children: Se
 case class Table(
     key: String = Keys.nextKey,
     @volatile var variant: String = "simple",
+    @volatile var size: String = "md",
     @volatile var colorScheme: Option[String] = None,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement

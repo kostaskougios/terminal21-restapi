@@ -15,7 +15,7 @@ object DataDisplay:
     Seq(
       Box(text = "Tables", props = greenProps),
       TableContainer().withChildren(
-        Table(variant = "striped", colorScheme = Some("teal")).withChildren(
+        Table(variant = "striped", colorScheme = Some("teal"), size = "lg").withChildren(
           TableCaption(text = "Imperial to metric conversion factors"),
           Thead().withChildren(
             headAndFoot

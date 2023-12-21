@@ -37,7 +37,8 @@ abstract class ReliableClientWsListener(id: String, wsClient: WsClient, remotePa
     if isRunning.get() then
       wsSessionReady.countDown()
       wsSessionReady = new CountDownLatch(1)
-      wsClient.connect(remotePath, this)
+      errorLogger.tryForeverLogErrors:
+        wsClient.connect(remotePath, this)
 
   protected def setupPeriodicalPing(): Unit =
     fiberExecutor.submit:
