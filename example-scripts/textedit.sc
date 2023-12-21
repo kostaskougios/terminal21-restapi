@@ -33,7 +33,9 @@ Sessions.withNewSession(s"textedit-$fileName", s"Edit: $fileName"): session =>
   // This will display a "saved" badge for a second when the user saves the file
   val status = Badge()
   // This will display an asterisk when the contents of the file are changed in the editor
-  val modified = Badge(colorScheme = Some("tomato"))
+  val modified = Badge(colorScheme = Some("red"))
+
+  // when the user changes the textarea, we get the new text and we can compare it with the loaded value.
   editor.onChange: newValue =>
     modified.text = if newValue != contents then "*" else ""
     session.render()
