@@ -13,6 +13,16 @@ object DataDisplay:
       Th(text = "multiply by", isNumeric = true)
     )
     Seq(
+      commonBox(text = "Badges"),
+      HStack().withChildren(
+        Badge(text = "badge 1", size = "sm"),
+        Badge(text = "badge 2", size = "md", colorScheme = Some("red")),
+        Badge(text = "badge 3", size = "lg", colorScheme = Some("green")),
+        Badge(text = "badge 4", variant = Some("outline"), colorScheme = Some("tomato")),
+        Badge(text = "badge 4").withChildren(
+          Button(text = "test")
+        )
+      ),
       commonBox(text = "Tables"),
       TableContainer().withChildren(
         Table(variant = "striped", colorScheme = Some("teal"), size = "lg").withChildren(

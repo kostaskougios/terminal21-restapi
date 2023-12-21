@@ -865,3 +865,13 @@ case class MenuItem(key: String = Keys.nextKey, @volatile var text: String = "",
     with OnClickEventHandler.CanHandleOnClickEvent[MenuItem]
 
 case class MenuDivider(key: String = Keys.nextKey) extends ChakraElement
+
+case class Badge(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "",
+    @volatile var colorScheme: Option[String] = None,
+    @volatile var variant: Option[String] = None,
+    @volatile var size: String = "md",
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
+    with HasChildren[Badge]
