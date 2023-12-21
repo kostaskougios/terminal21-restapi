@@ -3,6 +3,7 @@ package tests.chakra
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
+import tests.chakra.Common.greenProps
 
 object DataDisplay:
   def components(using session: ConnectedSession): Seq[UiElement] = {
@@ -12,6 +13,7 @@ object DataDisplay:
       Th(text = "multiply by", isNumeric = true)
     )
     Seq(
+      Box(text = "Tables", props = greenProps),
       TableContainer().withChildren(
         Table().withChildren(
           TableCaption(text = "Imperial to metric conversion factors"),
