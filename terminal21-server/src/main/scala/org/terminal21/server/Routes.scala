@@ -5,8 +5,6 @@ import io.helidon.webserver.staticcontent.StaticContentService
 import io.helidon.webserver.websocket.WsRouting
 import org.terminal21.ui.std.SessionsServiceReceiverFactory
 
-import java.nio.file.Path
-
 object Routes:
   def register(dependencies: Dependencies, rb: HttpRouting.Builder): Unit =
     import dependencies.*
@@ -14,7 +12,7 @@ object Routes:
 
   def static(rb: HttpRouting.Builder): Unit =
     val staticContent = StaticContentService
-      .builder(Path.of("../../terminal21-ui/build"))
+      .builder("web")
       .welcomeFileName("index.html")
       .build
     rb.register("/ui", staticContent)

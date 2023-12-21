@@ -27,3 +27,4 @@ generated
 .scala-build
 
 functions-remote-generated
+terminal21-server/src/main/resources/web
