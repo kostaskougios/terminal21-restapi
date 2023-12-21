@@ -12,12 +12,14 @@ object Overlay:
       HStack().withChildren(
         Menu().withChildren(
           MenuButton(text = "Actions", size = Some("sm"), colorScheme = Some("teal")).withChildren(
-            ArrowDownIcon()
+            ChevronDownIcon()
           ),
           MenuList().withChildren(
             MenuItem(text = "Download"),
             MenuItem(text = "Copy"),
-            MenuItem(text = "Paste")
+            MenuItem(text = "Paste"),
+            MenuDivider(),
+            MenuItem(text = "Exit")
           )
         )
       )

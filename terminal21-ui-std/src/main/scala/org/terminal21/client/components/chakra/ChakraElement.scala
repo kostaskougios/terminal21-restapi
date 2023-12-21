@@ -864,3 +864,5 @@ case class MenuList(key: String = Keys.nextKey, @volatile var children: Seq[UiEl
 case class MenuItem(key: String = Keys.nextKey, @volatile var text: String = "", @volatile var children: Seq[UiElement] = Nil)
     extends ChakraElement
     with HasChildren[MenuItem]
+
+case class MenuDivider(key: String = Keys.nextKey) extends ChakraElement
