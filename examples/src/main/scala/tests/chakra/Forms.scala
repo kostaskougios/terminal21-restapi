@@ -24,6 +24,20 @@ object Forms:
       status.text = s"description input new value = $newValue, verify description.value = ${description.value}"
       session.render()
 
+    val select1 = Select(placeholder = "Please choose").withChildren(
+      Option_(text = "Male", value = "male"),
+      Option_(text = "Female", value = "female")
+    )
+
+    select1.onChange: newValue =>
+      status.text = s"select1 input new value = $newValue, verify select1.value = ${select1.value}"
+      session.render()
+
+    val select2 = Select(value = "1", bg = Some("tomato"), color = Some("black"), borderColor = Some("yellow")).withChildren(
+      Option_(text = "First", value = "1"),
+      Option_(text = "Second", value = "2")
+    )
+
     val password = Input(`type` = "password", value = "mysecret")
     val dob      = Input(`type` = "datetime-local")
     dob.onChange: newValue =>
@@ -107,6 +121,10 @@ object Forms:
           InputLeftAddon().withChildren(DragHandleIcon()),
           color
         )
+      ),
+      HStack().withChildren(
+        select1,
+        select2
       ),
       HStack().withChildren(
         checkbox1,

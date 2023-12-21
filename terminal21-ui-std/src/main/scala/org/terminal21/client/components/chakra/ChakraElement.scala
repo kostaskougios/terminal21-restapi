@@ -793,3 +793,26 @@ case class Switch(key: String = Keys.nextKey, @volatile var text: String = "", d
   @volatile private var checkedV: Option[Boolean]        = None
   def checked: Boolean                                   = checkedV.getOrElse(defaultChecked)
   override def defaultEventHandler: OnChangeEventHandler = newValue => checkedV = Some(newValue.toBoolean)
+
+case class Select(
+    key: String = Keys.nextKey,
+    placeholder: String = "",
+    defaultValue: String = "",
+    @volatile var value: String = "",
+    @volatile var bg: Option[String] = None,
+    @volatile var color: Option[String] = None,
+    @volatile var borderColor: Option[String] = None,
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
+    with HasEventHandler
+    with HasChildren[Select]
+    with OnChangeEventHandler.CanHandleOnChangeEvent[Select]:
+  if value == "" then value = defaultValue
+
+  override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
+
+case class Option_(
+    key: String = Keys.nextKey,
+    value: String,
+    @volatile var text: String = ""
+) extends ChakraElement
