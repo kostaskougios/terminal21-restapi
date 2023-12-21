@@ -794,6 +794,8 @@ case class Switch(key: String = Keys.nextKey, @volatile var text: String = "", d
   def checked: Boolean                                   = checkedV.getOrElse(defaultChecked)
   override def defaultEventHandler: OnChangeEventHandler = newValue => checkedV = Some(newValue.toBoolean)
 
+/** https://chakra-ui.com/docs/components/select
+  */
 case class Select(
     key: String = Keys.nextKey,
     placeholder: String = "",
