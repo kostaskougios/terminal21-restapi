@@ -22,32 +22,51 @@ val file = new File(fileName)
 val contents =
   if file.exists() then FileUtils.readFileToString(file) else ""
 
-def saveFile(content:String) = FileUtils.writeStringToFile(file,content)
-    
+def saveFile(content: String) = FileUtils.writeStringToFile(file, content)
+
 Sessions.withNewSession(s"textedit-$fileName", s"Edit: $fileName"): session =>
   given ConnectedSession = session
+  // we will wait till the user clicks the "Exit" menu, this latch makes sure the main thread of the app waits.
   val exitLatch = new CountDownLatch(1)
-
+  // the main editor area.
   val editor = Textarea(value = contents)
+  // This will display a "saved" badge for a second when the user saves the file
+  val status = Badge()
+  // This will display an asterisk when the contents of the file are changed in the editor
+  val modified = Badge(colorScheme = Some("tomato"))
+  editor.onChange: newValue =>
+    modified.text = if newValue != contents then "*" else ""
+    session.render()
+
   Seq(
-    Menu().withChildren(
-      MenuButton(text = "File").withChildren(ChevronDownIcon()),
-      MenuList().withChildren(
-        MenuItem(text = "Save")
-          .onClick: () =>
-            saveFile(editor.value),
-        MenuItem(text = "Exit")
-          .onClick: () =>
-            exitLatch.countDown()
-      )
+    HStack().withChildren(
+      Menu().withChildren(
+        MenuButton(text = "File").withChildren(ChevronDownIcon()),
+        MenuList().withChildren(
+          MenuItem(text = "Save")
+            .onClick: () =>
+              saveFile(editor.value)
+              status.text = "Saved"
+              session.render()
+              Thread.sleep(1000)
+              status.text = ""
+              session.render()
+          ,
+          MenuItem(text = "Exit")
+            .onClick: () =>
+              exitLatch.countDown()
+        )
+      ),
+      status,
+      modified
     ),
     FormControl().withChildren(
-        FormLabel(text = "Editor"),
-        InputGroup().withChildren(
-          InputLeftAddon().withChildren(EditIcon()),
-          editor
-        )
+      FormLabel(text = "Editor"),
+      InputGroup().withChildren(
+        InputLeftAddon().withChildren(EditIcon()),
+        editor
       )
+    )
   ).render()
 
   println(s"Now open ${session.uiUrl} to view the UI")
