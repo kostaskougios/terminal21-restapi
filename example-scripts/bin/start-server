@@ -1,0 +1,2 @@
+#! /bin/sh
+scala-cli . server.sc

@@ -26,6 +26,8 @@ object Terminal21Server:
         .addRouting(Routes.ws(dependencies))
         .build
         .start
+
+      if !server.isRunning then throw new IllegalStateException("Server failed to start")
       try
         logger.info(s"Terminal 21 Server started and listening on http://localhost:$portV")
         val hostname = InetAddress.getLocalHost.getHostName

@@ -3,7 +3,7 @@
   */
 val scala3Version = "3.3.1"
 
-ThisBuild / version      := "0.1-SNAPSHOT"
+ThisBuild / version      := "0.1"
 ThisBuild / organization := "io.github.kostaskougios"
 name                     := "rest-api"
 ThisBuild / scalaVersion := scala3Version
@@ -63,7 +63,7 @@ lazy val `terminal21-server-client-common` = project
 
 lazy val `terminal21-server` = project
   .settings(
-    receiverExports           := Seq(s"org.terminal21:terminal21-ui-std-exports_3:${version.value}"),
+    receiverExports           := Seq(s"io.github.kostaskougios:terminal21-ui-std-exports_3:${version.value}"),
     receiverJsonSerialization := true,
     receiverHelidonRoutes     := true,
     libraryDependencies ++= Seq(
@@ -101,7 +101,7 @@ lazy val `terminal21-client-common` = project
 
 lazy val `terminal21-ui-std` = project
   .settings(
-    callerExports                := Seq(s"org.terminal21:terminal21-ui-std-exports_3:${version.value}"),
+    callerExports                := Seq(s"io.github.kostaskougios:terminal21-ui-std-exports_3:${version.value}"),
     callerJsonSerialization      := true,
     callerHelidonClientTransport := true,
     libraryDependencies ++= Seq(
