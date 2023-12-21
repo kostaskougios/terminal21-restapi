@@ -12,7 +12,9 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
 
     val latch = new CountDownLatch(1)
 
-    (Forms.components ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components(latch) ++ Etc.components ++ Icons.components)
+    (Forms.components ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components(
+      latch
+    ) ++ Etc.components ++ Icons.components ++ DataDisplay.components)
       .render()
 
     println("Waiting for button to be pressed for 1 hour")

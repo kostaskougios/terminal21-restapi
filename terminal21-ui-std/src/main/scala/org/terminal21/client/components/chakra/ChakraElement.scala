@@ -818,3 +818,21 @@ case class Option_(
     value: String,
     @volatile var text: String = ""
 ) extends ChakraElement
+
+/** https://chakra-ui.com/docs/components/table/usage
+  */
+case class TableContainer(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil) extends ChakraElement with HasChildren[TableContainer]
+case class Table(key: String = Keys.nextKey, @volatile var variant: String = "simple", @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasChildren[Table]
+case class TableCaption(key: String = Keys.nextKey, @volatile var text: String = "")                extends ChakraElement
+case class Thead(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil)          extends ChakraElement with HasChildren[Thead]
+case class Tbody(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil)          extends ChakraElement with HasChildren[Tbody]
+case class Tfoot(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil)          extends ChakraElement with HasChildren[Tfoot]
+case class Tr(key: String = Keys.nextKey, isNumeric: Boolean = false, @volatile var children: Seq[UiElement] = Nil) extends ChakraElement with HasChildren[Tr]
+case class Th(key: String = Keys.nextKey, @volatile var text: String = "", isNumeric: Boolean = false, @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasChildren[Th]
+case class Td(key: String = Keys.nextKey, @volatile var text: String = "", isNumeric: Boolean = false, @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasChildren[Td]
