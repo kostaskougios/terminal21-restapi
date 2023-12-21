@@ -7,6 +7,8 @@ import io.helidon.webserver.http.HttpRouting
 import org.slf4j.LoggerFactory
 import org.terminal21.config.Config
 
+import java.net.InetAddress
+
 object Terminal21Server:
   private val logger                        = LoggerFactory.getLogger(getClass)
   def start(port: Option[Int] = None): Unit =
@@ -26,6 +28,14 @@ object Terminal21Server:
         .start
       try
         logger.info(s"Terminal 21 Server started and listening on http://localhost:$portV")
+        val hostname = InetAddress.getLocalHost.getHostName
+        logger.info(s"""
+             |Clients should set env variables:
+             |TERMINAL21_HOST = $hostname
+             |TERMINAL21_PORT = $portV
+             |
+             |if unset, they will point to localhost:8080
+             |""".stripMargin)
         while true do
           Thread.sleep(86400 * 1000)
           logger.info("One more day passed...")
