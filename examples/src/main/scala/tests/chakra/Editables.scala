@@ -3,7 +3,7 @@ package tests.chakra
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
-import tests.chakra.Common.greenProps
+import tests.chakra.Common.*
 
 object Editables:
   def components(using session: ConnectedSession): Seq[UiElement] =
@@ -27,7 +27,7 @@ object Editables:
       session.render()
 
     Seq(
-      Box(text = "Editables", props = greenProps),
+      commonBox(text = "Editables"),
       SimpleGrid(columns = 2).withChildren(
         Box(text = "Editable"),
         editable1,

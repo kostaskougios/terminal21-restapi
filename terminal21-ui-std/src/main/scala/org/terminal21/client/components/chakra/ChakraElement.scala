@@ -39,7 +39,10 @@ case class ButtonGroup(
 case class Box(
     key: String = Keys.nextKey,
     @volatile var text: String = "",
-    @volatile var props: ChakraProps = ChakraProps(),
+    @volatile var bg: String = "",
+    @volatile var w: String = "",
+    @volatile var p: Int = 0,
+    @volatile var color: String = "",
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[Box]

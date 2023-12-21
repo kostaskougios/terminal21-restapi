@@ -2,18 +2,17 @@ package tests.chakra
 
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement
-import org.terminal21.client.components.chakra.{Box, ChakraProps, SimpleGrid}
-import tests.chakra.Common.greenProps
+import org.terminal21.client.components.chakra.{Box, SimpleGrid}
+import tests.chakra.Common.*
 
-object Grids :
+object Grids:
   def components(using session: ConnectedSession): Seq[UiElement] =
-    val box1 = Box(text = "Simple grid", props = greenProps)
+    val box1 = commonBox(text = "Simple grid")
     Seq(
       box1,
       SimpleGrid(spacing = Some("8px"), columns = 4).withChildren(
-        Box(text = "One", props = ChakraProps(bg = "yellow", color = "black")),
-        Box(text = "Two", props = ChakraProps(bg = "tomato", color = "black")),
-        Box(text = "Three", props = ChakraProps(bg = "blue", color = "black"))
+        Box(text = "One", bg = "yellow", color = "black"),
+        Box(text = "Two", bg = "tomato", color = "black"),
+        Box(text = "Three", bg = "blue", color = "black")
       )
     )
-

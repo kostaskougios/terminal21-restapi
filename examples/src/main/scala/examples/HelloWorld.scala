@@ -10,7 +10,7 @@ import org.terminal21.client.{ConnectedSession, Sessions}
     println(session.session.id)
 
     val h1   = Header1(key = "header", text = "Welcome to the Hello World Program!")
-    val b1   = Box(text = "First box", props = ChakraProps(bg = "green", p = 4, color = "black"))
+    val b1   = Box(text = "First box", bg = "green", p = 4, color = "black")
     b1.withChildren(
       Button(text = "Click me!").onClick: () =>
         b1.text = "Clicked!"
@@ -21,7 +21,7 @@ import org.terminal21.client.{ConnectedSession, Sessions}
       text = s"Hello there mr X",
       children = Seq(
         b1,
-        Box(text = "Second box", props = ChakraProps(bg = "tomato", p = 4, color = "black"))
+        Box(text = "Second box", bg = "tomato", p = 4, color = "black")
       )
     )
     val grid = SimpleGrid(spacing = Some("8px"), columns = 4)
@@ -31,7 +31,7 @@ import org.terminal21.client.{ConnectedSession, Sessions}
     for i <- 1 to 25 do
       Thread.sleep(1000)
       p1.text = s"i = $i"
-      grid.addChildren(Box(text = s"counting i = $i", props = ChakraProps(bg = "green")))
+      grid.addChildren(Box(text = s"counting i = $i", bg = "green"))
       session.render()
 
     h1.text = "Done!"
