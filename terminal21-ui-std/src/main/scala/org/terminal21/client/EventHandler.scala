@@ -7,6 +7,13 @@ trait EventHandler
 trait OnClickEventHandler extends EventHandler:
   def onClick(): Unit
 
+object OnClickEventHandler:
+  trait CanHandleOnClickEvent[A <: UiElement]:
+    this: A =>
+    def onClick(h: OnClickEventHandler)(using session: ConnectedSession): A =
+      session.addEventHandler(key, h)
+      this
+
 trait OnChangeEventHandler extends EventHandler:
   def onChange(newValue: String): Unit
 

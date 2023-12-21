@@ -7,6 +7,7 @@ import tests.chakra.Common.commonBox
 
 object Overlay:
   def components(using session: ConnectedSession): Seq[UiElement] =
+    val box1 = Box(text = "Clicks will be reported here.")
     Seq(
       commonBox(text = "Menus"),
       HStack().withChildren(
@@ -15,12 +16,25 @@ object Overlay:
             ChevronDownIcon()
           ),
           MenuList().withChildren(
-            MenuItem(text = "Download"),
-            MenuItem(text = "Copy"),
-            MenuItem(text = "Paste"),
+            MenuItem(text = "Download")
+              .onClick: () =>
+                box1.text = "'Download' clicked"
+                session.render()
+            ,
+            MenuItem(text = "Copy").onClick: () =>
+              box1.text = "'Copy' clicked"
+              session.render()
+            ,
+            MenuItem(text = "Paste").onClick: () =>
+              box1.text = "'Paste' clicked"
+              session.render()
+            ,
             MenuDivider(),
-            MenuItem(text = "Exit")
+            MenuItem(text = "Exit").onClick: () =>
+              box1.text = "'Exit' clicked"
+              session.render()
           )
-        )
+        ),
+        box1
       )
     )

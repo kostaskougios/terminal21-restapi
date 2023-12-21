@@ -2,7 +2,7 @@ package org.terminal21.client.components.chakra
 
 import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler}
 import org.terminal21.client.components.{Keys, UiElement}
-import org.terminal21.client.{ConnectedSession, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler}
+import org.terminal21.client.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler}
 
 sealed trait ChakraElement extends UiElement
 
@@ -14,10 +14,8 @@ case class Button(
     @volatile var size: Option[String] = None,
     @volatile var variant: Option[String] = None,
     @volatile var colorScheme: Option[String] = None
-) extends ChakraElement:
-  def onClick(h: OnClickEventHandler)(using session: ConnectedSession): Button =
-    session.addEventHandler(key, h)
-    this
+) extends ChakraElement
+    with OnClickEventHandler.CanHandleOnClickEvent[Button]
 
 /** https://chakra-ui.com/docs/components/button
   */
@@ -864,5 +862,6 @@ case class MenuList(key: String = Keys.nextKey, @volatile var children: Seq[UiEl
 case class MenuItem(key: String = Keys.nextKey, @volatile var text: String = "", @volatile var children: Seq[UiElement] = Nil)
     extends ChakraElement
     with HasChildren[MenuItem]
+    with OnClickEventHandler.CanHandleOnClickEvent[MenuItem]
 
 case class MenuDivider(key: String = Keys.nextKey) extends ChakraElement
