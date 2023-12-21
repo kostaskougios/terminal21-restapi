@@ -848,3 +848,19 @@ case class Th(
 case class Td(key: String = Keys.nextKey, @volatile var text: String = "", isNumeric: Boolean = false, @volatile var children: Seq[UiElement] = Nil)
     extends ChakraElement
     with HasChildren[Td]
+
+/** https://chakra-ui.com/docs/components/menu/usage
+  */
+case class Menu(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil)     extends ChakraElement with HasChildren[Menu]
+case class MenuButton(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "",
+    @volatile var size: Option[String] = None,
+    @volatile var colorScheme: Option[String] = None,
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
+    with HasChildren[MenuButton]
+case class MenuList(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil) extends ChakraElement with HasChildren[MenuList]
+case class MenuItem(key: String = Keys.nextKey, @volatile var text: String = "", @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasChildren[MenuItem]

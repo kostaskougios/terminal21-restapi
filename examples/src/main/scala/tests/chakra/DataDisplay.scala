@@ -6,7 +6,7 @@ import org.terminal21.client.components.chakra.*
 import tests.chakra.Common.*
 
 object DataDisplay:
-  def components(using session: ConnectedSession): Seq[UiElement] = {
+  def components(using session: ConnectedSession): Seq[UiElement] =
     val headAndFoot = Tr().withChildren(
       Th(text = "To convert"),
       Th(text = "into"),
@@ -43,4 +43,3 @@ object DataDisplay:
         )
       )
     )
-  }
