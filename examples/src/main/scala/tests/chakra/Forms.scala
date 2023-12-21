@@ -47,6 +47,14 @@ object Forms:
       status.text = s"checkbox1 checked is $newValue , verify checkbox1.checked = ${checkbox1.checked}"
       session.render()
 
+    val switch1 = Switch(text = "Switch 1")
+    val switch2 = Switch(text = "Switch 2")
+
+    switch1.onChange: newValue =>
+      switch2.isDisabled = newValue
+      status.text = s"switch1 checked is $newValue , verify switch1.checked = ${switch1.checked}"
+      session.render()
+
     val radioGroup = RadioGroup(defaultValue = "2").withChildren(
       HStack().withChildren(
         Radio(value = "1", text = "first"),
@@ -103,6 +111,10 @@ object Forms:
       HStack().withChildren(
         checkbox1,
         checkbox2
+      ),
+      HStack().withChildren(
+        switch1,
+        switch2
       ),
       ButtonGroup(variant = Some("outline"), spacing = Some("24")).withChildren(
         Button(text = "Save", colorScheme = Some("red"))

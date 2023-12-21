@@ -783,3 +783,13 @@ case class Textarea(
     with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Textarea]:
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
+
+/** https://chakra-ui.com/docs/components/switch
+  */
+case class Switch(key: String = Keys.nextKey, @volatile var text: String = "", defaultChecked: Boolean = false, @volatile var isDisabled: Boolean = false)
+    extends ChakraElement
+    with HasEventHandler
+    with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Switch]:
+  @volatile private var checkedV: Option[Boolean]        = None
+  def checked: Boolean                                   = checkedV.getOrElse(defaultChecked)
+  override def defaultEventHandler: OnChangeEventHandler = newValue => checkedV = Some(newValue.toBoolean)
