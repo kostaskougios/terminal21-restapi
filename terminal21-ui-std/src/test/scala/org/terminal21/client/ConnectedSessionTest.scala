@@ -11,7 +11,7 @@ import org.terminal21.ui.std.SessionsService
 class ConnectedSessionTest extends AnyFunSuiteLike:
   test("default event handlers are invoked before user handlers"):
     val sessionsService                      = mock(classOf[SessionsService])
-    given connectedSession: ConnectedSession = new ConnectedSession(session(), "test", sessionsService)
+    given connectedSession: ConnectedSession = new ConnectedSession(session(), "test", sessionsService, () => ())
     val editable                             = Editable()
     editable.onChange: newValue =>
       editable.value should be(newValue)

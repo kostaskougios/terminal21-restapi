@@ -7,10 +7,10 @@ import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.UiElement.{HasEventHandler, allDeep}
 import org.terminal21.client.components.UiElementEncoding.uiElementEncoder
-import org.terminal21.model.{CommandEvent, OnChange, OnClick, Session}
+import org.terminal21.model.*
 import org.terminal21.ui.std.SessionsService
 
-class ConnectedSession(val session: Session, val serverUrl: String, sessionsService: SessionsService):
+class ConnectedSession(val session: Session, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
   private val logger   = LoggerFactory.getLogger(getClass)
   private var elements = List.empty[UiElement]
 
@@ -38,16 +38,20 @@ class ConnectedSession(val session: Session, val serverUrl: String, sessionsServ
     eventHandlers += key -> (handlers :+ handler)
 
   def fireEvent(event: CommandEvent): Unit =
-    eventHandlers.get(event.key) match
-      case Some(handlers) =>
-        for handler <- handlers do
-          (event, handler) match
-            case (_: OnClick, h: OnClickEventHandler)                 => h.onClick()
-            case (onChange: OnChange, h: OnChangeEventHandler)        => h.onChange(onChange.value)
-            case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
-            case x                                                    => logger.error(s"Unknown event handling combination : $x")
-      case None           =>
-        logger.warn(s"There is no event handler for event $event")
+    event match
+      case SessionClosed(_) =>
+        onCloseHandler()
+      case _                =>
+        eventHandlers.get(event.key) match
+          case Some(handlers) =>
+            for handler <- handlers do
+              (event, handler) match
+                case (_: OnClick, h: OnClickEventHandler)                 => h.onClick()
+                case (onChange: OnChange, h: OnChangeEventHandler)        => h.onChange(onChange.value)
+                case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
+                case x                                                    => logger.error(s"Unknown event handling combination : $x")
+          case None           =>
+            logger.warn(s"There is no event handler for event $event")
 
   def render(): Unit =
     val j = toJson

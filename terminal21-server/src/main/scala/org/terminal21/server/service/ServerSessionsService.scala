@@ -1,7 +1,7 @@
 package org.terminal21.server.service
 
 import org.slf4j.LoggerFactory
-import org.terminal21.model.{CommandEvent, OnChange, OnClick, Session}
+import org.terminal21.model.*
 import org.terminal21.server.json.UiEvent
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.utils.{ListenerFunction, NotificationRegistry}
@@ -17,17 +17,23 @@ class ServerSessionsService extends SessionsService:
   private val sessionChangeNotificationRegistry      = new NotificationRegistry[Seq[Session]]
   private val sessionStateChangeNotificationRegistry = new NotificationRegistry[(Session, SessionState)]
 
-  private def sessionById(sessionId: String): Session =
+  def sessionById(sessionId: String): Session =
     sessions.keys.find(_.id == sessionId).getOrElse(throw new IllegalArgumentException(s"Invalid session id = $sessionId"))
 
   def notifyMeWhenSessionsChange(listener: ListenerFunction[Seq[Session]]): Unit =
     sessionChangeNotificationRegistry.addAndNotify(allSessions)(listener)
 
+  def removeSession(session: Session): Unit =
+    sessions -= session
+
   override def terminateSession(session: Session): Unit =
-    logger.info(s"Terminating session $session")
+    val state = sessions.getOrElse(session, throw new IllegalArgumentException(s"Session ${session.id} doesn't exist"))
+    state.eventsNotificationRegistry.notifyAll(SessionClosed("-"))
+    sessions -= session
+    sessions += session.close -> state.close
 
   override def createSession(id: String, name: String): Session =
-    val s     = Session(id, name, UUID.randomUUID().toString)
+    val s     = Session(id, name, UUID.randomUUID().toString, true)
     logger.info(s"Creating session $s")
     sessions.keys.toList.foreach(s => if s.id == id then sessions.remove(s))
     val state = SessionState("""{ "elements" : [] }""", new NotificationRegistry)

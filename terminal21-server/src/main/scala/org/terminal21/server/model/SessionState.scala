@@ -8,3 +8,4 @@ case class SessionState(
     eventsNotificationRegistry: NotificationRegistry[CommandEvent]
 ):
   def withNewState(newJson: String): SessionState = copy(json = newJson)
+  def close: SessionState                         = copy(eventsNotificationRegistry = new NotificationRegistry[CommandEvent])
