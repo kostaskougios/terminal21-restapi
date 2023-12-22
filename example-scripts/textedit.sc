@@ -27,9 +27,9 @@ if args.length != 1 then
 val fileName = args(0)
 val file = new File(fileName)
 val contents =
-  if file.exists() then FileUtils.readFileToString(file) else ""
+  if file.exists() then FileUtils.readFileToString(file, "UTF-8") else ""
 
-def saveFile(content: String) = FileUtils.writeStringToFile(file, content)
+def saveFile(content: String) = FileUtils.writeStringToFile(file, content, "UTF-8")
 
 Sessions.withNewSession(s"textedit-$fileName", s"Edit: $fileName"): session =>
   given ConnectedSession = session

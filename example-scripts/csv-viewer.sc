@@ -25,29 +25,28 @@ if args.length != 1 then
 
 val fileName = args(0)
 val file = new File(fileName)
-val contents = FileUtils.readFileToString(file)
+val contents = FileUtils.readFileToString(file, "UTF-8")
 
 val csv = contents.split("\n").map(_.split(","))
 
-Sessions.withNewSession(s"csv-viewer-$fileName", s"CsvView: $fileName"):
-  session =>
-    given ConnectedSession = session
+Sessions.withNewSession(s"csv-viewer-$fileName", s"CsvView: $fileName"): session =>
+  given ConnectedSession = session
 
-    Seq(
-      TableContainer().withChildren(
-        Table(variant = "striped", colorScheme = Some("teal"), size = "mg")
-          .withChildren(
-            TableCaption(text = "Csv file contents"),
-            Thead(),
-            Tbody(
-              children = csv.map: row =>
-                Tr(
-                  children = row.map: column =>
-                    Td(text = column)
-                )
-            )
+  Seq(
+    TableContainer().withChildren(
+      Table(variant = "striped", colorScheme = Some("teal"), size = "mg")
+        .withChildren(
+          TableCaption(text = "Csv file contents"),
+          Thead(),
+          Tbody(
+            children = csv.map: row =>
+              Tr(
+                children = row.map: column =>
+                  Td(text = column)
+              )
           )
-      )
-    ).render()
-    println(s"Now open ${session.uiUrl} to view the UI.")
-    session.waitTillUserClosesSession()
+        )
+    )
+  ).render()
+  println(s"Now open ${session.uiUrl} to view the UI.")
+  session.waitTillUserClosesSession()

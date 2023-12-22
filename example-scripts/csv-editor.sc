@@ -26,7 +26,7 @@ if args.length != 1 then
 val fileName = args(0)
 val file = new File(fileName)
 val contents =
-  if file.exists() then FileUtils.readFileToString(file)
+  if file.exists() then FileUtils.readFileToString(file, "UTF-8")
   else "type,damage points,hit points\nmage,10dp,20hp\nwarrior,20dp,30hp"
 
 val csv = contents.split("\n").map(_.split(","))
@@ -53,62 +53,59 @@ def saveCsvMap() =
           csvMap.getOrElse((x, y), "")
         .mkString(",")
     .mkString("\n")
-  FileUtils.writeStringToFile(file, s)
+  FileUtils.writeStringToFile(file, s, "UTF-8")
 
   // this will be countDown to 0 when we have to exit
 val exitLatch = new CountDownLatch(1)
 
-Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"):
-  session =>
-    given ConnectedSession = session
+Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session =>
+  given ConnectedSession = session
 
-    val status = Box()
-    val saveAndExit = Button(text = "Save & Exit")
-      .onClick: () =>
-        saveCsvMap()
-        session.add(Paragraph(text="Csv file saved, exiting."))
-        session.render()
-        exitLatch.countDown()
+  val status = Box()
+  val saveAndExit = Button(text = "Save & Exit")
+    .onClick: () =>
+      saveCsvMap()
+      session.add(Paragraph(text = "Csv file saved, exiting."))
+      session.render()
+      exitLatch.countDown()
 
-    val exit = Button(text = "Exit Without Saving")
-      .onClick: () =>
-        exitLatch.countDown()
+  val exit = Button(text = "Exit Without Saving")
+    .onClick: () =>
+      exitLatch.countDown()
 
-    def newEditable(x: Int, y: Int, value: String) =
-      Editable(defaultValue = value)
-        .withChildren(
-          EditablePreview(),
-          EditableInput()
-        )
-        .onChange: newValue =>
-          csvMap((x, y)) = newValue
-          status.text = s"($x,$y) value changed to $newValue"
-          session.render()
-
-    Seq(
-      TableContainer().withChildren(
-        Table(variant = "striped", colorScheme = Some("teal"), size = "mg")
-          .withChildren(
-            TableCaption(text =
-              "Please edit the csv contents above and click save to save and exit"
-            ),
-            Thead(),
-            Tbody(
-              children = csv.zipWithIndex.map: (row, y) =>
-                Tr(
-                  children = row.zipWithIndex.map: (column, x) =>
-                    Td().withChildren(newEditable(x, y, column))
-                )
-            )
-          )
-      ),
-      HStack().withChildren(
-        saveAndExit,
-        exit,
-        status
+  def newEditable(x: Int, y: Int, value: String) =
+    Editable(defaultValue = value)
+      .withChildren(
+        EditablePreview(),
+        EditableInput()
       )
-    ).render()
+      .onChange: newValue =>
+        csvMap((x, y)) = newValue
+        status.text = s"($x,$y) value changed to $newValue"
+        session.render()
 
-    println(s"Now open ${session.uiUrl} to view the UI")
-    // wait for one of the save/exit buttons to be pressed.
-    exitLatch.await()
+  Seq(
+    TableContainer().withChildren(
+      Table(variant = "striped", colorScheme = Some("teal"), size = "mg")
+        .withChildren(
+          TableCaption(text = "Please edit the csv contents above and click save to save and exit"),
+          Thead(),
+          Tbody(
+            children = csv.zipWithIndex.map: (row, y) =>
+              Tr(
+                children = row.zipWithIndex.map: (column, x) =>
+                  Td().withChildren(newEditable(x, y, column))
+              )
+          )
+        )
+    ),
+    HStack().withChildren(
+      saveAndExit,
+      exit,
+      status
+    )
+  ).render()
+
+  println(s"Now open ${session.uiUrl} to view the UI")
+  // wait for one of the save/exit buttons to be pressed.
+  exitLatch.await()
