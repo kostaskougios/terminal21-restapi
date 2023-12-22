@@ -877,6 +877,10 @@ case class Badge(
     with HasChildren[Badge]
 
 /** https://chakra-ui.com/docs/components/image/usage
+  *
+  * Note: you can also add images under ~/.terminal21/web/images (where the server runs) and use a relative url to access them, i.e.
+  *
+  * Image(src = "/web/images/logo1.png")
   */
 case class Image(
     key: String = Keys.nextKey,

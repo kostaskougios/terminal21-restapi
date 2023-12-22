@@ -1,13 +1,20 @@
+// ------------------------------------------------------------------------------
+// A text file editor for small files.
+// ------------------------------------------------------------------------------
+
 //> using dep io.github.kostaskougios::terminal21-ui-std:0.1
 //> using dep commons-io:commons-io:2.15.1
 
-import org.terminal21.client.*
-import org.terminal21.client.components.*
+import org.apache.commons.io.FileUtils
 
 import java.io.File
 
+// always import these
+import org.terminal21.client.*
+// std components, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala
+import org.terminal21.client.components.*
 // use the chakra components for menus, forms etc, https://chakra-ui.com/docs/components
-import org.apache.commons.io.FileUtils
+// The scala case classes : https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/chakra/ChakraElement.scala
 import org.terminal21.client.components.chakra.*
 
 import java.util.concurrent.CountDownLatch
