@@ -3,9 +3,9 @@ package tests.chakra
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
-import tests.chakra.Common.*
+import tests.chakra.Common.commonBox
 
-object Icons:
+object MediaAndIcons:
   def components(using session: ConnectedSession): Seq[UiElement] =
     Seq(
       commonBox(text = "Icons"),
@@ -70,5 +70,19 @@ object Icons:
         ViewOffIcon(),
         WarningIcon(),
         WarningTwoIcon()
+      ),
+      commonBox(text = "Images"),
+      HStack().withChildren(
+        Image(
+          src = "https://bit.ly/dan-abramov",
+          alt = "Dan Abramov",
+          boxSize = Some("150px")
+        ),
+        Image(
+          src = "https://bit.ly/dan-abramov",
+          alt = "Dan Abramov",
+          boxSize = Some("150px"),
+          borderRadius = Some("full")
+        )
       )
     )

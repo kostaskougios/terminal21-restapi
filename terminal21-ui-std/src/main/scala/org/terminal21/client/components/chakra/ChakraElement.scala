@@ -875,3 +875,13 @@ case class Badge(
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[Badge]
+
+/** https://chakra-ui.com/docs/components/image/usage
+  */
+case class Image(
+    key: String = Keys.nextKey,
+    @volatile var src: String = "",
+    @volatile var alt: String = "",
+    @volatile var boxSize: Option[String] = None,
+    @volatile var borderRadius: Option[String] = None
+) extends ChakraElement
