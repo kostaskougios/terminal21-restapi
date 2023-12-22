@@ -1,9 +1,5 @@
 //> using dep io.github.kostaskougios::terminal21-ui-std:0.1
 //> using dep commons-io:commons-io:2.15.1
-import org.apache.commons.io.FileUtils
-
-import java.io.File
-import scala.collection.concurrent.TrieMap
 
 // always import these
 import org.terminal21.client.*
@@ -11,9 +7,12 @@ import org.terminal21.client.*
 import org.terminal21.client.components.*
 // use the chakra components for menus, forms etc, https://chakra-ui.com/docs/components
 // The scala case classes : https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/chakra/ChakraElement.scala
+import org.apache.commons.io.FileUtils
 import org.terminal21.client.components.chakra.*
 
+import java.io.File
 import java.util.concurrent.CountDownLatch
+import scala.collection.concurrent.TrieMap
 
 if args.length != 1 then
   throw new IllegalArgumentException(
