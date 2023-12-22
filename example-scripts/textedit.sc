@@ -6,7 +6,7 @@ import org.terminal21.client.components.*
 
 import java.io.File
 
-// use the chakra components, https://chakra-ui.com/docs/components
+// use the chakra components for menus, forms etc, https://chakra-ui.com/docs/components
 import org.apache.commons.io.FileUtils
 import org.terminal21.client.components.chakra.*
 
@@ -48,8 +48,11 @@ Sessions.withNewSession(s"textedit-$fileName", s"Edit: $fileName"): session =>
           MenuItem(text = "Save")
             .onClick: () =>
               saveFile(editor.value)
+              // we'll display a "Saved" badge for 1 second.
               status.text = "Saved"
+              modified.text = ""
               session.render()
+              // each event handler runs on a new fibler, it is ok to sleep here
               Thread.sleep(1000)
               status.text = ""
               session.render()
