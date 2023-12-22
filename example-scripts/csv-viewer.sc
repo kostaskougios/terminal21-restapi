@@ -49,5 +49,5 @@ Sessions.withNewSession(s"csv-viewer-$fileName", s"CsvView: $fileName"):
           )
       )
     ).render()
-
     println(s"Now open ${session.uiUrl} to view the UI.")
+    session.waitTillUserClosesSession()

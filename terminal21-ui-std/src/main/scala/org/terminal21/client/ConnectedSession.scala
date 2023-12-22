@@ -10,6 +10,8 @@ import org.terminal21.client.components.UiElementEncoding.uiElementEncoder
 import org.terminal21.model.*
 import org.terminal21.ui.std.SessionsService
 
+import java.util.concurrent.CountDownLatch
+
 class ConnectedSession(val session: Session, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
   private val logger   = LoggerFactory.getLogger(getClass)
   private var elements = List.empty[UiElement]
@@ -37,9 +39,15 @@ class ConnectedSession(val session: Session, val serverUrl: String, sessionsServ
     val handlers = eventHandlers.getOrElse(key, Nil)
     eventHandlers += key -> (handlers :+ handler)
 
+  private val exitLatch                 = new CountDownLatch(1)
+  def waitTillUserClosesSession(): Unit =
+    try exitLatch.await()
+    catch case _: Throwable => () // nop
+
   def fireEvent(event: CommandEvent): Unit =
     event match
       case SessionClosed(_) =>
+        exitLatch.countDown()
         onCloseHandler()
       case _                =>
         eventHandlers.get(event.key) match
