@@ -83,6 +83,12 @@ object MediaAndIcons:
           alt = "Dan Abramov",
           boxSize = Some("150px"),
           borderRadius = Some("full")
+        ),
+        Image(
+          src = "/web/images/logo1.png",
+          alt = "logo no 1",
+          boxSize = Some("150px"),
+          borderRadius = Some("full")
         )
       )
     )

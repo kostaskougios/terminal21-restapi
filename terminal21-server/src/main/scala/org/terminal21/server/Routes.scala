@@ -3,7 +3,10 @@ package org.terminal21.server
 import io.helidon.webserver.http.HttpRouting
 import io.helidon.webserver.staticcontent.StaticContentService
 import io.helidon.webserver.websocket.WsRouting
+import org.terminal21.server.utils.Environment
 import org.terminal21.ui.std.SessionsServiceReceiverFactory
+
+import java.nio.file.Path
 
 object Routes:
   def register(dependencies: Dependencies, rb: HttpRouting.Builder): Unit =
@@ -15,7 +18,13 @@ object Routes:
       .builder("web")
       .welcomeFileName("index.html")
       .build
+    val publicContent = StaticContentService
+      .builder(Path.of(Environment.UserHome, ".terminal21", "web"))
+      .welcomeFileName("index.html")
+      .build
+
     rb.register("/ui", staticContent)
+    rb.register("/web", publicContent)
 
   def ws(dependencies: Dependencies): WsRouting.Builder =
     val b = WsRouting.builder

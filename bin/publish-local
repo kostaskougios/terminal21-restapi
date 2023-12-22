@@ -1,0 +1,7 @@
+#! /bin/sh
+
+cd ../terminal21-ui
+bin/build-and-copy-to-restapi
+
+cd ../terminal21-restapi
+sbt clean compile publishLocal
