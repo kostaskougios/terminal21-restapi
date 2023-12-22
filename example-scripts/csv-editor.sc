@@ -66,6 +66,8 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"):
     val saveAndExit = Button(text = "Save & Exit")
       .onClick: () =>
         saveCsvMap()
+        session.add(Paragraph(text="Csv file saved, exiting."))
+        session.render()
         exitLatch.countDown()
 
     val exit = Button(text = "Exit Without Saving")
@@ -110,5 +112,3 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"):
     println(s"Now open ${session.uiUrl} to view the UI")
     // wait for one of the save/exit buttons to be pressed.
     exitLatch.await()
-    session.clear()
-    session.render()
