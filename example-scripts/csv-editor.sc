@@ -37,6 +37,22 @@ val initialCsvMap = csv.zipWithIndex
   .toMap
 val csvMap = TrieMap.empty[(Int, Int), String] ++ initialCsvMap
 
+// save the map back to the csv file
+def saveCsvMap() =
+  val coords = csvMap.keySet
+  val maxX = coords.map(_._1).max
+  val maxY = coords.map(_._2).max
+
+  val s = (0 to maxX)
+    .map: y =>
+      (0 to maxY)
+        .map: x =>
+          csvMap.getOrElse((x, y), "")
+        .mkString(",")
+    .mkString("\n")
+  FileUtils.writeStringToFile(file, s)
+
+  // this will be countDown to 0 when we have to exit
 val exitLatch = new CountDownLatch(1)
 
 Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"):
@@ -46,6 +62,7 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"):
     val status = Box()
     val saveAndExit = Button(text = "Save & Exit")
       .onClick: () =>
+        saveCsvMap()
         exitLatch.countDown()
 
     val exit = Button(text = "Exit Without Saving")
@@ -72,9 +89,9 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"):
             ),
             Thead(),
             Tbody(
-              children = csv.zipWithIndex.map: (row, x) =>
+              children = csv.zipWithIndex.map: (row, y) =>
                 Tr(
-                  children = row.zipWithIndex.map: (column, y) =>
+                  children = row.zipWithIndex.map: (column, x) =>
                     Td().withChildren(newEditable(x, y, column))
                 )
             )
