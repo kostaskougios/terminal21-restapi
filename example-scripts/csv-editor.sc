@@ -1,9 +1,9 @@
 //> using dep io.github.kostaskougios::terminal21-ui-std:0.1
 //> using dep commons-io:commons-io:2.15.1
-
 import org.apache.commons.io.FileUtils
 
 import java.io.File
+import scala.collection.concurrent.TrieMap
 
 // always import these
 import org.terminal21.client.*
@@ -28,12 +28,22 @@ val contents =
 
 val csv = contents.split("\n").map(_.split(","))
 
+// store the csv data in a more usable Map
+val initialCsvMap = csv.zipWithIndex
+  .flatMap: (row, y) =>
+    row.zipWithIndex
+      .map: (col, x) =>
+        ((x, y), col)
+  .toMap
+val csvMap = TrieMap.empty[(Int, Int), String] ++ initialCsvMap
+
 val exitLatch = new CountDownLatch(1)
 
 Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"):
   session =>
     given ConnectedSession = session
 
+    val status = Box()
     val saveAndExit = Button(text = "Save & Exit")
       .onClick: () =>
         exitLatch.countDown()
@@ -41,6 +51,17 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"):
     val exit = Button(text = "Exit Without Saving")
       .onClick: () =>
         exitLatch.countDown()
+
+    def newEditable(x: Int, y: Int, value: String) =
+      Editable(defaultValue = value)
+        .withChildren(
+          EditablePreview(),
+          EditableInput()
+        )
+        .onChange: newValue =>
+          csvMap((x, y)) = newValue
+          status.text = s"($x,$y) value changed to $newValue"
+          session.render()
 
     Seq(
       TableContainer().withChildren(
@@ -51,22 +72,18 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"):
             ),
             Thead(),
             Tbody(
-              children = csv.map: row =>
+              children = csv.zipWithIndex.map: (row, x) =>
                 Tr(
-                  children = row.map: column =>
-                    Td().withChildren(
-                      Editable(defaultValue = column).withChildren(
-                        EditablePreview(),
-                        EditableInput()
-                      )
-                    )
+                  children = row.zipWithIndex.map: (column, y) =>
+                    Td().withChildren(newEditable(x, y, column))
                 )
             )
           )
       ),
       HStack().withChildren(
         saveAndExit,
-        exit
+        exit,
+        status
       )
     ).render()
 
