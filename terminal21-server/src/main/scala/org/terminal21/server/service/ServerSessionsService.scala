@@ -25,12 +25,14 @@ class ServerSessionsService extends SessionsService:
 
   def removeSession(session: Session): Unit =
     sessions -= session
+    sessionChangeNotificationRegistry.notifyAll(allSessions)
 
   override def terminateSession(session: Session): Unit =
     val state = sessions.getOrElse(session, throw new IllegalArgumentException(s"Session ${session.id} doesn't exist"))
     state.eventsNotificationRegistry.notifyAll(SessionClosed("-"))
     sessions -= session
     sessions += session.close -> state.close
+    sessionChangeNotificationRegistry.notifyAll(allSessions)
 
   override def createSession(id: String, name: String): Session =
     val s     = Session(id, name, UUID.randomUUID().toString, true)

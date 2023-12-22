@@ -51,11 +51,9 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
         case Right(WsRequest("close-session", Some(CloseSession(sessionId))))   =>
           val session = sessionsService.sessionById(sessionId)
           sessionsService.terminateSession(session)
-          sendSessions(wsSession, sessionsService.allSessions)
         case Right(WsRequest("remove-session", Some(RemoveSession(sessionId)))) =>
           val session = sessionsService.sessionById(sessionId)
           sessionsService.removeSession(session)
-          sendSessions(wsSession, sessionsService.allSessions)
         case x                                                                  =>
           logger.error(s"Invalid request : $x")
 
