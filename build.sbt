@@ -15,7 +15,7 @@ ThisBuild / resolvers += "Local Maven Repository" at "file://" + Path.userHome.a
 // Dependencies
 // -----------------------------------------------------------------------------------------------
 
-val FunctionsVersion         = "0.51-SNAPSHOT"
+val FunctionsVersion         = "0.51"
 val FunctionsCaller          = "io.github.kostaskougios" %% "functions-caller"   % FunctionsVersion
 val FunctionsReceiver        = "io.github.kostaskougios" %% "functions-receiver" % FunctionsVersion
 val FunctionsAvro            = "io.github.kostaskougios" %% "functions-avro"     % FunctionsVersion
