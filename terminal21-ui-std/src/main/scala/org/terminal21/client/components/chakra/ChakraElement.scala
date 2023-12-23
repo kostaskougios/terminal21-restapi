@@ -47,11 +47,19 @@ case class Box(
 
 /** https://chakra-ui.com/docs/components/stack
   */
-case class HStack(key: String = Keys.nextKey, @volatile var spacing: Option[String] = None, @volatile var children: Seq[UiElement] = Nil)
-    extends ChakraElement
+case class HStack(
+    key: String = Keys.nextKey,
+    @volatile var spacing: Option[String] = None,
+    @volatile var align: Option[String] = None,
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
     with HasChildren[HStack]
-case class VStack(key: String = Keys.nextKey, @volatile var spacing: Option[String] = None, @volatile var children: Seq[UiElement] = Nil)
-    extends ChakraElement
+case class VStack(
+    key: String = Keys.nextKey,
+    @volatile var spacing: Option[String] = None,
+    @volatile var align: Option[String] = None,
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
     with HasChildren[VStack]
 
 case class SimpleGrid(
