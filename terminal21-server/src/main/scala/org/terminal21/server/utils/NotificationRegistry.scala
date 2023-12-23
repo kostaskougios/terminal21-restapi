@@ -1,5 +1,7 @@
 package org.terminal21.server.utils
 
+import scala.util.Try
+
 // make sure this doesn't throw any exceptions
 type ListenerFunction[A] = A => Boolean
 
@@ -15,5 +17,5 @@ class NotificationRegistry[A]:
 
   def notifyAll(a: A): Int =
     synchronized:
-      ns = ns.filter(f => f(a))
+      ns = ns.filter(f => Try(f(a)).getOrElse(false))
       ns.size
