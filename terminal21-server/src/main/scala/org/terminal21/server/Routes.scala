@@ -6,6 +6,7 @@ import io.helidon.webserver.websocket.WsRouting
 import org.terminal21.server.utils.Environment
 import org.terminal21.ui.std.SessionsServiceReceiverFactory
 
+import java.io.File
 import java.nio.file.Path
 
 object Routes:
@@ -18,6 +19,11 @@ object Routes:
       .builder("web")
       .welcomeFileName("index.html")
       .build
+    val webFolder     = new File(Environment.UserHome, ".terminal21/web")
+    if !webFolder.exists() then
+      println(s"Creating $webFolder where static files can be placed.")
+      webFolder.mkdirs()
+
     val publicContent = StaticContentService
       .builder(Path.of(Environment.UserHome, ".terminal21", "web"))
       .welcomeFileName("index.html")
