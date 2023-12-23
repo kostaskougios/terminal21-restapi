@@ -1,5 +1,4 @@
 #!/usr/bin/env -S scala-cli project.scala
-
 // ------------------------------------------------------------------------------
 // A note poster, where anyone can write a note
 // ------------------------------------------------------------------------------
@@ -18,17 +17,17 @@ Sessions.withNewSession("postit", "Post-It"): session =>
   given ConnectedSession = session
 
   val editor = Textarea(placeholder = "Please post your note by clicking here and editing the content")
-  val messages=VStack()
+  val messages = VStack(align = Some("stretch"))
   val add = Button(text = "Post It.").onClick: () =>
     // add the new msg.
     // note: editor.value is automatically updated by terminal-ui
     messages.addChildren(
-      HStack(align = Some("stretch")).withChildren(
+      HStack().withChildren(
         Image(
           src = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_Notes_icon.svg/2048px-Apple_Notes_icon.svg.png",
           boxSize = Some("32px")
         ),
-        Box(text = editor.value)
+        Box(text =  editor.value)
       )
     )
     // always render after adding/modifying something
@@ -45,4 +44,4 @@ Sessions.withNewSession("postit", "Post-It"): session =>
   ).render()
 
   println(s"Now open ${session.uiUrl} to view the UI.")
-  while true do Thread.sleep(100000)
+  session.waitTillUserClosesSession()
