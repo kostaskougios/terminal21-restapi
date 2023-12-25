@@ -1,7 +1,8 @@
 #!/usr/bin/env -S scala-cli project.scala
 
 // ------------------------------------------------------------------------------
-// A csv file viewer
+// A bouncing ball similar to the C64 basic program. Can we make a bouncing
+// ball with the same simplicity as that program?
 // ------------------------------------------------------------------------------
 
 //> using dep io.github.kostaskougios::terminal21-ui-std:0.1
@@ -34,7 +35,7 @@ Sessions.withNewSession("bouncing-ball", "C64 bouncing ball"): session =>
   @tailrec def animateBall(x: Int, y: Int, dx: Int, dy: Int): Unit =
     ball.style = Map("position" -> "fixed", "left" -> (x + "px"), "top" -> (y + "px"))
     session.render()
-    Thread.sleep(1000 / 60)
+    Thread.sleep(1000 / 120)
     val newDx = if x < 0 || x > 600 then -dx else dx
     val newDy = if y < 0 || y > 500 then -dy else dy
     animateBall(x + newDx, y + newDy, newDx, newDy)
