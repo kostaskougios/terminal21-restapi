@@ -13,7 +13,8 @@ case class Button(
     @volatile var text: String = "Ok",
     @volatile var size: Option[String] = None,
     @volatile var variant: Option[String] = None,
-    @volatile var colorScheme: Option[String] = None
+    @volatile var colorScheme: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
     with OnClickEventHandler.CanHandleOnClickEvent[Button]
 
@@ -28,6 +29,7 @@ case class ButtonGroup(
     @volatile var height: Option[String] = None,
     @volatile var border: Option[String] = None,
     @volatile var borderColor: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[ButtonGroup]
@@ -41,6 +43,7 @@ case class Box(
     @volatile var w: String = "",
     @volatile var p: Int = 0,
     @volatile var color: String = "",
+    @volatile var style: Map[String, String] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[Box]
@@ -51,6 +54,7 @@ case class HStack(
     key: String = Keys.nextKey,
     @volatile var spacing: Option[String] = None,
     @volatile var align: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[HStack]
@@ -58,6 +62,7 @@ case class VStack(
     key: String = Keys.nextKey,
     @volatile var spacing: Option[String] = None,
     @volatile var align: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[VStack]
@@ -68,7 +73,8 @@ case class SimpleGrid(
     @volatile var spacingX: Option[String] = None,
     @volatile var spacingY: Option[String] = None,
     @volatile var columns: Int = 2,
-    @volatile var children: Seq[UiElement] = Nil
+    @volatile var children: Seq[UiElement] = Nil,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
     with HasChildren[SimpleGrid]
 
@@ -78,6 +84,7 @@ case class Editable(
     key: String = Keys.nextKey,
     defaultValue: String = "",
     @volatile var value: String = "",
+    @volatile var style: Map[String, String] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasEventHandler
@@ -86,26 +93,38 @@ case class Editable(
   if value == "" then value = defaultValue
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
 
-case class EditablePreview(key: String = Keys.nextKey)  extends ChakraElement
-case class EditableInput(key: String = Keys.nextKey)    extends ChakraElement
-case class EditableTextarea(key: String = Keys.nextKey) extends ChakraElement
+case class EditablePreview(key: String = Keys.nextKey, @volatile var style: Map[String, String] = Map.empty)  extends ChakraElement
+case class EditableInput(key: String = Keys.nextKey, @volatile var style: Map[String, String] = Map.empty)    extends ChakraElement
+case class EditableTextarea(key: String = Keys.nextKey, @volatile var style: Map[String, String] = Map.empty) extends ChakraElement
 
 /** https://chakra-ui.com/docs/components/form-control
   */
-case class FormControl(key: String = Keys.nextKey, as: String = "", @volatile var children: Seq[UiElement] = Nil)
-    extends ChakraElement
+case class FormControl(
+    key: String = Keys.nextKey,
+    as: String = "",
+    @volatile var style: Map[String, String] = Map.empty,
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
     with HasChildren[FormControl]
 
 /** https://chakra-ui.com/docs/components/form-control
   */
-case class FormLabel(key: String = Keys.nextKey, @volatile var text: String, @volatile var children: Seq[UiElement] = Nil)
-    extends ChakraElement
+case class FormLabel(
+    key: String = Keys.nextKey,
+    @volatile var text: String,
+    @volatile var style: Map[String, String] = Map.empty,
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
     with HasChildren[FormLabel]
 
 /** https://chakra-ui.com/docs/components/form-control
   */
-case class FormHelperText(key: String = Keys.nextKey, @volatile var text: String, @volatile var children: Seq[UiElement] = Nil)
-    extends ChakraElement
+case class FormHelperText(
+    key: String = Keys.nextKey,
+    @volatile var text: String,
+    @volatile var style: Map[String, String] = Map.empty,
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
     with HasChildren[FormHelperText]
 
 /** https://chakra-ui.com/docs/components/input
@@ -116,7 +135,8 @@ case class Input(
     placeholder: String = "",
     @volatile var size: String = "md",
     @volatile var variant: Option[String] = None,
-    @volatile var value: String = ""
+    @volatile var value: String = "",
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
     with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Input]:
@@ -125,6 +145,7 @@ case class Input(
 case class InputGroup(
     key: String = Keys.nextKey,
     @volatile var size: String = "md",
+    @volatile var style: Map[String, String] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[InputGroup]
@@ -132,6 +153,7 @@ case class InputGroup(
 case class InputLeftAddon(
     key: String = Keys.nextKey,
     @volatile var text: String = "",
+    @volatile var style: Map[String, String] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[InputLeftAddon]
@@ -139,14 +161,20 @@ case class InputLeftAddon(
 case class InputRightAddon(
     key: String = Keys.nextKey,
     @volatile var text: String = "",
+    @volatile var style: Map[String, String] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[InputRightAddon]
 
 /** https://chakra-ui.com/docs/components/checkbox
   */
-case class Checkbox(key: String = Keys.nextKey, @volatile var text: String = "", defaultChecked: Boolean = false, @volatile var isDisabled: Boolean = false)
-    extends ChakraElement
+case class Checkbox(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "",
+    defaultChecked: Boolean = false,
+    @volatile var isDisabled: Boolean = false,
+    @volatile var style: Map[String, String] = Map.empty
+) extends ChakraElement
     with HasEventHandler
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Checkbox]:
   @volatile private var checkedV: Option[Boolean]        = None
@@ -157,8 +185,13 @@ case class Checkbox(key: String = Keys.nextKey, @volatile var text: String = "",
   */
 case class Radio(key: String = Keys.nextKey, value: String, @volatile var text: String = "", @volatile var colorScheme: Option[String] = None)
     extends ChakraElement
-case class RadioGroup(key: String = Keys.nextKey, defaultValue: String = "", @volatile var value: String = "", @volatile var children: Seq[UiElement] = Nil)
-    extends ChakraElement
+case class RadioGroup(
+    key: String = Keys.nextKey,
+    defaultValue: String = "",
+    @volatile var value: String = "",
+    @volatile var style: Map[String, String] = Map.empty,
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
     with HasEventHandler
     with HasChildren[RadioGroup]
     with OnChangeEventHandler.CanHandleOnChangeEvent[RadioGroup]:
@@ -173,7 +206,8 @@ case class Center(
     @volatile var bg: Option[String] = None,
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
     with HasChildren[Center]
 
@@ -184,7 +218,8 @@ case class Circle(
     @volatile var bg: Option[String] = None,
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
     with HasChildren[Circle]
 
@@ -195,7 +230,8 @@ case class Square(
     @volatile var bg: Option[String] = None,
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
     with HasChildren[Square]
 
@@ -206,7 +242,8 @@ case class AddIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -216,7 +253,8 @@ case class ArrowBackIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -226,7 +264,8 @@ case class ArrowDownIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -236,7 +275,8 @@ case class ArrowForwardIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -246,7 +286,8 @@ case class ArrowLeftIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -256,7 +297,8 @@ case class ArrowRightIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -266,7 +308,8 @@ case class ArrowUpIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -276,7 +319,8 @@ case class ArrowUpDownIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -286,7 +330,8 @@ case class AtSignIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -296,7 +341,8 @@ case class AttachmentIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -306,7 +352,8 @@ case class BellIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -316,7 +363,8 @@ case class CalendarIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -326,7 +374,8 @@ case class ChatIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -336,7 +385,8 @@ case class CheckIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -346,7 +396,8 @@ case class CheckCircleIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -356,7 +407,8 @@ case class ChevronDownIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -366,7 +418,8 @@ case class ChevronLeftIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -376,7 +429,8 @@ case class ChevronRightIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -386,7 +440,8 @@ case class ChevronUpIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -396,7 +451,8 @@ case class CloseIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -406,7 +462,8 @@ case class CopyIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -416,7 +473,8 @@ case class DeleteIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -426,7 +484,8 @@ case class DownloadIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -436,7 +495,8 @@ case class DragHandleIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -446,7 +506,8 @@ case class EditIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -456,7 +517,8 @@ case class EmailIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -466,7 +528,8 @@ case class ExternalLinkIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -476,7 +539,8 @@ case class HamburgerIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -486,7 +550,8 @@ case class InfoIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -496,7 +561,8 @@ case class InfoOutlineIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -506,7 +572,8 @@ case class LinkIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -516,7 +583,8 @@ case class LockIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -526,7 +594,8 @@ case class MinusIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -536,7 +605,8 @@ case class MoonIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -546,7 +616,8 @@ case class NotAllowedIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -556,7 +627,8 @@ case class PhoneIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -566,7 +638,8 @@ case class PlusSquareIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -576,7 +649,8 @@ case class QuestionIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -586,7 +660,8 @@ case class QuestionOutlineIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -596,7 +671,8 @@ case class RepeatIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -606,7 +682,8 @@ case class RepeatClockIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -616,7 +693,8 @@ case class SearchIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -626,7 +704,8 @@ case class Search2Icon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -636,7 +715,8 @@ case class SettingsIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -646,7 +726,8 @@ case class SmallAddIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -656,7 +737,8 @@ case class SmallCloseIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -666,7 +748,8 @@ case class SpinnerIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -676,7 +759,8 @@ case class StarIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -686,7 +770,8 @@ case class SunIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -696,7 +781,8 @@ case class TimeIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -706,7 +792,8 @@ case class TriangleDownIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -716,7 +803,8 @@ case class TriangleUpIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -726,7 +814,8 @@ case class UnlockIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -736,7 +825,8 @@ case class UpDownIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -746,7 +836,8 @@ case class ViewIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -756,7 +847,8 @@ case class ViewOffIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -766,7 +858,8 @@ case class WarningIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
@@ -776,7 +869,8 @@ case class WarningTwoIcon(
     @volatile var w: Option[String] = None,
     @volatile var h: Option[String] = None,
     @volatile var boxSize: Option[String] = None,
-    @volatile var color: Option[String] = None
+    @volatile var color: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** https://chakra-ui.com/docs/components/textarea
@@ -787,7 +881,8 @@ case class Textarea(
     placeholder: String = "",
     @volatile var size: String = "md",
     @volatile var variant: Option[String] = None,
-    @volatile var value: String = ""
+    @volatile var value: String = "",
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
     with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Textarea]:
@@ -795,8 +890,13 @@ case class Textarea(
 
 /** https://chakra-ui.com/docs/components/switch
   */
-case class Switch(key: String = Keys.nextKey, @volatile var text: String = "", defaultChecked: Boolean = false, @volatile var isDisabled: Boolean = false)
-    extends ChakraElement
+case class Switch(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "",
+    defaultChecked: Boolean = false,
+    @volatile var isDisabled: Boolean = false,
+    @volatile var style: Map[String, String] = Map.empty
+) extends ChakraElement
     with HasEventHandler
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Switch]:
   @volatile private var checkedV: Option[Boolean]        = None
@@ -813,6 +913,7 @@ case class Select(
     @volatile var bg: Option[String] = None,
     @volatile var color: Option[String] = None,
     @volatile var borderColor: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasEventHandler
@@ -825,7 +926,8 @@ case class Select(
 case class Option_(
     key: String = Keys.nextKey,
     value: String,
-    @volatile var text: String = ""
+    @volatile var text: String = "",
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
 
 /** https://chakra-ui.com/docs/components/table/usage
@@ -836,19 +938,33 @@ case class Table(
     @volatile var variant: String = "simple",
     @volatile var size: String = "md",
     @volatile var colorScheme: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[Table]
 case class TableCaption(key: String = Keys.nextKey, @volatile var text: String = "")                extends ChakraElement
-case class Thead(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil)          extends ChakraElement with HasChildren[Thead]
-case class Tbody(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil)          extends ChakraElement with HasChildren[Tbody]
-case class Tfoot(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil)          extends ChakraElement with HasChildren[Tfoot]
-case class Tr(key: String = Keys.nextKey, isNumeric: Boolean = false, @volatile var children: Seq[UiElement] = Nil) extends ChakraElement with HasChildren[Tr]
+case class Thead(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil, @volatile var style: Map[String, String] = Map.empty)
+    extends ChakraElement
+    with HasChildren[Thead]
+case class Tbody(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil, @volatile var style: Map[String, String] = Map.empty)
+    extends ChakraElement
+    with HasChildren[Tbody]
+case class Tfoot(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil, @volatile var style: Map[String, String] = Map.empty)
+    extends ChakraElement
+    with HasChildren[Tfoot]
+case class Tr(
+    key: String = Keys.nextKey,
+    isNumeric: Boolean = false,
+    @volatile var children: Seq[UiElement] = Nil,
+    @volatile var style: Map[String, String] = Map.empty
+) extends ChakraElement
+    with HasChildren[Tr]
 case class Th(
     key: String = Keys.nextKey,
     @volatile var text: String = "",
     isNumeric: Boolean = false,
-    @volatile var children: Seq[UiElement] = Nil
+    @volatile var children: Seq[UiElement] = Nil,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
     with HasChildren[Th]
 case class Td(key: String = Keys.nextKey, @volatile var text: String = "", isNumeric: Boolean = false, @volatile var children: Seq[UiElement] = Nil)
@@ -880,7 +996,8 @@ case class Badge(
     @volatile var colorScheme: Option[String] = None,
     @volatile var variant: Option[String] = None,
     @volatile var size: String = "md",
-    @volatile var children: Seq[UiElement] = Nil
+    @volatile var children: Seq[UiElement] = Nil,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
     with HasChildren[Badge]
 

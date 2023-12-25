@@ -76,8 +76,7 @@ object MediaAndIcons:
         Image(
           src = "https://bit.ly/dan-abramov",
           alt = "Dan Abramov",
-          boxSize = Some("150px"),
-          style = Map("position" -> "fixed", "left" -> "50px", "top" -> "50px")
+          boxSize = Some("150px")
         ),
         Image(
           src = "https://bit.ly/dan-abramov",
