@@ -32,6 +32,7 @@ object Terminal21Server:
         logger.info(s"Terminal 21 Server started and listening on http://localhost:$portV")
         val hostname = InetAddress.getLocalHost.getHostName
         logger.info(s"""
+             |Files under ~/.terminal21/web will be served under /web
              |Clients should set env variables:
              |TERMINAL21_HOST = $hostname
              |TERMINAL21_PORT = $portV

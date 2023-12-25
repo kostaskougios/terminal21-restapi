@@ -3,6 +3,7 @@ package org.terminal21.server
 import io.helidon.webserver.http.HttpRouting
 import io.helidon.webserver.staticcontent.StaticContentService
 import io.helidon.webserver.websocket.WsRouting
+import org.slf4j.LoggerFactory
 import org.terminal21.server.utils.Environment
 import org.terminal21.ui.std.SessionsServiceReceiverFactory
 
@@ -10,6 +11,7 @@ import java.io.File
 import java.nio.file.Path
 
 object Routes:
+  private val logger                                                      = LoggerFactory.getLogger(getClass)
   def register(dependencies: Dependencies, rb: HttpRouting.Builder): Unit =
     import dependencies.*
     SessionsServiceReceiverFactory.newJsonSessionsServiceHelidonRoutes(sessionsService).routes(rb)
@@ -21,7 +23,7 @@ object Routes:
       .build
     val webFolder     = new File(Environment.UserHome, ".terminal21/web")
     if !webFolder.exists() then
-      println(s"Creating $webFolder where static files can be placed.")
+      logger.info(s"Creating $webFolder where static files can be placed.")
       webFolder.mkdirs()
 
     val publicContent = StaticContentService

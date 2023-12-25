@@ -895,5 +895,6 @@ case class Image(
     @volatile var src: String = "",
     @volatile var alt: String = "",
     @volatile var boxSize: Option[String] = None,
-    @volatile var borderRadius: Option[String] = None
+    @volatile var borderRadius: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
