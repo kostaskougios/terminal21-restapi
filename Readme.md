@@ -6,7 +6,7 @@ have a web user interface (which is based on react and components like chakra et
 For scala 3 and jdk21 or better. If you have scala-cli installed, you won't need to download scala 3 or jdk21, see below for instructions on how to quickly start with terminal21.
 
 Terminal21 consist of :
-- a server that can be easily deployed i.e. on your home network 
+- a web server that can be easily deployed on your laptop, home network etc 
 - scala apps (scala-cli/ammonite scripts or just normal scala apps) that use the terminal21 UI libs to create user interfaces
 
 The terminal21 libs have a websocket open with the server and they send / receive instructions and events. Similarly, the server
