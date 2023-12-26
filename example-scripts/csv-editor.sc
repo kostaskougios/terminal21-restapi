@@ -4,7 +4,6 @@
 // A quick and dirty casv file editor for small csv files.
 // ------------------------------------------------------------------------------
 
-//> using dep io.github.kostaskougios::terminal21-ui-std:0.1
 //> using dep commons-io:commons-io:2.15.1
 
 // always import these

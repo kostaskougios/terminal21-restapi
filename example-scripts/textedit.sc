@@ -4,7 +4,6 @@
 // A text file editor for small files.
 // ------------------------------------------------------------------------------
 
-//> using dep io.github.kostaskougios::terminal21-ui-std:0.1
 //> using dep commons-io:commons-io:2.15.1
 
 import org.apache.commons.io.FileUtils

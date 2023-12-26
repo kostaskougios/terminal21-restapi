@@ -3,8 +3,6 @@
 // A note poster, where anyone can write a note
 // ------------------------------------------------------------------------------
 
-//> using dep io.github.kostaskougios::terminal21-ui-std:0.1
-
 // always import these
 import org.terminal21.client.*
 // std components, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala

@@ -5,9 +5,6 @@
 // ball with the same simplicity as that program?
 // ------------------------------------------------------------------------------
 
-//> using dep io.github.kostaskougios::terminal21-ui-std:0.1
-//> using dep commons-io:commons-io:2.15.1
-
 // always import these
 import org.terminal21.client.*
 // std components, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala
@@ -23,12 +20,6 @@ Sessions.withNewSession("bouncing-ball", "C64 bouncing ball"): session =>
 
   val ball = Image(src = "/web/images/ball.png")
   Seq(
-    Paragraph(text =
-      "There was a very simple C64 basic program that was bouncing a ball into the screen. This reimplements it in scala and terminal21. Unfortunately the imports and deps make it a bit more complicated but it is not bad at all. Just make sure you have your favorite ball.png under ~/.terminal21-ui/web/images/ball.png"
-    ),
-        Paragraph(text =
-      "The original C64 basic program: https://www.commodore.ca/manuals/c64_users_guide/c64-users_guide-04-advanced_basic.pdf"
-    ),
     ball
   ).render()
 
