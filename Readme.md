@@ -44,6 +44,7 @@ session it has with the server and terminate the app.
 Due to it's client-server architecture, terminal21 gives a UI to scripts running i.e. on servers without a desktop environment and
 can be used for things like:
 - creating text file editors which run on desktop-less servers but still allows us to edit the text file on our browser, see [textedit.sc](example-scripts/textedit.sc)
+![text editor](docs/images/text-editor.png)
 - creating csv editors and viewers, [csv-editor.sc](example-scripts/csv-editor.sc) and [csv-viewer.sc](example-scripts/csv-viewer.sc)
 - messaging apps like [postit.sc](example-scripts/postit.sc)
 - even small web based games, maybe starting with [bouncing-ball.sc](example-scripts/bouncing-ball.sc)
