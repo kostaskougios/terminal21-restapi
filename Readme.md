@@ -47,8 +47,9 @@ can be used for things like:
 ![text editor](docs/images/text-editor.png)
 - creating csv editors and viewers, [csv-editor.sc](example-scripts/csv-editor.sc) and [csv-viewer.sc](example-scripts/csv-viewer.sc)
 - messaging apps like [postit.sc](example-scripts/postit.sc)
+![postit](docs/images/postit.png)
 - even small web based games, maybe starting with [bouncing-ball.sc](example-scripts/bouncing-ball.sc)
-- POC code can be presented via a scala-cli script + terminal21 UI for those office presentations instead of a powerpoint.
+- POC code at the office can be presented via a scala-cli script + terminal21 UI. The POC code can be imported as a lib in a script.
 - logs can be viewed and searched via scripts
 - ... and so on
 
