@@ -1,7 +1,7 @@
 # Terminal 21
 
-Terminal 21 is a terminal / notebook like app and libraries that give scala command line programs (i.e. scala-cli scripts) the ability to easily
-have a web user interface (which is based on react and components like chakra etc).
+Terminal 21 is a library and server that give scala command line programs (i.e. scala-cli scripts) the ability to easily
+create web user interface (which is based on react and components like chakra etc).
 
 For scala 3 and jdk21 or better. If you have scala-cli installed, you won't need to download scala 3 or jdk21, see below for instructions on how to quickly start with terminal21.
 
