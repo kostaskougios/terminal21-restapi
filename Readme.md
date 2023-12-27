@@ -9,7 +9,7 @@ Terminal21 consist of :
 - a web server that can be easily deployed on your laptop, home network etc 
 - scala apps (scala-cli/ammonite scripts or just normal scala apps) that use the terminal21 UI libs to create user interfaces
 
-The terminal21 libs have a websocket open with the server and they send / receive instructions and events. Similarly, the server
+The terminal21 libs have a websocket open with the server, and they send / receive instructions and events. Similarly, the server
 has a websocket open with the React frontend to do the same. Events like clicks or changes to input boxes instantly update
 the state in the client scripts.
 
@@ -96,3 +96,6 @@ ls *.sc
 bouncing-ball.sc csv-editor.sc    csv-viewer.sc    hello-world.sc   postit.sc        server.sc        textedit.sc
 ```
 
+# Need help?
+
+Please use the discussions of the project to post any questions, comments or ideas.
