@@ -18,6 +18,7 @@ import scala.annotation.tailrec
 Sessions.withNewSession("bouncing-ball", "C64 bouncing ball"): session =>
   given ConnectedSession = session
 
+  // Files under ~/.terminal21/web will be served under /web . Please place a ball.png file under ~/.terminal21/web/images on the box where the server runs.
   val ball = Image(src = "/web/images/ball.png")
   Seq(
     ball
