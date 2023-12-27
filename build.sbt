@@ -43,13 +43,19 @@ val HelidonClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websock
 val HelidonClient          = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
 val HelidonServerLogging   = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
 
-val LogBack                                = "ch.qos.logback" % "logback-classic" % "1.4.14"
-val Slf4jApi                               = "org.slf4j"      % "slf4j-api"       % "2.0.9"
+val LogBack        = "ch.qos.logback" % "logback-classic" % "1.4.14"
+val Slf4jApi       = "org.slf4j"      % "slf4j-api"       % "2.0.9"
 // -----------------------------------------------------------------------------------------------
 // Modules
 // -----------------------------------------------------------------------------------------------
+val commonSettings = Seq(
+  Test / fork := true,
+  Test / javaOptions += "--add-opens=java.base/java.lang=ALL-UNNAMED"
+)
+
 lazy val `terminal21-server-client-common` = project
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(
       ScalaTest,
       Slf4jApi,
@@ -63,6 +69,7 @@ lazy val `terminal21-server-client-common` = project
 
 lazy val `terminal21-server` = project
   .settings(
+    commonSettings,
     receiverExports           := Seq(s"io.github.kostaskougios:terminal21-ui-std-exports_3:${version.value}"),
     receiverJsonSerialization := true,
     receiverHelidonRoutes     := true,
@@ -85,6 +92,7 @@ lazy val `terminal21-server` = project
 
 lazy val `terminal21-ui-std-exports` = project
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(ScalaTest),
     // make sure exportedArtifact points to the full artifact name of the receiver.
     buildInfoKeys    := Seq[BuildInfoKey](organization, name, version, scalaVersion, "exportedArtifact" -> "none"),
@@ -95,12 +103,14 @@ lazy val `terminal21-ui-std-exports` = project
 
 lazy val `terminal21-client-common` = project
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(ScalaTest, Mockito, FunctionsFibers, HelidonClientWebSocket) ++ Circe
   )
   .dependsOn(`terminal21-server-client-common`)
 
 lazy val `terminal21-ui-std` = project
   .settings(
+    commonSettings,
     callerExports                := Seq(s"io.github.kostaskougios:terminal21-ui-std-exports_3:${version.value}"),
     callerJsonSerialization      := true,
     callerHelidonClientTransport := true,
@@ -124,6 +134,7 @@ lazy val `terminal21-ui-std` = project
 
 lazy val examples = project
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(ScalaTest, LogBack)
   )
   .dependsOn(`terminal21-ui-std`)
