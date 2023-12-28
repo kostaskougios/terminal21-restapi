@@ -4,4 +4,4 @@ cd ../terminal21-ui
 bin/build-and-copy-to-restapi
 
 cd ../terminal21-restapi
-sbt clean compile publishLocal
+sbt clean terminal21-server-client-common/publishLocal terminal21-ui-std-exports/publishLocal compile publishLocal
