@@ -6,6 +6,8 @@ of what can be done at the [terminal 21 youtube channel](https://www.youtube.com
 
 For scala 3 and jdk21 or better. If you have scala-cli installed, you won't need to download scala 3 or jdk21, see below for instructions on how to quickly start with terminal21.
 
+Note: feel free to ask questions in the "Discussions" board at the top of this github page.
+
 Terminal21 consist of :
 - a web server that can be easily deployed on your laptop, home network etc 
 - scala apps (scala-cli/ammonite scripts or just normal scala apps) that use the terminal21 UI libs to create user interfaces
