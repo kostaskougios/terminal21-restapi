@@ -12,7 +12,7 @@ object Overlay:
       commonBox(text = "Menus"),
       HStack().withChildren(
         Menu().withChildren(
-          MenuButton(text = "Actions", size = Some("sm"), colorScheme = Some("teal")).withChildren(
+          MenuButton(text = "Actions menu0001", size = Some("sm"), colorScheme = Some("teal")).withChildren(
             ChevronDownIcon()
           ),
           MenuList().withChildren(
