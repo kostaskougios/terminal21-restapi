@@ -30,7 +30,8 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
         .render()
 
       println("Waiting for button to be pressed for 1 hour")
-      latch.await(1, TimeUnit.HOURS)
-      session.clear()
-      Paragraph(text = "Terminated").render()
-      Thread.sleep(2000)
+      session.waitTillUserClosesSessionOr(latch.getCount == 0)
+      if !session.isClosed then
+        session.clear()
+        Paragraph(text = "Terminated").render()
+        Thread.sleep(2000)

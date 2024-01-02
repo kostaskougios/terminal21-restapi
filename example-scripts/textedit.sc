@@ -4,8 +4,6 @@
 // A text file editor for small files.
 // ------------------------------------------------------------------------------
 
-//> using dep commons-io:commons-io:2.15.1
-
 import org.apache.commons.io.FileUtils
 
 import java.io.File
