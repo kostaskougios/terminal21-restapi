@@ -9,7 +9,7 @@ object Overlay:
   def components(using session: ConnectedSession): Seq[UiElement] =
     val box1 = Box(text = "Clicks will be reported here.")
     Seq(
-      commonBox(text = "Menus"),
+      commonBox(text = "Menus box0001"),
       HStack().withChildren(
         Menu().withChildren(
           MenuButton(text = "Actions menu0001", size = Some("sm"), colorScheme = Some("teal")).withChildren(
