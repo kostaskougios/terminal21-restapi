@@ -23,11 +23,9 @@ object Sessions:
       .baseUri(s"ws://${config.host}:${config.port}")
       .build
 
-    val currentThread     = Thread.currentThread()
     val isStopped         = new AtomicBoolean(false)
     def terminate(): Unit =
       isStopped.set(true)
-      currentThread.interrupt()
 
     val connectedSession = ConnectedSession(session, serverUrl, sessionsService, terminate)
     FiberExecutor.withFiberExecutor: executor =>
