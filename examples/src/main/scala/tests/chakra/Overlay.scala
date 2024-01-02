@@ -16,7 +16,7 @@ object Overlay:
             ChevronDownIcon()
           ),
           MenuList().withChildren(
-            MenuItem(text = "Download")
+            MenuItem(text = "Download menu-download")
               .onClick: () =>
                 box1.text = "'Download' clicked"
                 session.render()
