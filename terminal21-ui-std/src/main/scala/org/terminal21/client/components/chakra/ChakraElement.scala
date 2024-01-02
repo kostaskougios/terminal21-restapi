@@ -954,7 +954,6 @@ case class Tfoot(key: String = Keys.nextKey, @volatile var children: Seq[UiEleme
     with HasChildren[Tfoot]
 case class Tr(
     key: String = Keys.nextKey,
-    isNumeric: Boolean = false,
     @volatile var children: Seq[UiElement] = Nil,
     @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
