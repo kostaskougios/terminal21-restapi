@@ -908,7 +908,6 @@ case class Switch(
 case class Select(
     key: String = Keys.nextKey,
     placeholder: String = "",
-    defaultValue: String = "",
     @volatile var value: String = "",
     @volatile var bg: Option[String] = None,
     @volatile var color: Option[String] = None,
@@ -919,8 +918,6 @@ case class Select(
     with HasEventHandler
     with HasChildren[Select]
     with OnChangeEventHandler.CanHandleOnChangeEvent[Select]:
-  if value == "" then value = defaultValue
-
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
 
 case class Option_(
