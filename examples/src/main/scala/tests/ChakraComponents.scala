@@ -34,4 +34,4 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
       if !session.isClosed then
         session.clear()
         Paragraph(text = "Terminated").render()
-        Thread.sleep(2000)
+        Thread.sleep(1000)
