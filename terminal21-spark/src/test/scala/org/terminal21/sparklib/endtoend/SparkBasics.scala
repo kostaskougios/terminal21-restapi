@@ -1,6 +1,8 @@
 package org.terminal21.sparklib.endtoend
 
 import org.terminal21.client.ConnectedSession
+import org.terminal21.client.components.*
+import org.terminal21.client.components.chakra.*
 import org.terminal21.sparklib.SparkSessions
 import org.terminal21.sparklib.endtoend.model.CodeFile.createDatasetFromProjectsSourceFiles
 import org.terminal21.sparklib.steps.Steps
@@ -20,3 +22,9 @@ import java.time.LocalDate
 
     val sourceCodeDs = step1.calculateOnce:
       createDatasetFromProjectsSourceFiles.toDS
+
+    val tableData = sourceCodeDs.take(10).toList
+    Seq(
+      QuickTable.quickTable(Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate"), tableData.map(d => d.toData.map(c => Text(text = c))))
+    ).render()
+    session.waitTillUserClosesSession()

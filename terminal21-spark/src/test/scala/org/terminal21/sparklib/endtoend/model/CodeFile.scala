@@ -6,7 +6,9 @@ import java.io.File
 import java.nio.file.Files
 import java.time.{Instant, LocalDate, ZoneId}
 
-case class CodeFile(id: Int, name: String, path: String, numOfLines: Int, numOfWords: Int, createdDate: LocalDate)
+case class CodeFile(id: Int, name: String, path: String, numOfLines: Int, numOfWords: Int, createdDate: LocalDate):
+  def toColumnNames: Seq[String] = productElementNames.toList
+  def toData: Seq[String]        = productIterator.map(_.toString).toList
 
 object CodeFile:
   import scala.jdk.CollectionConverters.*
