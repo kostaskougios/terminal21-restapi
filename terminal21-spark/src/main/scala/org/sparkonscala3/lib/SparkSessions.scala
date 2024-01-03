@@ -2,7 +2,7 @@ package org.sparkonscala3.lib
 
 import org.apache.spark.sql.SparkSession
 
-object Sessions:
+object SparkSessions:
   def newSparkSession(
       appName: String = "spark-app",
       master: String = "local[*]",

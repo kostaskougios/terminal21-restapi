@@ -1,13 +1,13 @@
 package org.sparkonscala3.lib.steps
 
-import org.sparkonscala3.lib.{AbstractSparkSuite, Sessions}
+import org.sparkonscala3.lib.{AbstractSparkSuite, SparkSessions}
 
 import java.util.concurrent.atomic.AtomicInteger
 import scala.util.Using
 
 class StepsTest extends AbstractSparkSuite:
   test("returns the correct dataframe"):
-    Using.resource(Sessions.newSparkSession()): spark =>
+    Using.resource(SparkSessions.newSparkSession()): spark =>
       import spark.implicits.*
 
       val steps      = Steps(spark, "StepsTest-correct-df")
@@ -19,7 +19,7 @@ class StepsTest extends AbstractSparkSuite:
       for _ <- 1 to 3 do budgetStep.calculateOnce(calculations()).as[Int].collect().sorted should be(Array(1, 2, 3))
 
   test("returns the correct dataset"):
-    Using.resource(Sessions.newSparkSession()): spark =>
+    Using.resource(SparkSessions.newSparkSession()): spark =>
       import spark.implicits.*
 
       val steps      = Steps(spark, "StepsTest-correct-ds")
@@ -31,7 +31,7 @@ class StepsTest extends AbstractSparkSuite:
       for _ <- 1 to 3 do budgetStep.calculateOnce(calculations()).as[Int].collect().sorted should be(Array(1, 2, 3))
 
   test("doesn't re-evaluate cached dataframes"):
-    Using.resource(Sessions.newSparkSession()): spark =>
+    Using.resource(SparkSessions.newSparkSession()): spark =>
       import spark.implicits.*
 
       val steps      = Steps(spark, "StepsTest-cachedDF")
@@ -49,7 +49,7 @@ class StepsTest extends AbstractSparkSuite:
       calculated.get() should be(1)
 
   test("doesn't re-evaluate cached datasets"):
-    Using.resource(Sessions.newSparkSession()): spark =>
+    Using.resource(SparkSessions.newSparkSession()): spark =>
       import spark.implicits.*
 
       val steps      = Steps(spark, "StepsTest-cachedDS")
