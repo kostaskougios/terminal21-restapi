@@ -1011,3 +1011,17 @@ case class Image(
     @volatile var borderRadius: Option[String] = None,
     @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
+
+/** https://chakra-ui.com/docs/components/text
+  */
+case class Text(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "text.text is empty",
+    @volatile var fontSize: Option[String] = None,
+    @volatile var noOfLines: Option[Int] = None,
+    @volatile var color: Option[String] = None,
+    @volatile var as: Option[String] = None,
+    @volatile var align: Option[String] = None,
+    @volatile var casing: Option[String] = None,
+    @volatile var decoration: Option[String] = None
+) extends ChakraElement
