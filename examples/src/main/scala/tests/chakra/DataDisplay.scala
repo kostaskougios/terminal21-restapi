@@ -26,7 +26,7 @@ object DataDisplay:
       commonBox(text = "Tables"),
       TableContainer().withChildren(
         Table(variant = "striped", colorScheme = Some("teal"), size = "lg").withChildren(
-          TableCaption(text = "Imperial to metric conversion factors"),
+          TableCaption(text = "Imperial to metric conversion factors (table-caption-0001)"),
           Thead().withChildren(
             headAndFoot
           ),
@@ -45,6 +45,11 @@ object DataDisplay:
               Td(text = "yards"),
               Td(text = "metres (m)"),
               Td(text = "0.91444", isNumeric = true)
+            ),
+            Tr().withChildren(
+              Td(text = "td0001"),
+              Td(text = "td0002"),
+              Td(text = "td0003", isNumeric = true)
             )
           ),
           Tfoot().withChildren(
