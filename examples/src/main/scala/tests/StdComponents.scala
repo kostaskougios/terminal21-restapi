@@ -28,6 +28,4 @@ import org.terminal21.client.components.*
       output
     ).render()
 
-    for i <- 1 to 400 do
-      println(s"i = $i, input value = ${input.value}")
-      Thread.sleep(1000)
+    session.waitTillUserClosesSession()
