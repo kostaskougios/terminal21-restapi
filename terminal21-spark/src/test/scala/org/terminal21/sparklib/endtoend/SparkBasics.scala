@@ -21,10 +21,11 @@ import java.time.LocalDate
     println(step1.targetDir)
 
     val sourceCodeDs = step1.calculateOnce:
+      println("*** Recalculating source codes dataset ***")
       createDatasetFromProjectsSourceFiles.toDS
 
     val tableData = sourceCodeDs.take(10).toList
     Seq(
-      QuickTable.quickTable(Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate"), tableData.map(d => d.toData.map(c => Text(text = c))))
+      QuickTable.quickTable().withStringHeaders("id", "name", "path", "numOfLines", "numOfWords", "createdDate").withStringData(tableData.map(_.toData)).build
     ).render()
     session.waitTillUserClosesSession()
