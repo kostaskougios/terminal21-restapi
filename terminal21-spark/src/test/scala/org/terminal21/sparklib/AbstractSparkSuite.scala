@@ -1,8 +1,8 @@
-package org.sparkonscala3.lib
+package org.terminal21.sparklib
 
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
-import org.sparkonscala3.lib.util.Environment
+import org.terminal21.sparklib.util.Environment
 
 import java.util.UUID
 

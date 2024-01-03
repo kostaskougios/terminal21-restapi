@@ -1,4 +1,4 @@
-package org.sparkonscala3.lib
+package org.terminal21.sparklib
 
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
 

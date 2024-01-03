@@ -1,6 +1,6 @@
-package org.sparkonscala3.lib.steps
+package org.terminal21.sparklib.steps
 
-import org.sparkonscala3.lib.{AbstractSparkSuite, SparkSessions}
+import org.terminal21.sparklib.{AbstractSparkSuite, SparkSessions}
 
 import java.util.concurrent.atomic.AtomicInteger
 import scala.util.Using

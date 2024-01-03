@@ -1,4 +1,4 @@
-package org.sparkonscala3.lib.util
+package org.terminal21.sparklib.util
 
 import org.apache.commons.lang3.StringUtils
 

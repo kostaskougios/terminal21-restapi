@@ -1,3 +1,3 @@
-package org.sparkonscala3.lib.testmodel
+package org.terminal21.sparklib.testmodel
 
 case class Person(id: String, name: String)

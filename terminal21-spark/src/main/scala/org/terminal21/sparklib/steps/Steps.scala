@@ -1,8 +1,8 @@
-package org.sparkonscala3.lib.steps
+package org.terminal21.sparklib.steps
 
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
-import org.sparkonscala3.lib.util.Environment
+import org.terminal21.sparklib.util.Environment
 
 import java.io.File
 

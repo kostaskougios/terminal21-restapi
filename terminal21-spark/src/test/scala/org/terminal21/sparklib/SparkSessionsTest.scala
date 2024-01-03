@@ -1,6 +1,6 @@
-package org.sparkonscala3.lib
+package org.terminal21.sparklib
 
-import org.sparkonscala3.lib.testmodel.Person
+import org.terminal21.sparklib.testmodel.Person
 
 import scala.util.Using
 
