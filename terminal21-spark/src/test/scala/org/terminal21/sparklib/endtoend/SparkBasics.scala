@@ -33,7 +33,7 @@ def calculateSourceCodeFiles(spark: SparkSession, session: ConnectedSession, tab
   import spark.implicits.*
   import scala3encoders.given
   Calculation
-    .newOutOnlyCalculation:
+    .newCalculationNoIn:
       createDatasetFromProjectsSourceFiles.toDS
     .whenStartingCalculationUpdateUi:
       table.withRowStringData(Nil)

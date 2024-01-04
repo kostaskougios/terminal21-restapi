@@ -38,7 +38,7 @@ object Calculation:
     def notifyAfterCalculated(other: Calculation[OUT, _])   = new CalcBuilder(executor, calc, uiUpdater, uiReadyUpdater, notify :+ other)
     def build: Calculation[IN, OUT]                         = new Calculation[IN, OUT](executor, calc, uiUpdater, uiReadyUpdater, notify)
 
-  def newOutOnlyCalculation[OUT](calc: => OUT)(using executor: FiberExecutor): CalcBuilder[Unit, OUT] =
+  def newCalculationNoIn[OUT](calc: => OUT)(using executor: FiberExecutor): CalcBuilder[Unit, OUT] =
     new CalcBuilder(executor, _ => calc)
 
   def newCalculation[IN, OUT](calc: IN => OUT)(using executor: FiberExecutor): CalcBuilder[IN, OUT] =
