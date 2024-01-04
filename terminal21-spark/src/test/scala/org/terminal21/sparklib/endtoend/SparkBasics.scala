@@ -38,10 +38,10 @@ def calculateSourceCodeFiles(spark: SparkSession, session: ConnectedSession, cod
   Calculation(
     _ => createDatasetFromProjectsSourceFiles.toDS.orderBy($"createdDate".desc),
     () =>
-      codeFilesTable.withTBodyStringData(Nil)
+      codeFilesTable.withRowStringData(Nil)
       session.render()
     ,
     tableData =>
-      codeFilesTable.withTBodyStringData(tableData.take(10).map(_.toData))
+      codeFilesTable.withRowStringData(tableData.take(10).map(_.toData))
       session.render()
   )
