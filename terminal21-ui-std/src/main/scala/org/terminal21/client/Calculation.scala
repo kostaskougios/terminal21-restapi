@@ -25,16 +25,21 @@ class Calculation[IN, OUT] private (
       out
     f.get()
 
-  def notifyCalc(calcToNotify: Calculation[OUT, _]): Calculation[IN, OUT] =
-    new Calculation(executor, calc, uiUpdaterWhenResultsNotReady, uiUpdaterWhenResultsReady, notifyWhenCalcReady :+ calcToNotify)
-
 object Calculation:
-  def apply[IN, OUT](
+  class CalcBuilder[IN, OUT](
+      executor: FiberExecutor,
       calc: IN => OUT,
-      uiUpdaterWhenResultsNotReady: () => Unit,
-      uiUpdaterWhenResultsReady: OUT => Unit,
+      uiUpdater: () => Unit = () => (),
+      uiReadyUpdater: OUT => Unit = (_: OUT) => (),
       notify: Seq[Calculation[OUT, _]] = Nil
-  )(using
-      executor: FiberExecutor
-  ): Calculation[IN, OUT] =
-    new Calculation(executor, calc, uiUpdaterWhenResultsNotReady, uiUpdaterWhenResultsReady, notify)
+  ):
+    def whenStartingCalculationUpdateUi(uiUpdater: => Unit) = new CalcBuilder(executor, calc, () => uiUpdater, uiReadyUpdater, notify)
+    def whenCalculatedUpdateUi(uiReadyUpdater: OUT => Unit) = new CalcBuilder(executor, calc, uiUpdater, uiReadyUpdater, notify)
+    def notifyAfterCalculated(other: Calculation[OUT, _])   = new CalcBuilder(executor, calc, uiUpdater, uiReadyUpdater, notify :+ other)
+    def build: Calculation[IN, OUT]                         = new Calculation[IN, OUT](executor, calc, uiUpdater, uiReadyUpdater, notify)
+
+  def newOutOnlyCalculation[OUT](calc: => OUT)(using executor: FiberExecutor): CalcBuilder[Unit, OUT] =
+    new CalcBuilder(executor, _ => calc)
+
+  def newCalculation[IN, OUT](calc: IN => OUT)(using executor: FiberExecutor): CalcBuilder[IN, OUT] =
+    new CalcBuilder(executor, calc)

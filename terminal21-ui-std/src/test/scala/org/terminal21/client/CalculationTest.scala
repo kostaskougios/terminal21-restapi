@@ -13,13 +13,13 @@ class CalculationTest extends AnyFunSuiteLike:
   def testCalcString(i: Int): String = (i + 10).toString
 
   test("calculates"):
-    val calc = Calculation(testCalc, () => (), _ => (), Nil)
+    val calc = Calculation.newCalculation(testCalc).build
     calc(1) should be(2)
 
   test("calls the ui updater with the calculated value"):
     val c    = new AtomicInteger(-1)
     val b    = new AtomicBoolean(false)
-    val calc = Calculation(testCalc, () => b.set(true), i => c.set(i), Nil)
+    val calc = Calculation.newCalculation(testCalc).whenStartingCalculationUpdateUi(b.set(true)).whenCalculatedUpdateUi(i => c.set(i)).build
     calc(1)
     b.get() should be(true)
     eventually:
@@ -27,8 +27,8 @@ class CalculationTest extends AnyFunSuiteLike:
 
   test("notifies"):
     val c     = new AtomicInteger(-1)
-    val calc2 = Calculation(testCalcString, () => (), i => c.set(i.toInt), Nil)
-    val calc1 = Calculation(testCalc, () => (), _ => ()).notifyCalc(calc2)
+    val calc2 = Calculation.newCalculation(testCalcString).whenCalculatedUpdateUi(i => c.set(i.toInt)).build
+    val calc1 = Calculation.newCalculation(testCalc).notifyAfterCalculated(calc2).build
     calc1(1)
     eventually:
       c.get() should be(12)

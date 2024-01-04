@@ -32,16 +32,16 @@ import java.time.LocalDate
 
     session.waitTillUserClosesSession()
 
-def calculateSourceCodeFiles(spark: SparkSession, session: ConnectedSession, codeFilesTable: TableContainer): Calculation[Unit, Dataset[CodeFile]] =
+def calculateSourceCodeFiles(spark: SparkSession, session: ConnectedSession, codeFilesTable: TableContainer) =
   import spark.implicits.*
   import scala3encoders.given
-  Calculation(
-    _ => createDatasetFromProjectsSourceFiles.toDS.orderBy($"createdDate".desc),
-    () =>
+  Calculation
+    .newOutOnlyCalculation:
+      createDatasetFromProjectsSourceFiles.toDS.orderBy($"createdDate".desc)
+    .whenStartingCalculationUpdateUi:
       codeFilesTable.withRowStringData(Nil)
       session.render()
-    ,
-    tableData =>
-      codeFilesTable.withRowStringData(tableData.take(10).map(_.toData))
+    .whenCalculatedUpdateUi: tableData =>
+      codeFilesTable.withRowStringData(tableData.take(10).toList.map(_.toData))
       session.render()
-  )
+    .build
