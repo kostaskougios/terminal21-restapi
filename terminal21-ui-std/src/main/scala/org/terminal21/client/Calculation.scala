@@ -9,7 +9,7 @@ class Calculation[IN, OUT] private (
     uiUpdaterWhenResultsReady: OUT => Unit,
     notifyWhenCalcReady: Seq[Calculation[OUT, _]]
 ):
-  def apply(in: IN): OUT =
+  def run(in: IN): OUT =
     val f = executor.submit:
       executor.submit:
         uiUpdaterWhenResultsNotReady()
@@ -20,7 +20,7 @@ class Calculation[IN, OUT] private (
 
       for c <- notifyWhenCalcReady do
         executor.submit:
-          try c(out)
+          try c.run(out)
           catch case t: Throwable => t.printStackTrace()
       out
     f.get()

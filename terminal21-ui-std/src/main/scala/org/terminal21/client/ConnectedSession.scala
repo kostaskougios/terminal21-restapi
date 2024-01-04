@@ -4,7 +4,7 @@ import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.slf4j.LoggerFactory
-import org.terminal21.client.components.UiElement
+import org.terminal21.client.components.{UiComponent, UiElement}
 import org.terminal21.client.components.UiElement.{HasEventHandler, allDeep}
 import org.terminal21.client.components.UiElementEncoding.uiElementEncoder
 import org.terminal21.model.*
@@ -28,7 +28,9 @@ class ConnectedSession(val session: Session, val serverUrl: String, sessionsServ
     for e <- withEvents do addEventHandlerAtTheTop(e.key, e.defaultEventHandler)
 
     synchronized:
-      elements = elements ::: es.toList
+      elements = elements ::: es.toList.flatMap:
+        case c: UiComponent => c.children
+        case e              => Seq(e)
 
   private val eventHandlers = collection.concurrent.TrieMap.empty[String, List[EventHandler]]
 
@@ -82,8 +84,10 @@ class ConnectedSession(val session: Session, val serverUrl: String, sessionsServ
     val j = toJson
     sessionsService.setSessionJsonState(session, j.toJson.noSpaces)
 
+  def allElements: Seq[UiElement] = synchronized(elements)
+
   private def toJson: JsonObject =
-    val elementsCopy = synchronized(elements)
+    val elementsCopy = allElements
     val json         =
       for e <- elementsCopy
       yield e.asJson.deepDropNullValues
