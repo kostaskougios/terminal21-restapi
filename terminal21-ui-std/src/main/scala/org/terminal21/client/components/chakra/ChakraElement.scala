@@ -44,6 +44,7 @@ case class Box(
     @volatile var p: Int = 0,
     @volatile var color: String = "",
     @volatile var style: Map[String, String] = Map.empty,
+    @volatile var as: Option[String] = None,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[Box]

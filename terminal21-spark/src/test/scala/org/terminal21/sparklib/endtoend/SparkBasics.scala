@@ -15,21 +15,39 @@ import java.time.LocalDate
 @main def sparkBasics(): Unit =
   SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-basics", "Spark Basics"): (spark, session) =>
     given ConnectedSession = session
+    given SparkSession     = spark
 
-    val codeFilesTable = QuickTable.quickTable().withStringHeaders("id", "name", "path", "numOfLines", "numOfWords", "createdDate").build
-    val codeFilesBadge = Badge()
+    val headers          = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate")
+    val codeFilesTable   = QuickTable.quickTable().withStringHeaders(headers: _*).build
+    val codeFilesBadge   = Badge()
+    val sortedFilesTable = QuickTable.quickTable().withStringHeaders(headers: _*).build
+    val sortedFilesBadge = Badge()
 
     Seq(
+      Box(text = "Code files", bg = "green", p = 4),
       codeFilesBadge,
-      codeFilesTable
+      codeFilesTable,
+      Box(text = "Code files sorted by date", bg = "green", p = 4),
+      sortedFilesBadge,
+      sortedFilesTable
     ).render()
 
-    val calcSrcCodeFiles = calculateSourceCodeFiles(spark, session, codeFilesTable, codeFilesBadge)
-    calcSrcCodeFiles(())
+    val sortedCalc       = Calculation
+      .newCalculation(sortedSourceFiles)
+      .whenStartingCalculationUpdateUi:
+        sortedFilesBadge.text = "Calculating..."
+        session.render()
+      .whenCalculatedUpdateUi: data =>
+        sortedFilesBadge.text = "Ready"
+        sortedFilesTable.withRowStringData(data.take(10).toList.map(_.toData))
+        session.render()
+      .build
+    val calcSrcCodeFiles = calculateSourceCodeFiles(codeFilesTable, codeFilesBadge)
+    calcSrcCodeFiles.notifyAfterCalculated(sortedCalc).build.apply(())
 
     session.waitTillUserClosesSession()
 
-def calculateSourceCodeFiles(spark: SparkSession, session: ConnectedSession, table: TableContainer, badge: Badge) =
+def calculateSourceCodeFiles(table: TableContainer, badge: Badge)(using spark: SparkSession, session: ConnectedSession) =
   import spark.implicits.*
   import scala3encoders.given
   Calculation
@@ -43,4 +61,7 @@ def calculateSourceCodeFiles(spark: SparkSession, session: ConnectedSession, tab
       table.withRowStringData(tableData.take(10).toList.map(_.toData))
       badge.text = "Ready"
       session.render()
-    .build
+
+def sortedSourceFiles(sourceFiles: Dataset[CodeFile])(using spark: SparkSession) =
+  import spark.implicits.*
+  sourceFiles.sort($"createdDate".desc)
