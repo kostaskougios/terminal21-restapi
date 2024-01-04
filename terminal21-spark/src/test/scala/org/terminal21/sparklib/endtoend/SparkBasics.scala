@@ -16,32 +16,31 @@ import java.time.LocalDate
   SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-basics", "Spark Basics"): (spark, session) =>
     given ConnectedSession = session
 
-    val steps = Steps(spark, "spark-basics")
-    val step1 = steps.step("query-dataset")
-
     val codeFilesTable = QuickTable.quickTable().withStringHeaders("id", "name", "path", "numOfLines", "numOfWords", "createdDate").build
+    val codeFilesBadge = Badge()
 
     Seq(
-      Button(text = "Code files").onClick: () =>
-        step1.invalidateCache(),
+      codeFilesBadge,
       codeFilesTable
     ).render()
 
-    val calcSrcCodeFiles = calculateSourceCodeFiles(spark, session, codeFilesTable)
+    val calcSrcCodeFiles = calculateSourceCodeFiles(spark, session, codeFilesTable, codeFilesBadge)
     calcSrcCodeFiles(())
 
     session.waitTillUserClosesSession()
 
-def calculateSourceCodeFiles(spark: SparkSession, session: ConnectedSession, codeFilesTable: TableContainer) =
+def calculateSourceCodeFiles(spark: SparkSession, session: ConnectedSession, table: TableContainer, badge: Badge) =
   import spark.implicits.*
   import scala3encoders.given
   Calculation
     .newOutOnlyCalculation:
-      createDatasetFromProjectsSourceFiles.toDS.orderBy($"createdDate".desc)
+      createDatasetFromProjectsSourceFiles.toDS
     .whenStartingCalculationUpdateUi:
-      codeFilesTable.withRowStringData(Nil)
+      table.withRowStringData(Nil)
+      badge.text = "Calculating..."
       session.render()
     .whenCalculatedUpdateUi: tableData =>
-      codeFilesTable.withRowStringData(tableData.take(10).toList.map(_.toData))
+      table.withRowStringData(tableData.take(10).toList.map(_.toData))
+      badge.text = "Ready"
       session.render()
     .build
