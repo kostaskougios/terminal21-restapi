@@ -929,7 +929,23 @@ case class Option_(
 
 /** https://chakra-ui.com/docs/components/table/usage
   */
-case class TableContainer(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil) extends ChakraElement with HasChildren[TableContainer]
+case class TableContainer(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil) extends ChakraElement with HasChildren[TableContainer]:
+  def withTBodyStringData(data: Seq[Seq[String]]): TableContainer = withTBodyData(data.map(_.map(c => Text(text = c))))
+  def withTBodyData(data: Seq[Seq[UiElement]]): TableContainer    =
+    val tableBodies = children
+      .collect:
+        case t: Table =>
+          t.children.collect:
+            case b: Tbody => b
+      .flatten
+    val newTrs      = data.map: row =>
+      Tr(
+        children = row.map: column =>
+          Td().withChildren(column)
+      )
+    for b <- tableBodies do b.withChildren(newTrs: _*)
+    this
+
 case class Table(
     key: String = Keys.nextKey,
     @volatile var variant: String = "simple",
