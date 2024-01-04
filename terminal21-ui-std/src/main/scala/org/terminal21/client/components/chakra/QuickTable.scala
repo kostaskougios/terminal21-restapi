@@ -14,8 +14,8 @@ object QuickTable:
     def withHeaders(hs: Seq[UiElement]): QuickTableBuilder = copy(headers = hs)
     def withStringHeaders(hs: String*): QuickTableBuilder  = copy(headers = hs.map(h => Text(text = h)))
 
-    def withData(dt: Seq[Seq[UiElement]])    = copy(data = dt)
-    def withStringData(dt: Seq[Seq[String]]) = copy(data = dt.map(row => row.map(c => Text(text = c))))
+    def withData(dt: Seq[Seq[UiElement]]): QuickTableBuilder    = copy(data = dt)
+    def withStringData(dt: Seq[Seq[String]]): QuickTableBuilder = copy(data = dt.map(row => row.map(c => Text(text = c))))
 
     def build: TableContainer =
       val hs = headers.map: h =>
