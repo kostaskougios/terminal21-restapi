@@ -34,3 +34,21 @@ abstract class StdSparkCalculation[IN, OUT](
   override protected def whenResultsReady(results: OUT): Unit =
     badge.text = "Ready"
     session.render()
+
+object SparkCalculation:
+  class Builder[IN, OUT](name: String, dataUi: UiElement, notifyWhenCalcReady: Seq[Calculation[OUT, _]], calc: IN => OUT)(using
+      session: ConnectedSession,
+      executor: FiberExecutor
+  ):
+    def whenResultsReady(ready: OUT => Unit) =
+      new StdSparkCalculation[IN, OUT](name = name, dataUi = dataUi, notifyWhenCalcReady):
+        override protected def calculation(in: IN): OUT             = calc(in)
+        override protected def whenResultsReady(results: OUT): Unit =
+          ready(results)
+          super.whenResultsReady(results)
+
+  def stdSparkCalculation[IN, OUT](name: String, dataUi: UiElement, notifyWhenCalcReady: Seq[Calculation[OUT, _]] = Nil)(calc: IN => OUT)(using
+      session: ConnectedSession,
+      executor: FiberExecutor
+  ) =
+    new Builder[IN, OUT](name, dataUi, notifyWhenCalcReady, calc)

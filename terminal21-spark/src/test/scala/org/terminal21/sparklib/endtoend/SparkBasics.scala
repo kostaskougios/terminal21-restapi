@@ -34,22 +34,21 @@ import org.terminal21.sparklib.steps.{SparkCalculation, StdSparkCalculation}
 
     val codeFilesTable = QuickTable.quickTable().withStringHeaders(headers: _*).build
 
-    object CodeFilesCalculation
-        extends StdSparkCalculation[Unit, Dataset[CodeFile]](name = "Code files", dataUi = codeFilesTable, notifyWhenCalcReady = Seq(sortedCalc)):
-      override protected def calculation(in: Unit)                              = createDatasetFromProjectsSourceFiles.toDS
-      override protected def whenResultsReady(results: Dataset[CodeFile]): Unit =
+    val codeFilesCalculation = SparkCalculation
+      .stdSparkCalculation("Code files", codeFilesTable, Seq(sortedCalc)): _ =>
+        createDatasetFromProjectsSourceFiles.toDS
+      .whenResultsReady: results =>
         val dt = results.take(10).toList
         codeFilesTable.withRowStringData(dt.map(_.toData))
-        super.whenResultsReady(results)
 
     Seq(
-      CodeFilesCalculation,
+      codeFilesCalculation,
       Box(text = "Code files sorted by date", bg = "green", p = 4),
       sortedFilesBadge,
       sortedFilesTable
     ).render()
 
-    CodeFilesCalculation.run(())
+    codeFilesCalculation.run(())
     session.waitTillUserClosesSession()
 
 def sortedSourceFiles(sourceFiles: Dataset[CodeFile])(using spark: SparkSession) =
