@@ -4,7 +4,7 @@ import functions.fibers.FiberExecutor
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
 
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 import org.scalatest.concurrent.Eventually.*
 
 class CalculationTest extends AnyFunSuiteLike:
@@ -18,8 +18,10 @@ class CalculationTest extends AnyFunSuiteLike:
 
   test("calls the ui updater with the calculated value"):
     val c    = new AtomicInteger(-1)
-    val calc = Calculation(testCalc, () => (), i => c.set(i), Nil)
+    val b    = new AtomicBoolean(false)
+    val calc = Calculation(testCalc, () => b.set(true), i => c.set(i), Nil)
     calc(1)
+    b.get() should be(true)
     eventually:
       c.get() should be(2)
 
