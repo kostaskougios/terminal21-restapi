@@ -2,21 +2,21 @@ package org.terminal21.client
 
 import functions.fibers.FiberExecutor
 
-class Calculation[IN, OUT] private (
-    executor: FiberExecutor,
-    calc: IN => OUT,
-    uiUpdaterWhenResultsNotReady: () => Unit,
-    uiUpdaterWhenResultsReady: OUT => Unit,
+abstract class Calculation[IN, OUT](
     notifyWhenCalcReady: Seq[Calculation[OUT, _]]
-):
+)(using executor: FiberExecutor):
+  protected def calculation(in: IN): OUT
+  protected def whenResultsNotReady(): Unit
+  protected def whenResultsReady(results: OUT): Unit
+
   def run(in: IN): OUT =
     val f = executor.submit:
       executor.submit:
-        uiUpdaterWhenResultsNotReady()
+        whenResultsNotReady()
 
-      val out = calc(in)
+      val out = calculation(in)
       executor.submit:
-        uiUpdaterWhenResultsReady(out)
+        whenResultsReady(out)
 
       for c <- notifyWhenCalcReady do
         executor.submit:
@@ -26,20 +26,23 @@ class Calculation[IN, OUT] private (
     f.get()
 
 object Calculation:
-  class CalcBuilder[IN, OUT](
-      executor: FiberExecutor,
+  class Builder[IN, OUT](
       calc: IN => OUT,
-      uiUpdater: () => Unit = () => (),
+      uiNotReadyUpdater: () => Unit = () => (),
       uiReadyUpdater: OUT => Unit = (_: OUT) => (),
       notify: Seq[Calculation[OUT, _]] = Nil
-  ):
-    def whenStartingCalculationUpdateUi(uiUpdater: => Unit) = new CalcBuilder(executor, calc, () => uiUpdater, uiReadyUpdater, notify)
-    def whenCalculatedUpdateUi(uiReadyUpdater: OUT => Unit) = new CalcBuilder(executor, calc, uiUpdater, uiReadyUpdater, notify)
-    def notifyAfterCalculated(other: Calculation[OUT, _])   = new CalcBuilder(executor, calc, uiUpdater, uiReadyUpdater, notify :+ other)
-    def build: Calculation[IN, OUT]                         = new Calculation[IN, OUT](executor, calc, uiUpdater, uiReadyUpdater, notify)
+  )(using executor: FiberExecutor):
+    def whenResultsNotReady(uiUpdater: => Unit)           = new Builder(calc, () => uiUpdater, uiReadyUpdater, notify)
+    def whenResultsReady(uiReadyUpdater: OUT => Unit)     = new Builder(calc, uiNotReadyUpdater, uiReadyUpdater, notify)
+    def notifyAfterCalculated(other: Calculation[OUT, _]) = new Builder(calc, uiNotReadyUpdater, uiReadyUpdater, notify :+ other)
+    def build: Calculation[IN, OUT]                       =
+      new Calculation[IN, OUT](notify):
+        override protected def calculation(in: IN): OUT             = calc(in)
+        override protected def whenResultsNotReady(): Unit          = uiNotReadyUpdater()
+        override protected def whenResultsReady(results: OUT): Unit = uiReadyUpdater(results)
 
-  def newCalculationNoIn[OUT](calc: => OUT)(using executor: FiberExecutor): CalcBuilder[Unit, OUT] =
-    new CalcBuilder(executor, _ => calc)
+  def newCalculationNoIn[OUT](calc: => OUT)(using executor: FiberExecutor): Builder[Unit, OUT] =
+    new Builder(_ => calc)
 
-  def newCalculation[IN, OUT](calc: IN => OUT)(using executor: FiberExecutor): CalcBuilder[IN, OUT] =
-    new CalcBuilder(executor, calc)
+  def newCalculation[IN, OUT](calc: IN => OUT)(using executor: FiberExecutor): Builder[IN, OUT] =
+    new Builder(calc)

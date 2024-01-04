@@ -16,10 +16,10 @@ class StepsCalculation(session: ConnectedSession):
 
     val calculation = Calculation
       .newCalculation(calc)
-      .whenStartingCalculationUpdateUi:
+      .whenResultsNotReady:
         badge.text = "Calculating..."
         session.render()
-      .whenCalculatedUpdateUi: data =>
+      .whenResultsReady: data =>
         badge.text = "Ready"
         renderer(data)
         session.render()

@@ -7,7 +7,7 @@ import org.terminal21.client.{*, given}
 import org.terminal21.sparklib.SparkSessions
 import org.terminal21.sparklib.endtoend.model.CodeFile
 import org.terminal21.sparklib.endtoend.model.CodeFile.createDatasetFromProjectsSourceFiles
-import org.terminal21.sparklib.steps.StepComponent
+import org.terminal21.sparklib.steps.{SparkCalculation, StdSparkCalculation}
 
 @main def sparkBasics(): Unit =
   SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-basics", "Spark Basics"): (spark, session) =>
@@ -19,44 +19,37 @@ import org.terminal21.sparklib.steps.StepComponent
 
     val headers = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate")
 
-    val codeFilesTable     = QuickTable.quickTable().withStringHeaders(headers: _*).build
-    val codeFilesComponent = StepComponent.stdStep("Code files", codeFilesTable)
-
     val sortedFilesTable = QuickTable.quickTable().withStringHeaders(headers: _*).build
     val sortedFilesBadge = Badge()
-
-    Seq(
-      codeFilesComponent,
-      Box(text = "Code files sorted by date", bg = "green", p = 4),
-      sortedFilesBadge,
-      sortedFilesTable
-    ).render()
-
-    val sortedCalc = Calculation
+    val sortedCalc       = Calculation
       .newCalculation(sortedSourceFiles)
-      .whenStartingCalculationUpdateUi:
+      .whenResultsNotReady:
         sortedFilesBadge.text = "Calculating..."
         session.render()
-      .whenCalculatedUpdateUi: data =>
+      .whenResultsReady: data =>
         sortedFilesBadge.text = "Ready"
         sortedFilesTable.withRowStringData(data.take(10).toList.map(_.toData))
         session.render()
       .build
 
-    Calculation
-      .newCalculationNoIn:
-        createDatasetFromProjectsSourceFiles.toDS
-      .whenStartingCalculationUpdateUi:
-        sortedFilesTable.withRowStringData(Nil)
-        codeFilesComponent.calculating()
-      .whenCalculatedUpdateUi: tableData =>
-        val dt = tableData.take(10).toList
-        codeFilesTable.withRowStringData(dt.map(_.toData))
-        codeFilesComponent.ready()
-      .notifyAfterCalculated(sortedCalc)
-      .build
-      .run(())
+    val codeFilesTable = QuickTable.quickTable().withStringHeaders(headers: _*).build
 
+    object CodeFilesCalculation
+        extends StdSparkCalculation[Unit, Dataset[CodeFile]](name = "Code files", dataUi = codeFilesTable, notifyWhenCalcReady = Seq(sortedCalc)):
+      override protected def calculation(in: Unit)                              = createDatasetFromProjectsSourceFiles.toDS
+      override protected def whenResultsReady(results: Dataset[CodeFile]): Unit =
+        val dt = results.take(10).toList
+        codeFilesTable.withRowStringData(dt.map(_.toData))
+        super.whenResultsReady(results)
+
+    Seq(
+      CodeFilesCalculation,
+      Box(text = "Code files sorted by date", bg = "green", p = 4),
+      sortedFilesBadge,
+      sortedFilesTable
+    ).render()
+
+    CodeFilesCalculation.run(())
     session.waitTillUserClosesSession()
 
 def sortedSourceFiles(sourceFiles: Dataset[CodeFile])(using spark: SparkSession) =
