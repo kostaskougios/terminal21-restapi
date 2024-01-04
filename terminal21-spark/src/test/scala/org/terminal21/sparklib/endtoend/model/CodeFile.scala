@@ -13,7 +13,7 @@ case class CodeFile(id: Int, name: String, path: String, numOfLines: Int, numOfW
 object CodeFile:
   import scala.jdk.CollectionConverters.*
   def createDatasetFromProjectsSourceFiles: Seq[CodeFile] =
-    val availableFiles = FileUtils.listFiles(new File("."), Array("scala"), true).asScala.toArray
+    val availableFiles = FileUtils.listFiles(new File(".."), Array("scala"), true).asScala.toArray
     for i <- 1 to 10000 yield
       val f    = availableFiles(i % availableFiles.length)
       val code = Files.readString(f.toPath)

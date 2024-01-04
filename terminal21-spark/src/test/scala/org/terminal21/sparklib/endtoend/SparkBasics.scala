@@ -15,17 +15,17 @@ import java.time.LocalDate
 
     import scala3encoders.given
     import spark.implicits.*
-    val steps = Steps(spark, "spark-basics")
 
+    val steps = Steps(spark, "spark-basics")
     val step1 = steps.step("query-dataset")
-    println(step1.targetDir)
 
     val sourceCodeDs = step1.calculateOnce:
-      println("*** Recalculating source codes dataset ***")
-      createDatasetFromProjectsSourceFiles.toDS
+      createDatasetFromProjectsSourceFiles.toDS.orderBy($"createdDate".desc)
 
     val tableData = sourceCodeDs.take(10).toList
     Seq(
+      Button(text = "Code files").onClick: () =>
+        step1.invalidateCache(),
       QuickTable.quickTable().withStringHeaders("id", "name", "path", "numOfLines", "numOfWords", "createdDate").withStringData(tableData.map(_.toData)).build
     ).render()
     session.waitTillUserClosesSession()
