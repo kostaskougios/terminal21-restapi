@@ -42,4 +42,4 @@ import org.terminal21.sparklib.steps.{SparkCalculation, StdSparkCalculation}
 
 def sortedSourceFiles(sourceFiles: Dataset[CodeFile])(using spark: SparkSession) =
   import spark.implicits.*
-  sourceFiles.sort($"createdDate".desc)
+  sourceFiles.sort($"createdDate".desc, $"numOfWords".desc)

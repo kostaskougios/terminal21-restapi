@@ -1,10 +1,10 @@
 package org.terminal21.client.components.chakra
 
-import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler}
+import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, HasStyle}
 import org.terminal21.client.components.{Keys, UiElement}
 import org.terminal21.client.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler}
 
-sealed trait ChakraElement extends UiElement
+sealed trait ChakraElement extends UiElement with HasStyle
 
 /** https://chakra-ui.com/docs/components/button
   */
@@ -184,8 +184,13 @@ case class Checkbox(
 
 /** https://chakra-ui.com/docs/components/radio
   */
-case class Radio(key: String = Keys.nextKey, value: String, @volatile var text: String = "", @volatile var colorScheme: Option[String] = None)
-    extends ChakraElement
+case class Radio(
+    key: String = Keys.nextKey,
+    value: String,
+    @volatile var text: String = "",
+    @volatile var colorScheme: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
+) extends ChakraElement
 case class RadioGroup(
     key: String = Keys.nextKey,
     defaultValue: String = "",
@@ -930,7 +935,9 @@ case class Option_(
 
 /** https://chakra-ui.com/docs/components/table/usage
   */
-case class TableContainer(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil) extends ChakraElement with HasChildren[TableContainer]:
+case class TableContainer(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil, @volatile var style: Map[String, String] = Map.empty)
+    extends ChakraElement
+    with HasChildren[TableContainer]:
   def withRowStringData(data: Seq[Seq[String]]): TableContainer = withRowData(data.map(_.map(c => Text(text = c))))
   def withRowData(data: Seq[Seq[UiElement]]): TableContainer    =
     val tableBodies = children
@@ -956,7 +963,7 @@ case class Table(
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[Table]
-case class TableCaption(key: String = Keys.nextKey, @volatile var text: String = "")                extends ChakraElement
+case class TableCaption(key: String = Keys.nextKey, @volatile var text: String = "", @volatile var style: Map[String, String] = Map.empty) extends ChakraElement
 case class Thead(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil, @volatile var style: Map[String, String] = Map.empty)
     extends ChakraElement
     with HasChildren[Thead]
@@ -980,28 +987,42 @@ case class Th(
     @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement
     with HasChildren[Th]
-case class Td(key: String = Keys.nextKey, @volatile var text: String = "", isNumeric: Boolean = false, @volatile var children: Seq[UiElement] = Nil)
-    extends ChakraElement
+case class Td(
+    key: String = Keys.nextKey,
+    @volatile var text: String = "",
+    isNumeric: Boolean = false,
+    @volatile var style: Map[String, String] = Map.empty,
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
     with HasChildren[Td]
 
 /** https://chakra-ui.com/docs/components/menu/usage
   */
-case class Menu(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil)     extends ChakraElement with HasChildren[Menu]
+case class Menu(key: String = Keys.nextKey, @volatile var style: Map[String, String] = Map.empty, @volatile var children: Seq[UiElement] = Nil)
+    extends ChakraElement
+    with HasChildren[Menu]
 case class MenuButton(
     key: String = Keys.nextKey,
     @volatile var text: String = "",
     @volatile var size: Option[String] = None,
     @volatile var colorScheme: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[MenuButton]
-case class MenuList(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil) extends ChakraElement with HasChildren[MenuList]
-case class MenuItem(key: String = Keys.nextKey, @volatile var text: String = "", @volatile var children: Seq[UiElement] = Nil)
+case class MenuList(key: String = Keys.nextKey, @volatile var style: Map[String, String] = Map.empty, @volatile var children: Seq[UiElement] = Nil)
     extends ChakraElement
+    with HasChildren[MenuList]
+case class MenuItem(
+    key: String = Keys.nextKey,
+    @volatile var style: Map[String, String] = Map.empty,
+    @volatile var text: String = "",
+    @volatile var children: Seq[UiElement] = Nil
+) extends ChakraElement
     with HasChildren[MenuItem]
     with OnClickEventHandler.CanHandleOnClickEvent[MenuItem]
 
-case class MenuDivider(key: String = Keys.nextKey) extends ChakraElement
+case class MenuDivider(key: String = Keys.nextKey, @volatile var style: Map[String, String] = Map.empty) extends ChakraElement
 
 case class Badge(
     key: String = Keys.nextKey,
@@ -1040,5 +1061,6 @@ case class Text(
     @volatile var as: Option[String] = None,
     @volatile var align: Option[String] = None,
     @volatile var casing: Option[String] = None,
-    @volatile var decoration: Option[String] = None
+    @volatile var decoration: Option[String] = None,
+    @volatile var style: Map[String, String] = Map.empty
 ) extends ChakraElement

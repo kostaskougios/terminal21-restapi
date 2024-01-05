@@ -1,12 +1,12 @@
 package org.terminal21.client.components
 
-import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler}
+import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, HasStyle}
 import org.terminal21.client.{ConnectedSession, OnChangeEventHandler}
 
-sealed trait StdElement extends UiElement
+sealed trait StdElement extends UiElement with HasStyle
 
 case class Span(key: String = Keys.nextKey, @volatile var text: String, @volatile var style: Map[String, String] = Map.empty) extends StdElement
-case class NewLine(key: String = Keys.nextKey)                                                                                extends StdElement
+case class NewLine(key: String = Keys.nextKey, @volatile var style: Map[String, String] = Map.empty)                          extends StdElement
 case class Em(key: String = Keys.nextKey, @volatile var text: String, @volatile var style: Map[String, String] = Map.empty)   extends StdElement
 
 case class Header1(key: String = Keys.nextKey, @volatile var text: String, @volatile var style: Map[String, String] = Map.empty) extends StdElement
