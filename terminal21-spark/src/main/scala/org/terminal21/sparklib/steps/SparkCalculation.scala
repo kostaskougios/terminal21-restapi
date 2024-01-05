@@ -3,7 +3,7 @@ package org.terminal21.sparklib.steps
 import functions.fibers.FiberExecutor
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.{Calculation, ConnectedSession}
-import org.terminal21.client.components.chakra.{Badge, Box, Button, HStack}
+import org.terminal21.client.components.chakra.{Badge, Box, Button, HStack, RepeatIcon, Text}
 import org.terminal21.client.components.{Keys, UiComponent, UiElement}
 
 abstract class SparkCalculation[IN, OUT](
@@ -22,11 +22,17 @@ abstract class StdSparkCalculation[IN, OUT](
 )(using session: ConnectedSession, executor: FiberExecutor)
     extends SparkCalculation[IN, OUT](key, Nil, notifyWhenCalcReady):
   val badge  = Badge()
-  val recalc = Button(text = "Recalculate").onClick: () =>
+  val recalc = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
     for i <- in do run(i)
+
   children = Seq(
-    Box(text = name, bg = "green", p = 4),
-    HStack().withChildren(badge, recalc),
+    Box(bg = "green", p = 4).withChildren(
+      HStack().withChildren(
+        Text(text = name),
+        badge,
+        recalc
+      )
+    ),
     dataUi
   )
 
