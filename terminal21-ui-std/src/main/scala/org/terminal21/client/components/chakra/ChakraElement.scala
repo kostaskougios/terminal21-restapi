@@ -16,7 +16,12 @@ case class Button(
     @volatile var colorScheme: Option[String] = None,
     @volatile var style: Map[String, String] = Map.empty,
     @volatile var leftIcon: Option[UiElement] = None,
-    @volatile var rightIcon: Option[UiElement] = None
+    @volatile var rightIcon: Option[UiElement] = None,
+    @volatile var isActive: Option[Boolean] = None,
+    @volatile var isDisabled: Option[Boolean] = None,
+    @volatile var isLoading: Option[Boolean] = None,
+    @volatile var isAttached: Option[Boolean] = None,
+    @volatile var spacing: Option[String] = None
 ) extends ChakraElement
     with OnClickEventHandler.CanHandleOnClickEvent[Button]
 
