@@ -43,11 +43,13 @@ abstract class StdSparkCalculation[IN, OUT](
 
   override protected def whenResultsNotReady(): Unit =
     badge.text = "Calculating"
+    badge.colorScheme = Some("purple")
     dataUi.style = dataUi.style + ("filter" -> "grayscale(100%)")
     session.render()
 
   override protected def whenResultsReady(results: OUT): Unit =
     badge.text = "Ready"
+    badge.colorScheme = None
     dataUi.style = dataUi.style - "filter"
     session.render()
 
