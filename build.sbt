@@ -157,4 +157,4 @@ lazy val `terminal21-spark` = project
       LogBack % Test
     ) ++ SparkScala3Fix
   )
-  .dependsOn(`terminal21-ui-std`)
+  .dependsOn(`terminal21-ui-std` % "compile->compile;test->test")
