@@ -47,7 +47,7 @@ object SparkCalculation:
           ready(results)
           super.whenResultsReady(results)
 
-  def stdSparkCalculation[IN, OUT](name: String, dataUi: UiElement, notifyWhenCalcReady: Seq[Calculation[OUT, _]] = Nil)(calc: IN => OUT)(using
+  def stdSparkCalculation[IN, OUT](name: String, dataUi: UiElement, notifyWhenCalcReady: Calculation[OUT, _]*)(calc: IN => OUT)(using
       session: ConnectedSession,
       executor: FiberExecutor
   ) =
