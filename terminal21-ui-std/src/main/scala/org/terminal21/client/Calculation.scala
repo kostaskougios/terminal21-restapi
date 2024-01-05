@@ -6,7 +6,9 @@ abstract class Calculation[IN, OUT](
     notifyWhenCalcReady: Seq[Calculation[OUT, _]]
 )(using executor: FiberExecutor):
   protected def calculation(in: IN): OUT
-  protected def whenResultsNotReady(): Unit
+  protected def whenResultsNotReady(): Unit =
+    for c <- notifyWhenCalcReady do c.whenResultsNotReady()
+
   protected def whenResultsReady(results: OUT): Unit
 
   def run(in: IN): OUT =
