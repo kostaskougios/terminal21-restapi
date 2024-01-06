@@ -69,7 +69,7 @@ object SparkCalculation:
           ready(results)
           super.whenResultsReady(results)
 
-  def stdSparkCalculation[IN, OUT](name: String, dataUi: UiElement with HasStyle, notifyWhenCalcReady: Calculation[Dataset[OUT], _]*)(calc: IN => Dataset[OUT])(
+  def sparkCalculation[IN, OUT](name: String, dataUi: UiElement with HasStyle, notifyWhenCalcReady: Calculation[Dataset[OUT], _]*)(calc: IN => Dataset[OUT])(
       using
       session: ConnectedSession,
       executor: FiberExecutor

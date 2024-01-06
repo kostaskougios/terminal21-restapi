@@ -7,7 +7,7 @@ import org.terminal21.client.{*, given}
 import org.terminal21.sparklib.SparkSessions
 import org.terminal21.sparklib.endtoend.model.CodeFile
 import org.terminal21.sparklib.endtoend.model.CodeFile.createDatasetFromProjectsSourceFiles
-import org.terminal21.sparklib.steps.SparkCalculation.stdSparkCalculation
+import org.terminal21.sparklib.steps.SparkCalculation.sparkCalculation
 import org.terminal21.sparklib.steps.{SparkCalculation, StdSparkCalculation}
 
 @main def sparkBasics(): Unit =
@@ -21,12 +21,12 @@ import org.terminal21.sparklib.steps.{SparkCalculation, StdSparkCalculation}
     val headers = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate")
 
     val sortedFilesTable = QuickTable.quickTable().withStringHeaders(headers: _*).build
-    val sortedCalc       = stdSparkCalculation("Sorted files", sortedFilesTable)(sortedSourceFiles)
+    val sortedCalc       = sparkCalculation("Sorted files", sortedFilesTable)(sortedSourceFiles)
       .whenResultsReady: results =>
         sortedFilesTable.withRowStringData(results.take(10).toList.map(_.toData))
 
     val codeFilesTable       = QuickTable.quickTable().withStringHeaders(headers: _*).build
-    val codeFilesCalculation = stdSparkCalculation("Code files", codeFilesTable, sortedCalc): _ =>
+    val codeFilesCalculation = sparkCalculation("Code files", codeFilesTable, sortedCalc): _ =>
       createDatasetFromProjectsSourceFiles.toDS
     .whenResultsReady: results =>
       val dt = results.take(10).toList
