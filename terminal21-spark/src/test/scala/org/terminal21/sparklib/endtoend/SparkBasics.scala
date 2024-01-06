@@ -20,17 +20,17 @@ import org.terminal21.sparklib.steps.{SparkCalculation, StdSparkCalculation}
 
     val headers = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate")
 
-    val sortedFilesTable = QuickTable.quickTable().withStringHeaders(headers: _*).build
+    val sortedFilesTable = QuickTable().headers(headers: _*).caption("Files sorted by createdDate and numOfWords")
     val sortedCalc       = sparkCalculation("Sorted files", sortedFilesTable)(sortedSourceFiles)
       .whenResultsReady: results =>
-        sortedFilesTable.withRowStringData(results.take(10).toList.map(_.toData))
+        sortedFilesTable.rows(results.take(10).toList.map(_.toData))
 
-    val codeFilesTable       = QuickTable.quickTable().withStringHeaders(headers: _*).build
+    val codeFilesTable       = QuickTable().headers(headers: _*).caption("Unsorted files")
     val codeFilesCalculation = sparkCalculation("Code files", codeFilesTable, sortedCalc): _ =>
       createDatasetFromProjectsSourceFiles.toDS
     .whenResultsReady: results =>
       val dt = results.take(10).toList
-      codeFilesTable.withRowStringData(dt.map(_.toData))
+      codeFilesTable.rows(dt.map(_.toData))
 
     Seq(
       codeFilesCalculation,

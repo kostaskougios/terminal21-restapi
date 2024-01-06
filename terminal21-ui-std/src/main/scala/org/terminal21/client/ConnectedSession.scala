@@ -28,9 +28,7 @@ class ConnectedSession(val session: Session, val serverUrl: String, sessionsServ
     for e <- withEvents do addEventHandlerAtTheTop(e.key, e.defaultEventHandler)
 
     synchronized:
-      elements = elements ::: es.toList.flatMap:
-        case c: UiComponent => c.children
-        case e              => Seq(e)
+      elements = elements ::: es.toList
 
   private val eventHandlers = collection.concurrent.TrieMap.empty[String, List[EventHandler]]
 
