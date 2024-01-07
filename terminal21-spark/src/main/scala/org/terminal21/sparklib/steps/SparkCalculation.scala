@@ -117,6 +117,30 @@ object SparkCalculation:
           ready(results)
           super.whenResultsReady(results)
 
+  /** builder for a spark calculation
+    * @param name
+    *   the name of the calculation, it will show in the UI but also used as a directory name for storing the calculated Dataset. This storage is used as cache,
+    *   the dataset is not recalculated even if the jvm is restarted. There is a button for the user to invalidate this cache so that the spark calculation to
+    *   be rerun in case of changes in the data.
+    * @param dataUi
+    *   The UiElement that is used to display the calculated data, i.e. a table. This will be grayed out whenever the calculation is running
+    * @param notifyWhenCalcReady
+    *   if other spark calculations depend on the outcome of this calculation, they should be passed here so that calculations cascade across all of them.
+    * @param calc
+    *   the function that calculates the dataset.
+    * @param session
+    *   terminal21 session
+    * @param executor
+    *   a fiber executor, used for UI rendering
+    * @param spark
+    *   the spark session
+    * @tparam IN
+    *   the input data type, can be Unit
+    * @tparam OUT
+    *   the output data type for the Dataset.
+    * @return
+    *   a ui component that should be rendered.
+    */
   def sparkCalculation[IN, OUT: Encoder](name: String, dataUi: UiElement with HasStyle, notifyWhenCalcReady: Calculation[Dataset[OUT], _]*)(
       calc: IN => Dataset[OUT]
   )(using
