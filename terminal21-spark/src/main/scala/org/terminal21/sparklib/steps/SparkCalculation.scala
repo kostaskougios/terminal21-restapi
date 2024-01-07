@@ -22,7 +22,7 @@ abstract class SparkCalculation[IN, OUT](
 abstract class StdSparkCalculation[IN, OUT: Encoder](
     name: String,
     dataUi: UiElement with HasStyle,
-    notifyWhenCalcReady: Seq[Calculation[Dataset[OUT], _]],
+    notifyWhenCalcReady: Seq[StdSparkCalculation[Dataset[OUT], _]],
     key: String = Keys.nextKey
 )(using session: ConnectedSession, executor: FiberExecutor, spark: SparkSession)
     extends SparkCalculation[IN, OUT](key, Nil, notifyWhenCalcReady):
@@ -53,6 +53,7 @@ abstract class StdSparkCalculation[IN, OUT: Encoder](
 
   def invalidateCache(): Unit =
     FileUtils.deleteDirectory(new File(targetDir))
+    for n <- notifyWhenCalcReady do n.invalidateCache()
 
   private def calculateOnce(f: => Dataset[OUT]): Dataset[OUT] =
     cache(
@@ -90,7 +91,7 @@ object SparkCalculation:
   class Builder[IN, OUT: Encoder](
       name: String,
       dataUi: UiElement with HasStyle,
-      notifyWhenCalcReady: Seq[Calculation[Dataset[OUT], _]],
+      notifyWhenCalcReady: Seq[StdSparkCalculation[Dataset[OUT], _]],
       calc: IN => Dataset[OUT]
   )(using
       session: ConnectedSession,
@@ -104,7 +105,7 @@ object SparkCalculation:
           ready(results)
           super.whenResultsReady(results)
 
-  def sparkCalculation[IN, OUT: Encoder](name: String, dataUi: UiElement with HasStyle, notifyWhenCalcReady: Calculation[Dataset[OUT], _]*)(
+  def sparkCalculation[IN, OUT: Encoder](name: String, dataUi: UiElement with HasStyle, notifyWhenCalcReady: StdSparkCalculation[Dataset[OUT], _]*)(
       calc: IN => Dataset[OUT]
   )(using
       session: ConnectedSession,
