@@ -53,12 +53,20 @@ class StdSparkCalculationTest extends AnyFunSuiteLike:
       import spark.implicits.*
       given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
       given SparkSession     = spark
-
-      val calc = new TestingCalculation
-
+      val calc               = new TestingCalculation
       calc.run(1).collect().toList should be(List(2))
       calc.run(1).collect().toList should be(List(2))
       calc.calcCalledTimes.get() should be(1)
+
+  test("refresh button invalidates cache and runs calculations"):
+    Using.resource(SparkSessions.newSparkSession()): spark =>
+      import spark.implicits.*
+      given session: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
+      given SparkSession              = spark
+      val calc                        = new TestingCalculation
+      calc.run(1).collect().toList should be(List(2))
+      session.click(calc.recalc)
+      calc.calcCalledTimes.get() should be(2)
 
 class TestingCalculation(using session: ConnectedSession, executor: FiberExecutor, spark: SparkSession, intEncoder: Encoder[Int])
     extends StdSparkCalculation[Int, Int]("testing-calc", Box(), Nil):

@@ -61,6 +61,8 @@ class ConnectedSession(val session: Session, val serverUrl: String, sessionsServ
     */
   def isClosed: Boolean = exitLatch.getCount == 0
 
+  def click(e: UiElement): Unit = fireEvent(OnClick(e.key))
+
   private[client] def fireEvent(event: CommandEvent): Unit =
     event match
       case SessionClosed(_) =>

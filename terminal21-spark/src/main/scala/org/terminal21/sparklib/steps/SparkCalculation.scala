@@ -44,7 +44,7 @@ abstract class StdSparkCalculation[IN, OUT: Encoder](
     dataUi
   )
 
-  private val rootFolder                              = s"${Environment.tmpDirectory}/steps/$name"
+  private val rootFolder                              = s"${Environment.tmpDirectory}/spark-calculations/$name"
   private val targetDir                               = s"$rootFolder/$name"
   private def cache[A](reader: => A, writer: => A): A =
     if new File(targetDir).exists() then reader
