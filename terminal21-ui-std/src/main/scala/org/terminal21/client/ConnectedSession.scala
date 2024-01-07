@@ -4,7 +4,7 @@ import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.slf4j.LoggerFactory
-import org.terminal21.client.components.{UiComponent, UiElement}
+import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.UiElement.{HasEventHandler, allDeep}
 import org.terminal21.client.components.UiElementEncoding.uiElementEncoder
 import org.terminal21.model.*
