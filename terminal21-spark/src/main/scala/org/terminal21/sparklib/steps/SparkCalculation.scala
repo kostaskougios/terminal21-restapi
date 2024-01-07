@@ -28,11 +28,9 @@ abstract class SparkCalculation[IN, OUT: Encoder](
     if isCached then reader
     else writer
 
-  def invalidateCache(): Unit =
+  override def invalidateCache(): Unit =
     FileUtils.deleteDirectory(new File(targetDir))
-    val ccs = notifyWhenCalcReady.collect:
-      case cc: CachedCalculation[_, _] => cc
-    for n <- ccs do n.invalidateCache()
+    super.invalidateCache()
 
   private def calculateOnce(f: => Dataset[OUT]): Dataset[OUT] =
     cache(
