@@ -8,7 +8,7 @@ import org.terminal21.sparklib.SparkSessions
 import org.terminal21.sparklib.endtoend.model.CodeFile
 import org.terminal21.sparklib.endtoend.model.CodeFile.createDatasetFromProjectsSourceFiles
 import org.terminal21.sparklib.steps.SparkCalculation.sparkCalculation
-import org.terminal21.sparklib.steps.{SparkCalculation, StdSparkCalculation}
+import org.terminal21.sparklib.steps.{SparkCalculation, StdUiSparkCalculation}
 
 @main def sparkBasics(): Unit =
   SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-basics", "Spark Basics"): (spark, session) =>

@@ -4,28 +4,61 @@ import functions.fibers.FiberExecutor
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
 import org.terminal21.client.components.UiElement.HasStyle
-import org.terminal21.client.{Calculation, ConnectedSession}
+import org.terminal21.client.{CachedCalculation, Calculation, ConnectedSession}
 import org.terminal21.client.components.chakra.{Badge, Box, Button, HStack, RepeatIcon, Text}
 import org.terminal21.client.components.{Keys, UiComponent, UiElement}
 import org.terminal21.sparklib.util.Environment
 
 import java.io.File
 
-abstract class SparkCalculation[IN, OUT](
+abstract class SparkCalculation[IN, OUT: Encoder](
     val key: String = Keys.nextKey,
+    name: String,
     @volatile var children: Seq[UiElement],
     notifyWhenCalcReady: Seq[Calculation[Dataset[OUT], _]]
-)(using executor: FiberExecutor)
-    extends Calculation[IN, Dataset[OUT]](notifyWhenCalcReady)
-    with UiComponent
+)(using executor: FiberExecutor, spark: SparkSession)
+    extends CachedCalculation[IN, Dataset[OUT]](notifyWhenCalcReady)
+    with UiComponent:
+  private val rootFolder = s"${Environment.tmpDirectory}/spark-calculations/$name"
+  private val targetDir  = s"$rootFolder/$name"
 
-abstract class StdSparkCalculation[IN, OUT: Encoder](
+  def isCached: Boolean = new File(targetDir).exists()
+
+  private def cache[A](reader: => A, writer: => A): A =
+    if isCached then reader
+    else writer
+
+  def invalidateCache(): Unit =
+    FileUtils.deleteDirectory(new File(targetDir))
+    val ccs = notifyWhenCalcReady.collect:
+      case cc: CachedCalculation[_, _] => cc
+    for n <- ccs do n.invalidateCache()
+
+  private def calculateOnce(f: => Dataset[OUT]): Dataset[OUT] =
+    cache(
+      spark.read.parquet(targetDir).as[OUT], {
+        val ds = f
+        ds.write.parquet(targetDir)
+        ds
+      }
+    )
+
+  protected var in: Option[IN] = None
+
+  override def run(in: IN) =
+    this.in = Some(in)
+    val isC = isCached
+    val out = calculateOnce(super.run(in))
+    if isC then postRun(out)
+    out
+
+abstract class StdUiSparkCalculation[IN, OUT: Encoder](
     name: String,
     dataUi: UiElement with HasStyle,
-    notifyWhenCalcReady: Seq[StdSparkCalculation[Dataset[OUT], _]],
+    notifyWhenCalcReady: Seq[Calculation[Dataset[OUT], _]],
     key: String = Keys.nextKey
 )(using session: ConnectedSession, executor: FiberExecutor, spark: SparkSession)
-    extends SparkCalculation[IN, OUT](key, Nil, notifyWhenCalcReady):
+    extends SparkCalculation[IN, OUT](name, key, Nil, notifyWhenCalcReady):
   val badge  = Badge()
   val recalc = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
     badge.text = "Invalidating cache ..."
@@ -43,34 +76,6 @@ abstract class StdSparkCalculation[IN, OUT: Encoder](
     ),
     dataUi
   )
-
-  private val rootFolder                              = s"${Environment.tmpDirectory}/spark-calculations/$name"
-  private val targetDir                               = s"$rootFolder/$name"
-  def isCached: Boolean                               = new File(targetDir).exists()
-  private def cache[A](reader: => A, writer: => A): A =
-    if isCached then reader
-    else writer
-
-  def invalidateCache(): Unit =
-    FileUtils.deleteDirectory(new File(targetDir))
-    for n <- notifyWhenCalcReady do n.invalidateCache()
-
-  private def calculateOnce(f: => Dataset[OUT]): Dataset[OUT] =
-    cache(
-      spark.read.parquet(targetDir).as[OUT], {
-        val ds = f
-        ds.write.parquet(targetDir)
-        ds
-      }
-    )
-
-  private var in: Option[IN] = None
-  override def run(in: IN)   =
-    this.in = Some(in)
-    val isC = isCached
-    val out = calculateOnce(super.run(in))
-    if isC then postRun(out)
-    out
 
   override protected def whenResultsNotReady(): Unit =
     badge.text = "Calculating"
@@ -91,7 +96,7 @@ object SparkCalculation:
   class Builder[IN, OUT: Encoder](
       name: String,
       dataUi: UiElement with HasStyle,
-      notifyWhenCalcReady: Seq[StdSparkCalculation[Dataset[OUT], _]],
+      notifyWhenCalcReady: Seq[Calculation[Dataset[OUT], _]],
       calc: IN => Dataset[OUT]
   )(using
       session: ConnectedSession,
@@ -99,13 +104,13 @@ object SparkCalculation:
       spark: SparkSession
   ):
     def whenResultsReady(ready: Dataset[OUT] => Unit) =
-      new StdSparkCalculation[IN, OUT](name, dataUi, notifyWhenCalcReady):
+      new StdUiSparkCalculation[IN, OUT](name, dataUi, notifyWhenCalcReady):
         override protected def calculation(in: IN): Dataset[OUT]             = calc(in)
         override protected def whenResultsReady(results: Dataset[OUT]): Unit =
           ready(results)
           super.whenResultsReady(results)
 
-  def sparkCalculation[IN, OUT: Encoder](name: String, dataUi: UiElement with HasStyle, notifyWhenCalcReady: StdSparkCalculation[Dataset[OUT], _]*)(
+  def sparkCalculation[IN, OUT: Encoder](name: String, dataUi: UiElement with HasStyle, notifyWhenCalcReady: Calculation[Dataset[OUT], _]*)(
       calc: IN => Dataset[OUT]
   )(using
       session: ConnectedSession,

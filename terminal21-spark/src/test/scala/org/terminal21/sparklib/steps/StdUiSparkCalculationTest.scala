@@ -13,7 +13,7 @@ import org.terminal21.sparklib.SparkSessions
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 import scala.util.Using
 
-class StdSparkCalculationTest extends AnyFunSuiteLike with Eventually:
+class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
   given PatienceConfig = PatienceConfig(scaled(Span(3000, Millis)))
 
   test("calculates the correct result"):
@@ -88,7 +88,7 @@ class StdSparkCalculationTest extends AnyFunSuiteLike with Eventually:
       calc.calcCalledTimes.get() should be(2)
 
 class TestingCalculation(using session: ConnectedSession, executor: FiberExecutor, spark: SparkSession, intEncoder: Encoder[Int])
-    extends StdSparkCalculation[Int, Int]("testing-calc", Box(), Nil):
+    extends StdUiSparkCalculation[Int, Int]("testing-calc", Box(), Nil):
   val calcCalledTimes                         = new AtomicInteger(0)
   invalidateCache()
   override protected def calculation(in: Int) =

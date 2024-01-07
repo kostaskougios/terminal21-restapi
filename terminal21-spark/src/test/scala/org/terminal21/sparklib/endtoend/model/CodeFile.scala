@@ -20,7 +20,7 @@ object CodeFile:
         i,
         f.getName,
         f.getPath,
-        code.split("\n").size,
-        code.split(" ").size,
+        code.split("\n").length,
+        code.split(" ").length,
         LocalDate.ofInstant(Instant.ofEpochMilli(f.lastModified()), ZoneId.systemDefault())
       )
