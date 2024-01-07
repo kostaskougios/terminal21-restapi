@@ -2,9 +2,10 @@ package org.terminal21.sparklib.steps
 
 import functions.fibers.FiberExecutor
 import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
-import org.scalatest.concurrent.Eventually.eventually
+import org.scalatest.concurrent.Eventually
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
+import org.scalatest.time.{Millis, Span}
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.{ConnectedSession, ConnectedSessionMock, given}
 import org.terminal21.sparklib.SparkSessions
@@ -12,7 +13,9 @@ import org.terminal21.sparklib.SparkSessions
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 import scala.util.Using
 
-class StdSparkCalculationTest extends AnyFunSuiteLike:
+class StdSparkCalculationTest extends AnyFunSuiteLike with Eventually:
+  given PatienceConfig = PatienceConfig(scaled(Span(3000, Millis)))
+
   test("calculates the correct result"):
     Using.resource(SparkSessions.newSparkSession()): spark =>
       import spark.implicits.*
@@ -47,6 +50,22 @@ class StdSparkCalculationTest extends AnyFunSuiteLike:
       calc.run(1)
       eventually:
         called.get() should be(true)
+
+  test("whenResultsReady called even when cached"):
+    Using.resource(SparkSessions.newSparkSession()): spark =>
+      import spark.implicits.*
+      given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
+      given SparkSession     = spark
+      val called             = new AtomicInteger(0)
+      val calc               = new TestingCalculation:
+        override protected def whenResultsReady(results: Dataset[Int]): Unit =
+          results.collect().toList should be(List(2))
+          called.incrementAndGet()
+
+      calc.run(1)
+      calc.run(1)
+      eventually:
+        called.get() should be(2)
 
   test("caches results"):
     Using.resource(SparkSessions.newSparkSession()): spark =>

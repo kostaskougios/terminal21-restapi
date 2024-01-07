@@ -46,8 +46,9 @@ abstract class StdSparkCalculation[IN, OUT: Encoder](
 
   private val rootFolder                              = s"${Environment.tmpDirectory}/spark-calculations/$name"
   private val targetDir                               = s"$rootFolder/$name"
+  def isCached: Boolean                               = new File(targetDir).exists()
   private def cache[A](reader: => A, writer: => A): A =
-    if new File(targetDir).exists() then reader
+    if isCached then reader
     else writer
 
   def invalidateCache(): Unit =
@@ -65,7 +66,10 @@ abstract class StdSparkCalculation[IN, OUT: Encoder](
   private var in: Option[IN] = None
   override def run(in: IN)   =
     this.in = Some(in)
-    calculateOnce(super.run(in))
+    val isC = isCached
+    val out = calculateOnce(super.run(in))
+    if isC then postRun(out)
+    out
 
   override protected def whenResultsNotReady(): Unit =
     badge.text = "Calculating"

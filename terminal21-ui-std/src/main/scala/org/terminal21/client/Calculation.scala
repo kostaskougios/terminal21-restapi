@@ -17,15 +17,18 @@ abstract class Calculation[IN, OUT](
         whenResultsNotReady()
 
       val out = calculation(in)
-      executor.submit:
-        whenResultsReady(out)
-
-      for c <- notifyWhenCalcReady do
-        executor.submit:
-          try c.run(out)
-          catch case t: Throwable => t.printStackTrace()
+      postRun(out)
       out
     f.get()
+
+  def postRun(out: OUT): Unit =
+    executor.submit:
+      whenResultsReady(out)
+
+    for c <- notifyWhenCalcReady do
+      executor.submit:
+        try c.run(out)
+        catch case t: Throwable => t.printStackTrace()
 
 object Calculation:
   class Builder[IN, OUT](
