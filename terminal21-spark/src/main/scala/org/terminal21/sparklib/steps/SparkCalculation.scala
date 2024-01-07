@@ -28,6 +28,9 @@ abstract class StdSparkCalculation[IN, OUT: Encoder](
     extends SparkCalculation[IN, OUT](key, Nil, notifyWhenCalcReady):
   val badge  = Badge()
   val recalc = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
+    badge.text = "Invalidating cache ..."
+    session.render()
+    invalidateCache()
     for i <- in do run(i)
 
   children = Seq(

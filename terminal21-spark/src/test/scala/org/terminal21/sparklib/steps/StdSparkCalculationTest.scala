@@ -1,6 +1,7 @@
 package org.terminal21.sparklib.steps
 
-import org.apache.spark.sql.{Dataset, SparkSession}
+import functions.fibers.FiberExecutor
+import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
 import org.scalatest.concurrent.Eventually.eventually
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
@@ -17,11 +18,7 @@ class StdSparkCalculationTest extends AnyFunSuiteLike:
       import spark.implicits.*
       given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
       given SparkSession     = spark
-
-      val calc = new StdSparkCalculation[Int, Int]("name", Box(), Nil):
-        override protected def calculation(in: Int) = Seq(in + 1).toDS
-
-      calc.invalidateCache()
+      val calc               = new TestingCalculation
       calc.run(1).collect().toList should be(List(2))
 
   test("whenResultsNotReady"):
@@ -30,11 +27,9 @@ class StdSparkCalculationTest extends AnyFunSuiteLike:
       given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
       given SparkSession     = spark
       val called             = new AtomicBoolean(false)
-      val calc               = new StdSparkCalculation[Int, Int]("name", Box(), Nil):
-        override protected def calculation(in: Int)        = Seq(in + 1).toDS
+      val calc               = new TestingCalculation:
         override protected def whenResultsNotReady(): Unit =
           called.set(true)
-      calc.invalidateCache()
       calc.run(1)
       called.get() should be(true)
 
@@ -44,13 +39,11 @@ class StdSparkCalculationTest extends AnyFunSuiteLike:
       given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
       given SparkSession     = spark
       val called             = new AtomicBoolean(false)
-      val calc               = new StdSparkCalculation[Int, Int]("name", Box(), Nil):
-        override protected def calculation(in: Int)                          = Seq(in + 1).toDS()
+      val calc               = new TestingCalculation:
         override protected def whenResultsReady(results: Dataset[Int]): Unit =
           results.collect().toList should be(List(2))
           called.set(true)
 
-      calc.invalidateCache()
       calc.run(1)
       eventually:
         called.get() should be(true)
@@ -61,13 +54,17 @@ class StdSparkCalculationTest extends AnyFunSuiteLike:
       given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
       given SparkSession     = spark
 
-      val called = new AtomicInteger(0)
-      val calc   = new StdSparkCalculation[Int, Int]("name", Box(), Nil):
-        override protected def calculation(in: Int) =
-          called.incrementAndGet()
-          Seq(in + 1).toDS
+      val calc = new TestingCalculation
 
-      calc.invalidateCache()
       calc.run(1).collect().toList should be(List(2))
       calc.run(1).collect().toList should be(List(2))
-      called.get() should be(1)
+      calc.calcCalledTimes.get() should be(1)
+
+class TestingCalculation(using session: ConnectedSession, executor: FiberExecutor, spark: SparkSession, intEncoder: Encoder[Int])
+    extends StdSparkCalculation[Int, Int]("testing-calc", Box(), Nil):
+  val calcCalledTimes                         = new AtomicInteger(0)
+  invalidateCache()
+  override protected def calculation(in: Int) =
+    import spark.implicits.*
+    calcCalledTimes.incrementAndGet()
+    Seq(in + 1).toDS
