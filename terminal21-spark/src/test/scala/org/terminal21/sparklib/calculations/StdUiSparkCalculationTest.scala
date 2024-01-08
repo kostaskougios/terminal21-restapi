@@ -88,8 +88,8 @@ class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
       eventually:
         calc.calcCalledTimes.get() should be(2)
 
-class TestingCalculation(using session: ConnectedSession, spark: SparkSession, intEncoder: Encoder[Int])
-    extends StdUiSparkCalculation[Int](Keys.nextKey, "testing-calc", Box()):
+class TestingCalculation(using session: ConnectedSession, spark: SparkSession, enc: Encoder[Int])
+    extends StdUiSparkCalculation[Dataset[Int]](Keys.nextKey, "testing-calc", Box()):
   val calcCalledTimes = new AtomicInteger(0)
   invalidateCache()
 

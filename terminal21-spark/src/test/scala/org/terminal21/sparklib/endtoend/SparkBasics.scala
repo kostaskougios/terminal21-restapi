@@ -18,20 +18,28 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
     val headers = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate", "timestamp")
 
     val sortedFilesTable = QuickTable().headers(headers: _*).caption("Files sorted by createdDate and numOfWords")
-
-    val codeFilesTable = QuickTable().headers(headers: _*).caption("Unsorted files")
+    val codeFilesTable   = QuickTable().headers(headers: _*).caption("Unsorted files")
 
     val sortedCalc = sortedSourceFiles(sourceFiles()).visualize("Sorted files", sortedFilesTable): results =>
-      val tableRows = results.take(10).toList.map(_.toData)
+      val tableRows = results.take(3).toList.map(_.toData)
       sortedFilesTable.rows(tableRows)
 
     val codeFilesCalculation = sourceFiles().visualize("Code files", codeFilesTable): results =>
-      val dt = results.take(10).toList
+      val dt = results.take(3).toList
       codeFilesTable.rows(dt.map(_.toData))
+
+    val sortedFilesTableDF = QuickTable().headers(headers: _*).caption("Files sorted by createdDate and numOfWords ASC and as DF")
+    val sortedCalcDF       = sourceFiles()
+      .sort($"createdDate".asc, $"numOfWords".asc)
+      .toDF()
+      .visualize("Sorted files DF", sortedFilesTableDF): results =>
+        val tableRows = results.take(4).toList
+        sortedFilesTableDF.rows(tableRows.toUiTable)
 
     Seq(
       codeFilesCalculation,
-      sortedCalc
+      sortedCalc,
+      sortedCalcDF
     ).render()
 
     session.waitTillUserClosesSession()

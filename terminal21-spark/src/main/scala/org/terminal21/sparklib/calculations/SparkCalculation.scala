@@ -4,9 +4,9 @@ import functions.fibers.FiberExecutor
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
 import org.terminal21.client.components.UiElement.HasStyle
-import org.terminal21.client.{CachedCalculation, Calculation, ConnectedSession}
-import org.terminal21.client.components.chakra.{Badge, Box, Button, HStack, RepeatIcon, Text}
-import org.terminal21.client.components.{Keys, UiComponent, UiElement}
+import org.terminal21.client.components.chakra.*
+import org.terminal21.client.components.{UiComponent, UiElement}
+import org.terminal21.client.{CachedCalculation, ConnectedSession}
 import org.terminal21.sparklib.util.Environment
 
 import java.io.File
@@ -21,13 +21,14 @@ import java.util.concurrent.atomic.AtomicBoolean
   *
   * Subclass this to create your own UI for a spark calculation, see StdUiSparkCalculation below.
   */
-abstract class SparkCalculation[OUT: Encoder](
+abstract class SparkCalculation[OUT: ReadWriter](
     val key: String,
     name: String,
     @volatile var children: Seq[UiElement]
 )(using executor: FiberExecutor, spark: SparkSession)
-    extends CachedCalculation[Dataset[OUT]]
+    extends CachedCalculation[OUT]
     with UiComponent:
+  private val rw         = implicitly[ReadWriter[OUT]]
   private val rootFolder = s"${Environment.tmpDirectory}/spark-calculations"
   private val targetDir  = s"$rootFolder/$name"
 
@@ -40,18 +41,18 @@ abstract class SparkCalculation[OUT: Encoder](
   override def invalidateCache(): Unit =
     FileUtils.deleteDirectory(new File(targetDir))
 
-  private def calculateOnce(f: => Dataset[OUT]): Dataset[OUT] =
+  private def calculateOnce(f: => OUT): OUT =
     cache(
-      spark.read.parquet(targetDir).as[OUT], {
+      rw.read(spark, targetDir), {
         val ds = f
-        ds.write.parquet(targetDir)
+        rw.write(targetDir, ds)
         ds
       }
     )
 
-  override protected def calculation(): Dataset[OUT] = calculateOnce(nonCachedCalculation)
+  override protected def calculation(): OUT = calculateOnce(nonCachedCalculation)
 
-abstract class StdUiSparkCalculation[OUT: Encoder](
+abstract class StdUiSparkCalculation[OUT: ReadWriter](
     key: String,
     name: String,
     dataUi: UiElement with HasStyle
@@ -88,7 +89,7 @@ abstract class StdUiSparkCalculation[OUT: Encoder](
     session.render()
     super.whenResultsNotReady()
 
-  override protected def whenResultsReady(results: Dataset[OUT]): Unit =
+  override protected def whenResultsReady(results: OUT): Unit =
     badge.text = "Ready"
     badge.colorScheme = None
     recalc.isDisabled = Some(false)
