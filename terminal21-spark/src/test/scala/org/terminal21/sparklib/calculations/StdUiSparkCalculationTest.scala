@@ -1,6 +1,5 @@
 package org.terminal21.sparklib.calculations
 
-import functions.fibers.FiberExecutor
 import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.funsuite.AnyFunSuiteLike

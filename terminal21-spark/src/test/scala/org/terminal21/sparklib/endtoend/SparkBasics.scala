@@ -6,19 +6,21 @@ import org.terminal21.client.components.chakra.*
 import org.terminal21.client.{*, given}
 import org.terminal21.sparklib.SparkSessions
 import org.terminal21.sparklib.endtoend.model.CodeFile
-import org.terminal21.sparklib.endtoend.model.CodeFile.createDatasetFromProjectsSourceFiles
+import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
 import org.terminal21.sparklib.calculations.SparkCalculation.sparkCalculation
 import org.terminal21.sparklib.calculations.{SparkCalculation, StdUiSparkCalculation}
+import org.terminal21.sparklib.*
+
+import java.util.concurrent.atomic.AtomicInteger
 
 @main def sparkBasics(): Unit =
   SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-basics", "Spark Basics"): (spark, session) =>
     given ConnectedSession = session
     given SparkSession     = spark
-
     import scala3encoders.given
     import spark.implicits.*
 
-    val headers = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate")
+    val headers = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate", "timestamp")
 
     val sortedFilesTable = QuickTable().headers(headers: _*).caption("Files sorted by createdDate and numOfWords")
     val sortedCalc       = sparkCalculation("Sorted files", sortedFilesTable)(sortedSourceFiles)
@@ -27,9 +29,7 @@ import org.terminal21.sparklib.calculations.{SparkCalculation, StdUiSparkCalcula
         sortedFilesTable.rows(tableRows)
 
     val codeFilesTable       = QuickTable().headers(headers: _*).caption("Unsorted files")
-    val codeFilesCalculation = sparkCalculation("Code files", codeFilesTable, sortedCalc): _ =>
-      createDatasetFromProjectsSourceFiles.toDS
-    .whenResultsReady: results =>
+    val codeFilesCalculation = sourceFiles().visualize("Code files", codeFilesTable, sortedCalc): results =>
       val dt = results.take(10).toList
       codeFilesTable.rows(dt.map(_.toData))
 
@@ -40,6 +40,13 @@ import org.terminal21.sparklib.calculations.{SparkCalculation, StdUiSparkCalcula
 
     codeFilesCalculation.run(())
     session.waitTillUserClosesSession()
+
+def sourceFiles()(using spark: SparkSession) =
+  import spark.implicits.*
+  import scala3encoders.given
+  val runId = new AtomicInteger(0)
+  scanSourceFiles.toDS.map: cf =>
+    cf.copy(timestamp = System.currentTimeMillis())
 
 def sortedSourceFiles(sourceFiles: Dataset[CodeFile])(using spark: SparkSession) =
   import spark.implicits.*

@@ -6,13 +6,13 @@ import java.io.File
 import java.nio.file.Files
 import java.time.{Instant, LocalDate, ZoneId}
 
-case class CodeFile(id: Int, name: String, path: String, numOfLines: Int, numOfWords: Int, createdDate: LocalDate):
+case class CodeFile(id: Int, name: String, path: String, numOfLines: Int, numOfWords: Int, createdDate: LocalDate, timestamp: Long):
   def toColumnNames: Seq[String] = productElementNames.toList
   def toData: Seq[String]        = productIterator.map(_.toString).toList
 
 object CodeFile:
   import scala.jdk.CollectionConverters.*
-  def createDatasetFromProjectsSourceFiles: Seq[CodeFile] =
+  def scanSourceFiles: Seq[CodeFile] =
     val availableFiles = FileUtils.listFiles(new File(".."), Array("scala"), true).asScala.toList
     availableFiles.zipWithIndex.map: (f, i) =>
       val code = Files.readString(f.toPath)
@@ -22,5 +22,6 @@ object CodeFile:
         f.getPath,
         code.split("\n").length,
         code.split(" ").length,
-        LocalDate.ofInstant(Instant.ofEpochMilli(f.lastModified()), ZoneId.systemDefault())
+        LocalDate.ofInstant(Instant.ofEpochMilli(f.lastModified()), ZoneId.systemDefault()),
+        System.currentTimeMillis()
       )

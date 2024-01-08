@@ -2,6 +2,8 @@ package org.terminal21.client
 
 import functions.fibers.FiberExecutor
 
+import java.util.concurrent.CountDownLatch
+
 abstract class Calculation[IN, OUT](
     notifyWhenCalcReady: Seq[Calculation[OUT, _]]
 )(using executor: FiberExecutor):
@@ -12,16 +14,19 @@ abstract class Calculation[IN, OUT](
   protected def whenResultsReady(results: OUT): Unit
 
   def run(in: IN): OUT =
-    val f = executor.submit:
+    val refreshInOrder = new CountDownLatch(1)
+    val f              = executor.submit:
       executor.submit:
-        whenResultsNotReady()
+        try whenResultsNotReady()
+        finally refreshInOrder.countDown()
 
       val out = calculation(in)
+      refreshInOrder.await()
       postRun(out)
       out
     f.get()
 
-  def postRun(out: OUT): Unit =
+  protected def postRun(out: OUT): Unit =
     executor.submit:
       whenResultsReady(out)
 
