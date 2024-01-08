@@ -22,17 +22,15 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
     val codeFilesTable       = QuickTable().headers(headers: _*).caption("Unsorted files")
     val codeFilesCalculation = sourceFiles().visualize("Code files", codeFilesTable): results =>
       val dt = results.take(10).toList
-      println("results")
       codeFilesTable.rows(dt.map(_.toData))
-      println("results 2")
 
-//    val sortedCalc = sortedSourceFiles(sourceFiles()).visualize("Sorted files", sortedFilesTable): results =>
-//      val tableRows = results.take(10).toList.map(_.toData)
-//      sortedFilesTable.rows(tableRows)
+    val sortedCalc = sortedSourceFiles(sourceFiles()).visualize("Sorted files", sortedFilesTable): results =>
+      val tableRows = results.take(10).toList.map(_.toData)
+      sortedFilesTable.rows(tableRows)
 
     Seq(
-      codeFilesCalculation
-//      sortedCalc
+      codeFilesCalculation,
+      sortedCalc
     ).render()
 
     session.waitTillUserClosesSession()

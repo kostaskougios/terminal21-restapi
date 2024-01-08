@@ -19,9 +19,7 @@ extension [OUT: Encoder](ds: Dataset[OUT])
       override protected def whenResultsReady(results: Dataset[OUT]): Unit =
         toUi(results)
         super.whenResultsReady(results)
-      override def nonCachedCalculation: Dataset[OUT]                      =
-        println("nonCachedCalculation")
-        ds
+      override def nonCachedCalculation: Dataset[OUT]                      = ds
 
     ui.run()
     ui
