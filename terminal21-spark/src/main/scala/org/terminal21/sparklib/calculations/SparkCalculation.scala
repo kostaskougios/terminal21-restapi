@@ -78,14 +78,15 @@ abstract class StdUiSparkCalculation[IN, OUT: Encoder](
         for i <- in do run(i)
       finally running.set(false)
 
+  val header = Box(bg = "green", p = 4).withChildren(
+    HStack().withChildren(
+      Text(text = name),
+      badge,
+      recalc
+    )
+  )
   children = Seq(
-    Box(bg = "green", p = 4).withChildren(
-      HStack().withChildren(
-        Text(text = name),
-        badge,
-        recalc
-      )
-    ),
+    header,
     dataUi
   )
 

@@ -15,9 +15,13 @@ extension [OUT: Encoder](ds: Dataset[OUT])
       executor: FiberExecutor,
       spark: SparkSession
   ) =
-    new StdUiSparkCalculation[Unit, OUT](name, dataUi, notifyWhenReady):
+    val ui = new StdUiSparkCalculation[Unit, OUT](name, dataUi, notifyWhenReady):
       override protected def whenResultsReady(results: Dataset[OUT]): Unit =
         toUi(ds)
         super.whenResultsReady(results)
 
       override protected def calculation(in: Unit): Dataset[OUT] = ds
+
+    executor.submit:
+      ui.run(())
+    ui

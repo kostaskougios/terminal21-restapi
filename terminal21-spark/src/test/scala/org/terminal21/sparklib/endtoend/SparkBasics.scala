@@ -34,7 +34,6 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
       sortedCalc
     ).render()
 
-    codeFilesCalculation.run(())
     session.waitTillUserClosesSession()
 
 def sourceFiles()(using spark: SparkSession) =
