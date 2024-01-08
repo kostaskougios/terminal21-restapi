@@ -99,6 +99,27 @@ ls *.sc
 bouncing-ball.sc csv-editor.sc    csv-viewer.sc    hello-world.sc   postit.sc        server.sc        textedit.sc
 ```
 
+# Mutability
+
+terminal21 ui components are shamelessly mutable. This is a decision choice (for now) because of how much more simple code is this way. I.e.
+changing the text of a paragraph on an event handler is as simple as :
+
+```scala
+    p.text = "new text"
+```
+
+The equivalent immutable code would be (at least) 
+```scala
+    p.copy(text= "new text")
+```
+
+In the immutable version, the graph of components wouldn't reflect the change and there would be more work needed to do that.
+
+Also by default some component values (like input boxes) are changed by the user. These changes are reflected in the component graph, something that
+would be a lot harder if the graph was immutable.
+
+If there is a reasonable way to refactor to have immutability without compromising simplicity, it will be done.
+
 # Need help?
 
 Please use the discussions of the project to post any questions, comments or ideas.
