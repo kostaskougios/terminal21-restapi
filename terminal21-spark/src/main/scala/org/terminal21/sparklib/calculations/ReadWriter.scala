@@ -2,6 +2,9 @@ package org.terminal21.sparklib.calculations
 
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
 
+import scala.annotation.implicitNotFound
+
+@implicitNotFound("Unable to find ReadWriter for type ${A}. Dataset of case classes and Dataframes are supported.")
 trait ReadWriter[A]:
   def read(spark: SparkSession, file: String): A
   def write(file: String, ds: A): Unit
