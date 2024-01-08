@@ -5,7 +5,6 @@ import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.{*, given}
 import org.terminal21.sparklib.*
-import org.terminal21.sparklib.calculations.SparkCalculation.sparkCalculation
 import org.terminal21.sparklib.endtoend.model.CodeFile
 import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
 
@@ -19,19 +18,21 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
     val headers = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate", "timestamp")
 
     val sortedFilesTable = QuickTable().headers(headers: _*).caption("Files sorted by createdDate and numOfWords")
-    val sortedCalc       = sparkCalculation("Sorted files", sortedFilesTable)(sortedSourceFiles)
-      .whenResultsReady: results =>
-        val tableRows = results.take(10).toList.map(_.toData)
-        sortedFilesTable.rows(tableRows)
 
     val codeFilesTable       = QuickTable().headers(headers: _*).caption("Unsorted files")
-    val codeFilesCalculation = sourceFiles().visualize("Code files", codeFilesTable, sortedCalc): results =>
+    val codeFilesCalculation = sourceFiles().visualize("Code files", codeFilesTable): results =>
       val dt = results.take(10).toList
+      println("results")
       codeFilesTable.rows(dt.map(_.toData))
+      println("results 2")
+
+//    val sortedCalc = sortedSourceFiles(sourceFiles()).visualize("Sorted files", sortedFilesTable): results =>
+//      val tableRows = results.take(10).toList.map(_.toData)
+//      sortedFilesTable.rows(tableRows)
 
     Seq(
-      codeFilesCalculation,
-      sortedCalc
+      codeFilesCalculation
+//      sortedCalc
     ).render()
 
     session.waitTillUserClosesSession()

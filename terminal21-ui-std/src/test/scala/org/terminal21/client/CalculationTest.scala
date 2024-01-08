@@ -12,23 +12,25 @@ class CalculationTest extends AnyFunSuiteLike:
   def testCalc(i: Int)               = i + 1
   def testCalcString(i: Int): String = (i + 10).toString
 
+  class Calc extends Calculation[Int]:
+    val whenResultsNotReadyCalled                               = new AtomicBoolean(false)
+    val whenResultsReadyValue                                   = new AtomicInteger(-1)
+    override protected def whenResultsNotReady(): Unit          = whenResultsNotReadyCalled.set(true)
+    override protected def whenResultsReady(results: Int): Unit = whenResultsReadyValue.set(results)
+    override protected def calculation()                        = 2
+
   test("calculates"):
-    val calc = Calculation.newCalculation(testCalc).build
-    calc.run(1) should be(2)
+    val calc = new Calc
+    calc.run().get() should be(2)
 
-  test("calls the ui updater with the calculated value"):
-    val c    = new AtomicInteger(-1)
-    val b    = new AtomicBoolean(false)
-    val calc = Calculation.newCalculation(testCalc).whenResultsNotReady(b.set(true)).whenResultsReady(i => c.set(i)).build
-    calc.run(1)
-    b.get() should be(true)
+  test("calls whenResultsNotReady"):
+    val calc = new Calc
+    calc.run()
     eventually:
-      c.get() should be(2)
+      calc.whenResultsNotReadyCalled.get() should be(true)
 
-  test("notifies"):
-    val c     = new AtomicInteger(-1)
-    val calc2 = Calculation.newCalculation(testCalcString).whenResultsReady(i => c.set(i.toInt)).build
-    val calc1 = Calculation.newCalculation(testCalc).notifyAfterCalculated(calc2).build
-    calc1.run(1)
+  test("calls whenResultsReady"):
+    val calc = new Calc
+    calc.run()
     eventually:
-      c.get() should be(12)
+      calc.whenResultsReadyValue.get() should be(2)

@@ -5,6 +5,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.time.{Millis, Span}
+import org.terminal21.client.components.Keys
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.{ConnectedSession, ConnectedSessionMock, given}
 import org.terminal21.sparklib.SparkSessions
@@ -21,7 +22,7 @@ class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
       given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
       given SparkSession     = spark
       val calc               = new TestingCalculation
-      calc.run(1).collect().toList should be(List(2))
+      calc.run().get().collect().toList should be(List(2))
 
   test("whenResultsNotReady"):
     Using.resource(SparkSessions.newSparkSession()): spark =>
@@ -32,7 +33,7 @@ class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
       val calc               = new TestingCalculation:
         override protected def whenResultsNotReady(): Unit =
           called.set(true)
-      calc.run(1)
+      calc.run().get()
       called.get() should be(true)
 
   test("whenResultsReady"):
@@ -46,7 +47,7 @@ class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
           results.collect().toList should be(List(2))
           called.set(true)
 
-      calc.run(1)
+      calc.run()
       eventually:
         called.get() should be(true)
 
@@ -61,8 +62,8 @@ class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
           results.collect().toList should be(List(2))
           called.incrementAndGet()
 
-      calc.run(1)
-      calc.run(1)
+      calc.run().get()
+      calc.run()
       eventually:
         called.get() should be(2)
 
@@ -72,8 +73,8 @@ class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
       given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
       given SparkSession     = spark
       val calc               = new TestingCalculation
-      calc.run(1).collect().toList should be(List(2))
-      calc.run(1).collect().toList should be(List(2))
+      calc.run().get().collect().toList should be(List(2))
+      calc.run().get().collect().toList should be(List(2))
       calc.calcCalledTimes.get() should be(1)
 
   test("refresh button invalidates cache and runs calculations"):
@@ -82,15 +83,17 @@ class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
       given session: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
       given SparkSession              = spark
       val calc                        = new TestingCalculation
-      calc.run(1).collect().toList should be(List(2))
+      calc.run().get().collect().toList should be(List(2))
       session.click(calc.recalc)
-      calc.calcCalledTimes.get() should be(2)
+      eventually:
+        calc.calcCalledTimes.get() should be(2)
 
 class TestingCalculation(using session: ConnectedSession, spark: SparkSession, intEncoder: Encoder[Int])
-    extends StdUiSparkCalculation[Int, Int]("testing-calc", Box(), Nil):
-  val calcCalledTimes                         = new AtomicInteger(0)
+    extends StdUiSparkCalculation[Int](Keys.nextKey, "testing-calc", Box()):
+  val calcCalledTimes = new AtomicInteger(0)
   invalidateCache()
-  override protected def calculation(in: Int) =
+
+  override def nonCachedCalculation: Dataset[Int] =
     import spark.implicits.*
     calcCalledTimes.incrementAndGet()
-    Seq(in + 1).toDS
+    Seq(2).toDS
