@@ -4,14 +4,10 @@ import org.apache.spark.sql.{Dataset, SparkSession}
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.{*, given}
-import org.terminal21.sparklib.SparkSessions
+import org.terminal21.sparklib.*
+import org.terminal21.sparklib.calculations.SparkCalculation.sparkCalculation
 import org.terminal21.sparklib.endtoend.model.CodeFile
 import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
-import org.terminal21.sparklib.calculations.SparkCalculation.sparkCalculation
-import org.terminal21.sparklib.calculations.{SparkCalculation, StdUiSparkCalculation}
-import org.terminal21.sparklib.*
-
-import java.util.concurrent.atomic.AtomicInteger
 
 @main def sparkBasics(): Unit =
   SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-basics", "Spark Basics"): (spark, session) =>
@@ -42,9 +38,8 @@ import java.util.concurrent.atomic.AtomicInteger
     session.waitTillUserClosesSession()
 
 def sourceFiles()(using spark: SparkSession) =
-  import spark.implicits.*
   import scala3encoders.given
-  val runId = new AtomicInteger(0)
+  import spark.implicits.*
   scanSourceFiles.toDS.map: cf =>
     cf.copy(timestamp = System.currentTimeMillis())
 
