@@ -19,14 +19,15 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
 
     val sortedFilesTable = QuickTable().headers(headers: _*).caption("Files sorted by createdDate and numOfWords")
 
-    val codeFilesTable       = QuickTable().headers(headers: _*).caption("Unsorted files")
-    val codeFilesCalculation = sourceFiles().visualize("Code files", codeFilesTable): results =>
-      val dt = results.take(10).toList
-      codeFilesTable.rows(dt.map(_.toData))
+    val codeFilesTable = QuickTable().headers(headers: _*).caption("Unsorted files")
 
     val sortedCalc = sortedSourceFiles(sourceFiles()).visualize("Sorted files", sortedFilesTable): results =>
       val tableRows = results.take(10).toList.map(_.toData)
       sortedFilesTable.rows(tableRows)
+
+    val codeFilesCalculation = sourceFiles().visualize("Code files", codeFilesTable): results =>
+      val dt = results.take(10).toList
+      codeFilesTable.rows(dt.map(_.toData))
 
     Seq(
       codeFilesCalculation,
