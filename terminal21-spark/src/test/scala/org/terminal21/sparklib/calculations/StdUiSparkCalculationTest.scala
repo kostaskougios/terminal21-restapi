@@ -1,4 +1,4 @@
-package org.terminal21.sparklib.steps
+package org.terminal21.sparklib.calculations
 
 import functions.fibers.FiberExecutor
 import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
@@ -87,7 +87,7 @@ class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
       session.click(calc.recalc)
       calc.calcCalledTimes.get() should be(2)
 
-class TestingCalculation(using session: ConnectedSession, executor: FiberExecutor, spark: SparkSession, intEncoder: Encoder[Int])
+class TestingCalculation(using session: ConnectedSession, spark: SparkSession, intEncoder: Encoder[Int])
     extends StdUiSparkCalculation[Int, Int]("testing-calc", Box(), Nil):
   val calcCalledTimes                         = new AtomicInteger(0)
   invalidateCache()

@@ -7,8 +7,8 @@ import org.terminal21.client.{*, given}
 import org.terminal21.sparklib.SparkSessions
 import org.terminal21.sparklib.endtoend.model.CodeFile
 import org.terminal21.sparklib.endtoend.model.CodeFile.createDatasetFromProjectsSourceFiles
-import org.terminal21.sparklib.steps.SparkCalculation.sparkCalculation
-import org.terminal21.sparklib.steps.{SparkCalculation, StdUiSparkCalculation}
+import org.terminal21.sparklib.calculations.SparkCalculation.sparkCalculation
+import org.terminal21.sparklib.calculations.{SparkCalculation, StdUiSparkCalculation}
 
 @main def sparkBasics(): Unit =
   SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-basics", "Spark Basics"): (spark, session) =>
@@ -23,7 +23,8 @@ import org.terminal21.sparklib.steps.{SparkCalculation, StdUiSparkCalculation}
     val sortedFilesTable = QuickTable().headers(headers: _*).caption("Files sorted by createdDate and numOfWords")
     val sortedCalc       = sparkCalculation("Sorted files", sortedFilesTable)(sortedSourceFiles)
       .whenResultsReady: results =>
-        sortedFilesTable.rows(results.take(10).toList.map(_.toData))
+        val tableRows = results.take(10).toList.map(_.toData)
+        sortedFilesTable.rows(tableRows)
 
     val codeFilesTable       = QuickTable().headers(headers: _*).caption("Unsorted files")
     val codeFilesCalculation = sparkCalculation("Code files", codeFilesTable, sortedCalc): _ =>

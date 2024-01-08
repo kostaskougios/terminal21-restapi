@@ -1,4 +1,4 @@
-package org.terminal21.sparklib.steps
+package org.terminal21.sparklib.calculations
 
 import functions.fibers.FiberExecutor
 import org.apache.commons.io.FileUtils
