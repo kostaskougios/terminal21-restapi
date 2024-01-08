@@ -10,6 +10,7 @@ import org.terminal21.client.components.{Keys, UiComponent, UiElement}
 import org.terminal21.sparklib.util.Environment
 
 import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
 
 /** A UI component that takes a spark calculation (i.e. a spark query) that results in a Dataset. It caches the results by storing them as parquet into the tmp
   * folder/spark-calculations/$name. Next time the calculation runs it reads the cache if available. A button should allow the user to clear the cache and rerun
@@ -66,12 +67,16 @@ abstract class StdUiSparkCalculation[IN, OUT: Encoder](
     key: String = Keys.nextKey
 )(using session: ConnectedSession, executor: FiberExecutor, spark: SparkSession)
     extends SparkCalculation[IN, OUT](name, key, Nil, notifyWhenCalcReady):
-  val badge  = Badge()
-  val recalc = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
-    badge.text = "Invalidating cache ..."
-    session.render()
-    invalidateCache()
-    for i <- in do run(i)
+  val badge           = Badge()
+  private val running = new AtomicBoolean(false)
+  val recalc          = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
+    if running.compareAndSet(false, true) then
+      try
+        badge.text = "Invalidating cache ..."
+        session.render()
+        invalidateCache()
+        for i <- in do run(i)
+      finally running.set(false)
 
   children = Seq(
     Box(bg = "green", p = 4).withChildren(
