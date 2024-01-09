@@ -7,6 +7,11 @@ import org.terminal21.client.components.chakra.*
 
 import java.util.concurrent.atomic.AtomicBoolean
 
+/** Creates a standard UI for a calculation which may take time. While the calculation runs, the UI is grayed out, including the dataUi component. When the
+  * calculation completes, it allows for updating the dataUi component.
+  * @tparam OUT
+  *   the return value of the calculation.
+  */
 trait StdUiCalculation[OUT](
     name: String,
     dataUi: UiElement with HasStyle
