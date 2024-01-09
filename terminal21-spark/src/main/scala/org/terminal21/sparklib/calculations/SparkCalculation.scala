@@ -5,7 +5,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.SparkSession
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.chakra.*
-import org.terminal21.client.components.{CachedCalculation, UiComponent, UiElement}
+import org.terminal21.client.components.{CachedCalculation, StdUiCalculation, UiComponent, UiElement}
 import org.terminal21.client.ConnectedSession
 import org.terminal21.sparklib.util.Environment
 
@@ -21,13 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean
   *
   * Subclass this to create your own UI for a spark calculation, see StdUiSparkCalculation below.
   */
-abstract class SparkCalculation[OUT: ReadWriter](
-    val key: String,
-    name: String,
-    @volatile var children: Seq[UiElement]
-)(using executor: FiberExecutor, spark: SparkSession)
-    extends CachedCalculation[OUT]
-    with UiComponent:
+trait SparkCalculation[OUT: ReadWriter](name: String)(using executor: FiberExecutor, spark: SparkSession) extends CachedCalculation[OUT] with UiComponent:
   private val rw         = implicitly[ReadWriter[OUT]]
   private val rootFolder = s"${Environment.tmpDirectory}/spark-calculations"
   private val targetDir  = s"$rootFolder/$name"
@@ -53,45 +47,9 @@ abstract class SparkCalculation[OUT: ReadWriter](
   override protected def calculation(): OUT = calculateOnce(nonCachedCalculation)
 
 abstract class StdUiSparkCalculation[OUT: ReadWriter](
-    key: String,
+    val key: String,
     name: String,
     dataUi: UiElement with HasStyle
 )(using session: ConnectedSession, executor: FiberExecutor, spark: SparkSession)
-    extends SparkCalculation[OUT](key, name, Nil):
-  val badge           = Badge()
-  private val running = new AtomicBoolean(false)
-  val recalc          = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
-    if running.compareAndSet(false, true) then
-      try
-        badge.text = "Invalidating cache ..."
-        session.render()
-        invalidateCache()
-        run()
-      finally running.set(false)
-
-  val header = Box(bg = "green", p = 4).withChildren(
-    HStack().withChildren(
-      Text(text = name),
-      badge,
-      recalc
-    )
-  )
-  children = Seq(
-    header,
-    dataUi
-  )
-
-  override protected def whenResultsNotReady(): Unit =
-    badge.text = "Calculating"
-    badge.colorScheme = Some("purple")
-    recalc.isDisabled = Some(true)
-    dataUi.style = dataUi.style + ("filter" -> "grayscale(100%)")
-    session.render()
-    super.whenResultsNotReady()
-
-  override protected def whenResultsReady(results: OUT): Unit =
-    badge.text = "Ready"
-    badge.colorScheme = None
-    recalc.isDisabled = Some(false)
-    dataUi.style = dataUi.style - "filter"
-    session.render()
+    extends SparkCalculation[OUT](name)
+    with StdUiCalculation[OUT](name, dataUi)

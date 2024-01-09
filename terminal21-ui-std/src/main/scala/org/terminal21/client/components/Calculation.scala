@@ -4,7 +4,7 @@ import functions.fibers.{Fiber, FiberExecutor}
 
 import java.util.concurrent.CountDownLatch
 
-abstract class Calculation[OUT](using executor: FiberExecutor):
+trait Calculation[OUT](using executor: FiberExecutor):
   protected def calculation(): OUT
   protected def whenResultsNotReady(): Unit          = ()
   protected def whenResultsReady(results: OUT): Unit = ()
