@@ -21,7 +21,9 @@ case class ResponsiveLine(
     @volatile var axisBottom: Option[Axis] = Some(Axis(legend = "y", legendOffset = 36)),
     @volatile var axisLeft: Option[Axis] = Some(Axis(legend = "x", legendOffset = -40)),
     @volatile var pointSize: Int = 10,
+    @volatile var pointColor: Map[String, String] = Map("theme" -> "background"),
     @volatile var pointBorderWidth: Int = 2,
+    @volatile var pointBorderColor: Map[String, String] = Map("from" -> "serieColor"),
     @volatile var pointLabelYOffset: Int = -12,
     @volatile var useMesh: Boolean = true
 ) extends NivoElement
