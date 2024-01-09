@@ -12,7 +12,7 @@ case class ResponsiveLine(
     // for nivo components to be visible
     @volatile var wrapperStyle: Map[String, String] = Map("height" -> "400px"),
     @volatile var data: Seq[Serie] = Nil,
-    @volatile var margin: Margin = Margin(),
+    @volatile var margin: Margin = Margin(right = 110),
     @volatile var xScale: Scale = Scale.Point,
     @volatile var yScale: Scale = Scale(),
     @volatile var yFormat: String = " >-.2f",
@@ -25,5 +25,6 @@ case class ResponsiveLine(
     @volatile var pointBorderWidth: Int = 2,
     @volatile var pointBorderColor: Map[String, String] = Map("from" -> "serieColor"),
     @volatile var pointLabelYOffset: Int = -12,
-    @volatile var useMesh: Boolean = true
+    @volatile var useMesh: Boolean = true,
+    @volatile var legends: Seq[Legend] = Nil
 ) extends NivoElement
