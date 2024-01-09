@@ -13,7 +13,9 @@ import org.terminal21.client.components.*
           Serie(
             "japan",
             data = Seq(
-              Datum("plane", "262.5f")
+              StringIntDatum("plane", 262),
+              StringIntDatum("helicopter", 26),
+              StringIntDatum("boat", 43)
             )
           )
         )

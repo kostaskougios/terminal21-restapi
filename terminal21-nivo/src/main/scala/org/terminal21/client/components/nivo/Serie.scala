@@ -6,7 +6,24 @@ case class Serie(
     data: Seq[Datum] = Nil
 )
 
-case class Datum(
+sealed trait Datum
+
+case class StringDatum(
     x: String,
     y: String
-)
+) extends Datum
+
+case class IntDatum(
+    x: Int,
+    y: Int
+) extends Datum
+
+case class FloatDatum(
+    x: Float,
+    y: Float
+) extends Datum
+
+case class StringIntDatum(
+    x: String,
+    y: Int
+) extends Datum
