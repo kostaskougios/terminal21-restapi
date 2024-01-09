@@ -144,7 +144,16 @@ lazy val examples = project
     commonSettings,
     libraryDependencies ++= Seq(ScalaTest, LogBack)
   )
-  .dependsOn(`terminal21-ui-std`)
+  .dependsOn(`terminal21-ui-std`, `terminal21-nivo`)
+
+lazy val `terminal21-nivo` = project
+  .settings(
+    commonSettings,
+    libraryDependencies ++= Seq(
+      ScalaTest
+    )
+  )
+  .dependsOn(`terminal21-ui-std` % "compile->compile;test->test")
 
 lazy val `terminal21-spark` = project
   .settings(

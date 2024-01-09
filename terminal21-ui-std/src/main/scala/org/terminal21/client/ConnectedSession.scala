@@ -6,14 +6,14 @@ import io.circe.syntax.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.UiElement.{HasEventHandler, allDeep}
-import org.terminal21.client.components.UiElementEncoding.uiElementEncoder
+import org.terminal21.client.components.UiElementEncoding
 import org.terminal21.model.*
 import org.terminal21.ui.std.SessionsService
 
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 import scala.annotation.tailrec
 
-class ConnectedSession(val session: Session, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
+class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
   private val logger   = LoggerFactory.getLogger(getClass)
   private var elements = List.empty[UiElement]
 
@@ -87,6 +87,7 @@ class ConnectedSession(val session: Session, val serverUrl: String, sessionsServ
   def allElements: Seq[UiElement] = synchronized(elements)
 
   private def toJson: JsonObject =
+    import encoding.given
     val elementsCopy = allElements
     val json         =
       for e <- elementsCopy
