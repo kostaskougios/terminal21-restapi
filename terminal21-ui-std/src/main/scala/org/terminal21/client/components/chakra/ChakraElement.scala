@@ -4,6 +4,10 @@ import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler,
 import org.terminal21.client.components.{Keys, UiElement}
 import org.terminal21.client.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler}
 
+/** The chakra-react based components, for a complete (though bit rough) example please see
+  * https://github.com/kostaskougios/terminal21-restapi/blob/main/examples/src/main/scala/tests/ChakraComponents.scala and it's related scala files under
+  * https://github.com/kostaskougios/terminal21-restapi/tree/main/examples/src/main/scala/tests/chakra
+  */
 sealed trait ChakraElement extends UiElement with HasStyle
 
 /** https://chakra-ui.com/docs/components/button
