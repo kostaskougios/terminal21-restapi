@@ -1,5 +1,6 @@
 package org.terminal21.client.components.nivo
 
+import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.{Keys, UiElement}
 
 sealed trait NivoElement extends UiElement
@@ -10,7 +11,7 @@ case class ResponsiveLine(
     key: String = Keys.nextKey,
     // to give width and height, we wrap the component in a wrapper element. Height must be provided
     // for nivo components to be visible
-    @volatile var wrapperStyle: Map[String, String] = Map("height" -> "400px"),
+    @volatile var style: Map[String, String] = Map("height" -> "400px"),
     @volatile var data: Seq[Serie] = Nil,
     @volatile var margin: Margin = Margin(right = 110),
     @volatile var xScale: Scale = Scale.Point,
@@ -28,3 +29,4 @@ case class ResponsiveLine(
     @volatile var useMesh: Boolean = true,
     @volatile var legends: Seq[Legend] = Nil
 ) extends NivoElement
+    with HasStyle

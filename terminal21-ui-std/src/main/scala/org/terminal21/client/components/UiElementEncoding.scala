@@ -8,7 +8,10 @@ import org.terminal21.client.components.chakra.{Box, ChakraElement}
 class UiElementEncoding(libs: Seq[ComponentLib]):
   given uiElementEncoder: Encoder[UiElement] =
     a =>
-      val cl = libs.find(_.toJson.isDefinedAt(a)).getOrElse(throw new IllegalStateException(s"Unknown element $a , did you register a ComponentLib for it?"))
+      val cl =
+        libs
+          .find(_.toJson.isDefinedAt(a))
+          .getOrElse(throw new IllegalStateException(s"Unknown ui element, did you forget to register a Lib when creating a session? Component:  $a"))
       cl.toJson(a)
 
 object StdElementEncoding extends ComponentLib:

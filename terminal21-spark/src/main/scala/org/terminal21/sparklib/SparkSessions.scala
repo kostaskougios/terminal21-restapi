@@ -1,6 +1,7 @@
 package org.terminal21.sparklib
 
 import org.apache.spark.sql.SparkSession
+import org.terminal21.client.components.ComponentLib
 import org.terminal21.client.{ConnectedSession, Sessions}
 
 import scala.util.Using
@@ -34,7 +35,9 @@ object SparkSessions:
     * @return
     *   whatever f returns
     */
-  def newTerminal21WithSparkSession[R](spark: SparkSession, id: String, name: String)(f: (SparkSession, ConnectedSession) => R): R =
-    Sessions.withNewSession(id, name): terminal21Session =>
-      Using.resource(spark): sp =>
+  def newTerminal21WithSparkSession[R](spark: SparkSession, id: String, name: String, componentLibs: ComponentLib*)(
+      f: (SparkSession, ConnectedSession) => R
+  ): R =
+    Sessions.withNewSession(id, name, componentLibs: _*): terminal21Session =>
+      Using.resource(spark): _ =>
         f(spark, terminal21Session)

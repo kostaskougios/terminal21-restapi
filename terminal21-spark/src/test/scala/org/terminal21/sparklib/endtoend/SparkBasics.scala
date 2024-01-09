@@ -1,15 +1,17 @@
 package org.terminal21.sparklib.endtoend
 
+import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.client.components.nivo.*
 import org.terminal21.client.{*, given}
 import org.terminal21.sparklib.*
 import org.terminal21.sparklib.endtoend.model.CodeFile
 import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
 
 @main def sparkBasics(): Unit =
-  SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-basics", "Spark Basics"): (spark, session) =>
+  SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-basics", "Spark Basics", NivoLib): (spark, session) =>
     given ConnectedSession = session
     given SparkSession     = spark
     import scala3encoders.given
@@ -20,7 +22,8 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
     val sortedFilesTable = QuickTable().headers(headers: _*).caption("Files sorted by createdDate and numOfWords")
     val codeFilesTable   = QuickTable().headers(headers: _*).caption("Unsorted files")
 
-    val sortedCalc = sortedSourceFiles(sourceFiles()).visualize("Sorted files", sortedFilesTable): results =>
+    val sortedSourceFilesDS = sortedSourceFiles(sourceFiles())
+    val sortedCalc          = sortedSourceFilesDS.visualize("Sorted files", sortedFilesTable): results =>
       val tableRows = results.take(3).toList.map(_.toData)
       sortedFilesTable.rows(tableRows)
 
@@ -36,10 +39,34 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
         val tableRows = results.take(4).toList
         sortedFilesTableDF.rows(tableRows.toUiTable)
 
+    val chart = ResponsiveLine(
+      data = Seq(
+        Serie(
+          "Scala",
+          data = Seq(
+            Datum("plane", 262),
+            Datum("helicopter", 26),
+            Datum("boat", 43)
+          )
+        )
+      ),
+      axisBottom = Some(Axis(tickSize = 5, tickPadding = 5, tickRotation = 0, legend = "Class", legendOffset = 36, legendPosition = "middle")),
+      axisLeft = Some(Axis(tickSize = 5, tickPadding = 5, tickRotation = 0, legend = "Count", legendOffset = -40, legendPosition = "middle")),
+      legends = Seq(
+        Legend()
+      )
+    )
+
+    val sourceFileChart = sortedSourceFilesDS.visualize("Biggest Code Files", chart): results =>
+      val data = results.take(10).map(cf => Datum(StringUtils.substringBeforeLast(cf.name, ".scala"), cf.numOfLines)).toList
+      chart.data = Seq(Serie("Scala", data = data))
+      session.render()
+
     Seq(
       codeFilesCalculation,
       sortedCalc,
-      sortedCalcDF
+      sortedCalcDF,
+      sourceFileChart
     ).render()
 
     session.waitTillUserClosesSession()
