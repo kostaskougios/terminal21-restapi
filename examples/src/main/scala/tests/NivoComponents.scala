@@ -17,8 +17,18 @@ import org.terminal21.client.components.*
               Datum("helicopter", 26),
               Datum("boat", 43)
             )
+          ),
+          Serie(
+            "france",
+            "hsl(186, 70%, 50%)",
+            Seq(
+              Datum("plane", 271),
+              Datum("helicopter", 31),
+              Datum("boat", 27)
+            )
           )
-        )
+        ),
+        yScale = Scale(stacked = Some(true))
       )
     ).render()
     session.waitTillUserClosesSession()
