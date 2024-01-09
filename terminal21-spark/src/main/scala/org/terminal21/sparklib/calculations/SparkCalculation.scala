@@ -2,11 +2,11 @@ package org.terminal21.sparklib.calculations
 
 import functions.fibers.FiberExecutor
 import org.apache.commons.io.FileUtils
-import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.chakra.*
-import org.terminal21.client.components.{UiComponent, UiElement}
-import org.terminal21.client.{CachedCalculation, ConnectedSession}
+import org.terminal21.client.components.{CachedCalculation, UiComponent, UiElement}
+import org.terminal21.client.ConnectedSession
 import org.terminal21.sparklib.util.Environment
 
 import java.io.File

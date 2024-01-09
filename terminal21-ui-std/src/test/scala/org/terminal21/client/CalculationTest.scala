@@ -6,6 +6,7 @@ import org.scalatest.matchers.should.Matchers.*
 
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 import org.scalatest.concurrent.Eventually.*
+import org.terminal21.client.components.Calculation
 
 class CalculationTest extends AnyFunSuiteLike:
   given executor: FiberExecutor      = FiberExecutor()

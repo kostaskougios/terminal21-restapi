@@ -1,4 +1,4 @@
-package org.terminal21.client
+package org.terminal21.client.components
 
 import functions.fibers.{Fiber, FiberExecutor}
 
