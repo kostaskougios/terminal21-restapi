@@ -1,12 +1,12 @@
 package org.terminal21.client.components.nivo
 
-case class ResponsiveLineData(
+case class Serie(
     id: String,
     color: String = "hsl(88, 70%, 50%)",
-    data: Seq[XYCoordinates] = Nil
+    data: Seq[Datum] = Nil
 )
 
-case class XYCoordinates(
+case class Datum(
     x: String,
-    y: Float
+    y: String
 )
