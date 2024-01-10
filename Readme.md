@@ -31,9 +31,12 @@ Start with a hello world example:
 
 [hello-world.sc](example-scripts/hello-world.sc)
 
+Run it
 ```shell
 ./hello-world.sc
 ```
+
+and check your browser.
 
 And then continue with a more complicated csv editor:
 
