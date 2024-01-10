@@ -25,7 +25,7 @@ cd terminal21-restapi/example-scripts
 ```
 Now open your browser to http://localhost:8080/ui/ . You'll have the terminal21 UI, will be a bit empty for now, just the settings tab. But we will shortly run some scripts with UI's.
 
-Let's run some example scripts. All scripts use project.scala with some common settings and dependencies.
+Let's run some example scripts. All scripts use [project.scala](example-scripts/project.scala) with some common settings and dependencies.
 
 [csv-editor.sc](example-scripts/csv-editor.sc) : edit csv files.
 
