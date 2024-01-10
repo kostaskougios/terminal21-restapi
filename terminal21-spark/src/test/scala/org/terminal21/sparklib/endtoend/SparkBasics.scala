@@ -50,8 +50,8 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
           )
         )
       ),
-      axisBottom = Some(Axis(tickSize = 5, tickPadding = 5, tickRotation = 0, legend = "Class", legendOffset = 36, legendPosition = "middle")),
-      axisLeft = Some(Axis(tickSize = 5, tickPadding = 5, tickRotation = 0, legend = "Count", legendOffset = -40, legendPosition = "middle")),
+      axisBottom = Some(Axis(legend = "Class", legendOffset = 36)),
+      axisLeft = Some(Axis(legend = "Count", legendOffset = -40)),
       legends = Seq(
         Legend()
       )
