@@ -36,7 +36,7 @@ Run it
 ./hello-world.sc
 ```
 
-and check your browser.
+and check your browser. Changes in the terminal21 UI will reflect instantly.
 
 And then continue with a more complicated csv editor:
 
