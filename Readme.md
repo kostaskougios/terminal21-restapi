@@ -10,16 +10,6 @@ For scala 3 and jdk21 or better. If you have scala-cli installed, you won't need
 
 Note: feel free to ask questions in the "Discussions" board at the top of this github page.
 
-Terminal21 consist of :
-- a web server that can be easily deployed on your laptop, home network etc 
-- scala apps (scala-cli/ammonite scripts or just normal scala apps) that use the terminal21 UI libs to create user interfaces
-
-The terminal21 libs have a websocket open with the server, and they send / receive instructions and events. Similarly, the server
-has a websocket open with the React frontend to do the same. Events like clicks or changes to input boxes instantly update
-the state in the client scripts.
-
-The best and easiest way to start with terminal 21 is via scala-cli and a simple example.
-
 # Quick start with terminal21
 
 The easiest way to start with terminal21 is to clone this repository. There is a scala-cli
@@ -105,7 +95,13 @@ can be used for things like:
 
 # Architecture
 
-Terminal21 consists of a scala server, a react frontend on the server and a client library that can be imported by scripts/scala projects to create UI's.
+Terminal21 consist of :
+- a scala/react based web server that can be easily deployed on your laptop, home network etc
+- scala apps (scala-cli/ammonite scripts or just normal scala apps) that use the terminal21 UI libs to create user interfaces
+
+The terminal21 libs have a websocket open with the server, and they send / receive instructions and events. Similarly, the server
+has a websocket open with the React frontend on the browser to do the same. Events like clicks or changes to input boxes instantly update
+the state in the client scripts.
 
 ![architecture](docs/images/terminal21-architecture.png)
 
