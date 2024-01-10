@@ -31,6 +31,10 @@ Start with a hello world example:
 
 [hello-world.sc](example-scripts/hello-world.sc)
 
+```shell
+./hello-world.sc
+```
+
 And then continue with a more complicated csv editor:
 
 [csv-editor.sc](example-scripts/csv-editor.sc) : edit csv files.
