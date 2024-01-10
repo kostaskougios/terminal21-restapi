@@ -20,6 +20,10 @@ the state in the client scripts.
 
 The best and easiest way to start with terminal 21 is via scala-cli and a simple example.
 
+First start the server with a scala-cli script like this (better clone this repository as explained below at [Quick start with terminal21](#Quick start with terminal21) ):
+
+[server.sc](example-scripts/server.sc)
+
 Let's create a simple hello world script in scala-cli that uses terminal21 server to render the UI.
 
 [hello-world.sc](example-scripts/hello-world.sc)
@@ -101,6 +105,9 @@ ls *.sc
 bouncing-ball.sc csv-editor.sc    csv-viewer.sc    hello-world.sc   postit.sc        server.sc        textedit.sc
 ```
 
+# Architecture
+
+Terminal21 consists of a server (that can easily be started with the provided )
 # Mutability
 
 terminal21 ui components are mutable. This is a decision choice (for now) because of how much more simple code is this way. I.e.
