@@ -20,9 +20,46 @@ the state in the client scripts.
 
 The best and easiest way to start with terminal 21 is via scala-cli and a simple example.
 
-First start the server with a scala-cli script like this (better clone this repository as explained below at [Quick start with terminal21](#Quick start with terminal21) ):
+# Quick start with terminal21
 
-[server.sc](example-scripts/server.sc)
+The easiest way to start with terminal21 is to clone this repository. There is a scala-cli
+script that starts the server (all deps and jdk21 will be downloaded automatically by scala-cli).
+
+```shell
+git clone https://github.com/kostaskougios/terminal21-restapi.git
+cd terminal21-restapi/example-scripts
+
+# start the server
+./server.sc
+# ... it will download dependencies & jdk and start the server.
+```
+Now open your browser to http://localhost:8080/ui/ . You'll have the terminal21 UI, will be a bit empty for now, just the settings tab. But we will shortly run some scripts with UI's.
+
+Let's run some example scripts. All scripts use project.scala with some common settings and dependencies.
+
+[csv-editor.sc](example-scripts/csv-editor.sc) : edit csv files.
+
+```shell
+./csv-editor.sc -- /tmp/wargame.csv
+```
+(note the "--": this is a scala-cli parameter needed before passing actual arguments to a script. The actual argument is the csv filename.)
+
+Terminal21 UI will now have the csv editor's tab:
+![csv editor](docs/images/csv-editor.png)
+
+If we click in a cell, we will be able to change a value. And then use the "Save & Exit" button to save the file and exit.
+
+![csv editor](docs/images/csv-editor-change.png)
+
+Now feel free to examine and run the rest of the scripts or create your own! You can have the server running and develop your
+scripts with your favorite IDE. Run the scripts within the IDE and view the UI in a browser.
+
+# Example scripts
+
+```shell
+ls *.sc
+bouncing-ball.sc csv-editor.sc    csv-viewer.sc    hello-world.sc   postit.sc        server.sc        textedit.sc
+```
 
 Let's create a simple hello world script in scala-cli that uses terminal21 server to render the UI.
 
@@ -66,48 +103,12 @@ can be used for things like:
 - logs can be viewed and searched via scripts
 - ... and so on
 
-# Quick start with terminal21
-
-The easiest way to start with terminal21 is to clone this repository. There is a scala-cli
-script that starts the server (all deps and jdk21 will be downloaded automatically by scala-cli).
-
-```shell
-git clone https://github.com/kostaskougios/terminal21-restapi.git
-cd terminal21-restapi/example-scripts
-
-# start the server
-./server.sc
-# ... it will download dependencies & jdk and start the server.
-```
-Now open your browser to http://localhost:8080/ui/ . You'll have the terminal21 UI, will be a bit empty for now, just the settings tab. But we will shortly run some scripts with UI's. 
-
-Let's run some example scripts. All scripts use project.scala with some common settings and dependencies.
-
-[csv-editor.sc](example-scripts/csv-editor.sc) : edit csv files.
-
-```shell
-./csv-editor.sc -- /tmp/wargame.csv
-```
-(note the "--": this is a scala-cli parameter needed before passing actual arguments to a script. The actual argument is the csv filename.)
-
-Terminal21 UI will now have the csv editor's tab:
-![csv editor](docs/images/csv-editor.png)
-
-If we click in a cell, we will be able to change a value. And then use the "Save & Exit" button to save the file and exit.
-
-![csv editor](docs/images/csv-editor-change.png)
-
-Now feel free to examine and run the rest of the scripts or create your own! I found out MS code works better for scala-cli scripts but
-please make sure you include the terminal21 libs in the script rather than in `project.scala`. This will make autocomplete work better.
-
-```shell
-ls *.sc
-bouncing-ball.sc csv-editor.sc    csv-viewer.sc    hello-world.sc   postit.sc        server.sc        textedit.sc
-```
-
 # Architecture
 
-Terminal21 consists of a server (that can easily be started with the provided )
+Terminal21 consists of a scala server, a react frontend on the server and a client library that can be imported by scripts/scala projects to create UI's.
+
+![architecture](docs/images/terminal21-architecture.png)
+
 # Mutability
 
 terminal21 ui components are mutable. This is a decision choice (for now) because of how much more simple code is this way. I.e.
