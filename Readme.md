@@ -1,3 +1,5 @@
+Note: for Table Of Contents, just click the burger icon top right of this document.
+
 # Terminal 21
 
 Terminal 21 is a library and server that give scala command line programs (i.e. scala-cli scripts) the ability to easily
