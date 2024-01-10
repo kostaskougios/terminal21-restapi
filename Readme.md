@@ -1,4 +1,4 @@
-Note: for Table Of Contents, just click the burger icon top right of this document.
+Note: for Table Of Contents, just click the burger icon top right of this document, just above this text on the right.
 
 # Terminal 21
 
