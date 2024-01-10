@@ -27,6 +27,12 @@ Now open your browser to http://localhost:8080/ui/ . You'll have the terminal21 
 
 Let's run some example scripts. All scripts use [project.scala](example-scripts/project.scala) with some common settings and dependencies.
 
+Start with a hello world example:
+
+[hello-world.sc](example-scripts/hello-world.sc)
+
+And then continue with a more complicated csv editor:
+
 [csv-editor.sc](example-scripts/csv-editor.sc) : edit csv files.
 
 ```shell
