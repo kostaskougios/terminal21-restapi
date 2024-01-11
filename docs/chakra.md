@@ -229,3 +229,22 @@ WarningTwoIcon()
 ```
 
 ![Icons](images/chakra/icons.png)
+
+### Tables
+
+There are a lot of elements to create a table but QuickTable also helps simplify things. First lets see the code 
+for a table [here](../examples/src/main/scala/tests/chakra/DataDisplay.scala)
+
+![Table](images/chakra/table.png)
+
+Quicktable helps creating all those table elements for the most common usecases:
+
+```scala
+val sortedFilesTable = QuickTable().headers("id", "name", "path")
+  .caption("Files sorted")
+val tableRows:Seq[Seq[String]] = Seq(
+  Seq("file1","File1.scala","/tmp/scala"),
+  ...
+)
+sortedFilesTable.rows(tableRows)
+```
