@@ -30,7 +30,18 @@ object ResponsiveBarChart:
       axisLeft = Some(Axis(legend = "food", legendOffset = -40)),
       axisBottom = Some(Axis(legend = "country", legendOffset = 32)),
       valueScale = Scale(`type` = "linear"),
-      indexScale = Scale(`type` = "band", round = Some(true))
+      indexScale = Scale(`type` = "band", round = Some(true)),
+      legends = Seq(
+        Legend(
+          dataFrom = "keys",
+          translateX = 120,
+          itemsSpacing = 2,
+          itemWidth = 100,
+          itemHeight = 20,
+          symbolSize = 20,
+          symbolShape = "square"
+        )
+      )
     )
   )
 
