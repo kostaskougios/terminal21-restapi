@@ -9,6 +9,8 @@ trait Calculation[OUT](using executor: FiberExecutor):
   protected def whenResultsNotReady(): Unit          = ()
   protected def whenResultsReady(results: OUT): Unit = ()
 
+  protected def reRunRequested(): Fiber[OUT] = run()
+
   def run(): Fiber[OUT] =
     val refreshInOrder = new CountDownLatch(1)
     executor.submit:
