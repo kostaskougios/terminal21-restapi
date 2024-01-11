@@ -30,3 +30,27 @@ case class ResponsiveLine(
     @volatile var legends: Seq[Legend] = Nil
 ) extends NivoElement
     with HasStyle
+
+/** https://nivo.rocks/bar/
+  */
+case class ResponsiveBar(
+    key: String = Keys.nextKey,
+    // to give width and height, we wrap the component in a wrapper element. Height must be provided
+    // for nivo components to be visible
+    @volatile var style: Map[String, String] = Map("height" -> "400px"),
+    @volatile var data: Seq[Seq[BarDatum]] = Nil,
+    @volatile var keys: Seq[String] = Nil,
+    @volatile var indexBy: String = "",
+    @volatile var margin: Margin = Margin(right = 110),
+    @volatile var padding: Float = 0,
+    @volatile var valueScale: Scale = Scale(),
+    @volatile var indexScale: Scale = Scale(),
+    @volatile var colors: Map[String, String] = Map("scheme" -> "nivo"),
+    @volatile var axisTop: Option[Axis] = None,
+    @volatile var axisRight: Option[Axis] = None,
+    @volatile var axisBottom: Option[Axis] = Some(Axis(legend = "y", legendOffset = 36)),
+    @volatile var axisLeft: Option[Axis] = Some(Axis(legend = "x", legendOffset = -40)),
+    @volatile var legends: Seq[Legend] = Nil,
+    @volatile var ariaLabel: String = "Chart Label"
+) extends NivoElement
+    with HasStyle

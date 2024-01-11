@@ -1,6 +1,7 @@
 package org.terminal21.client.components.nivo
 
 case class Legend(
+    dataFrom: String = "keys",
     anchor: String = "bottom-right",
     direction: String = "column",
     justify: Boolean = false,
