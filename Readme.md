@@ -151,6 +151,7 @@ Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi
 - Quick* classes to simplify UI creation
 - A few Nivo visualisation components
 - spark integration, terminal21 acts as a spark notebook
+- ui component documentation
 
 ## Version 0.1
 

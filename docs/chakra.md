@@ -74,4 +74,50 @@ FormControl().withChildren(
 )
 ```
 
+### Editable
 
+Editable is a textarea but looks like normal text until the user clicks it.
+
+```scala
+val editable1 = Editable(defaultValue = "Please type here").withChildren(
+  EditablePreview(),
+  EditableInput()
+)
+
+editable1.onChange: newValue =>
+  status.text = s"editable1 newValue = $newValue, verify editable1.value = ${editable1.value}"
+  session.render()
+
+// Use text area for longer texts
+val editable2 = Editable(defaultValue = "For longer maybe-editable texts\nUse an EditableTextarea\nIt uses a textarea control.").withChildren(
+  EditablePreview(),
+  EditableTextarea()
+)
+
+```
+![Editable](images/chakra/editable.png)
+![Editable](images/chakra/editable-editing.png)
+
+### SimpleGrid
+
+```scala
+SimpleGrid(spacing = Some("8px"), columns = 4).withChildren(
+    Box(text = "One", bg = "yellow", color = "black"),
+    Box(text = "Two", bg = "tomato", color = "black"),
+    Box(text = "Three", bg = "blue", color = "black")
+)
+```
+
+![SimpleGrid](images/chakra/simplegrid.png)
+
+### Center / Circle / Square
+```scala
+Center(text = "Center demo, not styled"),
+Center(text = "Center demo center-demo-0001", bg = Some("tomato"), color = Some("white"), w = Some("100px"), h = Some("100px")),
+Circle(text = "Circle demo, not styled"),
+Circle(text = "Circle demo circle-demo-0001", bg = Some("tomato"), color = Some("white"), w = Some("100px"), h = Some("100px")),
+Square(text = "Square demo, not styled"),
+Square(text = "Square demo square-demo-0001", bg = Some("tomato"), color = Some("white"), w = Some("100px"), h = Some("100px"))
+```
+
+![CCS](images/chakra/ccs.png)
