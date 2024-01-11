@@ -107,6 +107,11 @@ can be used for things like:
 - ... and so on
 # Available UI Components
 
+Std
+
+Some standard html elements
+[Std](docs/std.md)
+
 Generic components for buttons, menus, forms, text, grids, tables:
 [Chakra](docs/chakra.md)
 
