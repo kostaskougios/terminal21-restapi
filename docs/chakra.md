@@ -1,5 +1,9 @@
 # Chakra components
 
+Chakra components build on top of standard html elements to provide nice UI for text, forms, tables etc.
+See [Chakra Components for React](https://chakra-ui.com/docs/components).
+
+These case classes can be used to render chakra components (note: not all chakra elements are available).
 [The case classes](../terminal21-ui-std/src/main/scala/org/terminal21/client/components/chakra/ChakraElement.scala)
 
 Note: only a fraction of the available properties of each component is documented here.
