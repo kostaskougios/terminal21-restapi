@@ -32,4 +32,4 @@ object UiElement:
     def defaultEventHandler: EventHandler
 
   trait HasStyle:
-    var style: Map[String, String]
+    var style: Map[String, Any]

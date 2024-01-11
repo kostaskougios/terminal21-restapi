@@ -33,8 +33,8 @@ case class QuickTable(
       Tr(children = row.map(c => Td().withChildren(c)))
     this
 
-  def style: Map[String, String]            = tableContainer.style
-  def style_=(s: Map[String, String]): Unit = tableContainer.style = s
+  def style: Map[String, Any]            = tableContainer.style
+  def style_=(s: Map[String, Any]): Unit = tableContainer.style = s
 
   def caption(text: String): QuickTable =
     table.addChildren(TableCaption(text = text))

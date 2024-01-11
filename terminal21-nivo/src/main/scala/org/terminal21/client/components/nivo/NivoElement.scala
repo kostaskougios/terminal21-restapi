@@ -11,7 +11,7 @@ case class ResponsiveLine(
     key: String = Keys.nextKey,
     // to give width and height, we wrap the component in a wrapper element. Height must be provided
     // for nivo components to be visible
-    @volatile var style: Map[String, String] = Map("height" -> "400px"),
+    @volatile var style: Map[String, Any] = Map("height" -> "400px"),
     @volatile var data: Seq[Serie] = Nil,
     @volatile var margin: Margin = Margin(right = 110),
     @volatile var xScale: Scale = Scale.Point,
@@ -37,7 +37,7 @@ case class ResponsiveBar(
     key: String = Keys.nextKey,
     // to give width and height, we wrap the component in a wrapper element. Height must be provided
     // for nivo components to be visible
-    @volatile var style: Map[String, String] = Map("height" -> "400px"),
+    @volatile var style: Map[String, Any] = Map("height" -> "400px"),
     @volatile var data: Seq[Seq[BarDatum]] = Nil,
     @volatile var keys: Seq[String] = Nil,
     @volatile var indexBy: String = "",
