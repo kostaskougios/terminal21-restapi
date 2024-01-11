@@ -164,3 +164,16 @@ Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi
 ## Version 0.1
 
 - initial release with std and chakra components
+
+
+# Our thanks
+
+![yourkit](https://www.yourkit.com/images/yklogo.png)
+
+To yourkit for their excellent profiler.
+
+YourKit supports open source projects with innovative and intelligent tools
+for monitoring and profiling Java and .NET applications.
+YourKit is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/profiler/),
+[YourKit .NET Profiler](https://www.yourkit.com/dotnet-profiler/),
+and [YourKit YouMonitor](https://www.yourkit.com/youmonitor/).
