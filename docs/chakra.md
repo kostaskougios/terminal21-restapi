@@ -10,6 +10,9 @@ Note: not all chakra elements are available and also only a fraction of the avai
 See the case class for a full list as well as the chakra react documentation (links are available in the scaladocs of each case class).
 
 If you want a chakra component that is not supported yet, please add a comment here: [Chakra support discussion](https://github.com/kostaskougios/terminal21-restapi/discussions/2)
+
+[Examples](https://github.com/kostaskougios/terminal21-restapi/tree/main/example-scripts) 
+
 ### Text
 
 ```scala

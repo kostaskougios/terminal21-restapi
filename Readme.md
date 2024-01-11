@@ -107,7 +107,12 @@ can be used for things like:
 - ... and so on
 # Available UI Components
 
+Generic components for buttons, menus, forms, text, grids, tables:
 [Chakra](docs/chakra.md)
+
+Charts and visualisation:
+[Nivo](docs/nivo.md)
+
 
 # Architecture
 
