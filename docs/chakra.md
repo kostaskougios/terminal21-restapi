@@ -232,19 +232,19 @@ WarningTwoIcon()
 
 ### Tables
 
-There are a lot of elements to create a table but QuickTable also helps simplify things. First lets see the code 
+There are a lot of elements to create a table but `QuickTable` component also helps simplify things. First lets see the code 
 for a table [here](../examples/src/main/scala/tests/chakra/DataDisplay.scala)
 
 ![Table](images/chakra/table.png)
 
-Quicktable helps creating all those table elements for the most common usecases:
+`Quicktable` helps creating all those table elements for the most common usecases:
 
 ```scala
-val sortedFilesTable = QuickTable().headers("id", "name", "path")
-  .caption("Files sorted")
+val conversionTable = QuickTable().headers("To convert", "into", "multiply by")
+  .caption("Imperial to metric conversion factors")
 val tableRows:Seq[Seq[String]] = Seq(
-  Seq("file1","File1.scala","/tmp/scala"),
+  Seq("inches","millimetres (mm)","25.4"),
   ...
 )
-sortedFilesTable.rows(tableRows)
+conversionTable.rows(tableRows)
 ```
