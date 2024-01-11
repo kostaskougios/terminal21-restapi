@@ -143,7 +143,7 @@ Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi
 
 # Changelog
 
-## Version 0.2
+## Version 0.11
 
 - Quick* classes to simplify UI creation
 - A few Nivo visualisation components
