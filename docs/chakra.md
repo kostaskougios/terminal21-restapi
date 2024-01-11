@@ -4,6 +4,15 @@
 
 Note: only a fraction of the available properties of each component is documented here.
 See the case class for a full list as well as the chakra react documentation (links are available in the scaladocs of each case class).
+
+### Text
+
+```scala
+Text(text = "typography-text-0001", color = Some("tomato"))
+```
+
+![Text](images/chakra/text.png)
+
 ### Button
 
 ![Button](images/chakra/button.png)
@@ -248,11 +257,3 @@ val tableRows:Seq[Seq[String]] = Seq(
 )
 conversionTable.rows(tableRows)
 ```
-
-### Text
-
-```scala
-Text(text = "typography-text-0001", color = Some("tomato"))
-```
-
-![Text](images/chakra/text.png)
