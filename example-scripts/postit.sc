@@ -25,7 +25,7 @@ Sessions.withNewSession("postit", "Post-It"): session =>
           src = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_Notes_icon.svg/2048px-Apple_Notes_icon.svg.png",
           boxSize = Some("32px")
         ),
-        Box(text =  editor.value)
+        Box(text = editor.value)
       )
     )
     // always render after adding/modifying something
