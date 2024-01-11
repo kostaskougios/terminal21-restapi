@@ -5,6 +5,8 @@
 terminal21 supports a few of these, but please add a comment [here](https://github.com/kostaskougios/terminal21-restapi/discussions/3) if you 
 would like support for a particular component.
 
+Dependency: `io.github.kostaskougios::terminal21-nivo:$VERSION`
+
 ### ResponsiveLine
 
 Code: [ResponsiveLine](../examples/src/main/scala/tests/nivo/ResponsiveLineChart.scala)

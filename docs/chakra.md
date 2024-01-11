@@ -13,6 +13,8 @@ If you want a chakra component that is not supported yet, please add a comment h
 
 [Examples](https://github.com/kostaskougios/terminal21-restapi/tree/main/example-scripts) 
 
+Dependency: `io.github.kostaskougios::terminal21-ui-std:$VERSION`
+
 ### Text
 
 ```scala

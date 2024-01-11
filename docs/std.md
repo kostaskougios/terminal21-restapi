@@ -4,6 +4,8 @@ These are standard html elements but please prefer the more flexible chakra comp
 
 [Example](../examples/src/main/scala/tests/StdComponents.scala)
 
+Dependency: `io.github.kostaskougios::terminal21-ui-std:$VERSION`
+
 ### Paragraph, NewLine, Span, Em
 
 ```scala
