@@ -53,3 +53,25 @@ Menu().withChildren(
   )
 )
 ```
+
+### Forms
+
+see [Forms](../examples/src/main/scala/tests/chakra/Forms.scala) as an example on how to create forms.
+
+![Forms](images/chakra/forms.png)
+
+Use FormControl to wrap your form elements:
+
+```scala
+FormControl().withChildren(
+    FormLabel(text = "Email address"),
+    InputGroup().withChildren(
+      InputLeftAddon().withChildren(EmailIcon()),
+      Input(`type` = "email", value = "my@email.com"),
+      InputRightAddon().withChildren(CheckCircleIcon(color = Some("green")))
+    ),
+    FormHelperText(text = "We'll never share your email.")
+)
+```
+
+
