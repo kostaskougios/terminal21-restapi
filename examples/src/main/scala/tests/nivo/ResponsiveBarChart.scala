@@ -22,6 +22,11 @@ object ResponsiveBarChart:
       keys = Seq("hot dog", "burger", "sandwich", "kebab", "fries", "donut"),
       indexBy = "country",
       padding = 0.3,
+      defs = Seq(
+        Defs("dots", "patternDots", "inherit", "#38bcb2", size = Some(4), padding = Some(1), stagger = Some(true)),
+        Defs("lines", "patternLines", "inherit", "#eed312", rotation = Some(-45), lineWidth = Some(6), spacing = Some(10))
+      ),
+      fill = Seq(Fill("dots", Match("fries")), Fill("lines", Match("sandwich"))),
       axisLeft = Some(Axis(legend = "food", legendOffset = -40)),
       axisBottom = Some(Axis(legend = "country", legendOffset = 32)),
       valueScale = Scale(`type` = "linear"),
@@ -30,12 +35,19 @@ object ResponsiveBarChart:
   )
 
   def dataFor(country: String) =
+    def r = Random.nextInt(500) + 50
     Seq(
       BarDatum("country", country),
-      BarDatum("hot dog", Random.nextInt(500) + 50),
+      BarDatum("hot dog", r),
       BarDatum("hot dogColor", "hsl(202, 70%, 50%)"),
-      BarDatum("burger", Random.nextInt(500) + 50),
+      BarDatum("burger", r),
       BarDatum("burgerColor", "hsl(106, 70%, 50%)"),
-      BarDatum("sandwich", Random.nextInt(500) + 50),
-      BarDatum("sandwichColor", "hsl(115, 70%, 50%)")
+      BarDatum("sandwich", r),
+      BarDatum("sandwichColor", "hsl(115, 70%, 50%)"),
+      BarDatum("kebab", r),
+      BarDatum("kebabColor", "hsl(113, 70%, 50%)"),
+      BarDatum("fries", r),
+      BarDatum("friesColor", "hsl(209, 70%, 50%)"),
+      BarDatum("donut", r),
+      BarDatum("donutColor", "hsl(47, 70%, 50%)")
     )

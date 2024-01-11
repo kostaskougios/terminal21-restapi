@@ -46,6 +46,8 @@ case class ResponsiveBar(
     @volatile var valueScale: Scale = Scale(),
     @volatile var indexScale: Scale = Scale(),
     @volatile var colors: Map[String, String] = Map("scheme" -> "nivo"),
+    @volatile var defs: Seq[Defs] = Nil,
+    @volatile var fill: Seq[Fill] = Nil,
     @volatile var axisTop: Option[Axis] = None,
     @volatile var axisRight: Option[Axis] = None,
     @volatile var axisBottom: Option[Axis] = Some(Axis(legend = "y", legendOffset = 36)),
