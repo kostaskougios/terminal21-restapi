@@ -23,7 +23,7 @@ trait StdUiCalculation[OUT](
   val recalc          = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
     if running.compareAndSet(false, true) then
       try
-        reRunRequested()
+        reCalculate()
       finally running.set(false)
 
   val header                             = Box(bg = "green", p = 4).withChildren(

@@ -6,10 +6,6 @@ abstract class CachedCalculation[OUT](using executor: FiberExecutor) extends Cal
   def isCached: Boolean
   def invalidateCache(): Unit
   def nonCachedCalculation: OUT
-  def reCalculate(): Fiber[OUT] =
+  override def reCalculate(): Fiber[OUT] =
     invalidateCache()
-    run()
-
-  override protected def reRunRequested() =
-    invalidateCache()
-    super.reRunRequested()
+    super.reCalculate()
