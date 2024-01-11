@@ -7,13 +7,13 @@ would like support for a particular component.
 
 ### ResponsiveLine
 
-code [ResponsiveLine](../examples/src/main/scala/tests/nivo/ResponsiveLineChart.scala)
+Code: [ResponsiveLine](../examples/src/main/scala/tests/nivo/ResponsiveLineChart.scala)
 
 ![RL](images/nivo/responsiveline.png)
 
 ### ResponsiveBar
 
-code [ResponsiveBar](../examples/src/main/scala/tests/nivo/ResponsiveBarChart.scala)
+Code: [ResponsiveBar](../examples/src/main/scala/tests/nivo/ResponsiveBarChart.scala)
 
 ![RB](images/nivo/responsivebar.png)
 
