@@ -46,19 +46,18 @@ object ResponsiveBarChart:
   )
 
   def dataFor(country: String) =
-    def r = Random.nextInt(500) + 50
     Seq(
       BarDatum("country", country),
-      BarDatum("hot dog", r),
+      BarDatum("hot dog", rnd),
       BarDatum("hot dogColor", "hsl(202, 70%, 50%)"),
-      BarDatum("burger", r),
+      BarDatum("burger", rnd),
       BarDatum("burgerColor", "hsl(106, 70%, 50%)"),
-      BarDatum("sandwich", r),
+      BarDatum("sandwich", rnd),
       BarDatum("sandwichColor", "hsl(115, 70%, 50%)"),
-      BarDatum("kebab", r),
+      BarDatum("kebab", rnd),
       BarDatum("kebabColor", "hsl(113, 70%, 50%)"),
-      BarDatum("fries", r),
+      BarDatum("fries", rnd),
       BarDatum("friesColor", "hsl(209, 70%, 50%)"),
-      BarDatum("donut", r),
+      BarDatum("donut", rnd),
       BarDatum("donutColor", "hsl(47, 70%, 50%)")
     )

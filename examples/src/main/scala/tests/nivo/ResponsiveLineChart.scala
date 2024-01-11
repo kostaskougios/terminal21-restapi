@@ -13,23 +13,11 @@ object ResponsiveLineChart:
     commonBox("ResponsiveLine"),
     ResponsiveLine(
       data = Seq(
-        Serie(
-          "japan",
-          data = Seq(
-            Datum("plane", 262),
-            Datum("helicopter", 26),
-            Datum("boat", 43)
-          )
-        ),
-        Serie(
-          "france",
-          "hsl(186, 70%, 50%)",
-          Seq(
-            Datum("plane", 271),
-            Datum("helicopter", 31),
-            Datum("boat", 27)
-          )
-        )
+        dataFor("Japan"),
+        dataFor("France"),
+        dataFor("Greece"),
+        dataFor("UK"),
+        dataFor("Germany")
       ),
       yScale = Scale(stacked = Some(true)),
       axisBottom = Some(Axis(legend = "transportation", legendOffset = 36)),
@@ -39,3 +27,15 @@ object ResponsiveLineChart:
       )
     )
   )
+
+  def dataFor(country: String) =
+    Serie(
+      country,
+      data = Seq(
+        Datum("plane", rnd),
+        Datum("helicopter", rnd),
+        Datum("boat", rnd),
+        Datum("car", rnd),
+        Datum("submarine", rnd)
+      )
+    )
