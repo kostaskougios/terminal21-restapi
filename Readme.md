@@ -105,6 +105,9 @@ can be used for things like:
 - POC code at the office can be presented via a scala-cli script + terminal21 UI. The POC code can be imported as a lib in a script.
 - logs can be viewed and searched via scripts
 - ... and so on
+# Available UI Components
+
+[Chakra](docs/chakra.md)
 
 # Architecture
 
