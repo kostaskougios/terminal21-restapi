@@ -29,8 +29,8 @@ import org.terminal21.client.components.*
           )
         ),
         yScale = Scale(stacked = Some(true)),
-        axisBottom = Some(Axis(tickSize = 5, tickPadding = 5, tickRotation = 0, legend = "transportation", legendOffset = 36, legendPosition = "middle")),
-        axisLeft = Some(Axis(tickSize = 5, tickPadding = 5, tickRotation = 0, legend = "count", legendOffset = -40, legendPosition = "middle")),
+        axisBottom = Some(Axis(legend = "transportation", legendOffset = 36)),
+        axisLeft = Some(Axis(legend = "count", legendOffset = -40)),
         legends = Seq(
           Legend()
         )
