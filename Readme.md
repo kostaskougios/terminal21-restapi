@@ -139,4 +139,16 @@ If there is a reasonable way to refactor to have immutability without compromisi
 
 # Need help?
 
-Please use the discussions of the project to post any questions, comments or ideas.
+Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi/discussions) of the project to post any questions, comments or ideas.
+
+# Changelog
+
+## Version 0.2
+
+- Quick* classes to simplify UI creation
+- A few Nivo visualisation components
+- spark integration, terminal21 acts as a spark notebook
+
+## Version 0.1
+
+- initial release with std and chakra components
