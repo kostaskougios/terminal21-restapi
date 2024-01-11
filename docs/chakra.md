@@ -121,3 +121,42 @@ Square(text = "Square demo square-demo-0001", bg = Some("tomato"), color = Some(
 ```
 
 ![CCS](images/chakra/ccs.png)
+
+### Image
+
+```scala
+Image(
+  src = "https://bit.ly/dan-abramov",
+  alt = "Dan Abramov",
+  boxSize = Some("150px")
+),
+Image(
+  src = "https://bit.ly/dan-abramov",
+  alt = "Dan Abramov",
+  boxSize = Some("150px"),
+  borderRadius = Some("full")
+)
+```
+
+![Images](images/chakra/images.png)
+
+Images can be hosted in the server under ~/.terminal21:
+
+```shell
+ ~/.terminal21  tree
+.
+└── web
+    └── images
+        ├── ball.png
+        ├── logo1.png
+        └── logo2.png
+```
+and then used like:
+```scala
+Image(
+  src = "/web/images/logo1.png",
+  alt = "logo no 1",
+  boxSize = Some("150px"),
+  borderRadius = Some("full")
+)
+```
