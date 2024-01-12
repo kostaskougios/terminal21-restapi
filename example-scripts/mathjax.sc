@@ -4,8 +4,6 @@ import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.mathjax.*
 
-import scala.util.Random
-
 Sessions.withNewSession("mathjax", "MathJax Example", MathJaxLib /* note we need to register the MathJaxLib in order to use it */ ): session =>
   given ConnectedSession = session
   Seq(
