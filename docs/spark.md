@@ -6,17 +6,24 @@ Terminal 21 spark integration allows using datasets and dataframes inside termin
 It also provides caching of datasets in order for scripts to be used as notebooks. The caching
 has also a UI component to allow invalidating the cache and re-evaluating the datasets.
 
-```scala
-import org.terminal21.sparklib.*
+To give it a go, please checkout this repo and try the examples:
 
-val sourceFiles:Dataset[...]
-// the following is a UI component that also caches the dataset.
-val codeFilesCalculation = sourceFiles.visualize("Code files", codeFilesTable): results =>
-    val dt = results.take(3).toList
-    codeFilesTable.rows(dt.map(_.toData))
+```shell
+git clone https://github.com/kostaskougios/terminal21-restapi.git
+cd terminal21-restapi/example-scripts
 
-  Seq(codeFilesCalculation).render()
+# start the server
+./server.sc
+# ... it will download dependencies & jdk and start the server.
+
+# Now lets run a spark notebook
+
+cd terminal21-restapi/example-spark
+./spark-notebook.sc
 ```
+
+Leave `spark-notebook.sc` running and edit it with your preferred editor. When you save your changes, it will automatically be rerun and
+the changes will be reflected in the UI.
 
 ## Using terminal21 as notebook within an ide
 

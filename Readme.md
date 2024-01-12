@@ -109,7 +109,7 @@ can be used for things like:
 ![notebooks, spark notebooks and maths](docs/images/mathjax/mathjaxbig.png)
 
 - notebooks with charts like [notebooks](example-scripts/nivo-line-chart.sc) and with maths like  [maths](example-scripts/mathjax.sc)
-- spark notebooks
+- spark notebooks like [spark-notebook.sc](example-spark/spark-notebook.sc)
 
 # Available UI Components
 
