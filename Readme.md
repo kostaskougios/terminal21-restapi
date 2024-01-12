@@ -125,6 +125,8 @@ Charts and visualisation:
 Maths:
 [MathJax](docs/mathjax.md)
 
+Spark:
+[Spark](docs/spark.md)
 # Architecture
 
 Terminal21 consist of :

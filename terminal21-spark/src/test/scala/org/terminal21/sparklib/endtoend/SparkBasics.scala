@@ -52,9 +52,7 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
       ),
       axisBottom = Some(Axis(legend = "Class", legendOffset = 36)),
       axisLeft = Some(Axis(legend = "Count", legendOffset = -40)),
-      legends = Seq(
-        Legend()
-      )
+      legends = Seq(Legend())
     )
 
     val sourceFileChart = sortedSourceFilesDS.visualize("Biggest Code Files", chart): results =>

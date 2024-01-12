@@ -34,7 +34,7 @@ SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "sp
   val peopleTable = QuickTable().headers("Id", "Name", "Age").caption("People")
 
   val peopleTableCalc = peopleDS.sort($"id").visualize("People sample", peopleTable): data =>
-    peopleTable.rows(data.take(10).map(p => Seq(p.id, p.name, p.age)))
+    peopleTable.rows(data.take(5).map(p => Seq(p.id, p.name, p.age)))
 
   /** The calculation above uses a directory to store the dataset results. This way we can restart this script without loosing datasets that may take long to
     * calculate, making our script behave more like a notebook. When we click "Recalculate" in the UI, the cache directory is deleted and the dataset is
