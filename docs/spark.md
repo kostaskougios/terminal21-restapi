@@ -35,7 +35,7 @@ you interact with the UI. Change the code and rerun it. Click "Recalculate" if y
 
 ## Using terminal21 as notebook with scala-cli
 
-See [spark-notebook.sc](../example-spark/spark-notebook.sc)
+See [spark-notebook.sc](../example-spark/spark-notebook.sc).
 On top of the file, `scala-cli` is configured to run with the `--restart` option. This will terminate and restart the script
 whenever a change in the file is detected. Edit the script with your favorite IDE and when saving it, it will automatically
 re-run. If you want to re-evaluate the datasets, click "Recalculate" on the UI components.
