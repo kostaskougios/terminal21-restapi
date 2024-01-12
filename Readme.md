@@ -108,7 +108,7 @@ can be used for things like:
 ![notebooks, spark notebooks and maths](docs/images/nivo/responsiveline.png)
 ![notebooks, spark notebooks and maths](docs/images/mathjax/mathjaxbig.png)
 
-- notebooks with charts, maths like [notebooks](example-scripts/nivo-line-chart.sc) and [maths](example-scripts/mathjax.sc)
+- notebooks with charts like [notebooks](example-scripts/nivo-line-chart.sc) and with maths like  [maths](example-scripts/mathjax.sc)
 - spark notebooks
 
 # Available UI Components
