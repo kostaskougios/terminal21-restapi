@@ -36,6 +36,24 @@ SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "sp
     */
   println(s"Cache path: ${peopleTableCalc.cachePath}")
 
+  val oldestPeopleChart = ResponsiveLine(
+    axisBottom = Some(Axis(legend = "Person", legendOffset = 36)),
+    axisLeft = Some(Axis(legend = "Age", legendOffset = -40)),
+    legends = Seq(
+      Legend()
+    )
+  )
+
+  val oldestPeopleChartCalc = peopleDS
+    .orderBy($"age".desc)
+    .visualize("Oldest people", oldestPeopleChart): data =>
+      oldestPeopleChart.data = Seq(
+        Serie(
+          "Person",
+          data = data.take(5).map(person => Datum(person.name, person.age))
+        )
+      )
+
   Seq(
     // just make it look a bit more like a proper notebook by adding some fake maths
     MathJax(
@@ -51,7 +69,8 @@ SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "sp
                      |nascetur ridiculus mus.
                      |""".stripMargin
     ),
-    peopleTableCalc
+    peopleTableCalc,
+    oldestPeopleChartCalc
   ).render()
 
   session.waitTillUserClosesSession()
@@ -60,7 +79,7 @@ object SparkNotebook:
   private val names                 = Array("Andy", "Kostas", "Alex", "Andreas", "George", "Jack")
   private val surnames              = Array("Papadopoulos", "Rex", "Dylan", "Johnson", "Regan")
   def randomName: String            = names(Random.nextInt(names.length)) + " " + surnames(Random.nextInt(surnames.length))
-  def randomPerson(id: Int): Person = Person(id, randomName, Random.nextInt(100))
+  def randomPerson(id: Int): Person = Person(id, randomName + s" ($id)", Random.nextInt(100))
 
   def createPeople(using spark: SparkSession): Dataset[Person] =
     import spark.implicits.*
