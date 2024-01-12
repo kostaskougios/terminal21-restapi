@@ -5,7 +5,7 @@ import org.terminal21.client.components.{Keys, UiElement}
 
 sealed trait MathJaxElement extends UiElement
 
-/** see https://asciimath.org/
+/** see https://asciimath.org/ and https://github.com/fast-reflexes/better-react-mathjax
   */
 case class MathJax(
     key: String = Keys.nextKey,

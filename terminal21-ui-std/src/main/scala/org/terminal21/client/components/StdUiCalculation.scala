@@ -38,6 +38,13 @@ trait StdUiCalculation[OUT](
     dataUi
   )
 
+  override def onError(t: Throwable): Unit =
+    badge.text = s"Error: ${t.getMessage}"
+    badge.colorScheme = Some("red")
+    recalc.isDisabled = None
+    session.render()
+    super.onError(t)
+
   override protected def whenResultsNotReady(): Unit =
     badge.text = "Calculating"
     badge.colorScheme = Some("purple")

@@ -26,7 +26,7 @@ case class QuickTable(
     head.children = headers.map(h => Th(children = Seq(h)))
     this
 
-  def rows(data: Seq[Seq[String]]): QuickTable = rowsElements(data.map(_.map(c => Text(text = c))))
+  def rows(data: Seq[Seq[Any]]): QuickTable = rowsElements(data.map(_.map(c => Text(text = c.toString))))
 
   def rowsElements(data: Seq[Seq[UiElement]]): QuickTable =
     body.children = data.map: row =>

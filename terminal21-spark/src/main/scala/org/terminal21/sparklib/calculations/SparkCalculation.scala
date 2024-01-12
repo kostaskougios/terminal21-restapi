@@ -3,14 +3,12 @@ package org.terminal21.sparklib.calculations
 import functions.fibers.FiberExecutor
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.SparkSession
-import org.terminal21.client.components.UiElement.HasStyle
-import org.terminal21.client.components.chakra.*
-import org.terminal21.client.components.{CachedCalculation, StdUiCalculation, UiComponent, UiElement}
 import org.terminal21.client.ConnectedSession
+import org.terminal21.client.components.UiElement.HasStyle
+import org.terminal21.client.components.{CachedCalculation, StdUiCalculation, UiComponent, UiElement}
 import org.terminal21.sparklib.util.Environment
 
 import java.io.File
-import java.util.concurrent.atomic.AtomicBoolean
 
 /** A UI component that takes a spark calculation (i.e. a spark query) that results in a Dataset. It caches the results by storing them as parquet into the tmp
   * folder/spark-calculations/$name. Next time the calculation runs it reads the cache if available. A button should allow the user to clear the cache and rerun
@@ -27,6 +25,7 @@ trait SparkCalculation[OUT: ReadWriter](name: String)(using executor: FiberExecu
   private val targetDir  = s"$rootFolder/$name"
 
   def isCached: Boolean = new File(targetDir).exists()
+  def cachePath: String = targetDir
 
   private def cache[A](reader: => A, writer: => A): A =
     if isCached then reader
