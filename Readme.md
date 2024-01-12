@@ -116,6 +116,8 @@ Generic components for buttons, menus, forms, text, grids, tables:
 Charts and visualisation:
 [Nivo](docs/nivo.md)
 
+Maths:
+[MathJax](docs/mathjax.md)
 
 # Architecture
 
