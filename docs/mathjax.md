@@ -9,7 +9,7 @@ Dependency: `io.github.kostaskougios::terminal21-mathjax:$VERSION`
 
 ### MathJax
 
-Example: [MathJax](../end-to-end-tests/src/main/scala/tests/MathJaxComponents.scala)
+Example: [mathjax.sc](../example-scripts/mathjax.sc) [MathJax](../end-to-end-tests/src/main/scala/tests/MathJaxComponents.scala)
 
 ```scala
 MathJax(
