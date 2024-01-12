@@ -6,7 +6,7 @@ Terminal 21 spark integration allows using datasets and dataframes inside termin
 It also provides caching of datasets in order for scripts to be used as notebooks. The caching
 has also a UI component to allow invalidating the cache and re-evaluating the datasets.
 
-To give it a go, please checkout this repo and try the examples:
+To give it a go, please checkout this repo and try the examples. Only requirement to do this is that you have `scala-cli` installed:
 
 ```shell
 git clone https://github.com/kostaskougios/terminal21-restapi.git
