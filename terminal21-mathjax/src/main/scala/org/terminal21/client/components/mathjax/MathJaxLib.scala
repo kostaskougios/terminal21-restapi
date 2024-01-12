@@ -6,5 +6,6 @@ import io.circe.*
 import org.terminal21.client.components.{ComponentLib, UiElement}
 
 object MathJaxLib extends ComponentLib:
+  import org.terminal21.client.components.StdElementEncoding.given
   override def toJson(using Encoder[UiElement]): PartialFunction[UiElement, Json] =
     case n: MathJaxElement => n.asJson.mapObject(o => o.add("type", "MathJax".asJson))

@@ -1065,7 +1065,7 @@ case class Image(
   */
 case class Text(
     key: String = Keys.nextKey,
-    @volatile var text: String = "text.text is empty",
+    @volatile var text: String = "text.text is empty. Did you accidentally assigned the text to the `key` field?",
     @volatile var fontSize: Option[String] = None,
     @volatile var noOfLines: Option[Int] = None,
     @volatile var color: Option[String] = None,
