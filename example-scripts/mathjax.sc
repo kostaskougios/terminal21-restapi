@@ -1,4 +1,4 @@
-//#!/usr/bin/env -S scala-cli project.scala
+#!/usr/bin/env -S scala-cli project.scala
 
 import org.terminal21.client.*
 import org.terminal21.client.components.*

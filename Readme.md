@@ -61,7 +61,7 @@ scripts with your favorite IDE. Run the scripts within the IDE and view the UI i
 
 ```shell
 ls *.sc
-bouncing-ball.sc csv-editor.sc    csv-viewer.sc    hello-world.sc   postit.sc        server.sc        textedit.sc
+bouncing-ball.sc   csv-editor.sc      csv-viewer.sc      hello-world.sc     mathjax.sc         nivo-line-chart.sc postit.sc          server.sc          textedit.sc
 ```
 
 Let's create a simple hello world script in scala-cli that uses terminal21 server to render the UI.
@@ -104,7 +104,13 @@ can be used for things like:
 - even small web based games, maybe starting with [bouncing-ball.sc](example-scripts/bouncing-ball.sc)
 - POC code at the office can be presented via a scala-cli script + terminal21 UI. The POC code can be imported as a lib in a script.
 - logs can be viewed and searched via scripts
-- ... and so on
+
+![notebooks, spark notebooks and maths](docs/images/nivo/responsiveline.png)
+![notebooks, spark notebooks and maths](docs/images/mathjax/mathjaxbig.png)
+
+- notebooks with charts, maths like [notebooks](example-scripts/nivo-line-chart.sc) and [maths](example-scripts/mathjax.sc)
+- spark notebooks
+
 # Available UI Components
 
 Standard html elements
