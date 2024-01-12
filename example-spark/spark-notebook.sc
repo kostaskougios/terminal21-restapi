@@ -27,7 +27,7 @@ SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "sp
   import spark.implicits.*
 
   // lets get a Dataset, the data are random so that when we click refresh we can see the data actually
-  // been refreshed. Better have spark code in an object to avoid accidentally capturing any script variables.
+  // been refreshed.
   val peopleDS = createPeople
 
   // We will display the data in a table
