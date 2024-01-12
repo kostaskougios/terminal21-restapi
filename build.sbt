@@ -139,12 +139,12 @@ lazy val `terminal21-ui-std` = project
   )
   .enablePlugins(FunctionsRemotePlugin)
 
-lazy val examples = project
+lazy val `end-to-end-tests` = project
   .settings(
     commonSettings,
     libraryDependencies ++= Seq(ScalaTest, LogBack)
   )
-  .dependsOn(`terminal21-ui-std`, `terminal21-nivo`)
+  .dependsOn(`terminal21-ui-std`, `terminal21-nivo`, `terminal21-mathjax`)
 
 lazy val `terminal21-nivo` = project
   .settings(
@@ -167,3 +167,12 @@ lazy val `terminal21-spark` = project
     ) ++ SparkScala3Fix
   )
   .dependsOn(`terminal21-ui-std` % "compile->compile;test->test", `terminal21-nivo` % Test)
+
+lazy val `terminal21-mathjax` = project
+  .settings(
+    commonSettings,
+    libraryDependencies ++= Seq(
+      ScalaTest
+    )
+  )
+  .dependsOn(`terminal21-ui-std` % "compile->compile;test->test")

@@ -75,7 +75,7 @@ Menu().withChildren(
 
 ### Forms
 
-see [Forms](../examples/src/main/scala/tests/chakra/Forms.scala) as an example on how to create forms.
+see [Forms](../end-to-end-tests/src/main/scala/tests/chakra/Forms.scala) as an example on how to create forms.
 
 ![Forms](images/chakra/forms.png)
 
@@ -252,7 +252,7 @@ WarningTwoIcon()
 ### Tables
 
 There are a lot of elements to create a table but `QuickTable` component also helps simplify things. First lets see the code 
-for a table [here](../examples/src/main/scala/tests/chakra/DataDisplay.scala)
+for a table [here](../end-to-end-tests/src/main/scala/tests/chakra/DataDisplay.scala)
 
 ![Table](images/chakra/table.png)
 

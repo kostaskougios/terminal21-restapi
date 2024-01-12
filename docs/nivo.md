@@ -9,13 +9,13 @@ Dependency: `io.github.kostaskougios::terminal21-nivo:$VERSION`
 
 ### ResponsiveLine
 
-Code: [ResponsiveLine](../examples/src/main/scala/tests/nivo/ResponsiveLineChart.scala)
+Code: [ResponsiveLine](../end-to-end-tests/src/main/scala/tests/nivo/ResponsiveLineChart.scala)
 
 ![RL](images/nivo/responsiveline.png)
 
 ### ResponsiveBar
 
-Code: [ResponsiveBar](../examples/src/main/scala/tests/nivo/ResponsiveBarChart.scala)
+Code: [ResponsiveBar](../end-to-end-tests/src/main/scala/tests/nivo/ResponsiveBarChart.scala)
 
 ![RB](images/nivo/responsivebar.png)
 

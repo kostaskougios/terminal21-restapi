@@ -2,7 +2,7 @@
 
 These are standard html elements but please prefer the more flexible chakra component if it exists.
 
-[Example](../examples/src/main/scala/tests/StdComponents.scala)
+[Example](../end-to-end-tests/src/main/scala/tests/StdComponents.scala)
 
 Dependency: `io.github.kostaskougios::terminal21-ui-std:$VERSION`
 
