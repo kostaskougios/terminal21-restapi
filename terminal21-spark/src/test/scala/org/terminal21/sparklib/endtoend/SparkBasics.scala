@@ -32,7 +32,7 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
       codeFilesTable.rows(dt.map(_.toData))
 
     val sortedFilesTableDF = QuickTable().headers(headers: _*).caption("Files sorted by createdDate and numOfWords ASC and as DF")
-    val sortedCalcDF       = sourceFiles()
+    val sortedCalcAsDF     = sourceFiles()
       .sort($"createdDate".asc, $"numOfWords".asc)
       .toDF()
       .visualize("Sorted files DF", sortedFilesTableDF): results =>
@@ -65,7 +65,7 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
     Seq(
       codeFilesCalculation,
       sortedCalc,
-      sortedCalcDF,
+      sortedCalcAsDF,
       sourceFileChart
     ).render()
 

@@ -1,4 +1,12 @@
-//#!/usr/bin/env -S scala-cli project.scala
+#!/usr/bin/env -S scala-cli --restart project.scala
+
+/**
+ * note we use the --restart param for scala-cli. This means every time we change this file, scala-cli will terminate
+ * and rerun it with the changes. This way we get the notebook feel when we use spark scripts.
+ *
+ * terminal21 spark lib caches datasets by storing them into disk. This way complex queries won't have to be re-evaluated
+ * on each restart of the script. We can force re-evaluation by clicking the "Recalculate" buttons in the UI.
+ */
 
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.terminal21.client.components.*
@@ -12,7 +20,7 @@ import scala.util.Random
 import SparkNotebook.*
 import org.terminal21.client.components.mathjax.{MathJax, MathJaxLib}
 
-SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-basics", "Spark Basics", NivoLib, MathJaxLib): (spark, session) =>
+SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-notebook", "Spark Notebook", NivoLib, MathJaxLib): (spark, session) =>
   given ConnectedSession = session
   given SparkSession     = spark
   import scala3encoders.given
@@ -25,7 +33,7 @@ SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "sp
   // We will display the data in a table
   val peopleTable = QuickTable().headers("Id", "Name", "Age").caption("People")
 
-  val peopleTableCalc = peopleDS.visualize("People sample", peopleTable): data =>
+  val peopleTableCalc = peopleDS.sort($"id").visualize("People sample", peopleTable): data =>
     peopleTable.rows(data.take(10).map(p => Seq(p.id, p.name, p.age)))
 
   /** The calculation above uses a directory to store the dataset results. This way we can restart this script without loosing datasets that may take long to
@@ -39,9 +47,7 @@ SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "sp
   val oldestPeopleChart = ResponsiveLine(
     axisBottom = Some(Axis(legend = "Person", legendOffset = 36)),
     axisLeft = Some(Axis(legend = "Age", legendOffset = -40)),
-    legends = Seq(
-      Legend()
-    )
+    legends = Seq(Legend())
   )
 
   val oldestPeopleChartCalc = peopleDS

@@ -13,7 +13,7 @@ case class CodeFile(id: Int, name: String, path: String, numOfLines: Int, numOfW
 object CodeFile:
   import scala.jdk.CollectionConverters.*
   def scanSourceFiles: Seq[CodeFile] =
-    val availableFiles = FileUtils.listFiles(new File(".."), Array("scala"), true).asScala.toList
+    val availableFiles = FileUtils.listFiles(new File(".."), Array("scala"), true).asScala.filterNot(_.getPath.contains("/.scala-build/")).toList
     availableFiles.zipWithIndex.map: (f, i) =>
       val code = Files.readString(f.toPath)
       CodeFile(

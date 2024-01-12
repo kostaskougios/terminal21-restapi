@@ -37,5 +37,5 @@ object Sessions:
       try {
         f(connectedSession)
       } finally
-        if !isStopped.get() then sessionsService.terminateSession(session)
+        if !isStopped.get() && !connectedSession.isLeaveSessionOpen then sessionsService.terminateSession(session)
         listener.close()

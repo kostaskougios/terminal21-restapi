@@ -10,6 +10,7 @@ import org.terminal21.client.components.UiElementEncoding
 import org.terminal21.model.*
 import org.terminal21.ui.std.SessionsService
 
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 import scala.annotation.tailrec
 
@@ -47,6 +48,15 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   def waitTillUserClosesSession(): Unit =
     try exitLatch.await()
     catch case _: Throwable => () // nop
+
+  private val leaveSessionOpen = new AtomicBoolean(false)
+
+  /** Doesn't close the session upon exiting. In the UI the session seems active but events are not working because the event handlers are not available.
+    */
+  def leaveSessionOpenAfterExiting(): Unit =
+    leaveSessionOpen.set(true)
+
+  def isLeaveSessionOpen: Boolean = leaveSessionOpen.get()
 
   /** Waits till user closes the session or a custom condition becomes true
     * @param condition
