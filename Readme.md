@@ -1,5 +1,6 @@
 Note: for Table Of Contents, just click the burger icon top right of this document, just above this text on the right.
 
+![artifact](https://img.shields.io/maven-central/v/io.github.kostaskougios/terminal21-server_3)
 # Terminal 21
 
 Terminal 21 is a library and server that give scala command line programs (i.e. scala-cli scripts) the ability to easily
