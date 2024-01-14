@@ -25,14 +25,6 @@ cd terminal21-restapi/example-spark
 Leave `spark-notebook.sc` running and edit it with your preferred editor. When you save your changes, it will automatically be rerun and
 the changes will be reflected in the UI.
 
-## Using terminal21 as notebook within an ide
-
-Create a scala project (i.e. using sbt), add the terminal21 dependencies and run the terminal21 server. Create your notebook code, i.e.
-see [SparkBasics](../terminal21-spark/src/test/scala/org/terminal21/sparklib/endtoend/SparkBasics.scala). Run it. Let it run while
-you interact with the UI. Change the code and rerun it. Click "Recalculate" if you want the datasets to be re-evaluated.
-
-![SparkBasics](images/spark/sparkbasics.png)
-
 ## Using terminal21 as notebook with scala-cli
 
 See [spark-notebook.sc](../example-spark/spark-notebook.sc).
@@ -41,3 +33,11 @@ whenever a change in the file is detected. Edit the script with your favorite ID
 re-run. If you want to re-evaluate the datasets, click "Recalculate" on the UI components.
 
 ![SparkNotebook](images/spark/spark-notebook.png)
+
+## Using terminal21 as notebook within an ide
+
+Create a scala project (i.e. using sbt), add the terminal21 dependencies and run the terminal21 server. Create your notebook code, i.e.
+see [SparkBasics](../terminal21-spark/src/test/scala/org/terminal21/sparklib/endtoend/SparkBasics.scala). Run it. Let it run while
+you interact with the UI. Change the code and rerun it. Click "Recalculate" if you want the datasets to be re-evaluated.
+
+![SparkBasics](images/spark/sparkbasics.png)
