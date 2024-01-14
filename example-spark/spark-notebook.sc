@@ -8,7 +8,8 @@
  * on each restart of the script. We can force re-evaluation by clicking the "Recalculate" buttons in the UI.
  */
 
-import org.apache.spark.sql.{Dataset, SparkSession}
+// We need these imports
+import org.apache.spark.sql.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.nivo.*
@@ -20,7 +21,7 @@ import scala.util.Random
 import SparkNotebook.*
 import org.terminal21.client.components.mathjax.{MathJax, MathJaxLib}
 
-SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(), "spark-notebook", "Spark Notebook", NivoLib, MathJaxLib): (spark, session) =>
+SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(/* configure your spark session here */), "spark-notebook", "Spark Notebook", NivoLib, MathJaxLib): (spark, session) =>
   given ConnectedSession = session
   given SparkSession     = spark
   import scala3encoders.given
