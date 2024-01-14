@@ -22,7 +22,7 @@ class CalculationTest extends AnyFunSuiteLike:
 
   test("calculates"):
     val calc = new Calc
-    calc.run() should be(2)
+    calc.run().get() should be(2)
 
   test("calls whenResultsNotReady"):
     val calc = new Calc
