@@ -4,8 +4,6 @@
 // A quick and dirty casv file editor for small csv files.
 // ------------------------------------------------------------------------------
 
-//> using dep commons-io:commons-io:2.15.1
-
 // always import these
 import org.terminal21.client.*
 // std components, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala

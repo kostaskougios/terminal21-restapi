@@ -30,3 +30,6 @@ object UiElement:
 
   trait HasEventHandler:
     def defaultEventHandler: EventHandler
+
+  trait HasStyle:
+    var style: Map[String, Any]

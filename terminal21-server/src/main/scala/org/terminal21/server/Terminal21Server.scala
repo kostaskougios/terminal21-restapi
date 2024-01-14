@@ -29,7 +29,7 @@ object Terminal21Server:
 
       if !server.isRunning then throw new IllegalStateException("Server failed to start")
       try
-        logger.info(s"Terminal 21 Server started and listening on http://localhost:$portV")
+        logger.info(s"Terminal 21 Server started. Please open http://localhost:$portV/ui for the user interface")
         val hostname = InetAddress.getLocalHost.getHostName
         logger.info(s"""
              |Files under ~/.terminal21/web will be served under /web

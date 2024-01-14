@@ -3,7 +3,7 @@
   */
 val scala3Version = "3.3.1"
 
-ThisBuild / version      := "0.1"
+ThisBuild / version      := "0.11"
 ThisBuild / organization := "io.github.kostaskougios"
 name                     := "rest-api"
 ThisBuild / scalaVersion := scala3Version
@@ -43,8 +43,15 @@ val HelidonClientWebSocket = "io.helidon.webclient" % "helidon-webclient-websock
 val HelidonClient          = "io.helidon.webclient" % "helidon-webclient-http2"          % HelidonVersion
 val HelidonServerLogging   = "io.helidon.logging"   % "helidon-logging-jul"              % HelidonVersion
 
-val LogBack        = "ch.qos.logback" % "logback-classic" % "1.4.14"
-val Slf4jApi       = "org.slf4j"      % "slf4j-api"       % "2.0.9"
+val LogBack  = "ch.qos.logback" % "logback-classic" % "1.4.14"
+val Slf4jApi = "org.slf4j"      % "slf4j-api"       % "2.0.9"
+
+val SparkSql = ("org.apache.spark" %% "spark-sql" % "3.5.0" % "provided").cross(CrossVersion.for3Use2_13).exclude("org.scala-lang.modules", "scala-xml_2.13")
+val SparkScala3Fix = Seq(
+  "io.github.vincenzobaz" %% "spark-scala3-encoders" % "0.2.5",
+  "io.github.vincenzobaz" %% "spark-scala3-udf"      % "0.2.5"
+).map(_.exclude("org.scala-lang.modules", "scala-xml_2.13"))
+
 // -----------------------------------------------------------------------------------------------
 // Modules
 // -----------------------------------------------------------------------------------------------
@@ -132,9 +139,40 @@ lazy val `terminal21-ui-std` = project
   )
   .enablePlugins(FunctionsRemotePlugin)
 
-lazy val examples = project
+lazy val `end-to-end-tests` = project
   .settings(
     commonSettings,
     libraryDependencies ++= Seq(ScalaTest, LogBack)
   )
-  .dependsOn(`terminal21-ui-std`)
+  .dependsOn(`terminal21-ui-std`, `terminal21-nivo`, `terminal21-mathjax`)
+
+lazy val `terminal21-nivo` = project
+  .settings(
+    commonSettings,
+    libraryDependencies ++= Seq(
+      ScalaTest
+    )
+  )
+  .dependsOn(`terminal21-ui-std` % "compile->compile;test->test")
+
+lazy val `terminal21-spark` = project
+  .settings(
+    commonSettings,
+    Test / fork := true,
+    Test / javaOptions ++= Seq("--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED"),
+    libraryDependencies ++= Seq(
+      ScalaTest,
+      SparkSql,
+      LogBack % Test
+    ) ++ SparkScala3Fix
+  )
+  .dependsOn(`terminal21-ui-std` % "compile->compile;test->test", `terminal21-nivo` % Test)
+
+lazy val `terminal21-mathjax` = project
+  .settings(
+    commonSettings,
+    libraryDependencies ++= Seq(
+      ScalaTest
+    )
+  )
+  .dependsOn(`terminal21-ui-std` % "compile->compile;test->test")

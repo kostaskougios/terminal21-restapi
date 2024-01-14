@@ -6,13 +6,15 @@ import io.circe.syntax.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.UiElement.{HasEventHandler, allDeep}
-import org.terminal21.client.components.UiElementEncoding.uiElementEncoder
+import org.terminal21.client.components.UiElementEncoding
 import org.terminal21.model.*
 import org.terminal21.ui.std.SessionsService
 
-import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.{CountDownLatch, TimeUnit}
+import scala.annotation.tailrec
 
-class ConnectedSession(val session: Session, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
+class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
   private val logger   = LoggerFactory.getLogger(getClass)
   private var elements = List.empty[UiElement]
 
@@ -39,12 +41,39 @@ class ConnectedSession(val session: Session, val serverUrl: String, sessionsServ
     val handlers = eventHandlers.getOrElse(key, Nil)
     eventHandlers += key -> (handlers :+ handler)
 
-  private val exitLatch                 = new CountDownLatch(1)
+  private val exitLatch = new CountDownLatch(1)
+
+  /** Waits till user closes the session by clicking the session close [X] button.
+    */
   def waitTillUserClosesSession(): Unit =
     try exitLatch.await()
     catch case _: Throwable => () // nop
 
-  def fireEvent(event: CommandEvent): Unit =
+  private val leaveSessionOpen = new AtomicBoolean(false)
+
+  /** Doesn't close the session upon exiting. In the UI the session seems active but events are not working because the event handlers are not available.
+    */
+  def leaveSessionOpenAfterExiting(): Unit =
+    leaveSessionOpen.set(true)
+
+  def isLeaveSessionOpen: Boolean = leaveSessionOpen.get()
+
+  /** Waits till user closes the session or a custom condition becomes true
+    * @param condition
+    *   if true then this returns otherwise it waits.
+    */
+  @tailrec final def waitTillUserClosesSessionOr(condition: => Boolean): Unit =
+    exitLatch.await(100, TimeUnit.MILLISECONDS)
+    if exitLatch.getCount == 0 || condition then () else waitTillUserClosesSessionOr(condition)
+
+  /** @return
+    *   true if user closed the session via the close button
+    */
+  def isClosed: Boolean = exitLatch.getCount == 0
+
+  def click(e: UiElement): Unit = fireEvent(OnClick(e.key))
+
+  private[client] def fireEvent(event: CommandEvent): Unit =
     event match
       case SessionClosed(_) =>
         exitLatch.countDown()
@@ -65,8 +94,11 @@ class ConnectedSession(val session: Session, val serverUrl: String, sessionsServ
     val j = toJson
     sessionsService.setSessionJsonState(session, j.toJson.noSpaces)
 
+  def allElements: Seq[UiElement] = synchronized(elements)
+
   private def toJson: JsonObject =
-    val elementsCopy = synchronized(elements)
+    import encoding.given
+    val elementsCopy = allElements
     val json         =
       for e <- elementsCopy
       yield e.asJson.deepDropNullValues

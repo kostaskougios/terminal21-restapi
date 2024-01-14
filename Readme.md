@@ -1,3 +1,6 @@
+Note: for Table Of Contents, just click the burger icon top right of this document, just above this text on the right.
+
+![artifact](https://img.shields.io/maven-central/v/io.github.kostaskougios/terminal21-server_3)
 # Terminal 21
 
 Terminal 21 is a library and server that give scala command line programs (i.e. scala-cli scripts) the ability to easily
@@ -6,15 +9,61 @@ of what can be done at the [terminal 21 youtube channel](https://www.youtube.com
 
 For scala 3 and jdk21 or better. If you have scala-cli installed, you won't need to download scala 3 or jdk21, see below for instructions on how to quickly start with terminal21.
 
-Terminal21 consist of :
-- a web server that can be easily deployed on your laptop, home network etc 
-- scala apps (scala-cli/ammonite scripts or just normal scala apps) that use the terminal21 UI libs to create user interfaces
+Note: feel free to ask questions in the "Discussions" board at the top of this github page.
 
-The terminal21 libs have a websocket open with the server, and they send / receive instructions and events. Similarly, the server
-has a websocket open with the React frontend to do the same. Events like clicks or changes to input boxes instantly update
-the state in the client scripts.
+# Quick start with terminal21
 
-The best and easiest way to start with terminal 21 is via scala-cli and a simple example.
+The easiest way to start with terminal21 is to clone this repository. There is a scala-cli
+script that starts the server (all deps and jdk21 will be downloaded automatically by scala-cli).
+
+```shell
+git clone https://github.com/kostaskougios/terminal21-restapi.git
+cd terminal21-restapi/example-scripts
+
+# start the server
+./server.sc
+# ... it will download dependencies & jdk and start the server.
+```
+Now open your browser to http://localhost:8080/ui/ . You'll have the terminal21 UI, will be a bit empty for now, just the settings tab. But we will shortly run some scripts with UI's.
+
+Let's run some example scripts. All scripts use [project.scala](example-scripts/project.scala) with some common settings and dependencies.
+
+Start with a hello world example:
+
+[hello-world.sc](example-scripts/hello-world.sc)
+
+Run it
+```shell
+./hello-world.sc
+```
+
+and check your browser. Changes in the terminal21 UI will reflect instantly.
+
+And then continue with a more complicated csv editor:
+
+[csv-editor.sc](example-scripts/csv-editor.sc) : edit csv files.
+
+```shell
+./csv-editor.sc -- /tmp/wargame.csv
+```
+(note the "--": this is a scala-cli parameter needed before passing actual arguments to a script. The actual argument is the csv filename.)
+
+Terminal21 UI will now have the csv editor's tab:
+![csv editor](docs/images/csv-editor.png)
+
+If we click in a cell, we will be able to change a value. And then use the "Save & Exit" button to save the file and exit.
+
+![csv editor](docs/images/csv-editor-change.png)
+
+Now feel free to examine and run the rest of the scripts or create your own! You can have the server running and develop your
+scripts with your favorite IDE. Run the scripts within the IDE and view the UI in a browser.
+
+# Example scripts
+
+```shell
+ls *.sc
+bouncing-ball.sc   csv-editor.sc      csv-viewer.sc      hello-world.sc     mathjax.sc         nivo-line-chart.sc postit.sc          server.sc          textedit.sc
+```
 
 Let's create a simple hello world script in scala-cli that uses terminal21 server to render the UI.
 
@@ -56,47 +105,86 @@ can be used for things like:
 - even small web based games, maybe starting with [bouncing-ball.sc](example-scripts/bouncing-ball.sc)
 - POC code at the office can be presented via a scala-cli script + terminal21 UI. The POC code can be imported as a lib in a script.
 - logs can be viewed and searched via scripts
-- ... and so on
 
-# Quick start with terminal21
+![notebooks, spark notebooks and maths](docs/images/nivo/responsiveline.png)
+![notebooks, spark notebooks and maths](docs/images/mathjax/mathjaxbig.png)
 
-The easiest way to start with terminal21 is to clone this repository. There is a scala-cli
-script that starts the server (all deps and jdk21 will be downloaded automatically by scala-cli).
+- notebooks with charts like [notebooks](example-scripts/nivo-line-chart.sc) and with maths like  [maths](example-scripts/mathjax.sc)
+- spark notebooks like [spark-notebook.sc](example-spark/spark-notebook.sc)
 
-```shell
-git clone https://github.com/kostaskougios/terminal21-restapi.git
-cd terminal21-restapi/example-scripts
+# Available UI Components
 
-# start the server
-./server.sc
-# ... it will download dependencies & jdk and start the server.
+Standard html elements
+[Std](docs/std.md)
+
+Generic components for buttons, menus, forms, text, grids, tables:
+[Chakra](docs/chakra.md)
+
+Charts and visualisation:
+[Nivo](docs/nivo.md)
+
+Maths:
+[MathJax](docs/mathjax.md)
+
+Spark:
+[Spark](docs/spark.md)
+# Architecture
+
+Terminal21 consist of :
+- a scala/react based web server that can be easily deployed on your laptop, home network etc
+- scala apps (scala-cli/ammonite scripts or just normal scala apps) that use the terminal21 UI libs to create user interfaces
+
+The terminal21 libs have a websocket open with the server, and they send / receive instructions and events. Similarly, the server
+has a websocket open with the React frontend on the browser to do the same. Events like clicks or changes to input boxes instantly update
+the state in the client scripts.
+
+![architecture](docs/images/terminal21-architecture.png)
+
+# Mutability
+
+terminal21 ui components are mutable. This is a decision choice (for now) because of how much more simple code is this way. I.e.
+changing the text of a paragraph on an event handler is as simple as :
+
+```scala
+    p.text = "new text"
 ```
-Now open your browser to http://localhost:8080/ui/ . You'll have the terminal21 UI, will be a bit empty for now, just the settings tab. But we will shortly run some scripts with UI's. 
 
-Let's run some example scripts. All scripts use project.scala with some common settings and dependencies.
-
-[csv-editor.sc](example-scripts/csv-editor.sc) : edit csv files.
-
-```shell
-./csv-editor.sc -- /tmp/wargame.csv
+The equivalent immutable code would be (at least) 
+```scala
+    p.copy(text= "new text")
 ```
-(note the "--": this is a scala-cli parameter needed before passing actual arguments to a script. The actual argument is the csv filename.)
 
-Terminal21 UI will now have the csv editor's tab:
-![csv editor](docs/images/csv-editor.png)
+Also by default some component values (like input boxes) are changed by the user. These changes are reflected in the component graph, something that
+would be a lot harder if the graph was immutable.
 
-If we click in a cell, we will be able to change a value. And then use the "Save & Exit" button to save the file and exit.
-
-![csv editor](docs/images/csv-editor-change.png)
-
-Now feel free to examine and run the rest of the scripts or create your own! I found out MS code works better for scala-cli scripts but
-please make sure you include the terminal21 libs in the script rather than in `project.scala`. This will make autocomplete work better.
-
-```shell
-ls *.sc
-bouncing-ball.sc csv-editor.sc    csv-viewer.sc    hello-world.sc   postit.sc        server.sc        textedit.sc
-```
+If there is a reasonable way to refactor to have immutability without compromising simplicity, it will be done.
 
 # Need help?
 
-Please use the discussions of the project to post any questions, comments or ideas.
+Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi/discussions) of the project to post any questions, comments or ideas.
+
+# Changelog
+
+## Version 0.11
+
+- Quick* classes to simplify UI creation
+- A few Nivo visualisation components
+- spark integration, terminal21 acts as a spark notebook
+- ui component documentation
+
+## Version 0.1
+
+- initial release with std and chakra components
+
+
+# Our thanks
+
+![yourkit](https://www.yourkit.com/images/yklogo.png)
+
+To yourkit for their excellent profiler.
+
+YourKit supports open source projects with innovative and intelligent tools
+for monitoring and profiling Java and .NET applications.
+YourKit is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/profiler/),
+[YourKit .NET Profiler](https://www.yourkit.com/dotnet-profiler/),
+and [YourKit YouMonitor](https://www.yourkit.com/youmonitor/).
