@@ -1,7 +1,7 @@
 #!/usr/bin/env -S scala-cli project.scala
 
 // ------------------------------------------------------------------------------
-// A quick and dirty casv file editor for small csv files.
+// A quick and dirty csv file editor for small csv files.
 // ------------------------------------------------------------------------------
 
 // always import these
