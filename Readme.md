@@ -3,6 +3,8 @@ Note: for Table Of Contents, just click the burger icon top right of this docume
 ![artifact](https://img.shields.io/maven-central/v/io.github.kostaskougios/terminal21-server_3)
 # Terminal 21
 
+Scala terminal apps for the 21st century.
+
 Terminal 21 is a library and server that give scala command line programs (i.e. scala-cli scripts) the ability to easily
 create web user interface (which is based on react and components like chakra etc). See a couple of quick presentations
 of what can be done at the [terminal 21 youtube channel](https://www.youtube.com/@terminal21-gf1oh/videos).
