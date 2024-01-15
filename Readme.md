@@ -15,8 +15,8 @@ Note: feel free to ask questions in the [Discussions board](https://github.com/k
 
 # Quick start with terminal21
 
-The easiest way to start with terminal21 is to clone this repository. There is a scala-cli
-script that starts the server (all deps and jdk21 will be downloaded automatically by scala-cli).
+The easiest way to start with terminal21 is to clone this repository. There is a [scala-cli script that starts the server](example-scripts/server.sc)
+(all deps and jdk21 will be downloaded automatically by scala-cli).
 
 ```shell
 git clone https://github.com/kostaskougios/terminal21-restapi.git
