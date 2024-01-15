@@ -122,7 +122,7 @@ Standard html elements
 Generic components for buttons, menus, forms, text, grids, tables:
 [Chakra](docs/chakra.md)
 
-"Quick" classes to simplify complicated UI's like tables
+"Quick" classes to simplify complicated UI's like tables:
 [Quick Classes](docs/quick.md)
 
 Charts and visualisation:
