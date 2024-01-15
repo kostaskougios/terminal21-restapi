@@ -11,7 +11,7 @@ of what can be done at the [terminal 21 youtube channel](https://www.youtube.com
 
 For scala 3 and jdk21 or better. If you have scala-cli installed, you won't need to download scala 3 or jdk21, see below for instructions on how to quickly start with terminal21.
 
-Note: feel free to ask questions in the [Discussions board](discussions).
+Note: feel free to ask questions in the [Discussions board](https://github.com/kostaskougios/terminal21-restapi/discussions).
 
 # Quick start with terminal21
 
