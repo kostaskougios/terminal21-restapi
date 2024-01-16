@@ -5,6 +5,7 @@ import io.circe.generic.auto.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, allDeep}
 import org.terminal21.client.components.{UiElement, UiElementEncoding}
+import org.terminal21.client.internal.ElementTree
 import org.terminal21.model.*
 import org.terminal21.ui.std.{ServerJson, SessionsService}
 
@@ -13,35 +14,16 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
 import scala.annotation.tailrec
 
 class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
-  private val logger        = LoggerFactory.getLogger(getClass)
-  private var elements      = List.empty[UiElement]
-  private var containedKeys = Set.empty[String]
+  private val logger      = LoggerFactory.getLogger(getClass)
+  private val elementTree = new ElementTree
 
   def uiUrl: String = serverUrl + "/ui"
-  def clear(): Unit = synchronized:
-    elements = Nil
-    eventHandlers.clear()
-    containedKeys = Set.empty
+  def clear(): Unit = elementTree.clear()
 
-  def add(es: UiElement*): Unit = synchronized:
-    for e <- es do if containedKeys.contains(e.key) then throw new IllegalArgumentException(s"Key ${e.key} already added. Component: $e")
+  def add(es: UiElement*): Unit =
+    elementTree.add(es)
 
-    val all        = allDeep(es)
-    containedKeys = containedKeys ++ all.map(_.key)
-    val withEvents = all.collect:
-      case h: HasEventHandler => h
-    for e <- withEvents do addEventHandlerAtTheTop(e.key, e.defaultEventHandler)
-    elements = elements ::: es.toList
-
-  private val eventHandlers = collection.concurrent.TrieMap.empty[String, List[EventHandler]]
-
-  private def addEventHandlerAtTheTop(key: String, handler: EventHandler): Unit =
-    val handlers = eventHandlers.getOrElse(key, Nil)
-    eventHandlers += key -> (handler :: handlers)
-
-  def addEventHandler(key: String, handler: EventHandler): Unit =
-    val handlers = eventHandlers.getOrElse(key, Nil)
-    eventHandlers += key -> (handlers :+ handler)
+  def addEventHandler(key: String, handler: EventHandler): Unit = elementTree.addEventHandler(key, handler)
 
   private val exitLatch = new CountDownLatch(1)
 
@@ -81,7 +63,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
         exitLatch.countDown()
         onCloseHandler()
       case _                =>
-        eventHandlers.get(event.key) match
+        elementTree.getEventHandler(event.key) match
           case Some(handlers) =>
             for handler <- handlers do
               (event, handler) match
@@ -97,11 +79,11 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     sessionsService.setSessionJsonState(session, j)
 
   def renderChanges(es: UiElement*): Unit =
-    for e <- es do if !containedKeys.contains(e.key) then throw new IllegalArgumentException(s"Element $es is not added to the session")
+    for e <- es do if !elementTree.containsKey(e.key) then throw new IllegalArgumentException(s"Element $es is not added to the session")
     val j = toJson(es)
     sessionsService.changeSessionJsonState(session, j)
 
-  def allElements: Seq[UiElement] = synchronized(elements)
+  def allElements: Seq[UiElement] = elementTree.allElements
 
   private def toJson: ServerJson = toJson(allElements)
 
