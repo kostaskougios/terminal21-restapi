@@ -34,7 +34,8 @@ class ClientEventsWsListener(wsClient: WsClient, session: ConnectedSession, exec
             logger.error(s"An invalid json was received as an event. error = $e")
           case Right(event) =>
             executor.submit:
-              session.fireEvent(event)
+              try session.fireEvent(event)
+              catch case t: Throwable => logger.error("An error occurred while an event was fired", t)
 
   def close(): Unit =
     eventsListener.close()

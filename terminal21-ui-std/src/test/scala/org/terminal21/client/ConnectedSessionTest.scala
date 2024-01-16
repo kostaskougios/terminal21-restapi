@@ -36,3 +36,19 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
         Map(p1.key -> Seq(span1.key), span1.key             -> Nil)
       )
     )
+
+  test("renderChanges"):
+    val (sessionService, connectedSession) = ConnectedSessionMock.newConnectedSessionAndSessionServiceMock
+
+    val p1    = Paragraph(text = "p1")
+    val span1 = Span(text = "span1")
+    connectedSession.add(p1)
+    connectedSession.renderChanges(p1.withChildren(span1))
+    verify(sessionService).changeSessionJsonState(
+      connectedSession.session,
+      ServerJson(
+        Seq(p1.key),
+        Map(p1.key -> encoder(p1.copyNoChildren), span1.key -> encoder(span1)),
+        Map(p1.key -> Seq(span1.key), span1.key             -> Nil)
+      )
+    )

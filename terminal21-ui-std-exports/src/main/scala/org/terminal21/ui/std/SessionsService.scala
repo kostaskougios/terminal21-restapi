@@ -9,3 +9,4 @@ trait SessionsService:
   def terminateSession(session: Session): Unit
 
   def setSessionJsonState(session: Session, state: ServerJson): Unit
+  def changeSessionJsonState(session: Session, state: ServerJson): Unit

@@ -19,20 +19,20 @@ object Overlay:
             MenuItem(text = "Download menu-download")
               .onClick: () =>
                 box1.text = "'Download' clicked"
-                session.render()
+                box1.renderChanges()
             ,
             MenuItem(text = "Copy").onClick: () =>
               box1.text = "'Copy' clicked"
-              session.render()
+              box1.renderChanges()
             ,
             MenuItem(text = "Paste").onClick: () =>
               box1.text = "'Paste' clicked"
-              session.render()
+              box1.renderChanges()
             ,
             MenuDivider(),
             MenuItem(text = "Exit").onClick: () =>
               box1.text = "'Exit' clicked"
-              session.render()
+              box1.renderChanges()
           )
         ),
         box1

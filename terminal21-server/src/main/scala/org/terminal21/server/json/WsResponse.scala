@@ -8,3 +8,5 @@ sealed trait WsResponse
 case class SessionsWsResponse(sessions: Seq[Session]) extends WsResponse
 
 case class StateWsResponse(session: Session, sessionState: ServerJson) extends WsResponse
+
+case class StateChangeWsResponse(session: Session, sessionStateChange: ServerJson) extends WsResponse

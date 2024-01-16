@@ -10,6 +10,11 @@ trait UiElement:
     session.add(this)
     session.render()
 
+  /** Renders any changes for this element and it's children (if any). The element must previously have been added to the session.
+    */
+  def renderChanges()(using session: ConnectedSession): Unit =
+    session.renderChanges(this)
+
 object UiElement:
   def allDeep(elements: Seq[UiElement]): Seq[UiElement] =
     elements ++ elements

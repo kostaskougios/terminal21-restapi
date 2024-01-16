@@ -15,7 +15,7 @@ class ServerSessionsService extends SessionsService:
   private val sessions = collection.concurrent.TrieMap.empty[Session, SessionState]
 
   private val sessionChangeNotificationRegistry      = new NotificationRegistry[Seq[Session]]
-  private val sessionStateChangeNotificationRegistry = new NotificationRegistry[(Session, SessionState)]
+  private val sessionStateChangeNotificationRegistry = new NotificationRegistry[(Session, SessionState, Option[ServerJson])]
 
   def sessionById(sessionId: String): Session =
     sessions.keys.find(_.id == sessionId).getOrElse(throw new IllegalArgumentException(s"Invalid session id = $sessionId"))
@@ -45,16 +45,23 @@ class ServerSessionsService extends SessionsService:
 
   def allSessions: Seq[Session] = sessions.keySet.toList
 
-  def notifyMeWhenSessionChanges(f: ListenerFunction[(Session, SessionState)]): Unit =
+  def notifyMeWhenSessionChanges(f: ListenerFunction[(Session, SessionState, Option[ServerJson])]): Unit =
     sessionStateChangeNotificationRegistry.add(f)
-    for (session, state) <- sessions do f(session, state)
+    for (session, state) <- sessions do f(session, state, None)
 
   override def setSessionJsonState(session: Session, newStateJson: ServerJson): Unit =
     val oldV = sessions(session)
     val newV = oldV.withNewState(newStateJson)
     sessions += session -> newV
-    sessionStateChangeNotificationRegistry.notifyAll((session, newV))
+    sessionStateChangeNotificationRegistry.notifyAll((session, newV, None))
     logger.info(s"Session $session new state $newStateJson")
+
+  override def changeSessionJsonState(session: Session, change: ServerJson): Unit =
+    val oldV = sessions(session)
+    val newV = oldV.withNewState(oldV.json.include(change))
+    sessions += session -> newV
+    sessionStateChangeNotificationRegistry.notifyAll((session, newV, Some(change)))
+    logger.info(s"Session $session change $change")
 
   def addEvent(event: UiEvent): Unit =
     val e = event match

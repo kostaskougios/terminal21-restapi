@@ -2,11 +2,9 @@ package org.terminal21.client
 
 import io.circe.*
 import io.circe.generic.auto.*
-import io.circe.syntax.*
 import org.slf4j.LoggerFactory
-import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, allDeep}
-import org.terminal21.client.components.UiElementEncoding
+import org.terminal21.client.components.{UiElement, UiElementEncoding}
 import org.terminal21.model.*
 import org.terminal21.ui.std.{ServerJson, SessionsService}
 
@@ -15,21 +13,25 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
 import scala.annotation.tailrec
 
 class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
-  private val logger   = LoggerFactory.getLogger(getClass)
-  private var elements = List.empty[UiElement]
+  private val logger        = LoggerFactory.getLogger(getClass)
+  private var elements      = List.empty[UiElement]
+  private var containedKeys = Set.empty[String]
 
   def uiUrl: String = serverUrl + "/ui"
   def clear(): Unit = synchronized:
     elements = Nil
+    eventHandlers.clear()
+    containedKeys = Set.empty
 
-  def add(es: UiElement*): Unit =
-    val withEvents = allDeep(es).collect:
+  def add(es: UiElement*): Unit = synchronized:
+    for e <- es do if containedKeys.contains(e.key) then throw new IllegalArgumentException(s"Key ${e.key} already added. Component: $e")
+
+    val all        = allDeep(es)
+    containedKeys = containedKeys ++ all.map(_.key)
+    val withEvents = all.collect:
       case h: HasEventHandler => h
-
     for e <- withEvents do addEventHandlerAtTheTop(e.key, e.defaultEventHandler)
-
-    synchronized:
-      elements = elements ::: es.toList
+    elements = elements ::: es.toList
 
   private val eventHandlers = collection.concurrent.TrieMap.empty[String, List[EventHandler]]
 
@@ -94,10 +96,16 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     val j = toJson
     sessionsService.setSessionJsonState(session, j)
 
+  def renderChanges(e: UiElement): Unit =
+    if !containedKeys.contains(e.key) then throw new IllegalArgumentException(s"Element $e is not added to the session")
+    val j = toJson(Seq(e))
+    sessionsService.changeSessionJsonState(session, j)
+
   def allElements: Seq[UiElement] = synchronized(elements)
 
-  private def toJson =
-    import encoding.given
+  private def toJson: ServerJson = toJson(allElements)
+
+  private def toJson(elements: Seq[UiElement]): ServerJson =
     val flat = elements.flatMap(_.flat)
     ServerJson(
       elements.map(_.key),
