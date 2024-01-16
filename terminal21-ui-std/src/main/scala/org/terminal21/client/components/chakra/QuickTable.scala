@@ -23,7 +23,7 @@ case class QuickTable(
 
   def headers(headers: String*): QuickTable            = headersElements(headers.map(h => Text(text = h)): _*)
   def headersElements(headers: UiElement*): QuickTable =
-    head.children = headers.map(h => Th(children = Seq(h)))
+    head.children = Seq(Tr(children = headers.map(h => Th(children = Seq(h)))))
     this
 
   def rows(data: Seq[Seq[Any]]): QuickTable = rowsElements(data.map(_.map(c => Text(text = c.toString))))
