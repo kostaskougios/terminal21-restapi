@@ -1,11 +1,17 @@
 package org.terminal21.client
 
+import org.mockito.Mockito
+import org.mockito.Mockito.verify
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
+import org.terminal21.client.ConnectedSessionMock.encoder
+import org.terminal21.client.components.{Paragraph, Span}
 import org.terminal21.client.components.chakra.Editable
 import org.terminal21.model.OnChange
+import org.terminal21.ui.std.ServerJson
 
 class ConnectedSessionTest extends AnyFunSuiteLike:
+
   test("default event handlers are invoked before user handlers"):
     given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
     val editable                             = Editable()
@@ -14,3 +20,19 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
 
     connectedSession.add(editable)
     connectedSession.fireEvent(OnChange(editable.key, "new value"))
+
+  test("to server json"):
+    val (sessionService, connectedSession) = ConnectedSessionMock.newConnectedSessionAndSessionServiceMock
+
+    val p1    = Paragraph(text = "p1")
+    val span1 = Span(text = "span1")
+    connectedSession.add(p1.withChildren(span1))
+    connectedSession.render()
+    verify(sessionService).setSessionJsonState(
+      connectedSession.session,
+      ServerJson(
+        Seq(p1.key),
+        Map(p1.key -> encoder(p1.copyNoChildren), span1.key -> encoder(span1)),
+        Map(p1.key -> Seq(span1.key), span1.key             -> Nil)
+      )
+    )

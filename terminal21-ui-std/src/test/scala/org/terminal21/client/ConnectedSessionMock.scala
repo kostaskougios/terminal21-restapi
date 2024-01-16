@@ -6,6 +6,11 @@ import org.terminal21.model.CommonModelBuilders.session
 import org.terminal21.ui.std.SessionsService
 
 object ConnectedSessionMock:
-  def newConnectedSessionMock: ConnectedSession =
+  val encoding = new UiElementEncoding(Seq(StdElementEncoding))
+  val encoder  = ConnectedSessionMock.encoding.uiElementEncoder
+
+  def newConnectedSessionAndSessionServiceMock: (SessionsService, ConnectedSession) =
     val sessionsService = mock(classOf[SessionsService])
-    new ConnectedSession(session(), new UiElementEncoding(Seq(StdElementEncoding)), "test", sessionsService, () => ())
+    (sessionsService, new ConnectedSession(session(), encoding, "test", sessionsService, () => ()))
+
+  def newConnectedSessionMock: ConnectedSession = newConnectedSessionAndSessionServiceMock._2
