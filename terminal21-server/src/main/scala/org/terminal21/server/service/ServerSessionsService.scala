@@ -5,7 +5,7 @@ import org.terminal21.model.*
 import org.terminal21.server.json.UiEvent
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.utils.{ListenerFunction, NotificationRegistry}
-import org.terminal21.ui.std.SessionsService
+import org.terminal21.ui.std.{ServerJson, SessionsService}
 
 import java.util.UUID
 
@@ -38,7 +38,7 @@ class ServerSessionsService extends SessionsService:
     val s     = Session(id, name, UUID.randomUUID().toString, true)
     logger.info(s"Creating session $s")
     sessions.keys.toList.foreach(s => if s.id == id then sessions.remove(s))
-    val state = SessionState("""{ "elements" : [] }""", new NotificationRegistry)
+    val state = SessionState(ServerJson.Empty, new NotificationRegistry)
     sessions += s -> state
     sessionChangeNotificationRegistry.notifyAll(allSessions)
     s
@@ -49,7 +49,7 @@ class ServerSessionsService extends SessionsService:
     sessionStateChangeNotificationRegistry.add(f)
     for (session, state) <- sessions do f(session, state)
 
-  override def setSessionJsonState(session: Session, newStateJson: String): Unit =
+  override def setSessionJsonState(session: Session, newStateJson: ServerJson): Unit =
     val oldV = sessions(session)
     val newV = oldV.withNewState(newStateJson)
     sessions += session -> newV

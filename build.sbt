@@ -100,7 +100,7 @@ lazy val `terminal21-server` = project
 lazy val `terminal21-ui-std-exports` = project
   .settings(
     commonSettings,
-    libraryDependencies ++= Seq(ScalaTest),
+    libraryDependencies ++= Seq(ScalaTest) ++ Circe,
     // make sure exportedArtifact points to the full artifact name of the receiver.
     buildInfoKeys    := Seq[BuildInfoKey](organization, name, version, scalaVersion, "exportedArtifact" -> "none"),
     buildInfoPackage := "org.terminal21.ui.std"

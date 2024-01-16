@@ -5,11 +5,10 @@ import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement
-import org.terminal21.client.components.UiElement.{HasEventHandler, allDeep}
+import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, allDeep}
 import org.terminal21.client.components.UiElementEncoding
-import org.terminal21.client.json.ServerJson
 import org.terminal21.model.*
-import org.terminal21.ui.std.SessionsService
+import org.terminal21.ui.std.{ServerJson, SessionsService}
 
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.{CountDownLatch, TimeUnit}
@@ -93,10 +92,31 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   def render(): Unit =
     val j = toJson
-    sessionsService.setSessionJsonState(session, j.noSpaces)
+    sessionsService.setSessionJsonState(session, j)
 
   def allElements: Seq[UiElement] = synchronized(elements)
 
-  private def toJson: Json =
+  private def toJson =
     import encoding.given
-    ServerJson.from(allElements).asJson.deepDropNullValues
+    val flat = elements.flatMap(_.flat)
+    ServerJson(
+      elements.map(_.key),
+      flat
+        .map: el =>
+          (
+            el.key,
+            el match
+              case e: HasChildren[_] => encoding.uiElementEncoder(e.copyNoChildren)
+              case e                 => encoding.uiElementEncoder(e)
+          )
+        .toMap,
+      flat
+        .map: e =>
+          (
+            e.key,
+            e match
+              case e: HasChildren[_] => e.children.map(_.key)
+              case _                 => Nil
+          )
+        .toMap
+    )

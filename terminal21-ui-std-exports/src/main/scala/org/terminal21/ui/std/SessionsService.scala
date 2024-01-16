@@ -8,4 +8,4 @@ trait SessionsService:
   def createSession(id: String, name: String): Session
   def terminateSession(session: Session): Unit
 
-  def setSessionJsonState(session: Session, state: String): Unit
+  def setSessionJsonState(session: Session, state: ServerJson): Unit
