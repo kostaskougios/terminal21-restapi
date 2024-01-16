@@ -81,7 +81,7 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session
       .onChange: newValue =>
         csvMap((x, y)) = newValue
         status.text = s"($x,$y) value changed to $newValue"
-        session.render()
+        status.renderChanges()
 
   Seq(
     TableContainer().withChildren(

@@ -23,4 +23,4 @@ Sessions.withNewSession("mathjax", "MathJax Example", MathJaxLib /* note we need
           |""".stripMargin
     )
   ).render()
-  session.waitTillUserClosesSession()
+  session.leaveSessionOpenAfterExiting()

@@ -48,4 +48,5 @@ Sessions.withNewSession(s"csv-viewer-$fileName", s"CsvView: $fileName"): session
     )
   ).render()
   println(s"Now open ${session.uiUrl} to view the UI.")
-  session.waitTillUserClosesSession()
+  // since this is a read-only UI, we can exit the app but leave the session open on the UI
+  session.leaveSessionOpenAfterExiting()

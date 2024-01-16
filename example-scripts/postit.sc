@@ -29,7 +29,7 @@ Sessions.withNewSession("postit", "Post-It"): session =>
       )
     )
     // always render after adding/modifying something
-    session.render()
+    messages.renderChanges()
 
   Seq(
     Paragraph(text = "Please type your note below and click 'Post It' to post it so that everyone can view it."),

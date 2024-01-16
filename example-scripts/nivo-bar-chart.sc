@@ -47,7 +47,7 @@ Sessions.withNewSession("nivo-bar-chart", "Nivo Bar Chart", NivoLib /* note we n
     while !session.isClosed do
       Thread.sleep(2000)
       chart.data = createRandomData
-      session.render()
+      chart.renderChanges()
 
   session.waitTillUserClosesSession()
 

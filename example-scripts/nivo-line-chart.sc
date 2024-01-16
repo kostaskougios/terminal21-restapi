@@ -28,7 +28,7 @@ Sessions.withNewSession("nivo-line-chart", "Nivo Line Chart", NivoLib /* note we
     while !session.isClosed do
       Thread.sleep(2000)
       chart.data = createRandomData
-      session.render()
+      chart.renderChanges()
 
   session.waitTillUserClosesSession()
 

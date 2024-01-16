@@ -8,10 +8,10 @@
 //> using javaOpt -Dlogback.configurationFile=file:etc/logback.xml
 
 // terminal21 dependencies
-//> using dep io.github.kostaskougios::terminal21-ui-std:0.11
-//> using dep io.github.kostaskougios::terminal21-spark:0.11
-//> using dep io.github.kostaskougios::terminal21-nivo:0.11
-//> using dep io.github.kostaskougios::terminal21-mathjax:0.11
+//> using dep io.github.kostaskougios::terminal21-ui-std:0.12
+//> using dep io.github.kostaskougios::terminal21-spark:0.12
+//> using dep io.github.kostaskougios::terminal21-nivo:0.12
+//> using dep io.github.kostaskougios::terminal21-mathjax:0.12
 
 //> using dep ch.qos.logback:logback-classic:1.4.14
 

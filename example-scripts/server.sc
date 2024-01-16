@@ -2,7 +2,7 @@
 
 //> using jvm "21"
 //> using scala 3
-//> using dep io.github.kostaskougios::terminal21-server:0.11
+//> using dep io.github.kostaskougios::terminal21-server:0.12
 
 import org.terminal21.server.Terminal21Server
 

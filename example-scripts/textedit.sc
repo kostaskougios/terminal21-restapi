@@ -44,7 +44,7 @@ Sessions.withNewSession(s"textedit-$fileName", s"Edit: $fileName"): session =>
   // when the user changes the textarea, we get the new text and we can compare it with the loaded value.
   editor.onChange: newValue =>
     modified.text = if newValue != contents then "*" else ""
-    session.render()
+    modified.renderChanges()
 
   Seq(
     HStack().withChildren(
@@ -57,11 +57,12 @@ Sessions.withNewSession(s"textedit-$fileName", s"Edit: $fileName"): session =>
               // we'll display a "Saved" badge for 1 second.
               status.text = "Saved"
               modified.text = ""
-              session.render()
+              status.renderChanges()
+              modified.renderChanges()
               // each event handler runs on a new fibler, it is ok to sleep here
               Thread.sleep(1000)
               status.text = ""
-              session.render()
+              status.renderChanges()
           ,
           MenuItem(text = "Exit")
             .onClick: () =>

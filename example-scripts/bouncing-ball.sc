@@ -20,13 +20,11 @@ Sessions.withNewSession("bouncing-ball", "C64 bouncing ball"): session =>
 
   // Files under ~/.terminal21/web will be served under /web . Please place a ball.png file under ~/.terminal21/web/images on the box where the server runs.
   val ball = Image(src = "/web/images/ball.png")
-  Seq(
-    ball
-  ).render()
+  ball.render()
 
   @tailrec def animateBall(x: Int, y: Int, dx: Int, dy: Int): Unit =
     ball.style = Map("position" -> "fixed", "left" -> (x + "px"), "top" -> (y + "px"))
-    session.render()
+    ball.renderChanges()
     Thread.sleep(1000 / 120)
     val newDx = if x < 0 || x > 600 then -dx else dx
     val newDy = if y < 0 || y > 500 then -dy else dy

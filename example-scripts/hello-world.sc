@@ -14,4 +14,4 @@ Sessions.withNewSession("hello-world", "Hello World Example"): session =>
   Seq(
     Paragraph(text = "Hello World!")
   ).render()
-  session.waitTillUserClosesSession()
+  session.leaveSessionOpenAfterExiting()
