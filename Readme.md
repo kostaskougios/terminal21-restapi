@@ -170,6 +170,11 @@ Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi
 
 # Changelog
 
+## Version 0.12
+
+- ability to render only 1 element and it's children
+- refactoring internal way of storing elements on lib - server - ui
+
 ## Version 0.11
 
 - Quick* classes to simplify UI creation

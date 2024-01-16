@@ -4,7 +4,7 @@ import io.circe.*
 import io.circe.generic.auto.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, allDeep}
-import org.terminal21.client.components.{UiComponent, UiElement, UiElementEncoding}
+import org.terminal21.client.components.{UiElement, UiElementEncoding}
 import org.terminal21.model.*
 import org.terminal21.ui.std.{ServerJson, SessionsService}
 
