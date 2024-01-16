@@ -4,7 +4,7 @@ import io.circe.*
 import io.circe.generic.auto.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, allDeep}
-import org.terminal21.client.components.{UiElement, UiElementEncoding}
+import org.terminal21.client.components.{UiComponent, UiElement, UiElementEncoding}
 import org.terminal21.model.*
 import org.terminal21.ui.std.{ServerJson, SessionsService}
 
@@ -96,9 +96,9 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     val j = toJson
     sessionsService.setSessionJsonState(session, j)
 
-  def renderChanges(e: UiElement): Unit =
-    if !containedKeys.contains(e.key) then throw new IllegalArgumentException(s"Element $e is not added to the session")
-    val j = toJson(Seq(e))
+  def renderChanges(es: UiElement*): Unit =
+    for e <- es do if !containedKeys.contains(e.key) then throw new IllegalArgumentException(s"Element $es is not added to the session")
+    val j = toJson(es)
     sessionsService.changeSessionJsonState(session, j)
 
   def allElements: Seq[UiElement] = synchronized(elements)
@@ -114,8 +114,8 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
           (
             el.key,
             el match
-              case e: HasChildren[_] => encoding.uiElementEncoder(e.copyNoChildren)
-              case e                 => encoding.uiElementEncoder(e)
+              case e: HasChildren[_] => encoding.uiElementEncoder(e.copyNoChildren).deepDropNullValues
+              case e                 => encoding.uiElementEncoder(e).deepDropNullValues
           )
         .toMap,
       flat

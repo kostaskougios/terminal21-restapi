@@ -42,7 +42,7 @@ trait StdUiCalculation[OUT](
     badge.text = s"Error: ${t.getMessage}"
     badge.colorScheme = Some("red")
     recalc.isDisabled = None
-    session.render()
+    session.renderChanges(badge, dataUi, recalc)
     super.onError(t)
 
   override protected def whenResultsNotReady(): Unit =
@@ -50,7 +50,7 @@ trait StdUiCalculation[OUT](
     badge.colorScheme = Some("purple")
     recalc.isDisabled = Some(true)
     dataUi.style = dataUi.style + ("filter" -> "grayscale(100%)")
-    session.render()
+    session.renderChanges(badge, dataUi, recalc)
     super.whenResultsNotReady()
 
   override protected def whenResultsReady(results: OUT): Unit =
@@ -58,4 +58,4 @@ trait StdUiCalculation[OUT](
     badge.colorScheme = None
     recalc.isDisabled = Some(false)
     dataUi.style = dataUi.style - "filter"
-    session.render()
+    session.renderChanges(badge, dataUi, recalc)

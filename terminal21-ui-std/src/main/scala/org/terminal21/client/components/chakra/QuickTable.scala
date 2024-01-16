@@ -39,3 +39,5 @@ case class QuickTable(
   def caption(text: String): QuickTable =
     table.addChildren(TableCaption(text = text))
     this
+
+  override def copyNoChildren: UiComponent = copy()
