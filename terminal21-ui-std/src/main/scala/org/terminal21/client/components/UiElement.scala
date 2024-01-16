@@ -4,6 +4,7 @@ import org.terminal21.client.{ConnectedSession, EventHandler}
 
 trait UiElement:
   def key: String
+  def flat: Seq[UiElement] = Seq(this)
 
   def render()(using session: ConnectedSession): Unit =
     session.add(this)
@@ -16,9 +17,11 @@ object UiElement:
         case hc: HasChildren[_] => allDeep(hc.children)
       .flatten
 
-  trait HasChildren[A]:
+  trait HasChildren[A <: UiElement]:
     this: A =>
     var children: Seq[UiElement]
+
+    override def flat: Seq[UiElement] = Seq(this) ++ children.flatMap(_.flat)
 
     def withChildren(cn: UiElement*): A =
       children = cn
@@ -27,6 +30,8 @@ object UiElement:
     def addChildren(e: UiElement*): A =
       children = children ++ e
       this
+
+    def copyNoChildren: A
 
   trait HasEventHandler:
     def defaultEventHandler: EventHandler

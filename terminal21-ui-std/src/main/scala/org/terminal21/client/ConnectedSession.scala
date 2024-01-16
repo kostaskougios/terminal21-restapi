@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.UiElement.{HasEventHandler, allDeep}
 import org.terminal21.client.components.UiElementEncoding
+import org.terminal21.client.json.ServerJson
 import org.terminal21.model.*
 import org.terminal21.ui.std.SessionsService
 
@@ -92,14 +93,11 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   def render(): Unit =
     val j = toJson
-    sessionsService.setSessionJsonState(session, j.toJson.noSpaces)
+    println(s"Sending: ${j.noSpaces}")
+    sessionsService.setSessionJsonState(session, j.noSpaces)
 
   def allElements: Seq[UiElement] = synchronized(elements)
 
-  private def toJson: JsonObject =
+  private def toJson: Json =
     import encoding.given
-    val elementsCopy = allElements
-    val json         =
-      for e <- elementsCopy
-      yield e.asJson.deepDropNullValues
-    JsonObject(("elements", json.asJson))
+    ServerJson.from(allElements).asJson.deepDropNullValues

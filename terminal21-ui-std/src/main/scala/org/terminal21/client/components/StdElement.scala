@@ -17,7 +17,8 @@ case class Paragraph(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends StdElement
-    with HasChildren[Paragraph]
+    with HasChildren[Paragraph]:
+  override def copyNoChildren: Paragraph = copy(children = Nil)
 
 case class Input(
     key: String = Keys.nextKey,

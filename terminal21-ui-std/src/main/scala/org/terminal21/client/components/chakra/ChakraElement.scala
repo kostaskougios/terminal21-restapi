@@ -43,7 +43,8 @@ case class ButtonGroup(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[ButtonGroup]
+    with HasChildren[ButtonGroup]:
+  override def copyNoChildren: ButtonGroup = copy(children = Nil)
 
 /** https://chakra-ui.com/docs/components/box
   */
@@ -58,7 +59,8 @@ case class Box(
     @volatile var as: Option[String] = None,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[Box]
+    with HasChildren[Box]:
+  override def copyNoChildren: Box = copy(children = Nil)
 
 /** https://chakra-ui.com/docs/components/stack
   */
@@ -69,7 +71,8 @@ case class HStack(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[HStack]
+    with HasChildren[HStack]:
+  override def copyNoChildren: HStack = copy(children = Nil)
 case class VStack(
     key: String = Keys.nextKey,
     @volatile var spacing: Option[String] = None,
@@ -77,7 +80,8 @@ case class VStack(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[VStack]
+    with HasChildren[VStack]:
+  override def copyNoChildren: VStack = copy(children = Nil)
 
 case class SimpleGrid(
     key: String = Keys.nextKey,
@@ -88,7 +92,8 @@ case class SimpleGrid(
     @volatile var children: Seq[UiElement] = Nil,
     @volatile var style: Map[String, Any] = Map.empty
 ) extends ChakraElement
-    with HasChildren[SimpleGrid]
+    with HasChildren[SimpleGrid]:
+  override def copyNoChildren: SimpleGrid = copy(children = Nil)
 
 /** https://chakra-ui.com/docs/components/editable
   */
@@ -104,6 +109,7 @@ case class Editable(
     with OnChangeEventHandler.CanHandleOnChangeEvent[Editable]:
   if value == "" then value = defaultValue
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
+  override def copyNoChildren: Editable                  = copy(children = Nil)
 
 case class EditablePreview(key: String = Keys.nextKey, @volatile var style: Map[String, Any] = Map.empty)  extends ChakraElement
 case class EditableInput(key: String = Keys.nextKey, @volatile var style: Map[String, Any] = Map.empty)    extends ChakraElement
@@ -117,7 +123,8 @@ case class FormControl(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[FormControl]
+    with HasChildren[FormControl]:
+  override def copyNoChildren: FormControl = copy(children = Nil)
 
 /** https://chakra-ui.com/docs/components/form-control
   */
@@ -127,7 +134,8 @@ case class FormLabel(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[FormLabel]
+    with HasChildren[FormLabel]:
+  override def copyNoChildren: FormLabel = copy(children = Nil)
 
 /** https://chakra-ui.com/docs/components/form-control
   */
@@ -137,7 +145,8 @@ case class FormHelperText(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[FormHelperText]
+    with HasChildren[FormHelperText]:
+  override def copyNoChildren: FormHelperText = copy(children = Nil)
 
 /** https://chakra-ui.com/docs/components/input
   */
@@ -160,7 +169,8 @@ case class InputGroup(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[InputGroup]
+    with HasChildren[InputGroup]:
+  override def copyNoChildren: InputGroup = copy(children = Nil)
 
 case class InputLeftAddon(
     key: String = Keys.nextKey,
@@ -168,7 +178,8 @@ case class InputLeftAddon(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[InputLeftAddon]
+    with HasChildren[InputLeftAddon]:
+  override def copyNoChildren: InputLeftAddon = copy(children = Nil)
 
 case class InputRightAddon(
     key: String = Keys.nextKey,
@@ -176,7 +187,8 @@ case class InputRightAddon(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[InputRightAddon]
+    with HasChildren[InputRightAddon]:
+  override def copyNoChildren: InputRightAddon = copy(children = Nil)
 
 /** https://chakra-ui.com/docs/components/checkbox
   */
@@ -216,6 +228,8 @@ case class RadioGroup(
 
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
 
+  override def copyNoChildren: RadioGroup = copy(children = Nil)
+
 case class Center(
     key: String = Keys.nextKey,
     @volatile var text: String = "",
@@ -226,7 +240,8 @@ case class Center(
     @volatile var color: Option[String] = None,
     @volatile var style: Map[String, Any] = Map.empty
 ) extends ChakraElement
-    with HasChildren[Center]
+    with HasChildren[Center]:
+  override def copyNoChildren: Center = copy(children = Nil)
 
 case class Circle(
     key: String = Keys.nextKey,
@@ -238,7 +253,8 @@ case class Circle(
     @volatile var color: Option[String] = None,
     @volatile var style: Map[String, Any] = Map.empty
 ) extends ChakraElement
-    with HasChildren[Circle]
+    with HasChildren[Circle]:
+  override def copyNoChildren: Circle = copy(children = Nil)
 
 case class Square(
     key: String = Keys.nextKey,
@@ -250,7 +266,8 @@ case class Square(
     @volatile var color: Option[String] = None,
     @volatile var style: Map[String, Any] = Map.empty
 ) extends ChakraElement
-    with HasChildren[Square]
+    with HasChildren[Square]:
+  override def copyNoChildren: Square = copy(children = Nil)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -937,6 +954,8 @@ case class Select(
     with OnChangeEventHandler.CanHandleOnChangeEvent[Select]:
   override def defaultEventHandler: OnChangeEventHandler = newValue => value = newValue
 
+  override def copyNoChildren: Select = copy(children = Nil)
+
 case class Option_(
     key: String = Keys.nextKey,
     value: String,
@@ -965,6 +984,8 @@ case class TableContainer(key: String = Keys.nextKey, @volatile var children: Se
     for b <- tableBodies do b.withChildren(newTrs: _*)
     this
 
+  override def copyNoChildren: TableContainer = copy(children = Nil)
+
 case class Table(
     key: String = Keys.nextKey,
     @volatile var variant: String = "simple",
@@ -973,23 +994,28 @@ case class Table(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[Table]
+    with HasChildren[Table]:
+  override def copyNoChildren: Table = copy(children = Nil)
 case class TableCaption(key: String = Keys.nextKey, @volatile var text: String = "", @volatile var style: Map[String, Any] = Map.empty) extends ChakraElement
 case class Thead(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil, @volatile var style: Map[String, Any] = Map.empty)
     extends ChakraElement
-    with HasChildren[Thead]
+    with HasChildren[Thead]:
+  override def copyNoChildren: Thead = copy(children = Nil)
 case class Tbody(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil, @volatile var style: Map[String, Any] = Map.empty)
     extends ChakraElement
-    with HasChildren[Tbody]
+    with HasChildren[Tbody]:
+  override def copyNoChildren: Tbody = copy(children = Nil)
 case class Tfoot(key: String = Keys.nextKey, @volatile var children: Seq[UiElement] = Nil, @volatile var style: Map[String, Any] = Map.empty)
     extends ChakraElement
-    with HasChildren[Tfoot]
+    with HasChildren[Tfoot]:
+  override def copyNoChildren: Tfoot = copy(children = Nil)
 case class Tr(
     key: String = Keys.nextKey,
     @volatile var children: Seq[UiElement] = Nil,
     @volatile var style: Map[String, Any] = Map.empty
 ) extends ChakraElement
-    with HasChildren[Tr]
+    with HasChildren[Tr]:
+  override def copyNoChildren: Tr = copy(children = Nil)
 case class Th(
     key: String = Keys.nextKey,
     @volatile var text: String = "",
@@ -997,7 +1023,8 @@ case class Th(
     @volatile var children: Seq[UiElement] = Nil,
     @volatile var style: Map[String, Any] = Map.empty
 ) extends ChakraElement
-    with HasChildren[Th]
+    with HasChildren[Th]:
+  override def copyNoChildren: Th = copy(children = Nil)
 case class Td(
     key: String = Keys.nextKey,
     @volatile var text: String = "",
@@ -1005,13 +1032,15 @@ case class Td(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[Td]
+    with HasChildren[Td]:
+  override def copyNoChildren: Td = copy(children = Nil)
 
 /** https://chakra-ui.com/docs/components/menu/usage
   */
 case class Menu(key: String = Keys.nextKey, @volatile var style: Map[String, Any] = Map.empty, @volatile var children: Seq[UiElement] = Nil)
     extends ChakraElement
-    with HasChildren[Menu]
+    with HasChildren[Menu]:
+  override def copyNoChildren: Menu = copy(children = Nil)
 case class MenuButton(
     key: String = Keys.nextKey,
     @volatile var text: String = "",
@@ -1020,10 +1049,12 @@ case class MenuButton(
     @volatile var style: Map[String, Any] = Map.empty,
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
-    with HasChildren[MenuButton]
+    with HasChildren[MenuButton]:
+  override def copyNoChildren: MenuButton = copy(children = Nil)
 case class MenuList(key: String = Keys.nextKey, @volatile var style: Map[String, Any] = Map.empty, @volatile var children: Seq[UiElement] = Nil)
     extends ChakraElement
-    with HasChildren[MenuList]
+    with HasChildren[MenuList]:
+  override def copyNoChildren: MenuList = copy(children = Nil)
 case class MenuItem(
     key: String = Keys.nextKey,
     @volatile var style: Map[String, Any] = Map.empty,
@@ -1031,7 +1062,8 @@ case class MenuItem(
     @volatile var children: Seq[UiElement] = Nil
 ) extends ChakraElement
     with HasChildren[MenuItem]
-    with OnClickEventHandler.CanHandleOnClickEvent[MenuItem]
+    with OnClickEventHandler.CanHandleOnClickEvent[MenuItem]:
+  override def copyNoChildren: MenuItem = copy(children = Nil)
 
 case class MenuDivider(key: String = Keys.nextKey, @volatile var style: Map[String, Any] = Map.empty) extends ChakraElement
 
@@ -1044,7 +1076,8 @@ case class Badge(
     @volatile var children: Seq[UiElement] = Nil,
     @volatile var style: Map[String, Any] = Map.empty
 ) extends ChakraElement
-    with HasChildren[Badge]
+    with HasChildren[Badge]:
+  override def copyNoChildren: Badge = copy(children = Nil)
 
 /** https://chakra-ui.com/docs/components/image/usage
   *
