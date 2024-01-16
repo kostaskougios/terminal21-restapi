@@ -93,7 +93,6 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   def render(): Unit =
     val j = toJson
-    println(s"Sending: ${j.noSpaces}")
     sessionsService.setSessionJsonState(session, j.noSpaces)
 
   def allElements: Seq[UiElement] = synchronized(elements)
