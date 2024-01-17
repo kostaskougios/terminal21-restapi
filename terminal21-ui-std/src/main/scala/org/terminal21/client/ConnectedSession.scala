@@ -4,7 +4,7 @@ import io.circe.*
 import io.circe.generic.auto.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, allDeep}
-import org.terminal21.client.components.{UiElement, UiElementEncoding}
+import org.terminal21.client.components.{UiComponent, UiElement, UiElementEncoding}
 import org.terminal21.client.internal.EventHandlers
 import org.terminal21.model.*
 import org.terminal21.ui.std.{ServerJson, SessionsService}
@@ -86,13 +86,14 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   private def toJson(elements: Seq[UiElement]): ServerJson =
     val flat = elements.flatMap(_.flat)
-    ServerJson(
+    val sj   = ServerJson(
       elements.map(_.key),
       flat
         .map: el =>
           (
             el.key,
             el match
+              case e: UiComponent    => encoding.uiElementEncoder(e).deepDropNullValues
               case e: HasChildren[_] => encoding.uiElementEncoder(e.withChildren()).deepDropNullValues
               case e                 => encoding.uiElementEncoder(e).deepDropNullValues
           )
@@ -102,11 +103,13 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
           (
             e.key,
             e match
+              case e: UiComponent    => e.rendered.map(_.key)
               case e: HasChildren[_] => e.children.map(_.key)
               case _                 => Nil
           )
         .toMap
     )
+    sj
   private val modifiedElements                             = TrieMap.empty[String, UiElement]
   def modified(e: UiElement): Unit                         =
     modifiedElements += e.key -> e

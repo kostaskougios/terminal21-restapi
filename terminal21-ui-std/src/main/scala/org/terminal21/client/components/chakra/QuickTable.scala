@@ -15,7 +15,7 @@ case class QuickTable(
 ) extends UiComponent
     with HasStyle[QuickTable]:
 
-  override def rendered: Seq[UiElement] =
+  override lazy val rendered: Seq[UiElement] =
     val head           = Thead(children = Seq(Tr(children = headers.map(h => Th(children = Seq(h))))))
     val body           = Tbody(
       children = rows.map: row =>

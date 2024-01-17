@@ -28,9 +28,7 @@ object UiElement:
   trait HasChildren[A <: UiElement]:
     this: A =>
     def children: Seq[UiElement]
-
     override def flat: Seq[UiElement] = Seq(this) ++ children.flatMap(_.flat)
-
     def withChildren(cn: UiElement*): A
 
   trait HasEventHandler:
