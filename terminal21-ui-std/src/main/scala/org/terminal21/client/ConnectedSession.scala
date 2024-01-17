@@ -5,7 +5,7 @@ import io.circe.generic.auto.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, allDeep}
 import org.terminal21.client.components.{UiElement, UiElementEncoding}
-import org.terminal21.client.internal.ElementTree
+import org.terminal21.client.internal.EventHandlers
 import org.terminal21.model.*
 import org.terminal21.ui.std.{ServerJson, SessionsService}
 
@@ -15,15 +15,14 @@ import scala.annotation.tailrec
 
 class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
   private val logger      = LoggerFactory.getLogger(getClass)
-  private val elementTree = new ElementTree
+  private val handlers = new EventHandlers
 
   def uiUrl: String = serverUrl + "/ui"
-  def clear(): Unit = elementTree.clear()
+  def clear(): Unit =
+    render()
+    handlers.clear()
 
-  def add(es: UiElement*): Unit =
-    elementTree.add(es)
-
-  def addEventHandler(key: String, handler: EventHandler): Unit = elementTree.addEventHandler(key, handler)
+  def addEventHandler(key: String, handler: EventHandler): Unit = handlers.addEventHandler(key, handler)
 
   private val exitLatch = new CountDownLatch(1)
 
@@ -63,7 +62,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
         exitLatch.countDown()
         onCloseHandler()
       case _                =>
-        elementTree.getEventHandler(event.key) match
+        handlers.getEventHandler(event.key) match
           case Some(handlers) =>
             for handler <- handlers do
               (event, handler) match
@@ -74,18 +73,14 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
           case None           =>
             logger.warn(s"There is no event handler for event $event")
 
-  def render(): Unit =
-    val j = toJson
+  def render(es: UiElement*): Unit =
+    handlers.registerEventHandlers(es)
+    val j = toJson(es)
     sessionsService.setSessionJsonState(session, j)
 
   def renderChanges(es: UiElement*): Unit =
-    for e <- es do if !elementTree.containsKey(e.key) then throw new IllegalArgumentException(s"Element $es is not added to the session")
     val j = toJson(es)
     sessionsService.changeSessionJsonState(session, j)
-
-  def allElements: Seq[UiElement] = elementTree.allElements
-
-  private def toJson: ServerJson = toJson(allElements)
 
   private def toJson(elements: Seq[UiElement]): ServerJson =
     val flat = elements.flatMap(_.flat)

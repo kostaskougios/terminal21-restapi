@@ -16,7 +16,7 @@ object Editables:
 
     editable1.onChange: newValue =>
       status.text = s"editable1 newValue = $newValue, verify editable1.value = ${editable1.value}"
-      session.render()
+      status.renderChanges()
 
     val editable2 = Editable(defaultValue = "For longer maybe-editable texts\nUse an EditableTextarea\nIt uses a textarea control.").withChildren(
       EditablePreview(),
@@ -24,7 +24,7 @@ object Editables:
     )
     editable2.onChange: newValue =>
       status.text = s"editable2 newValue = $newValue, verify editable2.value = ${editable2.value}"
-      session.render()
+      status.renderChanges()
 
     Seq(
       commonBox(text = "Editables"),

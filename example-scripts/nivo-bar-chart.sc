@@ -3,6 +3,7 @@
 import org.terminal21.client.*
 import org.terminal21.client.fiberExecutor
 import org.terminal21.client.components.*
+import org.terminal21.client.components.std.*
 import org.terminal21.client.components.nivo.*
 
 import scala.util.Random
@@ -39,7 +40,7 @@ Sessions.withNewSession("nivo-bar-chart", "Nivo Bar Chart", NivoLib /* note we n
   )
 
   Seq(
-    Paragraph(text = "Means of transportation for various countries", style = Map("margin" -> 20)),
+    Paragraph(text = "Various foods.", style = Map("margin" -> 20)),
     chart
   ).render()
 

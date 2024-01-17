@@ -2,12 +2,13 @@ package tests
 
 import org.terminal21.client.*
 import org.terminal21.client.components.*
+import org.terminal21.client.components.std.{Em, Header1, Input, NewLine, Paragraph, Span}
 
 @main def stdComponents(): Unit =
   Sessions.withNewSession("std-components", "Std Components"): session =>
     given ConnectedSession = session
 
-    val input  = Input(defaultValue = "Please enter your name")
+    val input  = Input(defaultValue = Some("Please enter your name"))
     val output = Paragraph(text = "This will reflect what you type in the input")
     input.onChange: newValue =>
       output.text = newValue

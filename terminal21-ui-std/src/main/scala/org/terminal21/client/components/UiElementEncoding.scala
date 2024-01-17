@@ -4,6 +4,7 @@ import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.terminal21.client.components.chakra.{Box, ChakraElement}
+import org.terminal21.client.components.std.StdElement
 
 class UiElementEncoding(libs: Seq[ComponentLib]):
   given uiElementEncoder: Encoder[UiElement] =

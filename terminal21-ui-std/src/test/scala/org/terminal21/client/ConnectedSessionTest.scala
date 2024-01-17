@@ -5,8 +5,8 @@ import org.mockito.Mockito.verify
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.ConnectedSessionMock.encoder
-import org.terminal21.client.components.{Paragraph, Span}
 import org.terminal21.client.components.chakra.Editable
+import org.terminal21.client.components.std.{Paragraph, Span}
 import org.terminal21.model.OnChange
 import org.terminal21.ui.std.ServerJson
 
@@ -18,7 +18,7 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
     editable.onChange: newValue =>
       editable.value should be(newValue)
 
-    connectedSession.add(editable)
+    connectedSession.render(editable)
     connectedSession.fireEvent(OnChange(editable.key, "new value"))
 
   test("to server json"):
@@ -26,7 +26,7 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
 
     val p1    = Paragraph(text = "p1")
     val span1 = Span(text = "span1")
-    connectedSession.add(p1.withChildren(span1))
+    connectedSession.render(p1.withChildren(span1))
     connectedSession.render()
     verify(sessionService).setSessionJsonState(
       connectedSession.session,
@@ -42,7 +42,7 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
 
     val p1    = Paragraph(text = "p1")
     val span1 = Span(text = "span1")
-    connectedSession.add(p1)
+    connectedSession.render(p1)
     connectedSession.renderChanges(p1.withChildren(span1))
     verify(sessionService).changeSessionJsonState(
       connectedSession.session,

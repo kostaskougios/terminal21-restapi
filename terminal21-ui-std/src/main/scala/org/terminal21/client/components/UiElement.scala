@@ -7,8 +7,7 @@ trait UiElement:
   def flat: Seq[UiElement] = Seq(this)
 
   def render()(using session: ConnectedSession): Unit =
-    session.add(this)
-    session.render()
+    session.render(this)
 
   /** Renders any changes for this element and it's children (if any). The element must previously have been added to the session.
     */

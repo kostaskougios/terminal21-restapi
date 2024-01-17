@@ -6,6 +6,8 @@
 
 // always import these
 import org.terminal21.client.*
+
+import java.util.concurrent.atomic.AtomicBoolean
 // std components, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala
 import org.terminal21.client.components.*
 // use the chakra components for menus, forms etc, https://chakra-ui.com/docs/components
@@ -14,7 +16,6 @@ import org.terminal21.client.components.chakra.*
 
 import org.apache.commons.io.FileUtils
 import java.io.File
-import java.util.concurrent.CountDownLatch
 import scala.collection.concurrent.TrieMap
 
 if args.length != 1 then
@@ -55,7 +56,7 @@ def saveCsvMap() =
   FileUtils.writeStringToFile(file, s, "UTF-8")
 
   // this will be countDown to 0 when we have to exit
-val exitLatch = new CountDownLatch(1)
+val exitFlag = new AtomicBoolean(false)
 
 Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session =>
   given ConnectedSession = session
@@ -64,13 +65,13 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session
   val saveAndExit = Button(text = "Save & Exit")
     .onClick: () =>
       saveCsvMap()
-      session.add(Paragraph(text = "Csv file saved, exiting."))
-      session.render()
-      exitLatch.countDown()
+      status.text="Csv file saved, exiting."
+      status.renderChanges()
+      exitFlag.set(true)
 
   val exit = Button(text = "Exit Without Saving")
     .onClick: () =>
-      exitLatch.countDown()
+      exitFlag.set(true)
 
   def newEditable(x: Int, y: Int, value: String) =
     Editable(defaultValue = value)
@@ -107,4 +108,5 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session
 
   println(s"Now open ${session.uiUrl} to view the UI")
   // wait for one of the save/exit buttons to be pressed.
-  exitLatch.await()
+  session.waitTillUserClosesSessionOr(exitFlag.get())
+

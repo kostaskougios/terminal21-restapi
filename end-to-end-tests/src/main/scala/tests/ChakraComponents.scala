@@ -2,7 +2,8 @@ package tests
 
 import org.terminal21.client.*
 import org.terminal21.client.components.chakra.*
-import org.terminal21.client.components.{Paragraph, render}
+import org.terminal21.client.components.render
+import org.terminal21.client.components.std.Paragraph
 import tests.chakra.*
 
 import java.util.concurrent.CountDownLatch

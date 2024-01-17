@@ -3,6 +3,7 @@
 import org.terminal21.client.*
 import org.terminal21.client.fiberExecutor
 import org.terminal21.client.components.*
+import org.terminal21.client.components.std.*
 import org.terminal21.client.components.nivo.*
 
 import scala.util.Random

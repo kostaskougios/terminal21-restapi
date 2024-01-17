@@ -4,5 +4,7 @@ import org.terminal21.client.ConnectedSession
 
 extension (s: Seq[UiElement])
   def render()(using session: ConnectedSession): Unit =
-    session.add(s: _*)
-    session.render()
+    session.render(s: _*)
+
+  def renderChanges()(using session: ConnectedSession): Unit =
+    session.renderChanges(s: _*)
