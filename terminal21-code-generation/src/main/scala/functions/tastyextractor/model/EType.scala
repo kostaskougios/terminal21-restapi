@@ -1,7 +1,10 @@
 package functions.tastyextractor.model
 
+import org.apache.commons.lang3.StringUtils
+
 case class EType(name: String, code: String, typeArgs: Seq[EType], vals: List[EParam], scalaDocs: Option[String], methods: Seq[EMethod]):
-  def isUnit: Boolean        = code == "scala.Unit"
+  def isUnit: Boolean = code == "scala.Unit"
+
   def simplifiedCode: String = if typeArgs.isEmpty then name else s"$name[${typeArgs.map(_.simplifiedCode).mkString(", ")}]"
 
 object EType:

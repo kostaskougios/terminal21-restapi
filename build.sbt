@@ -25,9 +25,11 @@ val FunctionsHelidonClient   = "io.github.kostaskougios" %% "helidon-client"    
 val FunctionsHelidonWsClient = "io.github.kostaskougios" %% "helidon-ws-client"  % FunctionsVersion
 val FunctionsFibers          = "io.github.kostaskougios" %% "fibers"             % FunctionsVersion
 
-val ScalaTest   = "org.scalatest"  %% "scalatest"              % "3.2.15"     % Test
-val Mockito     = "org.mockito"     % "mockito-all"            % "2.0.2-beta" % Test
-val Scala3Tasty = "org.scala-lang" %% "scala3-tasty-inspector" % scala3Version
+val ScalaTest   = "org.scalatest"     %% "scalatest"              % "3.2.15"     % Test
+val Mockito     = "org.mockito"        % "mockito-all"            % "2.0.2-beta" % Test
+val Scala3Tasty = "org.scala-lang"    %% "scala3-tasty-inspector" % scala3Version
+val CommonsText = "org.apache.commons" % "commons-text"           % "1.10.0"
+val CommonsIO   = "commons-io"         % "commons-io"             % "2.11.0"
 
 val CirceVersion = "0.14.6"
 val Circe        = Seq(
@@ -183,6 +185,8 @@ lazy val `terminal21-code-generation` = project
     commonSettings,
     libraryDependencies ++= Seq(
       ScalaTest,
-      Scala3Tasty
+      Scala3Tasty,
+      CommonsText,
+      CommonsIO
     )
   )
