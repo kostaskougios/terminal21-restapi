@@ -242,17 +242,17 @@ case class Radio(
 case class RadioGroup(
     key: String = Keys.nextKey,
     defaultValue: String = "",
-    value: String = "",
+    valueV: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[RadioGroup]
     with HasEventHandler
     with HasChildren[RadioGroup]
     with OnChangeEventHandler.CanHandleOnChangeEvent[RadioGroup]:
-
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = newValue))
+  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(valueV = Some(newValue)))
   override def withChildren(cn: UiElement*)                                         = copy(children = cn)
   override def style(v: Map[String, Any])                                           = copy(style = v)
+  def value: String                                                                 = valueV.getOrElse(defaultValue)
 
 case class Center(
     key: String = Keys.nextKey,

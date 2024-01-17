@@ -3,6 +3,7 @@ package org.terminal21.client.components.std
 
 // GENERATED WITH PropertiesExtensionGenerator, DON'T EDIT
 
+import org.terminal21.client.components.UiElement.Current
 import org.terminal21.client.components.UiElement.HasChildren
 import org.terminal21.client.components.UiElement.HasEventHandler
 import org.terminal21.client.components.UiElement.HasStyle

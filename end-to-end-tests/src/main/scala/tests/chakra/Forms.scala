@@ -59,7 +59,7 @@ object Forms:
       ).renderChanges()
 
     val switch1 = Switch(text = "Switch 1")
-    val switch2 = Switch(text = "Switch 2")
+    val switch2 = Switch(text = "Switch 2", defaultChecked = true)
 
     switch1.onChange: newValue =>
       Seq(
