@@ -1,11 +1,11 @@
 package org.terminal21.client.components.std
 
-import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, HasStyle}
+import org.terminal21.client.components.UiElement.{Current, HasChildren, HasEventHandler, HasStyle}
 import org.terminal21.client.components.{Keys, UiElement}
 import org.terminal21.client.{ConnectedSession, OnChangeEventHandler}
 
 sealed trait StdEJson                   extends UiElement
-sealed trait StdElement[A <: UiElement] extends StdEJson with HasStyle[A]
+sealed trait StdElement[A <: UiElement] extends StdEJson with HasStyle[A] with Current[A]
 
 case class Span(key: String = Keys.nextKey, text: String, style: Map[String, Any] = Map.empty) extends StdElement[Span]:
   override def style(v: Map[String, Any]) = copy(style = v)

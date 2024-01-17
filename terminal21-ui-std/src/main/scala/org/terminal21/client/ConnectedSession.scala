@@ -22,6 +22,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   def clear(): Unit =
     render()
     handlers.clear()
+    modifiedElements.clear()
 
   def addEventHandler(key: String, handler: EventHandler): Unit = handlers.addEventHandler(key, handler)
 
@@ -109,3 +110,4 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   private val modifiedElements                             = TrieMap.empty[String, UiElement]
   def modified(e: UiElement): Unit                         =
     modifiedElements += e.key -> e
+  def currentState[A <: UiElement](e: A): A = modifiedElements.getOrElse(e.key, e).asInstanceOf[A]

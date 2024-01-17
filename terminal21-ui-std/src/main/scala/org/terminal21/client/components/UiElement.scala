@@ -21,6 +21,10 @@ object UiElement:
         case hc: HasChildren[_] => allDeep(hc.children)
       .flatten
 
+  trait Current[A <: UiElement]:
+    this: UiElement =>
+    def current(using session: ConnectedSession): A = session.currentState(this.asInstanceOf[A])
+
   trait HasChildren[A <: UiElement]:
     this: A =>
     def children: Seq[UiElement]

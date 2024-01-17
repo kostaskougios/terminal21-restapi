@@ -16,13 +16,13 @@ object Forms:
     val email = Input(`type` = "email", value = "my@email.com")
     email.onChange: newValue =>
       Seq(
-        status.withText(s"email input new value = $newValue, verify email.value = ${email.value}"),
+        status.withText(s"email input new value = $newValue, verify email.value = ${email.current.value}"),
         if newValue.contains("@") then emailRightAddOn.withChildren(okIcon) else emailRightAddOn.withChildren(notOkIcon)
       ).renderChanges()
 
     val description = Textarea(placeholder = "Please enter a few things about you")
     description.onChange: newValue =>
-      status.withText(s"description input new value = $newValue, verify description.value = ${description.value}").renderChanges()
+      status.withText(s"description input new value = $newValue, verify description.value = ${description.current.value}").renderChanges()
 
     val select1 = Select(placeholder = "Please choose").withChildren(
       Option_(text = "Male", value = "male"),
@@ -30,7 +30,7 @@ object Forms:
     )
 
     select1.onChange: newValue =>
-      status.withText(s"select1 input new value = $newValue, verify select1.value = ${select1.value}").renderChanges()
+      status.withText(s"select1 input new value = $newValue, verify select1.value = ${select1.current.value}").renderChanges()
 
     val select2 = Select(value = "1", bg = Some("tomato"), color = Some("black"), borderColor = Some("yellow")).withChildren(
       Option_(text = "First", value = "1"),
@@ -40,21 +40,21 @@ object Forms:
     val password = Input(`type` = "password", value = "mysecret")
     val dob      = Input(`type` = "datetime-local")
     dob.onChange: newValue =>
-      status.withText(s"dob = $newValue , verify dob.value = ${dob.value}").renderChanges()
+      status.withText(s"dob = $newValue , verify dob.value = ${dob.current.value}").renderChanges()
 
     val color = Input(`type` = "color")
 
     color.onChange: newValue =>
-      status.withText(s"color = $newValue , verify color.value = ${color.value}").renderChanges()
+      status.withText(s"color = $newValue , verify color.value = ${color.current.value}").renderChanges()
 
     val checkbox2 = Checkbox(text = "Check 2", defaultChecked = true)
     checkbox2.onChange: newValue =>
-      status.withText(s"checkbox2 checked is $newValue , verify checkbox2.checked = ${checkbox2.checked}").renderChanges()
+      status.withText(s"checkbox2 checked is $newValue , verify checkbox2.checked = ${checkbox2.current.checked}").renderChanges()
 
     val checkbox1 = Checkbox(text = "Check 1")
     checkbox1.onChange: newValue =>
       Seq(
-        status.withText(s"checkbox1 checked is $newValue , verify checkbox1.checked = ${checkbox1.checked}"),
+        status.withText(s"checkbox1 checked is $newValue , verify checkbox1.checked = ${checkbox1.current.checked}"),
         checkbox2.withIsDisabled(newValue)
       ).renderChanges()
 
@@ -63,7 +63,7 @@ object Forms:
 
     switch1.onChange: newValue =>
       Seq(
-        status.withText(s"switch1 checked is $newValue , verify switch1.checked = ${switch1.checked}"),
+        status.withText(s"switch1 checked is $newValue , verify switch1.checked = ${switch1.current.checked}"),
         switch2.withIsDisabled(newValue)
       ).renderChanges()
 
@@ -76,7 +76,7 @@ object Forms:
     )
 
     radioGroup.onChange: newValue =>
-      status.withText(s"radioGroup newValue=$newValue , verify radioGroup.value=${radioGroup.value}").renderChanges()
+      status.withText(s"radioGroup newValue=$newValue , verify radioGroup.value=${radioGroup.current.value}").renderChanges()
 
     Seq(
       commonBox(text = "Forms"),
@@ -136,7 +136,7 @@ object Forms:
           .onClick: () =>
             status
               .withText(
-                s"Saved clicked. Email = ${email.value}, password = ${password.value}, dob = ${dob.value}, check1 = ${checkbox1.checked}, check2 = ${checkbox2.checked}, radio = ${radioGroup.value}"
+                s"Saved clicked. Email = ${email.current.value}, password = ${password.current.value}, dob = ${dob.current.value}, check1 = ${checkbox1.current.checked}, check2 = ${checkbox2.current.checked}, radio = ${radioGroup.current.value}"
               )
               .renderChanges(),
         Button(text = "Cancel")
