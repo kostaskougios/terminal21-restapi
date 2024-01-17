@@ -136,7 +136,7 @@ object Forms:
           .onClick: () =>
             status
               .withText(
-                s"Saved clicked. Email = ${email.current.value}, password = ${password.current.value}, dob = ${dob.current.value}, check1 = ${checkbox1.current.checked}, check2 = ${checkbox2.current.checked}, radio = ${radioGroup.current.value}"
+                s"Saved clicked. Email = ${email.current.value}, password = ${password.current.value}, dob = ${dob.current.value}, check1 = ${checkbox1.current.checked}, check2 = ${checkbox2.current.checked}, radio = ${radioGroup.current.value}, switch1 = ${switch1.current.checked}, switch2 = ${switch2.current.checked}"
               )
               .renderChanges(),
         Button(text = "Cancel")
