@@ -1,10 +1,10 @@
 package org.terminal21.client.internal
 
-import org.terminal21.client.EventHandler
+import org.terminal21.client.{ConnectedSession, EventHandler}
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.UiElement.{HasEventHandler, allDeep}
 
-class EventHandlers:
+class EventHandlers(session: ConnectedSession):
   private val eventHandlers = collection.concurrent.TrieMap.empty[String, List[EventHandler]]
 
   def registerEventHandlers(es: Seq[UiElement]): Unit = synchronized:
@@ -12,7 +12,7 @@ class EventHandlers:
     val withEvents = all.collect:
       case h: HasEventHandler => h
 
-    for e <- withEvents do addEventHandlerAtTheTop(e.key, e.defaultEventHandler)
+    for e <- withEvents do addEventHandlerAtTheTop(e.key, e.defaultEventHandler(session))
 
   def addEventHandler(key: String, handler: EventHandler): Unit =
     val handlers = eventHandlers.getOrElse(key, Nil)

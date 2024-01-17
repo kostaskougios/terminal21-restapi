@@ -15,16 +15,14 @@ object Editables:
     )
 
     editable1.onChange: newValue =>
-      status.text = s"editable1 newValue = $newValue, verify editable1.value = ${editable1.value}"
-      status.renderChanges()
+      status.withText(s"editable1 newValue = $newValue, verify editable1.value = ${editable1.value}").renderChanges()
 
     val editable2 = Editable(defaultValue = "For longer maybe-editable texts\nUse an EditableTextarea\nIt uses a textarea control.").withChildren(
       EditablePreview(),
       EditableTextarea()
     )
     editable2.onChange: newValue =>
-      status.text = s"editable2 newValue = $newValue, verify editable2.value = ${editable2.value}"
-      status.renderChanges()
+      status.withText(s"editable2 newValue = $newValue, verify editable2.value = ${editable2.value}").renderChanges()
 
     Seq(
       commonBox(text = "Editables"),

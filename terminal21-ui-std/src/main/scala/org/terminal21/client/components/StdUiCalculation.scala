@@ -3,7 +3,7 @@ package org.terminal21.client.components
 import functions.fibers.FiberExecutor
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement.HasStyle
-import org.terminal21.client.components.chakra.*
+import org.terminal21.client.components.chakra.{withColorScheme, *}
 
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -37,23 +37,25 @@ trait StdUiCalculation[OUT](
     Seq(header, dataUi)
 
   override def onError(t: Throwable): Unit =
-    badge.text = s"Error: ${t.getMessage}"
-    badge.colorScheme = Some("red")
-    recalc.isDisabled = None
-    session.renderChanges(badge, dataUi, recalc)
+    session.renderChanges(
+      badge.withText(s"Error: ${t.getMessage}").withColorScheme(Some("red")),
+      dataUi,
+      recalc.withIsDisabled(None)
+    )
     super.onError(t)
 
   override protected def whenResultsNotReady(): Unit =
-    badge.text = "Calculating"
-    badge.colorScheme = Some("purple")
-    recalc.isDisabled = Some(true)
-    val newDataUi = dataUi.style(dataUi.style + ("filter" -> "grayscale(100%)"))
-    session.renderChanges(badge, newDataUi, recalc)
+    session.renderChanges(
+      badge.withText("Calculating").withColorScheme(Some("purple")),
+      dataUi.style(dataUi.style + ("filter" -> "grayscale(100%)")),
+      recalc.withIsDisabled(Some(true))
+    )
     super.whenResultsNotReady()
 
   override protected def whenResultsReady(results: OUT): Unit =
-    badge.text = "Ready"
-    badge.colorScheme = None
-    recalc.isDisabled = Some(false)
     val newDataUi = dataUi.style(dataUi.style - "filter")
-    session.renderChanges(badge, newDataUi, recalc)
+    session.renderChanges(
+      badge.withText("Ready").withColorScheme(None),
+      newDataUi,
+      recalc.withIsDisabled(Some(false))
+    )

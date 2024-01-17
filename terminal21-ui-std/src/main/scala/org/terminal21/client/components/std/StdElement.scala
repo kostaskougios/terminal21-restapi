@@ -37,8 +37,8 @@ case class Input(
     value: Option[String] = None
 ) extends StdElement[Input]
     with HasEventHandler:
-  override def defaultEventHandler: OnChangeEventHandler = newValue => copy(value = Some(newValue))
-  override def style(v: Map[String, Any])                = copy(style = v)
+  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = Some(newValue)))
+  override def style(v: Map[String, Any])                                           = copy(style = v)
 
   def onChange(h: OnChangeEventHandler)(using session: ConnectedSession): Input =
     session.addEventHandler(key, h)

@@ -1,8 +1,8 @@
 package tests.chakra
 
 import org.terminal21.client.ConnectedSession
-import org.terminal21.client.components.UiElement
-import org.terminal21.client.components.chakra.{Box, Button}
+import org.terminal21.client.components.*
+import org.terminal21.client.components.chakra.*
 import tests.chakra.Common.*
 
 import java.util.concurrent.CountDownLatch
@@ -14,10 +14,10 @@ object Buttons:
     Seq(
       box1,
       exitButton.onClick: () =>
-        box1.text = "Exit Clicked!"
-        exitButton.text = "Stopping..."
-        exitButton.colorScheme = Some("green")
-        session.render()
+        Seq(
+          box1.withText("Exit Clicked!"),
+          exitButton.withText("Stopping...").withColorScheme(Some("green"))
+        ).renderChanges()
         Thread.sleep(1000)
         latch.countDown()
     )

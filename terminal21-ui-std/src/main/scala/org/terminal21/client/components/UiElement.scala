@@ -30,7 +30,7 @@ object UiElement:
     def withChildren(cn: UiElement*): A
 
   trait HasEventHandler:
-    def defaultEventHandler: EventHandler
+    def defaultEventHandler(session: ConnectedSession): EventHandler
 
   trait HasStyle[A <: UiElement]:
     def style: Map[String, Any]

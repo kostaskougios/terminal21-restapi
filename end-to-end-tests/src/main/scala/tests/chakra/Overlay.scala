@@ -18,21 +18,14 @@ object Overlay:
           MenuList().withChildren(
             MenuItem(text = "Download menu-download")
               .onClick: () =>
-                box1.text = "'Download' clicked"
-                box1.renderChanges()
-            ,
+                box1.withText("'Download' clicked").renderChanges(),
             MenuItem(text = "Copy").onClick: () =>
-              box1.text = "'Copy' clicked"
-              box1.renderChanges()
-            ,
+              box1.withText("'Copy' clicked").renderChanges(),
             MenuItem(text = "Paste").onClick: () =>
-              box1.text = "'Paste' clicked"
-              box1.renderChanges()
-            ,
+              box1.withText("'Paste' clicked").renderChanges(),
             MenuDivider(),
             MenuItem(text = "Exit").onClick: () =>
-              box1.text = "'Exit' clicked"
-              box1.renderChanges()
+              box1.withText("'Exit' clicked").renderChanges()
           )
         ),
         box1

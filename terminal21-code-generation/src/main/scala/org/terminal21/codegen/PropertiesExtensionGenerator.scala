@@ -54,3 +54,4 @@ object PropertiesExtensionGenerator:
 
 @main def propertiesExtensionGeneratorApp(): Unit =
   generate(new File("../terminal21-ui-std"), "org.terminal21.client.components.std")
+  generate(new File("../terminal21-ui-std"), "org.terminal21.client.components.chakra")

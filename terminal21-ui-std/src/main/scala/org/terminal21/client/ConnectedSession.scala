@@ -12,10 +12,11 @@ import org.terminal21.ui.std.{ServerJson, SessionsService}
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 import scala.annotation.tailrec
+import scala.collection.concurrent.TrieMap
 
 class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
   private val logger   = LoggerFactory.getLogger(getClass)
-  private val handlers = new EventHandlers
+  private val handlers = new EventHandlers(this)
 
   def uiUrl: String = serverUrl + "/ui"
   def clear(): Unit =
@@ -105,3 +106,6 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
           )
         .toMap
     )
+  private val modifiedElements                             = TrieMap.empty[String, UiElement]
+  def modified(e: UiElement): Unit                         =
+    modifiedElements += e.key -> e
