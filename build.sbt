@@ -121,6 +121,9 @@ lazy val `terminal21-client-common` = project
 lazy val `terminal21-ui-std` = project
   .settings(
     commonSettings,
+    Compile / unmanagedSourceDirectories ++= {
+      Seq(baseDirectory.value / "src" / "main" / "ui-generated")
+    },
     callerExports                := Seq(s"io.github.kostaskougios:terminal21-ui-std-exports_3:${version.value}"),
     callerJsonSerialization      := true,
     callerHelidonClientTransport := true,
