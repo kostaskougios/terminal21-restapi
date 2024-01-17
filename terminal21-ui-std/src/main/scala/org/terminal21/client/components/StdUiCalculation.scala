@@ -14,29 +14,27 @@ import java.util.concurrent.atomic.AtomicBoolean
   */
 trait StdUiCalculation[OUT](
     name: String,
-    dataUi: UiElement with HasStyle
+    dataUi: UiElement with HasStyle[_]
 )(using session: ConnectedSession, executor: FiberExecutor)
     extends Calculation[OUT]
     with UiComponent:
-  val badge           = Badge()
   private val running = new AtomicBoolean(false)
+  val badge           = Badge()
   val recalc          = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
     if running.compareAndSet(false, true) then
       try
         reCalculate()
       finally running.set(false)
 
-  val header                             = Box(bg = "green", p = 4).withChildren(
-    HStack().withChildren(
-      Text(text = name),
-      badge,
-      recalc
+  override def rendered: Seq[UiElement] =
+    val header = Box(
+      bg = "green",
+      p = 4,
+      children = Seq(
+        HStack(children = Seq(Text(text = name), badge, recalc))
+      )
     )
-  )
-  @volatile var children: Seq[UiElement] = Seq(
-    header,
-    dataUi
-  )
+    Seq(header, dataUi)
 
   override def onError(t: Throwable): Unit =
     badge.text = s"Error: ${t.getMessage}"
@@ -49,13 +47,13 @@ trait StdUiCalculation[OUT](
     badge.text = "Calculating"
     badge.colorScheme = Some("purple")
     recalc.isDisabled = Some(true)
-    dataUi.style = dataUi.style + ("filter" -> "grayscale(100%)")
-    session.renderChanges(badge, dataUi, recalc)
+    val newDataUi = dataUi.style(dataUi.style + ("filter" -> "grayscale(100%)"))
+    session.renderChanges(badge, newDataUi, recalc)
     super.whenResultsNotReady()
 
   override protected def whenResultsReady(results: OUT): Unit =
     badge.text = "Ready"
     badge.colorScheme = None
     recalc.isDisabled = Some(false)
-    dataUi.style = dataUi.style - "filter"
-    session.renderChanges(badge, dataUi, recalc)
+    val newDataUi = dataUi.style(dataUi.style - "filter")
+    session.renderChanges(badge, newDataUi, recalc)

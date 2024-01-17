@@ -23,22 +23,15 @@ object UiElement:
 
   trait HasChildren[A <: UiElement]:
     this: A =>
-    var children: Seq[UiElement]
+    def children: Seq[UiElement]
 
     override def flat: Seq[UiElement] = Seq(this) ++ children.flatMap(_.flat)
 
-    def withChildren(cn: UiElement*): A =
-      children = cn
-      this
-
-    def addChildren(e: UiElement*): A =
-      children = children ++ e
-      this
-
-    def copyNoChildren: A
+    def withChildren(cn: UiElement*): A
 
   trait HasEventHandler:
     def defaultEventHandler: EventHandler
 
-  trait HasStyle:
-    var style: Map[String, Any]
+  trait HasStyle[A <: UiElement]:
+    def style: Map[String, Any]
+    def style(v: Map[String, Any]): A

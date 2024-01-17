@@ -3,8 +3,8 @@ package org.terminal21.client.components
 import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
-import org.terminal21.client.components.chakra.{Box, ChakraElement}
-import org.terminal21.client.components.std.StdElement
+import org.terminal21.client.components.chakra.{Box, CEJson, ChakraElement}
+import org.terminal21.client.components.std.{StdEJson, StdElement}
 
 class UiElementEncoding(libs: Seq[ComponentLib]):
   given uiElementEncoder: Encoder[UiElement] =
@@ -30,8 +30,8 @@ object StdElementEncoding extends ComponentLib:
     Json.obj(vs: _*)
 
   override def toJson(using Encoder[UiElement]): PartialFunction[UiElement, Json] =
-    case std: StdElement  => std.asJson.mapObject(o => o.add("type", "Std".asJson))
-    case c: ChakraElement => c.asJson.mapObject(o => o.add("type", "Chakra".asJson))
-    case c: UiComponent   =>
-      val b: ChakraElement = Box(key = c.key, text = "")
+    case std: StdEJson  => std.asJson.mapObject(o => o.add("type", "Std".asJson))
+    case c: CEJson      => c.asJson.mapObject(o => o.add("type", "Chakra".asJson))
+    case c: UiComponent =>
+      val b: ChakraElement[Box] = Box(key = c.key, text = "")
       b.asJson.mapObject(o => o.add("type", "Chakra".asJson))

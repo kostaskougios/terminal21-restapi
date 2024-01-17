@@ -48,7 +48,7 @@ trait SparkCalculation[OUT: ReadWriter](name: String)(using executor: FiberExecu
 abstract class StdUiSparkCalculation[OUT: ReadWriter](
     val key: String,
     name: String,
-    dataUi: UiElement with HasStyle
+    dataUi: UiElement with HasStyle[_]
 )(using session: ConnectedSession, executor: FiberExecutor, spark: SparkSession)
     extends SparkCalculation[OUT](name)
     with StdUiCalculation[OUT](name, dataUi)

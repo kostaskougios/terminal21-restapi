@@ -24,6 +24,9 @@ object PropertiesExtensionGenerator:
       s"${p.name.replace('.', '/')}/extensions.scala",
       s"""
          |package ${p.name}
+         |
+         |// GENERATED WITH PropertiesExtensionGenerator, DON'T EDIT
+         |
          |${p.imports.map(_.fullName).mkString("import ", "\nimport ", "")}
          |${ext.mkString("\n")}
          |""".stripMargin
@@ -35,7 +38,7 @@ object PropertiesExtensionGenerator:
 
   def createExtension(t: EType): String =
     val methods = t.vals.map: vl =>
-      s"def ${fix(vl.name)}(v: ${vl.`type`.simplifiedCode}) = e.copy(${fix(vl.name)} = v)"
+      s"def with${vl.name.capitalize}(v: ${vl.`type`.simplifiedCode}) = e.copy(${fix(vl.name)} = v)"
 
     s"""
        |extension (e: ${t.name})

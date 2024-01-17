@@ -32,7 +32,7 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
       connectedSession.session,
       ServerJson(
         Seq(p1.key),
-        Map(p1.key -> encoder(p1.copyNoChildren), span1.key -> encoder(span1)),
+        Map(p1.key -> encoder(p1.withChildren()), span1.key -> encoder(span1)),
         Map(p1.key -> Seq(span1.key), span1.key             -> Nil)
       )
     )
@@ -48,7 +48,7 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
       connectedSession.session,
       ServerJson(
         Seq(p1.key),
-        Map(p1.key -> encoder(p1.copyNoChildren), span1.key -> encoder(span1)),
+        Map(p1.key -> encoder(p1.withChildren()), span1.key -> encoder(span1)),
         Map(p1.key -> Seq(span1.key), span1.key             -> Nil)
       )
     )

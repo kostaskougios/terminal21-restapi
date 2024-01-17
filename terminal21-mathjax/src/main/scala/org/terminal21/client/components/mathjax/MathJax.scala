@@ -14,4 +14,5 @@ case class MathJax(
     @volatile var expression: String = """fill in the expression as per https://asciimath.org/""",
     @volatile var style: Map[String, Any] = Map.empty // Note: some of the styles are ignored by mathjax lib
 ) extends MathJaxElement
-    with HasStyle
+    with HasStyle[MathJax]:
+  override def style(v: Map[String, Any]): MathJax = copy(style = v)
