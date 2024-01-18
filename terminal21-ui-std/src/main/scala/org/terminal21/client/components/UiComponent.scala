@@ -8,3 +8,5 @@ trait UiComponent extends UiElement:
   // Note: impl as a lazy val to avoid UiElements getting a random key
   def rendered: Seq[UiElement]
   override def flat = Seq(this) ++ rendered.flatMap(_.flat)
+
+//  protected def componentKey(i: Int): String = s"$key-$i"

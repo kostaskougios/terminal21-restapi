@@ -5,7 +5,7 @@ import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.chakra.*
 
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
 
 /** Creates a standard UI for a calculation which may take time. While the calculation runs, the UI is grayed out, including the dataUi component. When the
   * calculation completes, it allows for updating the dataUi component.
@@ -18,9 +18,13 @@ trait StdUiCalculation[OUT](
 )(using session: ConnectedSession, executor: FiberExecutor)
     extends Calculation[OUT]
     with UiComponent:
-  private val running = new AtomicBoolean(false)
-  lazy val badge      = Badge()
-  lazy val recalc     = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
+  private val running   = new AtomicBoolean(false)
+  private val currentUi = new AtomicReference(dataUi)
+
+  protected def updateUi(dataUi: UiElement & HasStyle[_]) = currentUi.set(dataUi)
+
+  lazy val badge  = Badge()
+  lazy val recalc = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
     if running.compareAndSet(false, true) then
       try
         reCalculate()
@@ -47,13 +51,13 @@ trait StdUiCalculation[OUT](
   override protected def whenResultsNotReady(): Unit =
     session.renderChanges(
       badge.withText("Calculating").withColorScheme(Some("purple")),
-      dataUi.withStyle(dataUi.style + ("filter" -> "grayscale(100%)")),
+      currentUi.get().withStyle(dataUi.style + ("filter" -> "grayscale(100%)")),
       recalc.withIsDisabled(Some(true))
     )
     super.whenResultsNotReady()
 
   override protected def whenResultsReady(results: OUT): Unit =
-    val newDataUi = dataUi.withStyle(dataUi.style - "filter")
+    val newDataUi = currentUi.get().withStyle(dataUi.style - "filter")
     session.renderChanges(
       badge.withText("Ready").withColorScheme(None),
       newDataUi,
