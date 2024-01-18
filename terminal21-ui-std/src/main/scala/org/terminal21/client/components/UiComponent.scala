@@ -9,5 +9,3 @@ trait UiComponent extends UiElement:
   // keys of any sub-elements the component has.
   def rendered: Seq[UiElement]
   override def flat = Seq(this) ++ rendered.flatMap(_.flat)
-
-//  protected def componentKey(i: Int): String = s"$key-$i"

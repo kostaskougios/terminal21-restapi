@@ -59,4 +59,5 @@ case class ResponsiveBar(
     ariaLabel: String = "Chart Label"
 ) extends NivoElement[ResponsiveBar]:
   override def withStyle(v: Map[String, Any]): ResponsiveBar = copy(style = v)
+  def withKey(v: String)                                     = copy(key = v)
   def withData(data: Seq[Seq[BarDatum]])                     = copy(data = data)
