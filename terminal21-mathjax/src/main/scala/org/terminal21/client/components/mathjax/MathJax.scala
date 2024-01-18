@@ -15,4 +15,4 @@ case class MathJax(
     @volatile var style: Map[String, Any] = Map.empty // Note: some of the styles are ignored by mathjax lib
 ) extends MathJaxElement
     with HasStyle[MathJax]:
-  override def style(v: Map[String, Any]): MathJax = copy(style = v)
+  override def withStyle(v: Map[String, Any]): MathJax = copy(style = v)

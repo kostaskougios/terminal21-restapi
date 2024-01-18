@@ -14,6 +14,13 @@ case class QuickTable(
     rows: Seq[Seq[UiElement]] = Nil
 ) extends UiComponent
     with HasStyle[QuickTable]:
+  def withKey(v: String)               = copy(key = v)
+  def withVariant(v: String)           = copy(variant = v)
+  def withColorScheme(v: String)       = copy(colorScheme = v)
+  def withSize(v: String)              = copy(size = v)
+  def withCaption(v: Option[String])   = copy(caption = v)
+  def withHeaders(v: Seq[UiElement])   = copy(headers = v)
+  def withRows(v: Seq[Seq[UiElement]]) = copy(rows = v)
 
   override lazy val rendered: Seq[UiElement] =
     val head           = Thead(children = Seq(Tr(children = headers.map(h => Th(children = Seq(h))))))
@@ -35,5 +42,5 @@ case class QuickTable(
   def rows(data: Seq[Seq[Any]]): QuickTable               = copy(rows = data.map(_.map(c => Text(text = c.toString))))
   def rowsElements(data: Seq[Seq[UiElement]]): QuickTable = copy(rows = data)
 
-  def caption(text: String): QuickTable               = copy(caption = Some(text))
-  override def style(v: Map[String, Any]): QuickTable = copy(style = v)
+  def caption(text: String): QuickTable                   = copy(caption = Some(text))
+  override def withStyle(v: Map[String, Any]): QuickTable = copy(style = v)

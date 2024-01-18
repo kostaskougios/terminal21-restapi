@@ -3,7 +3,7 @@ package org.terminal21.client.components
 import functions.fibers.FiberExecutor
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement.HasStyle
-import org.terminal21.client.components.chakra.{withColorScheme, *}
+import org.terminal21.client.components.chakra.*
 
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -19,14 +19,14 @@ trait StdUiCalculation[OUT](
     extends Calculation[OUT]
     with UiComponent:
   private val running = new AtomicBoolean(false)
-  val badge           = Badge()
-  val recalc          = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
+  lazy val badge      = Badge()
+  lazy val recalc     = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
     if running.compareAndSet(false, true) then
       try
         reCalculate()
       finally running.set(false)
 
-  override def rendered: Seq[UiElement] =
+  override lazy val rendered: Seq[UiElement] =
     val header = Box(
       bg = "green",
       p = 4,
@@ -47,13 +47,13 @@ trait StdUiCalculation[OUT](
   override protected def whenResultsNotReady(): Unit =
     session.renderChanges(
       badge.withText("Calculating").withColorScheme(Some("purple")),
-      dataUi.style(dataUi.style + ("filter" -> "grayscale(100%)")),
+      dataUi.withStyle(dataUi.style + ("filter" -> "grayscale(100%)")),
       recalc.withIsDisabled(Some(true))
     )
     super.whenResultsNotReady()
 
   override protected def whenResultsReady(results: OUT): Unit =
-    val newDataUi = dataUi.style(dataUi.style - "filter")
+    val newDataUi = dataUi.withStyle(dataUi.style - "filter")
     session.renderChanges(
       badge.withText("Ready").withColorScheme(None),
       newDataUi,

@@ -30,7 +30,19 @@ case class Button(
     spacing: Option[String] = None
 ) extends ChakraElement[Button]
     with OnClickEventHandler.CanHandleOnClickEvent[Button]:
-  override def style(v: Map[String, Any]): Button = copy(style = v)
+  override def withStyle(v: Map[String, Any]): Button = copy(style = v)
+  def withKey(v: String)                              = copy(key = v)
+  def withText(v: String)                             = copy(text = v)
+  def withSize(v: Option[String])                     = copy(size = v)
+  def withVariant(v: Option[String])                  = copy(variant = v)
+  def withColorScheme(v: Option[String])              = copy(colorScheme = v)
+  def withLeftIcon(v: Option[UiElement])              = copy(leftIcon = v)
+  def withRightIcon(v: Option[UiElement])             = copy(rightIcon = v)
+  def withIsActive(v: Option[Boolean])                = copy(isActive = v)
+  def withIsDisabled(v: Option[Boolean])              = copy(isDisabled = v)
+  def withIsLoading(v: Option[Boolean])               = copy(isLoading = v)
+  def withIsAttached(v: Option[Boolean])              = copy(isAttached = v)
+  def withSpacing(v: Option[String])                  = copy(spacing = v)
 
 /** https://chakra-ui.com/docs/components/button
   */
@@ -47,8 +59,16 @@ case class ButtonGroup(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[ButtonGroup]
     with HasChildren[ButtonGroup]:
-  override def withChildren(cn: UiElement*)            = copy(children = cn)
-  override def style(v: Map[String, Any]): ButtonGroup = copy(style = v)
+  override def withChildren(cn: UiElement*)                = copy(children = cn)
+  override def withStyle(v: Map[String, Any]): ButtonGroup = copy(style = v)
+  def withKey(v: String)                                   = copy(key = v)
+  def withVariant(v: Option[String])                       = copy(variant = v)
+  def withSpacing(v: Option[String])                       = copy(spacing = v)
+  def withSize(v: Option[String])                          = copy(size = v)
+  def withWidth(v: Option[String])                         = copy(width = v)
+  def withHeight(v: Option[String])                        = copy(height = v)
+  def withBorder(v: Option[String])                        = copy(border = v)
+  def withBorderColor(v: Option[String])                   = copy(borderColor = v)
 
 /** https://chakra-ui.com/docs/components/box
   */
@@ -64,8 +84,15 @@ case class Box(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Box]
     with HasChildren[Box]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  def withBg(v: String)                       = copy(bg = v)
+  def withW(v: String)                        = copy(w = v)
+  def withP(v: Int)                           = copy(p = v)
+  def withColor(v: String)                    = copy(color = v)
+  def withAs(v: Option[String])               = copy(as = v)
 
 /** https://chakra-ui.com/docs/components/stack
   */
@@ -77,8 +104,11 @@ case class HStack(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[HStack]
     with HasChildren[HStack]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withSpacing(v: Option[String])          = copy(spacing = v)
+  def withAlign(v: Option[String])            = copy(align = v)
 
 case class VStack(
     key: String = Keys.nextKey,
@@ -88,8 +118,11 @@ case class VStack(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[VStack]
     with HasChildren[VStack]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withSpacing(v: Option[String])          = copy(spacing = v)
+  def withAlign(v: Option[String])            = copy(align = v)
 
 case class SimpleGrid(
     key: String = Keys.nextKey,
@@ -101,8 +134,13 @@ case class SimpleGrid(
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[SimpleGrid]
     with HasChildren[SimpleGrid]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withSpacing(v: Option[String])          = copy(spacing = v)
+  def withSpacingX(v: Option[String])         = copy(spacingX = v)
+  def withSpacingY(v: Option[String])         = copy(spacingY = v)
+  def withColumns(v: Int)                     = copy(columns = v)
 
 /** https://chakra-ui.com/docs/components/editable
   */
@@ -119,16 +157,22 @@ case class Editable(
   override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler =
     newValue => session.modified(copy(value = newValue))
   override def withChildren(cn: UiElement*)                                         = copy(children = cn)
-  override def style(v: Map[String, Any])                                           = copy(style = v)
+  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
+  def withKey(v: String)                                                            = copy(key = v)
+  def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
+  def withValue(v: String)                                                          = copy(value = v)
 
 case class EditablePreview(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty) extends ChakraElement[EditablePreview]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
 
 case class EditableInput(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty) extends ChakraElement[EditableInput]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
 
 case class EditableTextarea(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty) extends ChakraElement[EditableTextarea]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
 
 /** https://chakra-ui.com/docs/components/form-control
   */
@@ -139,8 +183,10 @@ case class FormControl(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[FormControl]
     with HasChildren[FormControl]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withAs(v: String)                       = copy(as = v)
 
 /** https://chakra-ui.com/docs/components/form-control
   */
@@ -151,8 +197,10 @@ case class FormLabel(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[FormLabel]
     with HasChildren[FormLabel]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
 
 /** https://chakra-ui.com/docs/components/form-control
   */
@@ -163,8 +211,10 @@ case class FormHelperText(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[FormHelperText]
     with HasChildren[FormHelperText]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
 
 /** https://chakra-ui.com/docs/components/input
   */
@@ -180,7 +230,13 @@ case class Input(
     with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Input]:
   override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = newValue))
-  override def style(v: Map[String, Any])                                           = copy(style = v)
+  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
+  def withKey(v: String)                                                            = copy(key = v)
+  def withType(v: String)                                                           = copy(`type` = v)
+  def withPlaceholder(v: String)                                                    = copy(placeholder = v)
+  def withSize(v: String)                                                           = copy(size = v)
+  def withVariant(v: Option[String])                                                = copy(variant = v)
+  def withValue(v: String)                                                          = copy(value = v)
 
 case class InputGroup(
     key: String = Keys.nextKey,
@@ -189,8 +245,10 @@ case class InputGroup(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[InputGroup]
     with HasChildren[InputGroup]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withSize(v: String)                     = copy(size = v)
 
 case class InputLeftAddon(
     key: String = Keys.nextKey,
@@ -199,8 +257,10 @@ case class InputLeftAddon(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[InputLeftAddon]
     with HasChildren[InputLeftAddon]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
 
 case class InputRightAddon(
     key: String = Keys.nextKey,
@@ -209,8 +269,10 @@ case class InputRightAddon(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[InputRightAddon]
     with HasChildren[InputRightAddon]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
 
 /** https://chakra-ui.com/docs/components/checkbox
   */
@@ -226,7 +288,11 @@ case class Checkbox(
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Checkbox]:
   def checked: Boolean                                                              = checkedV.getOrElse(defaultChecked)
   override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(checkedV = Some(newValue.toBoolean)))
-  override def style(v: Map[String, Any])                                           = copy(style = v)
+  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
+  def withKey(v: String)                                                            = copy(key = v)
+  def withText(v: String)                                                           = copy(text = v)
+  def withDefaultChecked(v: Boolean)                                                = copy(defaultChecked = v)
+  def withIsDisabled(v: Boolean)                                                    = copy(isDisabled = v)
 
 /** https://chakra-ui.com/docs/components/radio
   */
@@ -237,7 +303,11 @@ case class Radio(
     colorScheme: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Radio]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withValue(v: String)                    = copy(value = v)
+  def withText(v: String)                     = copy(text = v)
+  def withColorScheme(v: Option[String])      = copy(colorScheme = v)
 
 case class RadioGroup(
     key: String = Keys.nextKey,
@@ -251,8 +321,10 @@ case class RadioGroup(
     with OnChangeEventHandler.CanHandleOnChangeEvent[RadioGroup]:
   override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(valueV = Some(newValue)))
   override def withChildren(cn: UiElement*)                                         = copy(children = cn)
-  override def style(v: Map[String, Any])                                           = copy(style = v)
+  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
   def value: String                                                                 = valueV.getOrElse(defaultValue)
+  def withKey(v: String)                                                            = copy(key = v)
+  def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
 
 case class Center(
     key: String = Keys.nextKey,
@@ -265,8 +337,14 @@ case class Center(
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Center]
     with HasChildren[Center]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  def withBg(v: Option[String])               = copy(bg = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 case class Circle(
     key: String = Keys.nextKey,
@@ -279,8 +357,14 @@ case class Circle(
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Circle]
     with HasChildren[Circle]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  def withBg(v: Option[String])               = copy(bg = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 case class Square(
     key: String = Keys.nextKey,
@@ -293,8 +377,14 @@ case class Square(
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Square]
     with HasChildren[Square]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  def withBg(v: Option[String])               = copy(bg = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -306,7 +396,12 @@ case class AddIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[AddIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -318,7 +413,12 @@ case class ArrowBackIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ArrowBackIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -330,7 +430,12 @@ case class ArrowDownIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ArrowDownIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -342,7 +447,12 @@ case class ArrowForwardIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ArrowForwardIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -354,7 +464,12 @@ case class ArrowLeftIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ArrowLeftIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -366,7 +481,12 @@ case class ArrowRightIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ArrowRightIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -378,7 +498,12 @@ case class ArrowUpIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ArrowUpIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -390,7 +515,12 @@ case class ArrowUpDownIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ArrowUpDownIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -402,7 +532,12 @@ case class AtSignIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[AtSignIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -414,7 +549,12 @@ case class AttachmentIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[AttachmentIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -426,7 +566,12 @@ case class BellIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[BellIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -438,7 +583,12 @@ case class CalendarIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[CalendarIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -450,7 +600,12 @@ case class ChatIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ChatIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -462,7 +617,12 @@ case class CheckIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[CheckIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -474,7 +634,12 @@ case class CheckCircleIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[CheckCircleIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -486,7 +651,12 @@ case class ChevronDownIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ChevronDownIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -498,7 +668,12 @@ case class ChevronLeftIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ChevronLeftIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -510,7 +685,12 @@ case class ChevronRightIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ChevronRightIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -522,7 +702,12 @@ case class ChevronUpIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ChevronUpIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -534,7 +719,12 @@ case class CloseIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[CloseIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -546,7 +736,12 @@ case class CopyIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[CopyIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -558,7 +753,12 @@ case class DeleteIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[DeleteIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -570,7 +770,12 @@ case class DownloadIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[DownloadIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -582,7 +787,12 @@ case class DragHandleIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[DragHandleIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -594,7 +804,12 @@ case class EditIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[EditIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -606,7 +821,12 @@ case class EmailIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[EmailIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -618,7 +838,12 @@ case class ExternalLinkIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ExternalLinkIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -630,7 +855,12 @@ case class HamburgerIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[HamburgerIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -642,7 +872,12 @@ case class InfoIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[InfoIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -654,7 +889,12 @@ case class InfoOutlineIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[InfoOutlineIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -666,7 +906,12 @@ case class LinkIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[LinkIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -678,7 +923,12 @@ case class LockIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[LockIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -690,7 +940,12 @@ case class MinusIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[MinusIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -702,7 +957,12 @@ case class MoonIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[MoonIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -714,7 +974,12 @@ case class NotAllowedIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[NotAllowedIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -726,7 +991,12 @@ case class PhoneIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[PhoneIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -738,7 +1008,12 @@ case class PlusSquareIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[PlusSquareIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -750,7 +1025,12 @@ case class QuestionIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[QuestionIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -762,7 +1042,12 @@ case class QuestionOutlineIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[QuestionOutlineIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -774,7 +1059,12 @@ case class RepeatIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[RepeatIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -786,7 +1076,12 @@ case class RepeatClockIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[RepeatClockIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -798,7 +1093,12 @@ case class SearchIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[SearchIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -810,7 +1110,12 @@ case class Search2Icon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Search2Icon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -822,7 +1127,12 @@ case class SettingsIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[SettingsIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -834,7 +1144,12 @@ case class SmallAddIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[SmallAddIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -846,7 +1161,12 @@ case class SmallCloseIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[SmallCloseIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -858,7 +1178,12 @@ case class SpinnerIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[SpinnerIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -870,7 +1195,12 @@ case class StarIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[StarIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -882,7 +1212,12 @@ case class SunIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[SunIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -894,7 +1229,12 @@ case class TimeIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[TimeIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -906,7 +1246,12 @@ case class TriangleDownIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[TriangleDownIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -918,7 +1263,12 @@ case class TriangleUpIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[TriangleUpIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -930,7 +1280,12 @@ case class UnlockIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[UnlockIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -942,7 +1297,12 @@ case class UpDownIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[UpDownIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -954,7 +1314,12 @@ case class ViewIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ViewIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -966,7 +1331,12 @@ case class ViewOffIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[ViewOffIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -978,7 +1348,12 @@ case class WarningIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[WarningIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** generated by generateIconsCode() , https://chakra-ui.com/docs/components/icon
   */
@@ -990,7 +1365,12 @@ case class WarningTwoIcon(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[WarningTwoIcon]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withW(v: Option[String])                = copy(w = v)
+  def withH(v: Option[String])                = copy(h = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withColor(v: Option[String])            = copy(color = v)
 
 /** https://chakra-ui.com/docs/components/textarea
   */
@@ -1006,7 +1386,13 @@ case class Textarea(
     with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Textarea]:
   override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = newValue))
-  override def style(v: Map[String, Any])                                           = copy(style = v)
+  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
+  def withKey(v: String)                                                            = copy(key = v)
+  def withType(v: String)                                                           = copy(`type` = v)
+  def withPlaceholder(v: String)                                                    = copy(placeholder = v)
+  def withSize(v: String)                                                           = copy(size = v)
+  def withVariant(v: Option[String])                                                = copy(variant = v)
+  def withValue(v: String)                                                          = copy(value = v)
 
 /** https://chakra-ui.com/docs/components/switch
   */
@@ -1022,7 +1408,11 @@ case class Switch(
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Switch]:
   def checked: Boolean                                                              = checkedV.getOrElse(defaultChecked)
   override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(checkedV = Some(newValue.toBoolean)))
-  override def style(v: Map[String, Any])                                           = copy(style = v)
+  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
+  def withKey(v: String)                                                            = copy(key = v)
+  def withText(v: String)                                                           = copy(text = v)
+  def withDefaultChecked(v: Boolean)                                                = copy(defaultChecked = v)
+  def withIsDisabled(v: Boolean)                                                    = copy(isDisabled = v)
 
 /** https://chakra-ui.com/docs/components/select
   */
@@ -1040,8 +1430,14 @@ case class Select(
     with HasChildren[Select]
     with OnChangeEventHandler.CanHandleOnChangeEvent[Select]:
   override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = newValue))
-  override def style(v: Map[String, Any])                                           = copy(style = v)
+  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
   override def withChildren(cn: UiElement*)                                         = copy(children = cn)
+  def withKey(v: String)                                                            = copy(key = v)
+  def withPlaceholder(v: String)                                                    = copy(placeholder = v)
+  def withValue(v: String)                                                          = copy(value = v)
+  def withBg(v: Option[String])                                                     = copy(bg = v)
+  def withColor(v: Option[String])                                                  = copy(color = v)
+  def withBorderColor(v: Option[String])                                            = copy(borderColor = v)
 
 case class Option_(
     key: String = Keys.nextKey,
@@ -1049,14 +1445,18 @@ case class Option_(
     text: String = "",
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Option_]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withValue(v: String)                    = copy(value = v)
+  def withText(v: String)                     = copy(text = v)
 
 /** https://chakra-ui.com/docs/components/table/usage
   */
 case class TableContainer(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty)
     extends ChakraElement[TableContainer]
     with HasChildren[TableContainer]:
-  override def style(v: Map[String, Any])                       = copy(style = v)
+  override def withStyle(v: Map[String, Any])                   = copy(style = v)
+  def withKey(v: String)                                        = copy(key = v)
   def withRowStringData(data: Seq[Seq[String]]): TableContainer = withRowData(data.map(_.map(c => Text(text = c))))
   def withRowData(data: Seq[Seq[UiElement]]): TableContainer    =
     val tableBodies = children
@@ -1084,29 +1484,38 @@ case class Table(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Table]
     with HasChildren[Table]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withVariant(v: String)                  = copy(variant = v)
+  def withSize(v: String)                     = copy(size = v)
+  def withColorScheme(v: Option[String])      = copy(colorScheme = v)
 
 case class TableCaption(key: String = Keys.nextKey, text: String = "", style: Map[String, Any] = Map.empty) extends ChakraElement[TableCaption]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
 
 case class Thead(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty)
     extends ChakraElement[Thead]
     with HasChildren[Thead]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
 
 case class Tbody(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty)
     extends ChakraElement[Tbody]
     with HasChildren[Tbody]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
 
 case class Tfoot(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty)
     extends ChakraElement[Tfoot]
     with HasChildren[Tfoot]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
 
 case class Tr(
     key: String = Keys.nextKey,
@@ -1114,8 +1523,9 @@ case class Tr(
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Tr]
     with HasChildren[Tr]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
 
 case class Th(
     key: String = Keys.nextKey,
@@ -1125,8 +1535,11 @@ case class Th(
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Th]
     with HasChildren[Th]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  def withIsNumeric(v: Boolean)               = copy(isNumeric = v)
 
 case class Td(
     key: String = Keys.nextKey,
@@ -1136,16 +1549,20 @@ case class Td(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Td]
     with HasChildren[Td]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  def withIsNumeric(v: Boolean)               = copy(isNumeric = v)
 
 /** https://chakra-ui.com/docs/components/menu/usage
   */
 case class Menu(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, children: Seq[UiElement] = Nil)
     extends ChakraElement[Menu]
     with HasChildren[Menu]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
 
 case class MenuButton(
     key: String = Keys.nextKey,
@@ -1156,14 +1573,19 @@ case class MenuButton(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[MenuButton]
     with HasChildren[MenuButton]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  def withSize(v: Option[String])             = copy(size = v)
+  def withColorScheme(v: Option[String])      = copy(colorScheme = v)
 
 case class MenuList(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, children: Seq[UiElement] = Nil)
     extends ChakraElement[MenuList]
     with HasChildren[MenuList]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
 
 case class MenuItem(
     key: String = Keys.nextKey,
@@ -1173,11 +1595,14 @@ case class MenuItem(
 ) extends ChakraElement[MenuItem]
     with HasChildren[MenuItem]
     with OnClickEventHandler.CanHandleOnClickEvent[MenuItem]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
 
 case class MenuDivider(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty) extends ChakraElement[MenuDivider]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
 
 case class Badge(
     key: String = Keys.nextKey,
@@ -1189,8 +1614,13 @@ case class Badge(
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Badge]
     with HasChildren[Badge]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  def withColorScheme(v: Option[String])      = copy(colorScheme = v)
+  def withVariant(v: Option[String])          = copy(variant = v)
+  def withSize(v: String)                     = copy(size = v)
 
 /** https://chakra-ui.com/docs/components/image/usage
   *
@@ -1206,7 +1636,12 @@ case class Image(
     borderRadius: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Image]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withSrc(v: String)                      = copy(src = v)
+  def withAlt(v: String)                      = copy(alt = v)
+  def withBoxSize(v: Option[String])          = copy(boxSize = v)
+  def withBorderRadius(v: Option[String])     = copy(borderRadius = v)
 
 /** https://chakra-ui.com/docs/components/text
   */
@@ -1222,4 +1657,13 @@ case class Text(
     decoration: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Text]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  def withFontSize(v: Option[String])         = copy(fontSize = v)
+  def withNoOfLines(v: Option[Int])           = copy(noOfLines = v)
+  def withColor(v: Option[String])            = copy(color = v)
+  def withAs(v: Option[String])               = copy(as = v)
+  def withAlign(v: Option[String])            = copy(align = v)
+  def withCasing(v: Option[String])           = copy(casing = v)
+  def withDecoration(v: Option[String])       = copy(decoration = v)

@@ -36,4 +36,4 @@ object UiElement:
 
   trait HasStyle[A <: UiElement]:
     def style: Map[String, Any]
-    def style(v: Map[String, Any]): A
+    def withStyle(v: Map[String, Any]): A

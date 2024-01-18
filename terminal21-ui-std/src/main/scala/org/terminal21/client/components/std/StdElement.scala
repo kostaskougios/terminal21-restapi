@@ -8,16 +8,23 @@ sealed trait StdEJson                   extends UiElement
 sealed trait StdElement[A <: UiElement] extends StdEJson with HasStyle[A] with Current[A]
 
 case class Span(key: String = Keys.nextKey, text: String, style: Map[String, Any] = Map.empty) extends StdElement[Span]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
 
 case class NewLine(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty) extends StdElement[NewLine]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
 
 case class Em(key: String = Keys.nextKey, text: String, style: Map[String, Any] = Map.empty) extends StdElement[Em]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
 
 case class Header1(key: String = Keys.nextKey, text: String, style: Map[String, Any] = Map.empty) extends StdElement[Header1]:
-  override def style(v: Map[String, Any]) = copy(style = v)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
 
 case class Paragraph(
     key: String = Keys.nextKey,
@@ -26,8 +33,10 @@ case class Paragraph(
     children: Seq[UiElement] = Nil
 ) extends StdElement[Paragraph]
     with HasChildren[Paragraph]:
-  override def withChildren(cn: UiElement*) = copy(children = cn)
-  override def style(v: Map[String, Any])   = copy(style = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
 
 case class Input(
     key: String = Keys.nextKey,
@@ -38,7 +47,11 @@ case class Input(
 ) extends StdElement[Input]
     with HasEventHandler:
   override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = Some(newValue)))
-  override def style(v: Map[String, Any])                                           = copy(style = v)
+  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
+  def withKey(v: String)                                                            = copy(key = v)
+  def withType(v: String)                                                           = copy(`type` = v)
+  def withDefaultValue(v: Option[String])                                           = copy(defaultValue = v)
+  def withValue(v: Option[String])                                                  = copy(value = v)
 
   def onChange(h: OnChangeEventHandler)(using session: ConnectedSession): Input =
     session.addEventHandler(key, h)

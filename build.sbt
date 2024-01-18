@@ -1,3 +1,5 @@
+import sbt.librarymanagement.ModuleFilter
+
 /** This build has different sections for each integration. I.e. an http4s section and a kafka section. These sections are not related to each other, please
   * examine the section you're interested in.
   */
@@ -121,9 +123,6 @@ lazy val `terminal21-client-common` = project
 lazy val `terminal21-ui-std` = project
   .settings(
     commonSettings,
-    Compile / unmanagedSourceDirectories ++= {
-      Seq(baseDirectory.value / "src" / "main" / "ui-generated")
-    },
     callerExports                := Seq(s"io.github.kostaskougios:terminal21-ui-std-exports_3:${version.value}"),
     callerJsonSerialization      := true,
     callerHelidonClientTransport := true,
@@ -183,7 +182,7 @@ lazy val `terminal21-mathjax` = project
   )
   .dependsOn(`terminal21-ui-std` % "compile->compile;test->test")
 
-lazy val `terminal21-code-generation` = project
+lazy val `terminal21-code-generation`: Project = project
   .settings(
     commonSettings,
     libraryDependencies ++= Seq(
