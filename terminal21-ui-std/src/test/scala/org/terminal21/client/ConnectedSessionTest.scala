@@ -16,7 +16,7 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
     given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
     val editable                             = Editable()
     editable.onChange: newValue =>
-      editable.value should be(newValue)
+      editable.current.value should be(newValue)
 
     connectedSession.render(editable)
     connectedSession.fireEvent(OnChange(editable.key, "new value"))
@@ -37,7 +37,7 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
       )
     )
 
-  test("renderChanges"):
+  test("renderChanges changes state on server"):
     val (sessionService, connectedSession) = ConnectedSessionMock.newConnectedSessionAndSessionServiceMock
 
     val p1    = Paragraph(text = "p1")
@@ -52,3 +52,12 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
         Map(p1.key -> Seq(span1.key), span1.key             -> Nil)
       )
     )
+
+  test("renderChanges updates current version of component"):
+    given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
+
+    val p1    = Paragraph(text = "p1")
+    val span1 = Span(text = "span1")
+    connectedSession.render(p1)
+    connectedSession.renderChanges(p1.withChildren(span1))
+    p1.current.children should be(Seq(span1))
