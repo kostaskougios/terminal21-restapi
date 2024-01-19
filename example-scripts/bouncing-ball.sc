@@ -23,8 +23,7 @@ Sessions.withNewSession("bouncing-ball", "C64 bouncing ball"): session =>
   ball.render()
 
   @tailrec def animateBall(x: Int, y: Int, dx: Int, dy: Int): Unit =
-    ball.style = Map("position" -> "fixed", "left" -> (x + "px"), "top" -> (y + "px"))
-    ball.renderChanges()
+    ball.withStyle("position" -> "fixed", "left" -> (x + "px"), "top" -> (y + "px")).renderChanges()
     Thread.sleep(1000 / 120)
     val newDx = if x < 0 || x > 600 then -dx else dx
     val newDy = if y < 0 || y > 500 then -dy else dy

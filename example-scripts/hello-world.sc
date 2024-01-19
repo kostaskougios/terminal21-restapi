@@ -12,7 +12,5 @@ import org.terminal21.client.components.std.*
 Sessions.withNewSession("hello-world", "Hello World Example"): session =>
   given ConnectedSession = session
 
-  Seq(
-    Paragraph(text = "Hello World!")
-  ).render()
+  Paragraph(text = "Hello World!").render()
   session.leaveSessionOpenAfterExiting()

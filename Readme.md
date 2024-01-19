@@ -147,28 +147,21 @@ the state in the client scripts.
 
 # Mutability
 
-terminal21 ui components are mutable. This is a decision choice (for now) because of how much more simple code is this way. I.e.
-changing the text of a paragraph on an event handler is as simple as :
+terminal21 ui components are immutable from v0.20. Use `component.withX(...).renderChanges()` to modify a component
+and render it. Note that the original `component` is not changed.
 
-```scala
-    p.text = "new text"
-```
-
-The equivalent immutable code would be (at least) 
-```scala
-    p.copy(text= "new text")
-```
-
-Also by default some component values (like input boxes) are changed by the user. These changes are reflected in the component graph, something that
-would be a lot harder if the graph was immutable.
-
-If there is a reasonable way to refactor to have immutability without compromising simplicity, it will be done.
+Also when getting a value of i.e. an Input, use `myInput.current.value`. `current` makes sure we read the component with
+all changes that may have occurred at the browser.
 
 # Need help?
 
 Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi/discussions) of the project to post any questions, comments or ideas.
 
 # Changelog
+## Version 0.20
+
+- immutable components
+- option to render only changed components
 
 ## Version 0.12
 

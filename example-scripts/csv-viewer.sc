@@ -23,7 +23,7 @@ if args.length != 1 then
   )
 
 val fileName = args(0)
-val file = new File(fileName)
+val file     = new File(fileName)
 val contents = FileUtils.readFileToString(file, "UTF-8")
 
 val csv = contents.split("\n").map(_.split(","))
@@ -31,12 +31,11 @@ val csv = contents.split("\n").map(_.split(","))
 Sessions.withNewSession(s"csv-viewer-$fileName", s"CsvView: $fileName"): session =>
   given ConnectedSession = session
 
-  Seq(
-    TableContainer().withChildren(
+  TableContainer()
+    .withChildren(
       Table(variant = "striped", colorScheme = Some("teal"), size = "mg")
         .withChildren(
           TableCaption(text = "Csv file contents"),
-          Thead(),
           Tbody(
             children = csv.map: row =>
               Tr(
@@ -45,8 +44,7 @@ Sessions.withNewSession(s"csv-viewer-$fileName", s"CsvView: $fileName"): session
               )
           )
         )
-    )
-  ).render()
+    ).render()
   println(s"Now open ${session.uiUrl} to view the UI.")
-  // since this is a read-only UI, we can exit the app but leave the session open on the UI
+  // since this is a read-only UI, we can exit the app but leave the session open on the UI for the user to examine the data.
   session.leaveSessionOpenAfterExiting()

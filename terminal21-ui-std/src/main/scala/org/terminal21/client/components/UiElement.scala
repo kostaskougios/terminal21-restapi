@@ -28,8 +28,9 @@ object UiElement:
   trait HasChildren[A <: UiElement]:
     this: A =>
     def children: Seq[UiElement]
-    override def flat: Seq[UiElement] = Seq(this) ++ children.flatMap(_.flat)
+    override def flat: Seq[UiElement]  = Seq(this) ++ children.flatMap(_.flat)
     def withChildren(cn: UiElement*): A
+    def addChildren(cn: UiElement*): A = withChildren(children ++ cn: _*)
 
   trait HasEventHandler:
     def defaultEventHandler(session: ConnectedSession): EventHandler
@@ -37,3 +38,4 @@ object UiElement:
   trait HasStyle[A <: UiElement]:
     def style: Map[String, Any]
     def withStyle(v: Map[String, Any]): A
+    def withStyle(vs: (String, Any)*): A = withStyle(vs.toMap)

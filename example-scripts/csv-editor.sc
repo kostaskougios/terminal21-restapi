@@ -65,8 +65,7 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session
   val saveAndExit = Button(text = "Save & Exit")
     .onClick: () =>
       saveCsvMap()
-      status.text="Csv file saved, exiting."
-      status.renderChanges()
+      status.withText("Csv file saved, exiting.").renderChanges()
       exitFlag.set(true)
 
   val exit = Button(text = "Exit Without Saving")
@@ -81,8 +80,7 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session
       )
       .onChange: newValue =>
         csvMap((x, y)) = newValue
-        status.text = s"($x,$y) value changed to $newValue"
-        status.renderChanges()
+        status.withText(s"($x,$y) value changed to $newValue").renderChanges()
 
   Seq(
     TableContainer().withChildren(
