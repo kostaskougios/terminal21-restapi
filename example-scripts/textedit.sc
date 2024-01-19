@@ -1,4 +1,4 @@
-//#!/usr/bin/env -S scala-cli project.scala
+#!/usr/bin/env -S scala-cli project.scala
 
 // ------------------------------------------------------------------------------
 // A text file editor for small files.
@@ -53,14 +53,13 @@ Sessions.withNewSession(s"textedit-$fileName", s"Edit: $fileName"): session =>
         MenuList().withChildren(
           MenuItem(text = "Save")
             .onClick: () =>
-              saveFile(editor.value)
+              saveFile(editor.current.value)
               // we'll display a "Saved" badge for 1 second.
               Seq(
                 status.withText("Saved"),
                 modified.withText("")
               ).renderChanges()
-              modified.renderChanges()
-              // each event handler runs on a new fibler, it is ok to sleep here
+              // each event handler runs on a new fiber, it is ok to sleep here
               Thread.sleep(1000)
               status.withText("").renderChanges()
           ,
