@@ -58,7 +58,7 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
           sendSessionState(wsSession, session, sessionState)
         case Right(WsRequest(eventName, Some(event: UiEvent)))                             =>
           logger.info(s"$wsSession: Received event $eventName = $event")
-          sessionsService.addEvent(event)
+          sessionsService.triggerUiEvent(event)
         case Right(WsRequest("ping", None))                                                =>
           logger.info(s"$wsSession: ping received")
         case Right(WsRequest("close-session", Some(CloseSession(sessionId))))              =>

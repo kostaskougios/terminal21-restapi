@@ -65,7 +65,7 @@ class ServerSessionsService extends SessionsService:
     sessionStateChangeNotificationRegistry.notifyAll((session, newV, Some(change)))
     logger.info(s"Session $session change $change")
 
-  def addEvent(event: UiEvent): Unit =
+  def triggerUiEvent(event: UiEvent): Unit =
     val e = event match
       case org.terminal21.server.json.OnClick(_, key)         => OnClick(key)
       case org.terminal21.server.json.OnChange(_, key, value) => OnChange(key, value)

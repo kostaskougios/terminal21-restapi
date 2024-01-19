@@ -3,7 +3,8 @@ package org.terminal21.server.service
 import io.circe.Json
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
-import org.terminal21.model.SessionClosed
+import org.terminal21.model.{OnChange, OnClick, SessionClosed}
+import org.terminal21.server.json
 import org.terminal21.ui.std.StdExportsBuilders.serverJson
 
 class ServerSessionsServiceTest extends AnyFunSuiteLike:
@@ -119,6 +120,30 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
         true
       serverSessionsService.changeSessionJsonState(session, sj2)
       called should be(2)
+
+  test("triggerUiEvent notifies listeners for clicks"):
+    new App:
+      val session = createSession
+      var called  = false
+      serverSessionsService.notifyMeOnSessionEvents(session): e =>
+        called = true
+        e should be(OnClick("key1"))
+        true
+
+      serverSessionsService.triggerUiEvent(json.OnClick(session.id, "key1"))
+      called should be(true)
+
+  test("triggerUiEvent notifies listeners for change"):
+    new App:
+      val session = createSession
+      var called  = false
+      serverSessionsService.notifyMeOnSessionEvents(session): e =>
+        called = true
+        e should be(OnChange("key1", "newvalue"))
+        true
+
+      serverSessionsService.triggerUiEvent(json.OnChange(session.id, "key1", "newvalue"))
+      called should be(true)
 
   class App:
     val serverSessionsService = new ServerSessionsService
