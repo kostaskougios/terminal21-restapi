@@ -54,12 +54,12 @@ SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(/* con
   val oldestPeopleChartCalc = peopleDS
     .orderBy($"age".desc)
     .visualize("Oldest people", oldestPeopleChart): data =>
-      oldestPeopleChart.data = Seq(
+      oldestPeopleChart.withData(Seq(
         Serie(
           "Person",
           data = data.take(5).map(person => Datum(person.name, person.age))
         )
-      )
+      ))
 
   Seq(
     // just make it look a bit more like a proper notebook by adding some fake maths

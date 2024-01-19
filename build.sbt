@@ -5,7 +5,7 @@ import sbt.librarymanagement.ModuleFilter
   */
 val scala3Version = "3.3.1"
 
-ThisBuild / version      := "0.12"
+ThisBuild / version      := "0.20"
 ThisBuild / organization := "io.github.kostaskougios"
 name                     := "rest-api"
 ThisBuild / scalaVersion := scala3Version
