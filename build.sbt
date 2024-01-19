@@ -99,7 +99,7 @@ lazy val `terminal21-server` = project
       LogBack
     ) ++ Circe
   )
-  .dependsOn(`terminal21-ui-std-exports`, `terminal21-server-client-common`)
+  .dependsOn(`terminal21-ui-std-exports` % "compile->compile;test->test", `terminal21-server-client-common`)
   .enablePlugins(FunctionsRemotePlugin)
 
 lazy val `terminal21-ui-std-exports` = project

@@ -60,7 +60,7 @@ class ServerSessionsService extends SessionsService:
 
   override def changeSessionJsonState(session: Session, change: ServerJson): Unit =
     val oldV = sessions(session)
-    val newV = oldV.withNewState(oldV.json.include(change))
+    val newV = oldV.withNewState(oldV.serverJson.include(change))
     sessions += session -> newV
     sessionStateChangeNotificationRegistry.notifyAll((session, newV, Some(change)))
     logger.info(s"Session $session change $change")

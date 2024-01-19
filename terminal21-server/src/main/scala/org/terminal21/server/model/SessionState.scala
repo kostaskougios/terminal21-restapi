@@ -5,8 +5,8 @@ import org.terminal21.server.utils.NotificationRegistry
 import org.terminal21.ui.std.ServerJson
 
 case class SessionState(
-    json: ServerJson,
+    serverJson: ServerJson,
     eventsNotificationRegistry: NotificationRegistry[CommandEvent]
 ):
-  def withNewState(newJson: ServerJson): SessionState = copy(json = newJson)
+  def withNewState(newJson: ServerJson): SessionState = copy(serverJson = newJson)
   def close: SessionState                             = copy(eventsNotificationRegistry = new NotificationRegistry[CommandEvent])

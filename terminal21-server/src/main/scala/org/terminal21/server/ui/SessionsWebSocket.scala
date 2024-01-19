@@ -29,7 +29,7 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
           case Some(change) => sendSessionStateChange(wsSession, session, change)
 
   private def sendSessionState(wsSession: WsSession, session: Session, sessionState: SessionState): Unit =
-    val response = StateWsResponse(session.hideSecret, sessionState.json).asJson.noSpaces
+    val response = StateWsResponse(session.hideSecret, sessionState.serverJson).asJson.noSpaces
     logger.info(s"$wsSession: Sending session state response $response")
     wsSession.send(response, true)
 
