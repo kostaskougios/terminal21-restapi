@@ -48,7 +48,7 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
       serverSessionsService.terminateSession(session)
       serverSessionsService.sessionById(session.id).isOpen should be(false)
 
-  test("terminateSession notifies listeners"):
+  test("terminateSession notifies session listeners"):
     new App:
       val session     = createSession
       serverSessionsService.setSessionJsonState(session, serverJson())
@@ -59,6 +59,20 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
         true
       serverSessionsService.terminateSession(session)
       eventCalled should be(true)
+
+  test("terminateSession notifies sessions listeners"):
+    new App:
+      val session        = createSession
+      serverSessionsService.setSessionJsonState(session, serverJson())
+      var listenerCalled = 0
+      serverSessionsService.notifyMeWhenSessionsChange: sessions =>
+        listenerCalled match
+          case 0 => sessions should be(Seq(session))
+          case 1 => sessions should be(Seq(session.close))
+        listenerCalled += 1
+        true
+      serverSessionsService.terminateSession(session)
+      listenerCalled should be(2)
 
   class App:
     val serverSessionsService = new ServerSessionsService
