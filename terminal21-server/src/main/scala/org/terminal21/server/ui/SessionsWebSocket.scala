@@ -48,21 +48,26 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
     logger.info(s"$wsSession: Received json: $text , last = $last")
     errorLogger.logErrors:
       WsRequest.decoder(text) match
-        case Right(WsRequest("sessions", None))                                 =>
+        case Right(WsRequest("sessions", None))                                            =>
           continuouslyRespond(wsSession)
           logger.info(s"$wsSession: sessions processed successfully")
-        case Right(WsRequest(eventName, Some(event: UiEvent)))                  =>
+        case Right(WsRequest("session-full-refresh", Some(SessionFullRefresh(sessionId)))) =>
+          logger.info(s"$wsSession: session-full-refresh requested, sending full session data for $sessionId")
+          val session      = sessionsService.sessionById(sessionId)
+          val sessionState = sessionsService.sessionStateOf(session)
+          sendSessionState(wsSession, session, sessionState)
+        case Right(WsRequest(eventName, Some(event: UiEvent)))                             =>
           logger.info(s"$wsSession: Received event $eventName = $event")
           sessionsService.addEvent(event)
-        case Right(WsRequest("ping", None))                                     =>
+        case Right(WsRequest("ping", None))                                                =>
           logger.info(s"$wsSession: ping received")
-        case Right(WsRequest("close-session", Some(CloseSession(sessionId))))   =>
+        case Right(WsRequest("close-session", Some(CloseSession(sessionId))))              =>
           val session = sessionsService.sessionById(sessionId)
           sessionsService.terminateSession(session)
-        case Right(WsRequest("remove-session", Some(RemoveSession(sessionId)))) =>
+        case Right(WsRequest("remove-session", Some(RemoveSession(sessionId))))            =>
           val session = sessionsService.sessionById(sessionId)
           sessionsService.removeSession(session)
-        case x                                                                  =>
+        case x                                                                             =>
           logger.error(s"Invalid request : $x")
 
   override def onOpen(wsSession: WsSession): Unit =

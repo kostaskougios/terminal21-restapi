@@ -20,6 +20,8 @@ class ServerSessionsService extends SessionsService:
   def sessionById(sessionId: String): Session =
     sessions.keys.find(_.id == sessionId).getOrElse(throw new IllegalArgumentException(s"Invalid session id = $sessionId"))
 
+  def sessionStateOf(session: Session): SessionState = sessions(session)
+
   def notifyMeWhenSessionsChange(listener: ListenerFunction[Seq[Session]]): Unit =
     sessionChangeNotificationRegistry.addAndNotify(allSessions)(listener)
 

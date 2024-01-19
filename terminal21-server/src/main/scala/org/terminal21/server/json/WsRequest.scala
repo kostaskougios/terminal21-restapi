@@ -8,6 +8,8 @@ case class WsRequest(operation: String, body: Option[Body])
 
 sealed trait Body
 
+case class SessionFullRefresh(sessionId: String) extends Body
+
 sealed trait UiEvent extends Body:
   def sessionId: String
 
