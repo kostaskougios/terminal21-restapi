@@ -74,6 +74,19 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
       serverSessionsService.terminateSession(session)
       listenerCalled should be(2)
 
+  test("createSession notifies listeners"):
+    new App:
+      var listenerCalled = 0
+      serverSessionsService.notifyMeWhenSessionsChange: sessions =>
+        listenerCalled match
+          case 0 => sessions should be(Nil)
+          case 1 => sessions.size should be(1)
+        listenerCalled += 1
+        true
+
+      val session = createSession
+      listenerCalled should be(2)
+
   class App:
     val serverSessionsService = new ServerSessionsService
     def createSession         = serverSessionsService.createSession("test", "Test")

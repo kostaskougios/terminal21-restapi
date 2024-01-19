@@ -17,5 +17,10 @@ class NotificationRegistry[A]:
 
   def notifyAll(a: A): Int =
     synchronized:
-      ns = ns.filter(f => Try(f(a)).getOrElse(false))
+      ns = ns.filter: f =>
+        Try(f(a))
+          .recover: e =>
+            e.printStackTrace()
+            false
+          .get
       ns.size
