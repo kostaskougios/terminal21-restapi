@@ -29,8 +29,7 @@ Text(text = "typography-text-0001", color = Some("tomato"))
 ```scala
 val b = Button(text = "Keep Running")
 b.onClick: () =>
-    b.text = "Clicked"
-    session.render()
+    b.withText("Clicked").renderChanges()
 ```
 
 ### Box
@@ -63,12 +62,10 @@ Menu().withChildren(
   MenuList().withChildren(
     MenuItem(text = "Download menu-download")
       .onClick: () =>
-        box1.text = "'Download' clicked"
-        session.render()
+        box1.withText("'Download' clicked").renderChanges()
     ,
     MenuItem(text = "Copy").onClick: () =>
-      box1.text = "'Copy' clicked"
-      session.render()
+      box1.withText("'Copy' clicked").renderChanges()
   )
 )
 ```
@@ -104,8 +101,7 @@ val editable1 = Editable(defaultValue = "Please type here").withChildren(
 )
 
 editable1.onChange: newValue =>
-  status.text = s"editable1 newValue = $newValue, verify editable1.value = ${editable1.value}"
-  session.render()
+  status.withText(s"editable1 newValue = $newValue, verify editable1.value = ${editable1.value}").renderChanges()
 
 // Use text area for longer texts
 val editable2 = Editable(defaultValue = "For longer maybe-editable texts\nUse an EditableTextarea\nIt uses a textarea control.").withChildren(

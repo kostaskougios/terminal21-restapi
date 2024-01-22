@@ -29,7 +29,5 @@ Header1(text = "Welcome to the std components demo/test")
     val input  = Input(defaultValue = "Please enter your name")
     val output = Paragraph(text = "This will reflect what you type in the input")
     input.onChange: newValue =>
-      output.text = newValue
-      session.render()
-
+      output.withText(newValue).renderChanges()
 ```
