@@ -19,4 +19,4 @@ import org.terminal21.client.components.mathjax.*
         style = Map("backgroundColor" -> "gray")
       )
     ).render()
-    session.waitTillUserClosesSession()
+    session.leaveSessionOpenAfterExiting()

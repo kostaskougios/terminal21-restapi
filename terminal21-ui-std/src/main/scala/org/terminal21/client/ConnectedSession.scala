@@ -2,44 +2,29 @@ package org.terminal21.client
 
 import io.circe.*
 import io.circe.generic.auto.*
-import io.circe.syntax.*
 import org.slf4j.LoggerFactory
-import org.terminal21.client.components.UiElement
-import org.terminal21.client.components.UiElement.{HasEventHandler, allDeep}
-import org.terminal21.client.components.UiElementEncoding
+import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, allDeep}
+import org.terminal21.client.components.{UiComponent, UiElement, UiElementEncoding}
+import org.terminal21.client.internal.EventHandlers
 import org.terminal21.model.*
-import org.terminal21.ui.std.SessionsService
+import org.terminal21.ui.std.{ServerJson, SessionsService}
 
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 import scala.annotation.tailrec
+import scala.collection.concurrent.TrieMap
 
 class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
   private val logger   = LoggerFactory.getLogger(getClass)
-  private var elements = List.empty[UiElement]
+  private val handlers = new EventHandlers(this)
 
   def uiUrl: String = serverUrl + "/ui"
-  def clear(): Unit = synchronized:
-    elements = Nil
+  def clear(): Unit =
+    render()
+    handlers.clear()
+    modifiedElements.clear()
 
-  def add(es: UiElement*): Unit =
-    val withEvents = allDeep(es).collect:
-      case h: HasEventHandler => h
-
-    for e <- withEvents do addEventHandlerAtTheTop(e.key, e.defaultEventHandler)
-
-    synchronized:
-      elements = elements ::: es.toList
-
-  private val eventHandlers = collection.concurrent.TrieMap.empty[String, List[EventHandler]]
-
-  private def addEventHandlerAtTheTop(key: String, handler: EventHandler): Unit =
-    val handlers = eventHandlers.getOrElse(key, Nil)
-    eventHandlers += key -> (handler :: handlers)
-
-  def addEventHandler(key: String, handler: EventHandler): Unit =
-    val handlers = eventHandlers.getOrElse(key, Nil)
-    eventHandlers += key -> (handlers :+ handler)
+  def addEventHandler(key: String, handler: EventHandler): Unit = handlers.addEventHandler(key, handler)
 
   private val exitLatch = new CountDownLatch(1)
 
@@ -79,7 +64,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
         exitLatch.countDown()
         onCloseHandler()
       case _                =>
-        eventHandlers.get(event.key) match
+        handlers.getEventHandler(event.key) match
           case Some(handlers) =>
             for handler <- handlers do
               (event, handler) match
@@ -90,16 +75,43 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
           case None           =>
             logger.warn(s"There is no event handler for event $event")
 
-  def render(): Unit =
-    val j = toJson
-    sessionsService.setSessionJsonState(session, j.toJson.noSpaces)
+  def render(es: UiElement*): Unit =
+    handlers.registerEventHandlers(es)
+    val j = toJson(es)
+    sessionsService.setSessionJsonState(session, j)
 
-  def allElements: Seq[UiElement] = synchronized(elements)
+  def renderChanges(es: UiElement*): Unit =
+    for e <- es do modified(e)
+    val j = toJson(es)
+    sessionsService.changeSessionJsonState(session, j)
 
-  private def toJson: JsonObject =
-    import encoding.given
-    val elementsCopy = allElements
-    val json         =
-      for e <- elementsCopy
-      yield e.asJson.deepDropNullValues
-    JsonObject(("elements", json.asJson))
+  private def toJson(elements: Seq[UiElement]): ServerJson =
+    val flat = elements.flatMap(_.flat)
+    val sj   = ServerJson(
+      elements.map(_.key),
+      flat
+        .map: el =>
+          (
+            el.key,
+            el match
+              case e: UiComponent    => encoding.uiElementEncoder(e).deepDropNullValues
+              case e: HasChildren[_] => encoding.uiElementEncoder(e.withChildren()).deepDropNullValues
+              case e                 => encoding.uiElementEncoder(e).deepDropNullValues
+          )
+        .toMap,
+      flat
+        .map: e =>
+          (
+            e.key,
+            e match
+              case e: UiComponent    => e.rendered.map(_.key)
+              case e: HasChildren[_] => e.children.map(_.key)
+              case _                 => Nil
+          )
+        .toMap
+    )
+    sj
+  private val modifiedElements                             = TrieMap.empty[String, UiElement]
+  def modified(e: UiElement): Unit                         =
+    modifiedElements += e.key -> e
+  def currentState[A <: UiElement](e: A): A = modifiedElements.getOrElse(e.key, e).asInstanceOf[A]

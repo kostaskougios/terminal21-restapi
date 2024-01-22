@@ -57,8 +57,7 @@ import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
 
     val sourceFileChart = sortedSourceFilesDS.visualize("Biggest Code Files", chart): results =>
       val data = results.take(10).map(cf => Datum(StringUtils.substringBeforeLast(cf.name, ".scala"), cf.numOfLines)).toList
-      chart.data = Seq(Serie("Scala", data = data))
-      session.render()
+      chart.withData(Seq(Serie("Scala", data = data)))
 
     Seq(
       codeFilesCalculation,

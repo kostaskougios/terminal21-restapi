@@ -5,7 +5,7 @@ import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.chakra.*
 
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
 
 /** Creates a standard UI for a calculation which may take time. While the calculation runs, the UI is grayed out, including the dataUi component. When the
   * calculation completes, it allows for updating the dataUi component.
@@ -14,48 +14,52 @@ import java.util.concurrent.atomic.AtomicBoolean
   */
 trait StdUiCalculation[OUT](
     name: String,
-    dataUi: UiElement with HasStyle
+    dataUi: UiElement with HasStyle[_]
 )(using session: ConnectedSession, executor: FiberExecutor)
     extends Calculation[OUT]
     with UiComponent:
-  val badge           = Badge()
-  private val running = new AtomicBoolean(false)
-  val recalc          = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
+  private val running   = new AtomicBoolean(false)
+  private val currentUi = new AtomicReference(dataUi)
+
+  protected def updateUi(dataUi: UiElement & HasStyle[_]) = currentUi.set(dataUi)
+
+  lazy val badge  = Badge()
+  lazy val recalc = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: () =>
     if running.compareAndSet(false, true) then
       try
         reCalculate()
       finally running.set(false)
 
-  val header                             = Box(bg = "green", p = 4).withChildren(
-    HStack().withChildren(
-      Text(text = name),
-      badge,
-      recalc
+  override lazy val rendered: Seq[UiElement] =
+    val header = Box(
+      bg = "green",
+      p = 4,
+      children = Seq(
+        HStack(children = Seq(Text(text = name), badge, recalc))
+      )
     )
-  )
-  @volatile var children: Seq[UiElement] = Seq(
-    header,
-    dataUi
-  )
+    Seq(header, dataUi)
 
   override def onError(t: Throwable): Unit =
-    badge.text = s"Error: ${t.getMessage}"
-    badge.colorScheme = Some("red")
-    recalc.isDisabled = None
-    session.render()
+    session.renderChanges(
+      badge.withText(s"Error: ${t.getMessage}").withColorScheme(Some("red")),
+      dataUi,
+      recalc.withIsDisabled(None)
+    )
     super.onError(t)
 
   override protected def whenResultsNotReady(): Unit =
-    badge.text = "Calculating"
-    badge.colorScheme = Some("purple")
-    recalc.isDisabled = Some(true)
-    dataUi.style = dataUi.style + ("filter" -> "grayscale(100%)")
-    session.render()
+    session.renderChanges(
+      badge.withText("Calculating").withColorScheme(Some("purple")),
+      currentUi.get().withStyle(dataUi.style + ("filter" -> "grayscale(100%)")),
+      recalc.withIsDisabled(Some(true))
+    )
     super.whenResultsNotReady()
 
   override protected def whenResultsReady(results: OUT): Unit =
-    badge.text = "Ready"
-    badge.colorScheme = None
-    recalc.isDisabled = Some(false)
-    dataUi.style = dataUi.style - "filter"
-    session.render()
+    val newDataUi = currentUi.get().withStyle(dataUi.style - "filter")
+    session.renderChanges(
+      badge.withText("Ready").withColorScheme(None),
+      newDataUi,
+      recalc.withIsDisabled(Some(false))
+    )

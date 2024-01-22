@@ -1,7 +1,7 @@
 package tests.chakra
 
 import org.terminal21.client.ConnectedSession
-import org.terminal21.client.components.UiElement
+import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import tests.chakra.Common.*
 
@@ -15,14 +15,14 @@ object Forms:
 
     val email = Input(`type` = "email", value = "my@email.com")
     email.onChange: newValue =>
-      status.text = s"email input new value = $newValue, verify email.value = ${email.value}"
-      if newValue.contains("@") then emailRightAddOn.children = Seq(okIcon) else emailRightAddOn.children = Seq(notOkIcon)
-      session.render()
+      Seq(
+        status.withText(s"email input new value = $newValue, verify email.value = ${email.current.value}"),
+        if newValue.contains("@") then emailRightAddOn.withChildren(okIcon) else emailRightAddOn.withChildren(notOkIcon)
+      ).renderChanges()
 
     val description = Textarea(placeholder = "Please enter a few things about you")
     description.onChange: newValue =>
-      status.text = s"description input new value = $newValue, verify description.value = ${description.value}"
-      session.render()
+      status.withText(s"description input new value = $newValue, verify description.value = ${description.current.value}").renderChanges()
 
     val select1 = Select(placeholder = "Please choose").withChildren(
       Option_(text = "Male", value = "male"),
@@ -30,8 +30,7 @@ object Forms:
     )
 
     select1.onChange: newValue =>
-      status.text = s"select1 input new value = $newValue, verify select1.value = ${select1.value}"
-      session.render()
+      status.withText(s"select1 input new value = $newValue, verify select1.value = ${select1.current.value}").renderChanges()
 
     val select2 = Select(value = "1", bg = Some("tomato"), color = Some("black"), borderColor = Some("yellow")).withChildren(
       Option_(text = "First", value = "1"),
@@ -41,33 +40,32 @@ object Forms:
     val password = Input(`type` = "password", value = "mysecret")
     val dob      = Input(`type` = "datetime-local")
     dob.onChange: newValue =>
-      status.text = s"dob = $newValue , verify dob.value = ${dob.value}"
-      session.render()
+      status.withText(s"dob = $newValue , verify dob.value = ${dob.current.value}").renderChanges()
 
     val color = Input(`type` = "color")
 
     color.onChange: newValue =>
-      status.text = s"color = $newValue , verify color.value = ${color.value}"
-      session.render()
+      status.withText(s"color = $newValue , verify color.value = ${color.current.value}").renderChanges()
 
     val checkbox2 = Checkbox(text = "Check 2", defaultChecked = true)
     checkbox2.onChange: newValue =>
-      status.text = s"checkbox2 checked is $newValue , verify checkbox2.checked = ${checkbox2.checked}"
-      session.render()
+      status.withText(s"checkbox2 checked is $newValue , verify checkbox2.checked = ${checkbox2.current.checked}").renderChanges()
 
     val checkbox1 = Checkbox(text = "Check 1")
     checkbox1.onChange: newValue =>
-      checkbox2.isDisabled = newValue
-      status.text = s"checkbox1 checked is $newValue , verify checkbox1.checked = ${checkbox1.checked}"
-      session.render()
+      Seq(
+        status.withText(s"checkbox1 checked is $newValue , verify checkbox1.checked = ${checkbox1.current.checked}"),
+        checkbox2.withIsDisabled(newValue)
+      ).renderChanges()
 
     val switch1 = Switch(text = "Switch 1")
-    val switch2 = Switch(text = "Switch 2")
+    val switch2 = Switch(text = "Switch 2", defaultChecked = true)
 
     switch1.onChange: newValue =>
-      switch2.isDisabled = newValue
-      status.text = s"switch1 checked is $newValue , verify switch1.checked = ${switch1.checked}"
-      session.render()
+      Seq(
+        status.withText(s"switch1 checked is $newValue , verify switch1.checked = ${switch1.current.checked}"),
+        switch2.withIsDisabled(newValue)
+      ).renderChanges()
 
     val radioGroup = RadioGroup(defaultValue = "2").withChildren(
       HStack().withChildren(
@@ -78,8 +76,7 @@ object Forms:
     )
 
     radioGroup.onChange: newValue =>
-      status.text = s"radioGroup newValue=$newValue , verify radioGroup.value=${radioGroup.value}"
-      session.render()
+      status.withText(s"radioGroup newValue=$newValue , verify radioGroup.value=${radioGroup.current.value}").renderChanges()
 
     Seq(
       commonBox(text = "Forms"),
@@ -137,14 +134,14 @@ object Forms:
       ButtonGroup(variant = Some("outline"), spacing = Some("24")).withChildren(
         Button(text = "Save", colorScheme = Some("red"))
           .onClick: () =>
-            status.text =
-              s"Saved clicked. Email = ${email.value}, password = ${password.value}, dob = ${dob.value}, check1 = ${checkbox1.checked}, check2 = ${checkbox2.checked}, radio = ${radioGroup.value}"
-            session.render()
-        ,
+            status
+              .withText(
+                s"Saved clicked. Email = ${email.current.value}, password = ${password.current.value}, dob = ${dob.current.value}, check1 = ${checkbox1.current.checked}, check2 = ${checkbox2.current.checked}, radio = ${radioGroup.current.value}, switch1 = ${switch1.current.checked}, switch2 = ${switch2.current.checked}"
+              )
+              .renderChanges(),
         Button(text = "Cancel")
           .onClick: () =>
-            status.text = "Cancel clicked"
-            session.render()
+            status.withText("Cancel clicked").renderChanges()
       ),
       radioGroup,
       status

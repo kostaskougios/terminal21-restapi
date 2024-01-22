@@ -8,8 +8,8 @@ import org.terminal21.client.components.{Keys, UiElement}
 import org.terminal21.sparklib.calculations.{ReadWriter, StdUiSparkCalculation}
 
 extension [OUT: ReadWriter](ds: OUT)
-  def visualize(name: String, dataUi: UiElement with HasStyle)(
-      toUi: OUT => Unit
+  def visualize(name: String, dataUi: UiElement with HasStyle[_])(
+      toUi: OUT => UiElement & HasStyle[_]
   )(using
       session: ConnectedSession,
       executor: FiberExecutor,
@@ -17,7 +17,7 @@ extension [OUT: ReadWriter](ds: OUT)
   ) =
     val ui = new StdUiSparkCalculation[OUT](Keys.nextKey, name, dataUi):
       override protected def whenResultsReady(results: OUT): Unit =
-        try toUi(results)
+        try updateUi(toUi(results))
         catch case t: Throwable => t.printStackTrace()
         super.whenResultsReady(results)
       override def nonCachedCalculation: OUT                      = ds

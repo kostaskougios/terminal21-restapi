@@ -1,9 +1,11 @@
+import sbt.librarymanagement.ModuleFilter
+
 /** This build has different sections for each integration. I.e. an http4s section and a kafka section. These sections are not related to each other, please
   * examine the section you're interested in.
   */
 val scala3Version = "3.3.1"
 
-ThisBuild / version      := "0.11"
+ThisBuild / version      := "0.20"
 ThisBuild / organization := "io.github.kostaskougios"
 name                     := "rest-api"
 ThisBuild / scalaVersion := scala3Version
@@ -25,8 +27,11 @@ val FunctionsHelidonClient   = "io.github.kostaskougios" %% "helidon-client"    
 val FunctionsHelidonWsClient = "io.github.kostaskougios" %% "helidon-ws-client"  % FunctionsVersion
 val FunctionsFibers          = "io.github.kostaskougios" %% "fibers"             % FunctionsVersion
 
-val ScalaTest = "org.scalatest" %% "scalatest"   % "3.2.15"     % Test
-val Mockito   = "org.mockito"    % "mockito-all" % "2.0.2-beta" % Test
+val ScalaTest   = "org.scalatest"     %% "scalatest"              % "3.2.15"     % Test
+val Mockito     = "org.mockito"        % "mockito-all"            % "2.0.2-beta" % Test
+val Scala3Tasty = "org.scala-lang"    %% "scala3-tasty-inspector" % scala3Version
+val CommonsText = "org.apache.commons" % "commons-text"           % "1.10.0"
+val CommonsIO   = "commons-io"         % "commons-io"             % "2.11.0"
 
 val CirceVersion = "0.14.6"
 val Circe        = Seq(
@@ -94,13 +99,13 @@ lazy val `terminal21-server` = project
       LogBack
     ) ++ Circe
   )
-  .dependsOn(`terminal21-ui-std-exports`, `terminal21-server-client-common`)
+  .dependsOn(`terminal21-ui-std-exports` % "compile->compile;test->test", `terminal21-server-client-common`)
   .enablePlugins(FunctionsRemotePlugin)
 
 lazy val `terminal21-ui-std-exports` = project
   .settings(
     commonSettings,
-    libraryDependencies ++= Seq(ScalaTest),
+    libraryDependencies ++= Seq(ScalaTest) ++ Circe,
     // make sure exportedArtifact points to the full artifact name of the receiver.
     buildInfoKeys    := Seq[BuildInfoKey](organization, name, version, scalaVersion, "exportedArtifact" -> "none"),
     buildInfoPackage := "org.terminal21.ui.std"
@@ -176,3 +181,14 @@ lazy val `terminal21-mathjax` = project
     )
   )
   .dependsOn(`terminal21-ui-std` % "compile->compile;test->test")
+
+lazy val `terminal21-code-generation`: Project = project
+  .settings(
+    commonSettings,
+    libraryDependencies ++= Seq(
+      ScalaTest,
+      Scala3Tasty,
+      CommonsText,
+      CommonsIO
+    )
+  )

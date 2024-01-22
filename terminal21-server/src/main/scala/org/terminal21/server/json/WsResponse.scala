@@ -1,10 +1,12 @@
 package org.terminal21.server.json
 
-import io.circe.Json
 import org.terminal21.model.Session
+import org.terminal21.ui.std.ServerJson
 
 sealed trait WsResponse
 
 case class SessionsWsResponse(sessions: Seq[Session]) extends WsResponse
 
-case class StateWsResponse(session: Session, sessionState: Json) extends WsResponse
+case class StateWsResponse(session: Session, sessionState: ServerJson) extends WsResponse
+
+case class StateChangeWsResponse(session: Session, sessionStateChange: ServerJson) extends WsResponse

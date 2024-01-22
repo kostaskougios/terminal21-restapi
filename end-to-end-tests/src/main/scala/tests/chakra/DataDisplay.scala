@@ -12,6 +12,15 @@ object DataDisplay:
       Th(text = "into"),
       Th(text = "multiply by", isNumeric = true)
     )
+    val quickTable1 = QuickTable()
+      .headers("id", "name")
+      .caption("Quick Table Caption")
+      .rows(
+        Seq(
+          Seq(1, "Kostas"),
+          Seq(2, "Andreas")
+        )
+      )
     Seq(
       commonBox(text = "Badges"),
       HStack().withChildren(
@@ -23,6 +32,8 @@ object DataDisplay:
           Button(text = "test")
         )
       ),
+      commonBox(text = "Quick Tables"),
+      quickTable1,
       commonBox(text = "Tables"),
       TableContainer().withChildren(
         Table(variant = "striped", colorScheme = Some("teal"), size = "lg").withChildren(

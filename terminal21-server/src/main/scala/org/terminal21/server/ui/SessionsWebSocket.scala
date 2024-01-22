@@ -9,6 +9,7 @@ import org.terminal21.model.Session
 import org.terminal21.server.json.*
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.service.ServerSessionsService
+import org.terminal21.ui.std.ServerJson
 import org.terminal21.utils.ErrorLogger
 
 // websocket: https://helidon.io/docs/v4/#/se/websocket
@@ -21,13 +22,20 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
       WsSessionOps.returnTrueIfSessionIsNotClosed:
         sendSessions(wsSession, allSessions)
 
-    sessionsService.notifyMeWhenSessionChanges: (session, sessionState) =>
+    sessionsService.notifyMeWhenSessionChanges: (session, sessionState, changeOpt) =>
       WsSessionOps.returnTrueIfSessionIsNotClosed:
-        sendSessionState(wsSession, session, sessionState)
+        changeOpt match
+          case None         => sendSessionState(wsSession, session, sessionState)
+          case Some(change) => sendSessionStateChange(wsSession, session, change)
 
   private def sendSessionState(wsSession: WsSession, session: Session, sessionState: SessionState): Unit =
-    val response = StateWsResponse(session.hideSecret, sessionState.json.asJson).asJson.noSpaces
+    val response = StateWsResponse(session.hideSecret, sessionState.serverJson).asJson.noSpaces
     logger.info(s"$wsSession: Sending session state response $response")
+    wsSession.send(response, true)
+
+  private def sendSessionStateChange(wsSession: WsSession, session: Session, change: ServerJson): Unit =
+    val response = StateChangeWsResponse(session.hideSecret, change).asJson.noSpaces
+    logger.info(s"$wsSession: Sending session change state response $response")
     wsSession.send(response, true)
 
   private def sendSessions(wsSession: WsSession, allSessions: Seq[Session]): Unit =
@@ -40,21 +48,26 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
     logger.info(s"$wsSession: Received json: $text , last = $last")
     errorLogger.logErrors:
       WsRequest.decoder(text) match
-        case Right(WsRequest("sessions", None))                                 =>
+        case Right(WsRequest("sessions", None))                                            =>
           continuouslyRespond(wsSession)
           logger.info(s"$wsSession: sessions processed successfully")
-        case Right(WsRequest(eventName, Some(event: UiEvent)))                  =>
+        case Right(WsRequest("session-full-refresh", Some(SessionFullRefresh(sessionId)))) =>
+          logger.info(s"$wsSession: session-full-refresh requested, sending full session data for $sessionId")
+          val session      = sessionsService.sessionById(sessionId)
+          val sessionState = sessionsService.sessionStateOf(session)
+          sendSessionState(wsSession, session, sessionState)
+        case Right(WsRequest(eventName, Some(event: UiEvent)))                             =>
           logger.info(s"$wsSession: Received event $eventName = $event")
-          sessionsService.addEvent(event)
-        case Right(WsRequest("ping", None))                                     =>
+          sessionsService.triggerUiEvent(event)
+        case Right(WsRequest("ping", None))                                                =>
           logger.info(s"$wsSession: ping received")
-        case Right(WsRequest("close-session", Some(CloseSession(sessionId))))   =>
+        case Right(WsRequest("close-session", Some(CloseSession(sessionId))))              =>
           val session = sessionsService.sessionById(sessionId)
           sessionsService.terminateSession(session)
-        case Right(WsRequest("remove-session", Some(RemoveSession(sessionId)))) =>
+        case Right(WsRequest("remove-session", Some(RemoveSession(sessionId))))            =>
           val session = sessionsService.sessionById(sessionId)
           sessionsService.removeSession(session)
-        case x                                                                  =>
+        case x                                                                             =>
           logger.error(s"Invalid request : $x")
 
   override def onOpen(wsSession: WsSession): Unit =
