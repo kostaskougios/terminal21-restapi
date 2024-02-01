@@ -55,7 +55,7 @@ def saveCsvMap() =
     .mkString("\n")
   FileUtils.writeStringToFile(file, s, "UTF-8")
 
-  // this will be countDown to 0 when we have to exit
+  // this will be set to true when we have to exit
 val exitFlag = new AtomicBoolean(false)
 
 Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session =>
@@ -107,4 +107,3 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session
   println(s"Now open ${session.uiUrl} to view the UI")
   // wait for one of the save/exit buttons to be pressed.
   session.waitTillUserClosesSessionOr(exitFlag.get())
-
