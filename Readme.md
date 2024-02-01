@@ -158,6 +158,10 @@ all changes that may have occurred at the browser and all the changes we did on 
 Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi/discussions) of the project to post any questions, comments or ideas.
 
 # Changelog
+## Version 0.21
+
+- more std and chakra components
+
 ## Version 0.20
 
 - immutable components
