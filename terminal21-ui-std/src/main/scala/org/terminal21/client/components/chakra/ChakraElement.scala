@@ -1684,6 +1684,7 @@ case class Code(
 
 case class UnorderedList(
     key: String = Keys.nextKey,
+    spacing: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[UnorderedList]
@@ -1691,9 +1692,11 @@ case class UnorderedList(
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
+  def withSpacing(v: Option[String])          = copy(spacing = v)
 
 case class OrderedList(
     key: String = Keys.nextKey,
+    spacing: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[OrderedList]
@@ -1701,6 +1704,7 @@ case class OrderedList(
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
+  def withSpacing(v: Option[String])          = copy(spacing = v)
 
 case class ListItem(
     key: String = Keys.nextKey,
