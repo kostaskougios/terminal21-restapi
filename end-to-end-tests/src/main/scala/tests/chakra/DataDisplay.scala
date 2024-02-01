@@ -82,5 +82,9 @@ object DataDisplay:
       UnorderedList().withChildren(
         ListItem(text = "unordered-list-list-item1"),
         ListItem(text = "unordered-list-list-item2")
+      ),
+      OrderedList().withChildren(
+        ListItem(text = "Ordered-list-list-item1"),
+        ListItem(text = "Ordered-list-list-item2")
       )
     )
