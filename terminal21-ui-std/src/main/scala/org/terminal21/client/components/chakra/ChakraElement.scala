@@ -1717,3 +1717,40 @@ case class ListItem(
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
+
+case class Alert(
+    key: String = Keys.nextKey,
+    status: String = "error", // error, success, warning, info
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Alert]
+    with HasChildren[Alert]:
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withStatus(v: String)                   = copy(status = v)
+
+case class AlertIcon(
+    key: String = Keys.nextKey,
+    style: Map[String, Any] = Map.empty
+) extends ChakraElement[AlertIcon]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+
+case class AlertTitle(
+    key: String = Keys.nextKey,
+    text: String = "Alert!",
+    style: Map[String, Any] = Map.empty
+) extends ChakraElement[AlertTitle]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+
+case class AlertDescription(
+    key: String = Keys.nextKey,
+    text: String = "Something happened!",
+    style: Map[String, Any] = Map.empty
+) extends ChakraElement[AlertDescription]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)

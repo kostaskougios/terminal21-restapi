@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
       (Overlay.components ++ Forms.components ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components(
         latch
-      ) ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Seq(krButton))
+      ) ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Feedback.components ++ Seq(krButton))
         .render()
 
       println("Waiting for button to be pressed for 1 hour")
