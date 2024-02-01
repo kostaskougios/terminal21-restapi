@@ -78,5 +78,9 @@ object DataDisplay:
           NewLine(),
           Text(text = "println(a)")
         )
+      ),
+      UnorderedList().withChildren(
+        ListItem(text = "unordered-list-list-item1"),
+        ListItem(text = "unordered-list-list-item2")
       )
     )
