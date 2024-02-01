@@ -1647,7 +1647,7 @@ case class Image(
   */
 case class Text(
     key: String = Keys.nextKey,
-    text: String = "text.text is empty. Did you accidentally assigned the text to the `key` field?",
+    text: String = "text.text is empty. Did you accidentally assigned the text to the `key` field? Do Text(text=...)",
     fontSize: Option[String] = None,
     noOfLines: Option[Int] = None,
     color: Option[String] = None,
@@ -1667,3 +1667,17 @@ case class Text(
   def withAlign(v: Option[String])            = copy(align = v)
   def withCasing(v: Option[String])           = copy(casing = v)
   def withDecoration(v: Option[String])       = copy(decoration = v)
+
+case class Code(
+    key: String = Keys.nextKey,
+    text: String = "",
+    colorScheme: Option[String] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Code]
+    with HasChildren[Code]:
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  def withColorScheme(v: Option[String])      = copy(colorScheme = v)

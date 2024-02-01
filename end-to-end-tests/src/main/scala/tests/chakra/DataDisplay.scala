@@ -3,6 +3,7 @@ package tests.chakra
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
+import org.terminal21.client.components.std.NewLine
 import tests.chakra.Common.*
 
 object DataDisplay:
@@ -66,6 +67,16 @@ object DataDisplay:
           Tfoot().withChildren(
             headAndFoot
           )
+        )
+      ),
+      VStack().withChildren(
+        Code(text = """
+          |code-0001
+          |""".stripMargin),
+        Code(colorScheme = Some("red")).withChildren(
+          Text(text = "val a=1"),
+          NewLine(),
+          Text(text = "println(a)")
         )
       )
     )
