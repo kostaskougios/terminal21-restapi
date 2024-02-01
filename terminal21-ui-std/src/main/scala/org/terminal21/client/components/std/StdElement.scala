@@ -26,6 +26,31 @@ case class Header1(key: String = Keys.nextKey, text: String, style: Map[String, 
   def withKey(v: String)                      = copy(key = v)
   def withText(v: String)                     = copy(text = v)
 
+case class Header2(key: String = Keys.nextKey, text: String, style: Map[String, Any] = Map.empty) extends StdElement[Header2]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+
+case class Header3(key: String = Keys.nextKey, text: String, style: Map[String, Any] = Map.empty) extends StdElement[Header3]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+
+case class Header4(key: String = Keys.nextKey, text: String, style: Map[String, Any] = Map.empty) extends StdElement[Header4]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+
+case class Header5(key: String = Keys.nextKey, text: String, style: Map[String, Any] = Map.empty) extends StdElement[Header5]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+
+case class Header6(key: String = Keys.nextKey, text: String, style: Map[String, Any] = Map.empty) extends StdElement[Header6]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+
 case class Paragraph(
     key: String = Keys.nextKey,
     text: String = "",
