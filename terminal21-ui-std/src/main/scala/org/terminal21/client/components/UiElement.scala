@@ -30,6 +30,7 @@ object UiElement:
     def children: Seq[UiElement]
     override def flat: Seq[UiElement]  = Seq(this) ++ children.flatMap(_.flat)
     def withChildren(cn: UiElement*): A
+    def noChildren: A                  = withChildren()
     def addChildren(cn: UiElement*): A = withChildren(children ++ cn: _*)
 
   trait HasEventHandler:

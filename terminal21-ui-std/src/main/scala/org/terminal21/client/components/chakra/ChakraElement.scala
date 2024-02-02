@@ -1780,16 +1780,16 @@ case class Tooltip(
     hasArrow: Option[Boolean] = None,
     fontSize: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    child: UiElement = Text("tooltip.child")
+    children: Seq[UiElement] = Seq(Text("use tooltip.withContent() to set this"))
 ) extends ChakraElement[Tooltip]
     with HasChildren[Tooltip]:
   override def withStyle(v: Map[String, Any])        = copy(style = v)
-  def withChild(cn: UiElement)                       = copy(child = cn)
+  def withContent(cn: UiElement)                     = withChildren(cn)
   def withKey(v: String)                             = copy(key = v)
   def withBg(v: Option[String])                      = copy(bg = v)
   def withColor(v: Option[String])                   = copy(color = v)
   def withHasArrow(v: Option[Boolean])               = copy(hasArrow = v)
   def withFontSize(v: Option[String])                = copy(fontSize = v)
-  override def children: Seq[UiElement]              = Seq(child)
+  override def noChildren                            = copy(children = Nil)
   override def withChildren(cn: UiElement*): Tooltip =
-    if cn.size != 1 then throw new IllegalArgumentException("tooltip takes 1 only child") else withChild(cn.head)
+    if cn.size != 1 then throw new IllegalArgumentException("tooltip takes 1 only child") else copy(children = cn)
