@@ -1771,3 +1771,25 @@ case class Progress(
   def withValue(v: Int)                       = copy(value = v)
   def withHasStripe(v: Option[Boolean])       = copy(hasStripe = v)
   def withIsIndeterminate(v: Option[Boolean]) = copy(isIndeterminate = v)
+
+case class Tooltip(
+    key: String = Keys.nextKey,
+    label: String = "tooltip.label",
+    bg: Option[String] = None,
+    color: Option[String] = None,
+    hasArrow: Option[Boolean] = None,
+    fontSize: Option[String] = None,
+    style: Map[String, Any] = Map.empty,
+    child: UiElement = Text("tooltip.child")
+) extends ChakraElement[Tooltip]
+    with HasChildren[Tooltip]:
+  override def withStyle(v: Map[String, Any])        = copy(style = v)
+  def withChild(cn: UiElement)                       = copy(child = cn)
+  def withKey(v: String)                             = copy(key = v)
+  def withBg(v: Option[String])                      = copy(bg = v)
+  def withColor(v: Option[String])                   = copy(color = v)
+  def withHasArrow(v: Option[Boolean])               = copy(hasArrow = v)
+  def withFontSize(v: Option[String])                = copy(fontSize = v)
+  override def children: Seq[UiElement]              = Seq(child)
+  override def withChildren(cn: UiElement*): Tooltip =
+    if cn.size != 1 then throw new IllegalArgumentException("tooltip takes 1 only child") else withChild(cn.head)

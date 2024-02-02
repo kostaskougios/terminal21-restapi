@@ -18,5 +18,6 @@ object Feedback:
       commonBox(text = "Progress"),
       Progress(value = 10),
       Progress(value = 20, hasStripe = Some(true)),
-      Progress(value = 30, isIndeterminate = Some(true))
+      Progress(value = 30, isIndeterminate = Some(true)),
+      Tooltip(label = "A help message", child = Text(text = "hover me!"))
     )
