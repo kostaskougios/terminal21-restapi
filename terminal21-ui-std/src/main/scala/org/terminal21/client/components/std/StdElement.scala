@@ -53,7 +53,7 @@ case class Header6(key: String = Keys.nextKey, text: String, style: Map[String, 
 
 case class Paragraph(
     key: String = Keys.nextKey,
-    text: String = "",
+    text: String = "paragraph.text",
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends StdElement[Paragraph]

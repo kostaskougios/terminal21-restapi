@@ -1793,3 +1793,84 @@ case class Tooltip(
   override def noChildren                            = copy(children = Nil)
   override def withChildren(cn: UiElement*): Tooltip =
     if cn.size != 1 then throw new IllegalArgumentException("tooltip takes 1 only child") else copy(children = cn)
+
+/** see https://chakra-ui.com/docs/components/tabs
+  */
+case class Tabs(
+    key: String = Keys.nextKey,
+    defaultIndex: Int = 0,
+    variant: Option[String] = Some("enclosed"), // line,enclosed, enclosed-colored, soft-rounded, solid-rounded, and unstyled.
+    align: Option[String] = None,               // start, center, end
+    colorScheme: Option[String] = None,
+    size: Option[String] = None,
+    isFitted: Option[Boolean] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Tabs]
+    with HasChildren[Tabs]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withVariant(v: Option[String])          = copy(variant = v)
+  def withColorScheme(v: Option[String])      = copy(colorScheme = v)
+  def withSize(v: Option[String])             = copy(size = v)
+  def withAlign(v: Option[String])            = copy(align = v)
+  def withIsFitted(v: Option[Boolean])        = copy(isFitted = v)
+
+/** see https://chakra-ui.com/docs/components/tabs
+  */
+case class TabList(
+    key: String = Keys.nextKey,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[TabList]
+    with HasChildren[TabList]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+
+/** see https://chakra-ui.com/docs/components/tabs
+  */
+case class Tab(
+    key: String = Keys.nextKey,
+    text: String = "tab.text",
+    isDisabled: Option[Boolean] = None,
+    _selected: Map[String, Any] = Map.empty,
+    _hover: Map[String, Any] = Map.empty,
+    _active: Map[String, Any] = Map.empty,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Tab]
+    with HasChildren[Tab]:
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withIsDisabled(v: Option[Boolean])      = copy(isDisabled = v)
+  def withSelected(v: Map[String, Any])       = copy(_selected = v)
+  def withHover(v: Map[String, Any])          = copy(_hover = v)
+  def withActive(v: Map[String, Any])         = copy(_active = v)
+
+/** see https://chakra-ui.com/docs/components/tabs
+  */
+case class TabPanels(
+    key: String = Keys.nextKey,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[TabPanels]
+    with HasChildren[TabPanels]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+
+/** see https://chakra-ui.com/docs/components/tabs
+  */
+case class TabPanel(
+    key: String = Keys.nextKey,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[TabPanel]
+    with HasChildren[TabPanel]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
