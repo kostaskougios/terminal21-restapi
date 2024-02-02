@@ -1754,3 +1754,20 @@ case class AlertDescription(
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
   def withText(v: String)                     = copy(text = v)
+
+case class Progress(
+    key: String = Keys.nextKey,
+    value: Int = 50,
+    colorScheme: Option[String] = None,
+    size: Option[String] = None,
+    hasStripe: Option[Boolean] = None,
+    isIndeterminate: Option[Boolean] = None,
+    style: Map[String, Any] = Map.empty
+) extends ChakraElement[Progress]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withColorScheme(v: Option[String])      = copy(colorScheme = v)
+  def withSize(v: Option[String])             = copy(size = v)
+  def withValue(v: Int)                       = copy(value = v)
+  def withHasStripe(v: Option[Boolean])       = copy(hasStripe = v)
+  def withIsIndeterminate(v: Option[Boolean]) = copy(isIndeterminate = v)
