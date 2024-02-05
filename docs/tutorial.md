@@ -4,6 +4,8 @@ Terminal21 consists of a server and user created scala scripts/apps. The scala s
 user interfaces and react to clicks, changed input boxes etc. The terminal21 libraries send the UI's to the server which
 in turn renders those as react components (but no js or react coding is required from the user).
 
+For a glimpse on what can be done with terminal21, please have a look at the [terminal21 youtube channel](https://www.youtube.com/@terminal21-gf1oh/videos).
+
 Terminal21 is not meant as a way to create websites. It is rather meant to give UI's to the odd jobs that has to be 
 performed by scripts and where it would require a lot of effort to create a dedicated web server with a UI. It is perfect
 for scripting for i.e. those internal odd tasks that have to be performed at your workplace or even for things you would
