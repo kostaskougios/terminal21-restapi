@@ -306,3 +306,5 @@ The important bit are these lines:
 ```
 
 For the `Input` box, we add an `onChange` handler that gets the new value as `v`. We then use the value to update the paragraph.
+
+This script can be run as `./on-change.sc`.
