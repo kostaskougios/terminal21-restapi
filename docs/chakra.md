@@ -263,3 +263,130 @@ val tableRows:Seq[Seq[String]] = Seq(
 )
 conversionTable.rows(tableRows)
 ```
+
+### Code
+
+Display some code.
+
+```scala
+Code(text = """
+  |val a=1
+  |""".stripMargin)
+
+Code(colorScheme = Some("red")).withChildren(
+  Text(text = "val a=1"),
+  NewLine(),
+  Text(text = "println(a)")
+)
+```
+
+### Lists
+
+Unordered or ordered lists.
+
+```scala
+UnorderedList().withChildren(
+    ListItem(text = "item 1"),
+    ListItem(text = "item 2")
+)
+
+OrderedList().withChildren(
+    ListItem(text = "item 1"),
+    ListItem(text = "item 2")
+)
+```
+
+### Alerts
+
+Display some important information.
+
+![Alerts](images/chakra/alerts.png)
+
+```scala
+Alert(status = "error").withChildren(AlertIcon(), AlertTitle(text = "An error"), AlertDescription(text = "some exception was thrown"))
+Alert(status = "success").withChildren(AlertIcon(), AlertTitle(text = "It worked!"), AlertDescription(text = "It all worked"))
+Alert(status = "warning").withChildren(AlertIcon(), AlertTitle(text = "Warning"), AlertDescription(text = "This may create issues"))
+Alert(status = "info").withChildren(AlertIcon(), AlertTitle(text = "Info"), AlertDescription(text = "Some information msg"))
+```
+
+### Progress
+
+A bar with the percentage of a tasks progress.
+
+```scala
+Progress(value = 10)
+// stripped
+Progress(value = 20, hasStripe = Some(true))
+// when progress percentage is unknown:
+Progress(value = 30, isIndeterminate = Some(true))
+```
+
+### Tooltip
+
+Display a tooltip when the mouse hovers over some elements.
+
+```scala
+Tooltip(label = "A help message").withContent(Text(text = "hover over me to show the help message!"))
+```
+
+### Tabs
+
+Breaks down the user interface in multiple tabs.
+
+![Tabs](images/chakra/tabs.png)
+
+```scala
+Tabs().withChildren(
+    TabList().withChildren(
+      // tabs
+      Tab(text = "tab-one", _selected = Map("color" -> "white", "bg" -> "blue.500")),
+      Tab(text = "tab-two", _selected = Map("color" -> "white", "bg" -> "green.400")),
+      Tab(text = "tab-three")
+    ),
+    TabPanels().withChildren(
+      // tabs contents
+      TabPanel().withChildren(
+        Paragraph(text = "tab-1-content")
+      ),
+      TabPanel().withChildren(
+        Paragraph(text = "tab-2-content")
+      ),
+      TabPanel().withChildren(
+        Paragraph(text = "tab-3-content")
+      )
+    )
+)
+```
+
+### Breadcrumb
+
+Breadcrumbs is a navigation pattern that helps users understand the hierarchy of a website.
+
+Breadcrumbs in react normally work with `href` but for terminal21 the onclick handler will be more useful in order to control
+what happens when the user clicks them.
+
+```scala
+Breadcrumb().withChildren(
+    BreadcrumbItem().withChildren(
+      BreadcrumbLink(text = "Home").onClick(() => ... )
+    ),
+    BreadcrumbItem().withChildren(
+      BreadcrumbLink(text = "Page 1").onClick(() => ... )
+    ),
+    BreadcrumbItem(isCurrentPage = Some(true)).withChildren(
+      BreadcrumbLink(text = "Subpage 2").onClick(() => ... )
+    )
+)
+```
+
+### Links
+
+Just a link to i.e. an external page. Or a link that does something with an onClick handler.
+
+```scala
+Link(text = "Open google on a new tab", href = "https://www.google.com/", isExternal = Some(true))
+
+Link(text = "Do something")
+  .onClick: () =>
+    ...
+```
