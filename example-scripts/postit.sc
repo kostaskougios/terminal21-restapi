@@ -5,8 +5,8 @@
 
 // always import these
 import org.terminal21.client.*
-// std components, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala
 import org.terminal21.client.components.*
+// std components, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala
 import org.terminal21.client.components.std.*
 // use the chakra components for menus, forms etc, https://chakra-ui.com/docs/components
 // The scala case classes : https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/chakra/ChakraElement.scala
@@ -15,9 +15,9 @@ import org.terminal21.client.components.chakra.*
 Sessions.withNewSession("postit", "Post-It"): session =>
   given ConnectedSession = session
 
-  val editor   = Textarea(placeholder = "Please post your note by clicking here and editing the content")
+  val editor = Textarea(placeholder = "Please post your note by clicking here and editing the content")
   val messages = VStack(align = Some("stretch"))
-  val add      = Button(text = "Post It.").onClick: () =>
+  val add = Button(text = "Post It.").onClick: () =>
     // add the new msg.
     // note: editor.value is automatically updated by terminal-ui
     val currentMessages = messages.current

@@ -8,7 +8,6 @@
 import org.terminal21.client.*
 
 import java.util.concurrent.atomic.AtomicBoolean
-// std components, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala
 import org.terminal21.client.components.*
 // use the chakra components for menus, forms etc, https://chakra-ui.com/docs/components
 // The scala case classes : https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/chakra/ChakraElement.scala
