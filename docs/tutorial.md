@@ -1,12 +1,35 @@
 # Terminal21 tutorial
 
-This tutorial assumes you have the terminal 21 server running (as described in the readme file of the project) and you would 
-like to learn how to create user interfaces in your scala scripts/code.
+Terminal21 consists of a server and user created scala scripts/apps. The scala scripts contain all the code to create
+user interfaces and react to clicks, changed input boxes etc. The terminal21 libraries send the UI's to the server which
+in turn renders those as react components (but no js or react coding is required from the user).
+
+Terminal21 is not meant as a way to create websites. It is rather meant to give UI's to the odd jobs that has to be 
+performed by scripts and where it would require a lot of effort to create a dedicated web server with a UI. It is perfect
+for scripting for i.e. those internal odd tasks that have to be performed at your workplace or even for things you would
+like to do on your box. And you won't have to write a single line of html or javascript.
 
 This tutorial will use `scala-cli` but the same applies for `sbt` or `mill` projects that use the terminal21 libraries.
 
 All example code is under `example-scripts` of this repo, feel free to check the repo and run them.
 
+## Starting the terminal21 server
+
+The easiest way to start the terminal21 server is to have a `scala-cli` script on the box where the server will run.
+
+[server.sc](../example-scripts/server.sc)
+
+```scala
+#!/usr/bin/env -S scala-cli
+
+//> using jvm "21"
+//> using scala 3
+//> using dep io.github.kostaskougios::terminal21-server:0.21
+
+import org.terminal21.server.Terminal21Server
+
+Terminal21Server.start()
+```
 ## Creating a folder for our scripts
 
 Create a folder and a file `project.scala` into it. This file will help us include the library dependencies and also
