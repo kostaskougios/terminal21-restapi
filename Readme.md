@@ -62,6 +62,10 @@ If we click in a cell, we will be able to change a value. And then use the "Save
 Now feel free to examine and run the rest of the scripts or create your own! You can have the server running and develop your
 scripts with your favorite IDE. Run the scripts within the IDE and view the UI in a browser.
 
+# Tutorial
+
+To learn the basics of coding with terminal21, please see the [tutorial](docs/tutorial.md)
+
 # Example scripts
 
 ```shell

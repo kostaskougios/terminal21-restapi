@@ -1755,6 +1755,8 @@ case class AlertDescription(
   def withKey(v: String)                      = copy(key = v)
   def withText(v: String)                     = copy(text = v)
 
+/** https://chakra-ui.com/docs/components/progress
+  */
 case class Progress(
     key: String = Keys.nextKey,
     value: Int = 50,
