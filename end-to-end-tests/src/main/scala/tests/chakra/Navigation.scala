@@ -12,6 +12,8 @@ object Navigation:
     def breadcrumbClicked(t: String): Unit =
       clickedBreadcrumb.withText(s"breadcrumb-click: $t").renderChanges()
 
+    val clickedLink = Paragraph(text = "no-link-clicked")
+
     Seq(
       commonBox(text = "Breadcrumbs"),
       Breadcrumb().withChildren(
@@ -25,5 +27,10 @@ object Navigation:
           BreadcrumbLink(text = "breadcrumb-link2").onClick(() => breadcrumbClicked("breadcrumb-link2"))
         )
       ),
-      clickedBreadcrumb
+      clickedBreadcrumb,
+      commonBox(text = "Link"),
+      Link(text = "link-external-google", href = "https://www.google.com/", isExternal = Some(true))
+        .onClick: () =>
+          clickedLink.withText("link-clicked").renderChanges(),
+      clickedLink
     )

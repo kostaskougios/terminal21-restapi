@@ -1927,3 +1927,20 @@ case class BreadcrumbLink(
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withHref(v: Option[String])             = copy(href = v)
   def withText(v: String)                     = copy(text = v)
+
+case class Link(
+    key: String = Keys.nextKey,
+    text: String = "link.text",
+    href: String = "#",
+    isExternal: Option[Boolean] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Link]
+    with HasChildren[Link]
+    with OnClickEventHandler.CanHandleOnClickEvent[Link]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withIsExternal(v: Option[Boolean])      = copy(isExternal = v)
+  def withHref(v: String)                     = copy(href = v)
+  def withText(v: String)                     = copy(text = v)
