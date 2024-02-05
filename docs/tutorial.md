@@ -1,7 +1,7 @@
 # Terminal21 tutorial
 
 This tutorial assumes you have the terminal 21 server running (as described in the readme file of the project) and you would 
-like to learn how to create user interfaces.
+like to learn how to create user interfaces in your scala scripts/code.
 
 This tutorial will use `scala-cli` but the same applies for `sbt` or `mill` projects that use the terminal21 libraries.
 
