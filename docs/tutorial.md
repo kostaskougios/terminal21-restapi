@@ -261,3 +261,48 @@ When the button is clicked, we get the current state of the `email` input box vi
 Also in order to append a new paragraph to the `output`, we get the current state of it (which includes any previous paragraphs we have added) and then
 add a paragraph as a new child. Then we render the changes of `output` which includes the paragraphs.
 
+We can now give it a try: `./read-changed-value.sc`
+
+We can also add an `onChange` event handler on our input box and get the value whenever the user changes it.
+
+[on-change.sc](../example-scripts/on-change.sc)
+
+```scala
+#!/usr/bin/env -S scala-cli project.scala
+
+import org.terminal21.client.*
+import org.terminal21.client.components.*
+import org.terminal21.client.components.std.Paragraph
+import org.terminal21.client.components.chakra.*
+
+Sessions.withNewSession("on-change-example", "On Change event handler"): session =>
+  given ConnectedSession = session
+
+  val output = Paragraph(text = "Please modify the email.")
+  val email = Input(`type` = "email", value = "my@email.com").onChange: v =>
+    output.withText(s"Email value : $v").renderChanges()
+
+  Seq(
+    FormControl().withChildren(
+      FormLabel(text = "Email address"),
+      InputGroup().withChildren(
+        InputLeftAddon().withChildren(EmailIcon()),
+        email
+      ),
+      FormHelperText(text = "We'll never share your email.")
+    ),
+    output
+  ).render()
+
+  session.waitTillUserClosesSession()
+```
+
+The important bit are these lines:
+
+```scala
+  val output = Paragraph(text = "Please modify the email.")
+  val email = Input(`type` = "email", value = "my@email.com").onChange: v =>
+    output.withText(s"Email value : $v").renderChanges()
+```
+
+For the `Input` box, we add an `onChange` handler that gets the new value as `v`. We then use the value to update the paragraph.
