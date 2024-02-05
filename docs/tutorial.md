@@ -148,3 +148,10 @@ Note the `e.withX()` methods. Those help us change a value on a UI element. We g
 ```scala
 Seq(p, m).renderChanges()
 ```
+
+Finally, when the universe is ready, we just clear the UI and render a paragraph before we exit.
+
+```scala
+session.clear()
+Paragraph(text = "Universe ready!").render()
+```
