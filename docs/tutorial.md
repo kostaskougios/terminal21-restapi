@@ -30,6 +30,9 @@ import org.terminal21.server.Terminal21Server
 
 Terminal21Server.start()
 ```
+
+Now run this with `./server.sc`.
+
 ## Creating a folder for our scripts
 
 Create a folder and a file `project.scala` into it. This file will help us include the library dependencies and also
