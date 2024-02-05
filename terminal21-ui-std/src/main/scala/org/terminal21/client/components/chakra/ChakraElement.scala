@@ -1647,7 +1647,7 @@ case class Image(
   */
 case class Text(
     key: String = Keys.nextKey,
-    text: String = "text.text is empty. Did you accidentally assigned the text to the `key` field?",
+    text: String = "text.text is empty. Did you accidentally assigned the text to the `key` field? Do Text(text=...)",
     fontSize: Option[String] = None,
     noOfLines: Option[Int] = None,
     color: Option[String] = None,
@@ -1667,3 +1667,280 @@ case class Text(
   def withAlign(v: Option[String])            = copy(align = v)
   def withCasing(v: Option[String])           = copy(casing = v)
   def withDecoration(v: Option[String])       = copy(decoration = v)
+
+case class Code(
+    key: String = Keys.nextKey,
+    text: String = "",
+    colorScheme: Option[String] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Code]
+    with HasChildren[Code]:
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  def withColorScheme(v: Option[String])      = copy(colorScheme = v)
+
+case class UnorderedList(
+    key: String = Keys.nextKey,
+    spacing: Option[String] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[UnorderedList]
+    with HasChildren[UnorderedList]:
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withSpacing(v: Option[String])          = copy(spacing = v)
+
+case class OrderedList(
+    key: String = Keys.nextKey,
+    spacing: Option[String] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[OrderedList]
+    with HasChildren[OrderedList]:
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withSpacing(v: Option[String])          = copy(spacing = v)
+
+case class ListItem(
+    key: String = Keys.nextKey,
+    text: String = "",
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[ListItem]
+    with HasChildren[ListItem]:
+  def withText(v: String)                     = copy(text = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+
+case class Alert(
+    key: String = Keys.nextKey,
+    status: String = "error", // error, success, warning, info
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Alert]
+    with HasChildren[Alert]:
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withStatus(v: String)                   = copy(status = v)
+
+case class AlertIcon(
+    key: String = Keys.nextKey,
+    style: Map[String, Any] = Map.empty
+) extends ChakraElement[AlertIcon]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+
+case class AlertTitle(
+    key: String = Keys.nextKey,
+    text: String = "Alert!",
+    style: Map[String, Any] = Map.empty
+) extends ChakraElement[AlertTitle]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+
+case class AlertDescription(
+    key: String = Keys.nextKey,
+    text: String = "Something happened!",
+    style: Map[String, Any] = Map.empty
+) extends ChakraElement[AlertDescription]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+
+case class Progress(
+    key: String = Keys.nextKey,
+    value: Int = 50,
+    colorScheme: Option[String] = None,
+    size: Option[String] = None,
+    hasStripe: Option[Boolean] = None,
+    isIndeterminate: Option[Boolean] = None,
+    style: Map[String, Any] = Map.empty
+) extends ChakraElement[Progress]:
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withKey(v: String)                      = copy(key = v)
+  def withColorScheme(v: Option[String])      = copy(colorScheme = v)
+  def withSize(v: Option[String])             = copy(size = v)
+  def withValue(v: Int)                       = copy(value = v)
+  def withHasStripe(v: Option[Boolean])       = copy(hasStripe = v)
+  def withIsIndeterminate(v: Option[Boolean]) = copy(isIndeterminate = v)
+
+case class Tooltip(
+    key: String = Keys.nextKey,
+    label: String = "tooltip.label",
+    bg: Option[String] = None,
+    color: Option[String] = None,
+    hasArrow: Option[Boolean] = None,
+    fontSize: Option[String] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Seq(Text("use tooltip.withContent() to set this"))
+) extends ChakraElement[Tooltip]
+    with HasChildren[Tooltip]:
+  override def withStyle(v: Map[String, Any])        = copy(style = v)
+  def withContent(cn: UiElement)                     = withChildren(cn)
+  def withKey(v: String)                             = copy(key = v)
+  def withBg(v: Option[String])                      = copy(bg = v)
+  def withColor(v: Option[String])                   = copy(color = v)
+  def withHasArrow(v: Option[Boolean])               = copy(hasArrow = v)
+  def withFontSize(v: Option[String])                = copy(fontSize = v)
+  override def noChildren                            = copy(children = Nil)
+  override def withChildren(cn: UiElement*): Tooltip =
+    if cn.size != 1 then throw new IllegalArgumentException("tooltip takes 1 only child") else copy(children = cn)
+
+/** see https://chakra-ui.com/docs/components/tabs
+  */
+case class Tabs(
+    key: String = Keys.nextKey,
+    defaultIndex: Int = 0,
+    variant: Option[String] = Some("enclosed"), // line,enclosed, enclosed-colored, soft-rounded, solid-rounded, and unstyled.
+    align: Option[String] = None,               // start, center, end
+    colorScheme: Option[String] = None,
+    size: Option[String] = None,
+    isFitted: Option[Boolean] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Tabs]
+    with HasChildren[Tabs]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withVariant(v: Option[String])          = copy(variant = v)
+  def withColorScheme(v: Option[String])      = copy(colorScheme = v)
+  def withSize(v: Option[String])             = copy(size = v)
+  def withAlign(v: Option[String])            = copy(align = v)
+  def withIsFitted(v: Option[Boolean])        = copy(isFitted = v)
+
+/** see https://chakra-ui.com/docs/components/tabs
+  */
+case class TabList(
+    key: String = Keys.nextKey,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[TabList]
+    with HasChildren[TabList]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+
+/** see https://chakra-ui.com/docs/components/tabs
+  */
+case class Tab(
+    key: String = Keys.nextKey,
+    text: String = "tab.text",
+    isDisabled: Option[Boolean] = None,
+    _selected: Map[String, Any] = Map.empty,
+    _hover: Map[String, Any] = Map.empty,
+    _active: Map[String, Any] = Map.empty,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Tab]
+    with HasChildren[Tab]:
+  def withKey(v: String)                      = copy(key = v)
+  def withText(v: String)                     = copy(text = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withIsDisabled(v: Option[Boolean])      = copy(isDisabled = v)
+  def withSelected(v: Map[String, Any])       = copy(_selected = v)
+  def withHover(v: Map[String, Any])          = copy(_hover = v)
+  def withActive(v: Map[String, Any])         = copy(_active = v)
+
+/** see https://chakra-ui.com/docs/components/tabs
+  */
+case class TabPanels(
+    key: String = Keys.nextKey,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[TabPanels]
+    with HasChildren[TabPanels]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+
+/** see https://chakra-ui.com/docs/components/tabs
+  */
+case class TabPanel(
+    key: String = Keys.nextKey,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[TabPanel]
+    with HasChildren[TabPanel]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+
+/** https://chakra-ui.com/docs/components/breadcrumb
+  */
+case class Breadcrumb(
+    key: String = Keys.nextKey,
+    separator: String = "/",
+    spacing: Option[String] = None,
+    fontWeight: Option[String] = None,
+    fontSize: Option[String] = None,
+    pt: Option[Int] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Breadcrumb]
+    with HasChildren[Breadcrumb]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withSeparator(v: String)                = copy(separator = v)
+  def withSpacing(v: Option[String])          = copy(spacing = v)
+  def withFontWeight(v: Option[String])       = copy(fontWeight = v)
+  def withFontSize(v: Option[String])         = copy(fontSize = v)
+  def withPt(v: Option[Int])                  = copy(pt = v)
+
+/** https://chakra-ui.com/docs/components/breadcrumb
+  */
+case class BreadcrumbItem(
+    key: String = Keys.nextKey,
+    isCurrentPage: Option[Boolean] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[BreadcrumbItem]
+    with HasChildren[BreadcrumbItem]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withIsCurrentPage(v: Option[Boolean])   = copy(isCurrentPage = v)
+
+/** https://chakra-ui.com/docs/components/breadcrumb
+  */
+case class BreadcrumbLink(
+    key: String = Keys.nextKey,
+    text: String = "breadcrumblink.text",
+    href: Option[String] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[BreadcrumbLink]
+    with HasChildren[BreadcrumbLink]
+    with OnClickEventHandler.CanHandleOnClickEvent[BreadcrumbLink]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withHref(v: Option[String])             = copy(href = v)
+  def withText(v: String)                     = copy(text = v)
+
+case class Link(
+    key: String = Keys.nextKey,
+    text: String = "link.text",
+    href: String = "#",
+    isExternal: Option[Boolean] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Link]
+    with HasChildren[Link]
+    with OnClickEventHandler.CanHandleOnClickEvent[Link]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withIsExternal(v: Option[Boolean])      = copy(isExternal = v)
+  def withHref(v: String)                     = copy(href = v)
+  def withText(v: String)                     = copy(text = v)

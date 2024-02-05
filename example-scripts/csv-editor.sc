@@ -8,7 +8,6 @@
 import org.terminal21.client.*
 
 import java.util.concurrent.atomic.AtomicBoolean
-// std components, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala
 import org.terminal21.client.components.*
 // use the chakra components for menus, forms etc, https://chakra-ui.com/docs/components
 // The scala case classes : https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/chakra/ChakraElement.scala
@@ -55,7 +54,7 @@ def saveCsvMap() =
     .mkString("\n")
   FileUtils.writeStringToFile(file, s, "UTF-8")
 
-  // this will be countDown to 0 when we have to exit
+  // this will be set to true when we have to exit
 val exitFlag = new AtomicBoolean(false)
 
 Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session =>
@@ -107,4 +106,3 @@ Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session
   println(s"Now open ${session.uiUrl} to view the UI")
   // wait for one of the save/exit buttons to be pressed.
   session.waitTillUserClosesSessionOr(exitFlag.get())
-

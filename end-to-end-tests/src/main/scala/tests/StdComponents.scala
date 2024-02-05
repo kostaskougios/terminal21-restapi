@@ -14,7 +14,12 @@ import org.terminal21.client.components.std.*
       output.withText(newValue).renderChanges()
 
     Seq(
-      Header1(text = "Welcome to the std components demo/test"),
+      Header1(text = "header1 test"),
+      Header2(text = "header2 test"),
+      Header3(text = "header3 test"),
+      Header4(text = "header4 test"),
+      Header5(text = "header5 test"),
+      Header6(text = "header6 test"),
       Paragraph(text = "Hello World!").withChildren(
         NewLine(),
         Span(text = "Some more text"),
