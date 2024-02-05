@@ -5,6 +5,8 @@ like to learn how to create user interfaces.
 
 This tutorial will use `scala-cli` but the same applies for `sbt` or `mill` projects that use the terminal21 libraries.
 
+All example code is under `example-scripts` of this repo, feel free to check the repo and run them.
+
 ## Creating a folder for our scripts
 
 Create a folder and a file `project.scala` into it. This file will help us include the library dependencies and also
@@ -155,3 +157,49 @@ Finally, when the universe is ready, we just clear the UI and render a paragraph
 session.clear()
 Paragraph(text = "Universe ready!").render()
 ```
+## Handling clicks
+
+Some UI elements allow us to attach an `onClick` handler. When the user clicks the element, our scala code runs.
+
+Let's see for example [on-click.sc](../example-scripts/on-click.sc). We will create a paragraph and a button. When the
+user clicks the button, the paragraph text will change and the script will exit.
+
+```scala
+#!/usr/bin/env -S scala-cli project.scala
+
+import org.terminal21.client.*
+import org.terminal21.client.components.*
+import org.terminal21.client.components.std.*
+import org.terminal21.client.components.chakra.*
+
+Sessions.withNewSession("on-click-example", "On Click Handler"): session =>
+  given ConnectedSession = session
+
+  @volatile var exit = false
+  val msg = Paragraph(text = "Waiting for user to click the button")
+  val button = Button(text = "Please click me").onClick: () =>
+    msg.withText("Button clicked.").renderChanges()
+    exit = true
+
+  Seq(msg, button).render()
+
+  session.waitTillUserClosesSessionOr(exit)
+```
+
+First we create the paragraph and button. We attach an `onClick` handler on the button:
+
+```scala
+  val button = Button(text = "Please click me").onClick: () =>
+    msg.withText("Button clicked.").renderChanges()
+    exit = true
+```
+Here we change the paragraph text and also update `exit` to `true`.
+
+Our script waits until var `exit` becomes true and then terminates.
+
+```scala
+session.waitTillUserClosesSessionOr(exit)
+```
+
+Now if we run it with `./on-click.sc` and click the button, the script will terminate.
+
