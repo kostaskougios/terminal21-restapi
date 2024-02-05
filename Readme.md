@@ -160,7 +160,7 @@ Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi
 # Changelog
 ## Version 0.21
 
-- more std and chakra components
+- more std and chakra components like Alert, Progress, Tooltip, Tabs.
 
 ## Version 0.20
 
