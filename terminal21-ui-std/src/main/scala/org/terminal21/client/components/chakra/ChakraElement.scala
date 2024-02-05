@@ -1874,3 +1874,56 @@ case class TabPanel(
   def withKey(v: String)                      = copy(key = v)
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
+
+/** https://chakra-ui.com/docs/components/breadcrumb
+  */
+case class Breadcrumb(
+    key: String = Keys.nextKey,
+    separator: String = "/",
+    spacing: Option[String] = None,
+    fontWeight: Option[String] = None,
+    fontSize: Option[String] = None,
+    pt: Option[Int] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[Breadcrumb]
+    with HasChildren[Breadcrumb]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withSeparator(v: String)                = copy(separator = v)
+  def withSpacing(v: Option[String])          = copy(spacing = v)
+  def withFontWeight(v: Option[String])       = copy(fontWeight = v)
+  def withFontSize(v: Option[String])         = copy(fontSize = v)
+  def withPt(v: Option[Int])                  = copy(pt = v)
+
+/** https://chakra-ui.com/docs/components/breadcrumb
+  */
+case class BreadcrumbItem(
+    key: String = Keys.nextKey,
+    isCurrentPage: Option[Boolean] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[BreadcrumbItem]
+    with HasChildren[BreadcrumbItem]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withIsCurrentPage(v: Option[Boolean])   = copy(isCurrentPage = v)
+
+/** https://chakra-ui.com/docs/components/breadcrumb
+  */
+case class BreadcrumbLink(
+    key: String = Keys.nextKey,
+    text: String = "breadcrumblink.text",
+    href: Option[String] = None,
+    style: Map[String, Any] = Map.empty,
+    children: Seq[UiElement] = Nil
+) extends ChakraElement[BreadcrumbLink]
+    with HasChildren[BreadcrumbLink]
+    with OnClickEventHandler.CanHandleOnClickEvent[BreadcrumbLink]:
+  def withKey(v: String)                      = copy(key = v)
+  override def withChildren(cn: UiElement*)   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]) = copy(style = v)
+  def withHref(v: Option[String])             = copy(href = v)
+  def withText(v: String)                     = copy(text = v)
