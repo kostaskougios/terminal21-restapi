@@ -31,7 +31,7 @@ import org.terminal21.server.Terminal21Server
 Terminal21Server.start()
 ```
 
-Now run this with `./server.sc`.
+Now run this with `./server.sc` and the server will start and also print some useful information.
 
 ## Creating a folder for our scripts
 
