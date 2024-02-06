@@ -11,7 +11,9 @@ performed by scripts and where it would require a lot of effort to create a dedi
 for scripting for i.e. those internal odd tasks that have to be performed at your workplace or even for things you would
 like to do on your box. And you won't have to write a single line of html or javascript.
 
-This tutorial will use `scala-cli` but the same applies for `sbt` or `mill` projects that use the terminal21 libraries.
+This tutorial will use `scala-cli` but the same applies for `sbt` or `mill` projects that use the terminal21 libraries. If you
+have `scala-cli` installed on your box, you're good to go, there are no other requirements to run terminal21 scripts. Jdk and
+dependencies will be downloaded by `scala-cli` for us.
 
 All example code is under `example-scripts` of this repo, feel free to check the repo and run them.
 
