@@ -26,12 +26,13 @@ The easiest way to start the terminal21 server is to have a `scala-cli` script o
 
 //> using jvm "21"
 //> using scala 3
-//> using dep io.github.kostaskougios::terminal21-server:0.21
+//> using dep io.github.kostaskougios::terminal21-server:_VERSION_
 
 import org.terminal21.server.Terminal21Server
 
 Terminal21Server.start()
 ```
+Change `_VERSION_` with the terminal 21 latest version: ![artifact](https://img.shields.io/maven-central/v/io.github.kostaskougios/terminal21-server_3)
 
 Now run this with `./server.sc` and the server will start and also print some useful information.
 
@@ -47,7 +48,7 @@ scala & jdk version. It should look like this:
 //> using dep io.github.kostaskougios::terminal21-ui-std:_VERSION_
 ```
 
-Change `_VERSION_` with the terminal 21 latest version.
+Change `_VERSION_` with the terminal 21 latest version: ![artifact](https://img.shields.io/maven-central/v/io.github.kostaskougios/terminal21-server_3)
 
 See [project.scala](../example-scripts/project.scala)
 
