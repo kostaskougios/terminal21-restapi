@@ -24,8 +24,8 @@ class AppManager(serverSideSessions: ServerSideSessions, fiberExecutor: FiberExe
           Seq[UiElement](link, Text(text = app.description))
         val appsTable = QuickTable(
           caption = Some("Apps installed on the server"),
-          rows = Seq(Seq(Text(text = "App Name"), Text(text = "Description"))) ++ appRows
-        )
+          rows = appRows
+        ).headers("App Name", "Description")
 
         Seq(
           appsTable
