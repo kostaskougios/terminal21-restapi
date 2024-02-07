@@ -15,22 +15,29 @@ class ServerStatusApp extends ServerSideApp:
   override def createSession(serverSideSessions: ServerSideSessions, dependencies: Dependencies): Unit =
     serverSideSessions.withNewSession("server-status", "Server Status"): session =>
       given ConnectedSession = session
-      val sessionService     = dependencies.sessionsService
-      val sessions           = sessionService.allSessions
-      val sessionsTable      = QuickTable(
-        caption = Some("All sessions"),
-        rows = sessions.map: session =>
-          Seq(Text(text = session.id), Text(text = session.name), if session.isOpen then CheckIcon() else NotAllowedIcon(), actionsFor(session, sessionService))
-      )
-        .headers("Id", "Name", "Is Open", "Actions")
+      new ServerStatusAppInternal(dependencies.sessionsService).run()
 
-      Seq(sessionsTable).render()
-      session.waitTillUserClosesSession()
+private class ServerStatusAppInternal(sessionsService: ServerSessionsService)(using session: ConnectedSession):
+  def run(): Unit =
+    updateStatus()
+    session.waitTillUserClosesSession()
 
-  private def actionsFor(session: Session, sessionsService: ServerSessionsService)(using ConnectedSession): UiElement =
+  private def updateStatus() =
+    val sessions      = sessionsService.allSessions
+    val sessionsTable = QuickTable(
+      caption = Some("All sessions"),
+      rows = sessions.map: session =>
+        Seq(Text(text = session.id), Text(text = session.name), if session.isOpen then CheckIcon() else NotAllowedIcon(), actionsFor(session))
+    )
+      .headers("Id", "Name", "Is Open", "Actions")
+
+    Seq(sessionsTable).render()
+
+  private def actionsFor(session: Session)(using ConnectedSession): UiElement =
     if session.isOpen then
       Button(text = "Close", size = Some("sm"))
         .withLeftIcon(CloseIcon())
         .onClick: () =>
           sessionsService.terminateAndRemove(session)
+          updateStatus()
     else NotAllowedIcon()
