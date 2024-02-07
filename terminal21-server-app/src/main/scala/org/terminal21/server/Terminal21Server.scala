@@ -6,15 +6,17 @@ import io.helidon.webserver.WebServer
 import io.helidon.webserver.http.HttpRouting
 import org.slf4j.LoggerFactory
 import org.terminal21.config.Config
+import org.terminal21.serverapp.ServerSideApp
+import org.terminal21.serverapp.bundled.DefaultApps
 
 import java.net.InetAddress
 
 object Terminal21Server:
-  private val logger                        = LoggerFactory.getLogger(getClass)
-  def start(port: Option[Int] = None): Unit =
+  private val logger = LoggerFactory.getLogger(getClass)
+  def start(port: Option[Int] = None, apps: Seq[ServerSideApp] = Nil, defaultApps: Seq[ServerSideApp] = DefaultApps.All): Unit =
     FiberExecutor.withFiberExecutor: executor =>
       val portV         = port.getOrElse(Config.Default.port)
-      val dependencies  = new Dependencies(executor)
+      val dependencies  = new Dependencies(executor, apps ++ defaultApps)
       val routesBuilder = HttpRouting.builder()
       Routes.register(dependencies, routesBuilder)
       Routes.static(routesBuilder)
