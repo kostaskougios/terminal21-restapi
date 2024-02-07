@@ -79,4 +79,4 @@ class ServerSessionsService extends SessionsService:
     state.eventsNotificationRegistry.add(listener)
 
 trait ServerSessionsServiceBeans:
-  val sessionsService: ServerSessionsService = new ServerSessionsService
+  lazy val sessionsService: ServerSessionsService = new ServerSessionsService

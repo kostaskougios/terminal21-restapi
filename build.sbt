@@ -5,7 +5,7 @@ import sbt.librarymanagement.ModuleFilter
   */
 val scala3Version = "3.3.1"
 
-ThisBuild / version      := "0.21"
+ThisBuild / version      := "0.30"
 ThisBuild / organization := "io.github.kostaskougios"
 name                     := "rest-api"
 ThisBuild / scalaVersion := scala3Version
@@ -102,6 +102,14 @@ lazy val `terminal21-server` = project
   .dependsOn(`terminal21-ui-std-exports` % "compile->compile;test->test", `terminal21-server-client-common`)
   .enablePlugins(FunctionsRemotePlugin)
 
+lazy val `terminal21-server-app` = project
+  .settings(
+    commonSettings,
+    libraryDependencies ++= Seq(
+    )
+  )
+  .dependsOn(`terminal21-server` % "compile->compile;test->test", `terminal21-ui-std`)
+
 lazy val `terminal21-ui-std-exports` = project
   .settings(
     commonSettings,
@@ -147,6 +155,7 @@ lazy val `terminal21-ui-std` = project
 lazy val `end-to-end-tests` = project
   .settings(
     commonSettings,
+    publish := {},
     libraryDependencies ++= Seq(ScalaTest, LogBack)
   )
   .dependsOn(`terminal21-ui-std`, `terminal21-nivo`, `terminal21-mathjax`)
@@ -185,6 +194,7 @@ lazy val `terminal21-mathjax` = project
 lazy val `terminal21-code-generation`: Project = project
   .settings(
     commonSettings,
+    publish := {},
     libraryDependencies ++= Seq(
       ScalaTest,
       Scala3Tasty,

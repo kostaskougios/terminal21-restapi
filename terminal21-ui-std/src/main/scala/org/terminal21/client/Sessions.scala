@@ -34,8 +34,7 @@ object Sessions:
       val listener = new ClientEventsWsListener(wsClient, connectedSession, executor)
       listener.start()
 
-      try {
-        f(connectedSession)
-      } finally
+      try f(connectedSession)
+      finally
         if !isStopped.get() && !connectedSession.isLeaveSessionOpen then sessionsService.terminateSession(session)
         listener.close()
