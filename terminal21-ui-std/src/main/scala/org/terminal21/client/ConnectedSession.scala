@@ -58,24 +58,28 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   def click(e: UiElement): Unit = fireEvent(OnClick(e.key))
 
-  private[client] def fireEvent(event: CommandEvent): Unit =
-    event match
-      case SessionClosed(_) =>
-        exitLatch.countDown()
-        onCloseHandler()
-      case _                =>
-        handlers.getEventHandler(event.key) match
-          case Some(handlers) =>
-            for handler <- handlers do
-              (event, handler) match
-                case (_: OnClick, h: OnClickEventHandler)                 => h.onClick()
-                case (onChange: OnChange, h: OnChangeEventHandler)        => h.onChange(onChange.value)
-                case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
-                case x                                                    => logger.error(s"Unknown event handling combination : $x")
-          case None           =>
-            logger.warn(s"There is no event handler for event $event")
-
-  def render(es: UiElement*): Unit =
+  def fireEvent(event: CommandEvent): Unit =
+    try
+      event match
+        case SessionClosed(_) =>
+          exitLatch.countDown()
+          onCloseHandler()
+        case _                =>
+          handlers.getEventHandler(event.key) match
+            case Some(handlers) =>
+              for handler <- handlers do
+                (event, handler) match
+                  case (_: OnClick, h: OnClickEventHandler)                 => h.onClick()
+                  case (onChange: OnChange, h: OnChangeEventHandler)        => h.onChange(onChange.value)
+                  case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
+                  case x                                                    => logger.error(s"Unknown event handling combination : $x")
+            case None           =>
+              logger.warn(s"There is no event handler for event $event")
+    catch
+      case t: Throwable =>
+        logger.error(s"Session ${session.id}: An error occurred while handling $event", t)
+        throw t
+  def render(es: UiElement*): Unit         =
     handlers.registerEventHandlers(es)
     val j = toJson(es)
     sessionsService.setSessionJsonState(session, j)
