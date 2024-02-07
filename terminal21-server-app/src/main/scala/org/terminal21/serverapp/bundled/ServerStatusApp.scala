@@ -7,7 +7,6 @@ import org.terminal21.model.Session
 import org.terminal21.server.Dependencies
 import org.terminal21.server.service.ServerSessionsService
 import org.terminal21.serverapp.{ServerSideApp, ServerSideSessions}
-import org.terminal21.ui.std.SessionsService
 
 class ServerStatusApp extends ServerSideApp:
   override def name: String        = "Server Status"
@@ -28,10 +27,10 @@ class ServerStatusApp extends ServerSideApp:
       Seq(sessionsTable).render()
       session.waitTillUserClosesSession()
 
-  def actionsFor(session: Session, sessionsService: ServerSessionsService)(using ConnectedSession): UiElement =
+  private def actionsFor(session: Session, sessionsService: ServerSessionsService)(using ConnectedSession): UiElement =
     if session.isOpen then
-      Button(text = "Close")
+      Button(text = "Close", size = Some("sm"))
         .withLeftIcon(CloseIcon())
         .onClick: () =>
-          sessionsService.terminateSession(session)
+          sessionsService.terminateAndRemove(session)
     else NotAllowedIcon()
