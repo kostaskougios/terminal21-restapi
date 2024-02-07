@@ -27,6 +27,7 @@ object Terminal21Server:
         .build
         .start
 
+      dependencies.appManager.start()
       if !server.isRunning then throw new IllegalStateException("Server failed to start")
       try
         logger.info(s"Terminal 21 Server started. Please open http://localhost:$portV/ui for the user interface")
