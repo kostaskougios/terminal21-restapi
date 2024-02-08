@@ -22,7 +22,7 @@ private class ServerStatusAppInternal(sessionsService: ServerSessionsService)(us
     updateStatus()
     session.waitTillUserClosesSession()
 
-  private def updateStatus() =
+  private def updateStatus(): Unit =
     val sessions      = sessionsService.allSessions
     val sessionsTable = QuickTable(
       caption = Some("All sessions"),

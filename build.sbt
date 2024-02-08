@@ -27,8 +27,9 @@ val FunctionsHelidonClient   = "io.github.kostaskougios" %% "helidon-client"    
 val FunctionsHelidonWsClient = "io.github.kostaskougios" %% "helidon-ws-client"  % FunctionsVersion
 val FunctionsFibers          = "io.github.kostaskougios" %% "fibers"             % FunctionsVersion
 
-val ScalaTest   = "org.scalatest"     %% "scalatest"              % "3.2.15"     % Test
+val ScalaTest   = "org.scalatest"     %% "scalatest"              % "3.2.18"     % Test
 val Mockito     = "org.mockito"        % "mockito-all"            % "2.0.2-beta" % Test
+val Mockito510  = "org.scalatestplus" %% "mockito-5-10"           % "3.2.18.0"   % Test
 val Scala3Tasty = "org.scala-lang"    %% "scala3-tasty-inspector" % scala3Version
 val CommonsText = "org.apache.commons" % "commons-text"           % "1.10.0"
 val CommonsIO   = "commons-io"         % "commons-io"             % "2.11.0"
@@ -106,9 +107,10 @@ lazy val `terminal21-server-app` = project
   .settings(
     commonSettings,
     libraryDependencies ++= Seq(
+      Mockito510
     )
   )
-  .dependsOn(`terminal21-server` % "compile->compile;test->test", `terminal21-ui-std`)
+  .dependsOn(`terminal21-server` % "compile->compile;test->test", `terminal21-ui-std`, `terminal21-server-client-common` % "compile->compile;test->test")
 
 lazy val `terminal21-ui-std-exports` = project
   .settings(
