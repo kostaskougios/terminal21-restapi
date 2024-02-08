@@ -164,6 +164,12 @@ all changes that may have occurred at the browser and all the changes we did on 
 Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi/discussions) of the project to post any questions, comments or ideas.
 
 # Changelog
+
+## Version 0.30
+
+- apps can now run on the server
+- session builders refactoring for more flexible creation of sessions
+
 ## Version 0.21
 
 - more std and chakra components like Alert, Progress, Tooltip, Tabs.
