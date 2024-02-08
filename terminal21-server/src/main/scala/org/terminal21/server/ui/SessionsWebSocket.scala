@@ -45,7 +45,7 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
     wsSession.send(json, true)
 
   override def onMessage(wsSession: WsSession, text: String, last: Boolean): Unit =
-    logger.info(s"$wsSession: Received json: $text , last = $last")
+    logger.debug(s"$wsSession: Received json: $text , last = $last")
     errorLogger.logErrors:
       WsRequest.decoder(text) match
         case Right(WsRequest("sessions", None))                                            =>
