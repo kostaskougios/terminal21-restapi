@@ -14,27 +14,29 @@ import java.util.concurrent.atomic.AtomicBoolean
 
   while keepRunning.get() do
     println("Starting new session")
-    Sessions.withNewSession("chakra-components", "Chakra Components"): session =>
-      keepRunning.set(false)
-      given ConnectedSession = session
+    Sessions
+      .withNewSession("chakra-components", "Chakra Components")
+      .connect: session =>
+        keepRunning.set(false)
+        given ConnectedSession = session
 
-      val latch = new CountDownLatch(1)
+        val latch = new CountDownLatch(1)
 
-      // react tests reset the session to clear state
-      val krButton = Button(text = "Keep Running").onClick: () =>
-        keepRunning.set(true)
-        latch.countDown()
+        // react tests reset the session to clear state
+        val krButton = Button(text = "Keep Running").onClick: () =>
+          keepRunning.set(true)
+          latch.countDown()
 
-      (Overlay.components ++ Forms.components ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components(
-        latch
-      ) ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Feedback.components ++ Disclosure.components ++ Navigation.components ++ Seq(
-        krButton
-      ))
-        .render()
+        (Overlay.components ++ Forms.components ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components(
+          latch
+        ) ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Feedback.components ++ Disclosure.components ++ Navigation.components ++ Seq(
+          krButton
+        ))
+          .render()
 
-      println("Waiting for button to be pressed for 1 hour")
-      session.waitTillUserClosesSessionOr(latch.getCount == 0)
-      if !session.isClosed then
-        session.clear()
-        Paragraph(text = "Terminated").render()
-        Thread.sleep(1000)
+        println("Waiting for button to be pressed for 1 hour")
+        session.waitTillUserClosesSessionOr(latch.getCount == 0)
+        if !session.isClosed then
+          session.clear()
+          Paragraph(text = "Terminated").render()
+          Thread.sleep(1000)
