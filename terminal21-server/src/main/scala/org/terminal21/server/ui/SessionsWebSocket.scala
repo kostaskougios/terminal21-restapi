@@ -60,7 +60,7 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
           logger.info(s"$wsSession: Received event $eventName = $event")
           sessionsService.triggerUiEvent(event)
         case Right(WsRequest("ping", None))                                                =>
-          logger.info(s"$wsSession: ping received")
+          logger.debug(s"$wsSession: ping received")
         case Right(WsRequest("close-session", Some(CloseSession(sessionId))))              =>
           val session = sessionsService.sessionById(sessionId)
           sessionsService.terminateSession(session)

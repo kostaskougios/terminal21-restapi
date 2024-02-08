@@ -1,5 +1,6 @@
 package org.terminal21.serverapp.bundled
 
+import functions.fibers.FiberExecutor
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
@@ -17,14 +18,36 @@ class ServerStatusApp extends ServerSideApp:
       .withNewSession("server-status", "Server Status")
       .connect: session =>
         given ConnectedSession = session
-        new ServerStatusAppInternal(dependencies.sessionsService).run()
+        new ServerStatusAppInternal(dependencies.sessionsService, dependencies.fiberExecutor).run()
 
-private class ServerStatusAppInternal(sessionsService: ServerSessionsService)(using session: ConnectedSession):
+class ServerStatusAppInternal(sessionsService: ServerSessionsService, executor: FiberExecutor)(using session: ConnectedSession):
   def run(): Unit =
-    updateStatus()
+    executor.submit:
+      while !session.isClosed do
+        updateStatus()
+        Thread.sleep(1000)
     session.waitTillUserClosesSession()
 
+  private def toMb(v: Long) = s"${v / (1024 * 1024)} MB"
+
   private def updateStatus(): Unit =
+    val runtime = Runtime.getRuntime
+
+    val jvmTable      = QuickTable(caption = Some("JVM"))
+      .headers("Property", "Value", "Actions")
+      .rows(
+        Seq(
+          Seq("Free Memory", toMb(runtime.freeMemory()), ""),
+          Seq("Max Memory", toMb(runtime.maxMemory()), ""),
+          Seq(
+            "Total Memory",
+            toMb(runtime.totalMemory()),
+            Button(size = Some("2xs"), text = "Run GC").onClick: () =>
+              System.gc()
+          ),
+          Seq("Available processors", runtime.availableProcessors(), "")
+        )
+      )
     val sessions      = sessionsService.allSessions
     val sessionsTable = QuickTable(
       caption = Some("All sessions"),
@@ -33,7 +56,7 @@ private class ServerStatusAppInternal(sessionsService: ServerSessionsService)(us
     )
       .headers("Id", "Name", "Is Open", "Actions")
 
-    Seq(sessionsTable).render()
+    Seq(jvmTable, sessionsTable).render()
 
   private def actionsFor(session: Session)(using ConnectedSession): UiElement =
     if session.isOpen then

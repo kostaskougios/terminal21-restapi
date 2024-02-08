@@ -41,7 +41,10 @@ case class QuickTable(
 
   def headers(headers: String*): QuickTable               = copy(headers = headers.map(h => Text(text = h)))
   def headersElements(headers: UiElement*): QuickTable    = copy(headers = headers)
-  def rows(data: Seq[Seq[Any]]): QuickTable               = copy(rows = data.map(_.map(c => Text(text = c.toString))))
+  def rows(data: Seq[Seq[Any]]): QuickTable               = copy(rows = data.map(_.map:
+    case u: UiElement => u
+    case c            => Text(text = c.toString)
+  ))
   def rowsElements(data: Seq[Seq[UiElement]]): QuickTable = copy(rows = data)
 
   def caption(text: String): QuickTable                   = copy(caption = Some(text))
