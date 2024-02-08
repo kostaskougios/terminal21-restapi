@@ -9,8 +9,8 @@ import org.terminal21.server.service.ServerSessionsService
 import java.util.concurrent.atomic.AtomicBoolean
 
 class ServerSideSessions(sessionsService: ServerSessionsService, executor: FiberExecutor):
-  case class Builder(id: String, name: String, componentLibs: Seq[ComponentLib] = Seq(StdElementEncoding)):
-    def andLibraries(libraries: ComponentLib*): Builder = copy(componentLibs = componentLibs ++ libraries)
+  case class ServerSideSessionBuilder(id: String, name: String, componentLibs: Seq[ComponentLib] = Seq(StdElementEncoding)):
+    def andLibraries(libraries: ComponentLib*): ServerSideSessionBuilder = copy(componentLibs = componentLibs ++ libraries)
 
     def connect[R](f: ConnectedSession => R): R =
       val config    = Config.Default
@@ -33,7 +33,7 @@ class ServerSideSessions(sessionsService: ServerSessionsService, executor: Fiber
       finally
         if !isStopped.get() && !connectedSession.isLeaveSessionOpen then sessionsService.terminateSession(session)
 
-  def withNewSession(id: String, name: String): Builder = Builder(id, name)
+  def withNewSession(id: String, name: String): ServerSideSessionBuilder = ServerSideSessionBuilder(id, name)
 
 trait ServerSideSessionsBeans:
   def sessionsService: ServerSessionsService
