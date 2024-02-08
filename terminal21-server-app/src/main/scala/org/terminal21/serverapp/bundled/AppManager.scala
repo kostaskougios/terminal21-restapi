@@ -15,23 +15,25 @@ class AppManager(serverSideSessions: ServerSideSessions, fiberExecutor: FiberExe
   def start(): Unit =
     fiberExecutor.submit:
       logger.info("Starting AppManager")
-      serverSideSessions.withNewSession("app-manager", "Apps"): session =>
-        given ConnectedSession = session
+      serverSideSessions
+        .withNewSession("app-manager", "Apps")
+        .connect: session =>
+          given ConnectedSession = session
 
-        val appRows   = apps.map: app =>
-          val link = Link(text = app.name).onClick: () =>
-            startApp(app)
-          Seq[UiElement](link, Text(text = app.description))
-        val appsTable = QuickTable(
-          caption = Some("Apps installed on the server"),
-          rows = appRows
-        ).headers("App Name", "Description")
+          val appRows   = apps.map: app =>
+            val link = Link(text = app.name).onClick: () =>
+              startApp(app)
+            Seq[UiElement](link, Text(text = app.description))
+          val appsTable = QuickTable(
+            caption = Some("Apps installed on the server"),
+            rows = appRows
+          ).headers("App Name", "Description")
 
-        Seq(
-          appsTable
-        ).render()
+          Seq(
+            appsTable
+          ).render()
 
-        session.waitTillUserClosesSession()
+          session.waitTillUserClosesSession()
 
   private def startApp(app: ServerSideApp): Unit =
     app.createSession(serverSideSessions, dependencies)

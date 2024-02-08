@@ -18,8 +18,10 @@ class ServerSideSessionsTest extends AnyFunSuiteLike with BeforeAndAfterAll:
     new App:
       val s = session()
       when(sessionsService.createSession(s.id, s.name)).thenReturn(s)
-      serverSideSessions.withNewSession(s.id, s.name): session =>
-        session.leaveSessionOpenAfterExiting()
+      serverSideSessions
+        .withNewSession(s.id, s.name)
+        .connect: session =>
+          session.leaveSessionOpenAfterExiting()
 
       verify(sessionsService).createSession(s.id, s.name)
 
@@ -27,10 +29,23 @@ class ServerSideSessionsTest extends AnyFunSuiteLike with BeforeAndAfterAll:
     new App:
       val s = session()
       when(sessionsService.createSession(s.id, s.name)).thenReturn(s)
-      serverSideSessions.withNewSession(s.id, s.name): _ =>
-        ()
+      serverSideSessions
+        .withNewSession(s.id, s.name)
+        .connect: _ =>
+          ()
 
       verify(sessionsService).terminateSession(s)
+
+  test("registers to receive events"):
+    new App:
+      val s = session()
+      when(sessionsService.createSession(s.id, s.name)).thenReturn(s)
+      serverSideSessions
+        .withNewSession(s.id, s.name)
+        .connect: _ =>
+          ()
+
+      verify(sessionsService).notifyMeOnSessionEvents(s)
 
   class App:
     val sessionsService    = mock[ServerSessionsService]

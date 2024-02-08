@@ -9,25 +9,31 @@ import org.terminal21.server.service.ServerSessionsService
 import java.util.concurrent.atomic.AtomicBoolean
 
 class ServerSideSessions(sessionsService: ServerSessionsService, executor: FiberExecutor):
-  def withNewSession[R](id: String, name: String, componentLibs: ComponentLib*)(f: ConnectedSession => R): R =
-    val config    = Config.Default
-    val serverUrl = s"http://${config.host}:${config.port}"
+  case class Builder(id: String, name: String, componentLibs: Seq[ComponentLib] = Seq(StdElementEncoding)):
+    def andLibraries(libraries: ComponentLib*): Builder = copy(componentLibs = componentLibs ++ libraries)
 
-    val session           = sessionsService.createSession(id, name)
-    val encoding          = new UiElementEncoding(Seq(StdElementEncoding) ++ componentLibs)
-    val isStopped         = new AtomicBoolean(false)
-    def terminate(): Unit =
-      isStopped.set(true)
+    def connect[R](f: ConnectedSession => R): R =
+      val config    = Config.Default
+      val serverUrl = s"http://${config.host}:${config.port}"
 
-    val connectedSession = ConnectedSession(session, encoding, serverUrl, sessionsService, terminate)
-    sessionsService.notifyMeOnSessionEvents(session): event =>
-      executor.submit:
-        connectedSession.fireEvent(event)
-      true
-    try
-      f(connectedSession)
-    finally
-      if !isStopped.get() && !connectedSession.isLeaveSessionOpen then sessionsService.terminateSession(session)
+      val session   = sessionsService.createSession(id, name)
+      val encoding  = new UiElementEncoding(Seq(StdElementEncoding) ++ componentLibs)
+      val isStopped = new AtomicBoolean(false)
+
+      def terminate(): Unit =
+        isStopped.set(true)
+
+      val connectedSession = ConnectedSession(session, encoding, serverUrl, sessionsService, terminate)
+      sessionsService.notifyMeOnSessionEvents(session): event =>
+        executor.submit:
+          connectedSession.fireEvent(event)
+        true
+      try
+        f(connectedSession)
+      finally
+        if !isStopped.get() && !connectedSession.isLeaveSessionOpen then sessionsService.terminateSession(session)
+
+  def withNewSession(id: String, name: String): Builder = Builder(id, name)
 
 trait ServerSideSessionsBeans:
   def sessionsService: ServerSessionsService

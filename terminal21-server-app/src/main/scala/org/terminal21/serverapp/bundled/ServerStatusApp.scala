@@ -13,9 +13,11 @@ class ServerStatusApp extends ServerSideApp:
   override def description: String = "Status of the server."
 
   override def createSession(serverSideSessions: ServerSideSessions, dependencies: Dependencies): Unit =
-    serverSideSessions.withNewSession("server-status", "Server Status"): session =>
-      given ConnectedSession = session
-      new ServerStatusAppInternal(dependencies.sessionsService).run()
+    serverSideSessions
+      .withNewSession("server-status", "Server Status")
+      .connect: session =>
+        given ConnectedSession = session
+        new ServerStatusAppInternal(dependencies.sessionsService).run()
 
 private class ServerStatusAppInternal(sessionsService: ServerSessionsService)(using session: ConnectedSession):
   def run(): Unit =
