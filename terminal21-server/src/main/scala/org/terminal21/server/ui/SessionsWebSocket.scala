@@ -30,18 +30,18 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
 
   private def sendSessionState(wsSession: WsSession, session: Session, sessionState: SessionState): Unit =
     val response = StateWsResponse(session.hideSecret, sessionState.serverJson).asJson.noSpaces
-    logger.info(s"$wsSession: Sending session state response $response")
+    logger.debug(s"$wsSession: Sending session state response $response")
     wsSession.send(response, true)
 
   private def sendSessionStateChange(wsSession: WsSession, session: Session, change: ServerJson): Unit =
     val response = StateChangeWsResponse(session.hideSecret, change).asJson.noSpaces
-    logger.info(s"$wsSession: Sending session change state response $response")
+    logger.debug(s"$wsSession: Sending session change state response $response")
     wsSession.send(response, true)
 
   private def sendSessions(wsSession: WsSession, allSessions: Seq[Session]): Unit =
     val sessions = allSessions.map(_.hideSecret).sortBy(_.name)
     val json     = SessionsWsResponse(sessions).asJson.noSpaces
-    logger.info(s"$wsSession: Sending sessions $json")
+    logger.debug(s"$wsSession: Sending sessions $json")
     wsSession.send(json, true)
 
   override def onMessage(wsSession: WsSession, text: String, last: Boolean): Unit =
@@ -50,14 +50,14 @@ class SessionsWebSocket(sessionsService: ServerSessionsService) extends WsListen
       WsRequest.decoder(text) match
         case Right(WsRequest("sessions", None))                                            =>
           continuouslyRespond(wsSession)
-          logger.info(s"$wsSession: sessions processed successfully")
+          logger.debug(s"$wsSession: sessions processed successfully")
         case Right(WsRequest("session-full-refresh", Some(SessionFullRefresh(sessionId)))) =>
           logger.info(s"$wsSession: session-full-refresh requested, sending full session data for $sessionId")
           val session      = sessionsService.sessionById(sessionId)
           val sessionState = sessionsService.sessionStateOf(session)
           sendSessionState(wsSession, session, sessionState)
         case Right(WsRequest(eventName, Some(event: UiEvent)))                             =>
-          logger.info(s"$wsSession: Received event $eventName = $event")
+          logger.debug(s"$wsSession: Received event $eventName = $event")
           sessionsService.triggerUiEvent(event)
         case Right(WsRequest("ping", None))                                                =>
           logger.debug(s"$wsSession: ping received")

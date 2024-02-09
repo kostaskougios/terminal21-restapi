@@ -104,12 +104,25 @@ class ViewServerState(session: ConnectedSession):
           sj.keyTree.toSeq.sortBy(_._1).map((k, v) => Seq(k, v.mkString(", ")))
         )
     )
+
+    val componentJson = Seq(
+      QuickTable()
+        .withCaption("Component Json")
+        .headers("Key", "Json")
+        .rows(
+          sj.elements.toSeq
+            .sortBy(_._1)
+            .map: (k, j) =>
+              Seq(k, j.noSpaces)
+        )
+    )
     Seq(
       QuickTabs()
-        .withTabs("Root Keys", "Key Tree")
+        .withTabs("Root Keys", "Key Tree", "Component Json")
         .withTabPanels(
           rootKeyPanel,
-          keyTreePanel
+          keyTreePanel,
+          componentJson
         )
     ).render()
     session.waitTillUserClosesSession()
