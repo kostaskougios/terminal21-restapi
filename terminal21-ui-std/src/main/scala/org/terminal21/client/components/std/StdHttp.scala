@@ -6,6 +6,8 @@ import org.terminal21.client.components.{Keys, UiElement}
   */
 sealed trait StdHttp extends UiElement
 
+/** On the browser, https://github.com/js-cookie/js-cookie is used.
+  */
 case class Cookie(
     key: String = Keys.nextKey,
     name: String = "cookie.name",

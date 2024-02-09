@@ -1839,21 +1839,24 @@ case class Tab(
     key: String = Keys.nextKey,
     text: String = "tab.text",
     isDisabled: Option[Boolean] = None,
-    _selected: Map[String, Any] = Map.empty,
-    _hover: Map[String, Any] = Map.empty,
-    _active: Map[String, Any] = Map.empty,
+    _selected: Option[Map[String, Any]] = None,
+    _hover: Option[Map[String, Any]] = None,
+    _active: Option[Map[String, Any]] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Tab]
     with HasChildren[Tab]:
-  def withKey(v: String)                      = copy(key = v)
-  def withText(v: String)                     = copy(text = v)
-  override def withChildren(cn: UiElement*)   = copy(children = cn)
-  override def withStyle(v: Map[String, Any]) = copy(style = v)
-  def withIsDisabled(v: Option[Boolean])      = copy(isDisabled = v)
-  def withSelected(v: Map[String, Any])       = copy(_selected = v)
-  def withHover(v: Map[String, Any])          = copy(_hover = v)
-  def withActive(v: Map[String, Any])         = copy(_active = v)
+  def withKey(v: String)                        = copy(key = v)
+  def withText(v: String)                       = copy(text = v)
+  override def withChildren(cn: UiElement*)     = copy(children = cn)
+  override def withStyle(v: Map[String, Any])   = copy(style = v)
+  def withIsDisabled(v: Option[Boolean])        = copy(isDisabled = v)
+  def withSelected(v: Map[String, Any])         = copy(_selected = Some(v))
+  def withSelected(v: Option[Map[String, Any]]) = copy(_selected = v)
+  def withHover(v: Map[String, Any])            = copy(_hover = Some(v))
+  def withHover(v: Option[Map[String, Any]])    = copy(_hover = v)
+  def withActive(v: Map[String, Any])           = copy(_active = Some(v))
+  def withActive(v: Option[Map[String, Any]])   = copy(_active = v)
 
 /** see https://chakra-ui.com/docs/components/tabs
   */

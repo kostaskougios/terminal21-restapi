@@ -19,6 +19,7 @@ case class QuickTable(
   def withColorScheme(v: String)       = copy(colorScheme = v)
   def withSize(v: String)              = copy(size = v)
   def withCaption(v: Option[String])   = copy(caption = v)
+  def withCaption(v: String)           = copy(caption = Some(v))
   def withHeaders(v: Seq[UiElement])   = copy(headers = v)
   def withRows(v: Seq[Seq[UiElement]]) = copy(rows = v)
 

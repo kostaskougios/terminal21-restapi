@@ -6,6 +6,7 @@ import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.model.Session
 import org.terminal21.server.Dependencies
+import org.terminal21.server.model.SessionState
 import org.terminal21.server.service.ServerSessionsService
 import org.terminal21.serverapp.{ServerSideApp, ServerSideSessions}
 
@@ -18,9 +19,11 @@ class ServerStatusApp extends ServerSideApp:
       .withNewSession("server-status", "Server Status")
       .connect: session =>
         given ConnectedSession = session
-        new ServerStatusAppInternal(dependencies.sessionsService, dependencies.fiberExecutor).run()
+        new ServerStatusAppInternal(serverSideSessions, dependencies.sessionsService, dependencies.fiberExecutor).run()
 
-class ServerStatusAppInternal(sessionsService: ServerSessionsService, executor: FiberExecutor)(using session: ConnectedSession):
+class ServerStatusAppInternal(serverSideSessions: ServerSideSessions, sessionsService: ServerSessionsService, executor: FiberExecutor)(using
+    session: ConnectedSession
+):
   def run(): Unit =
     executor.submit:
       while !session.isClosed do
@@ -28,8 +31,8 @@ class ServerStatusAppInternal(sessionsService: ServerSessionsService, executor: 
         Thread.sleep(1000)
     session.waitTillUserClosesSession()
 
-  private def toMb(v: Long) = s"${v / (1024 * 1024)} MB"
-
+  private def toMb(v: Long)        = s"${v / (1024 * 1024)} MB"
+  private val xs                   = Some("2xs")
   private def updateStatus(): Unit =
     val runtime = Runtime.getRuntime
 
@@ -42,7 +45,7 @@ class ServerStatusAppInternal(sessionsService: ServerSessionsService, executor: 
           Seq(
             "Total Memory",
             toMb(runtime.totalMemory()),
-            Button(size = Some("2xs"), text = "Run GC").onClick: () =>
+            Button(size = xs, text = "Run GC").onClick: () =>
               System.gc()
           ),
           Seq("Available processors", runtime.availableProcessors(), "")
@@ -60,9 +63,53 @@ class ServerStatusAppInternal(sessionsService: ServerSessionsService, executor: 
 
   private def actionsFor(session: Session)(using ConnectedSession): UiElement =
     if session.isOpen then
-      Button(text = "Close", size = Some("sm"))
-        .withLeftIcon(CloseIcon())
-        .onClick: () =>
-          sessionsService.terminateAndRemove(session)
-          updateStatus()
+      Box().withChildren(
+        Button(text = "Close", size = xs)
+          .withLeftIcon(SmallCloseIcon())
+          .onClick: () =>
+            sessionsService.terminateAndRemove(session)
+            updateStatus()
+        ,
+        Text(text = " "),
+        Button(text = "View State", size = xs)
+          .withLeftIcon(ChatIcon())
+          .onClick: () =>
+            serverSideSessions
+              .withNewSession(session.id + "-server-state", s"Server State:${session.id}")
+              .connect: sSession =>
+                new ViewServerState(sSession).runFor(sessionsService.sessionStateOf(session))
+      )
     else NotAllowedIcon()
+
+class ViewServerState(session: ConnectedSession):
+  given ConnectedSession = session
+
+  def runFor(state: SessionState): Unit =
+    val sj = state.serverJson
+
+    val rootKeyPanel = Seq(
+      QuickTable()
+        .withCaption("Root Keys")
+        .headers("Root Key")
+        .rows(
+          sj.rootKeys.map(k => Seq(k))
+        )
+    )
+
+    val keyTreePanel = Seq(
+      QuickTable()
+        .withCaption("Key Tree")
+        .headers("Key", "Children")
+        .rows(
+          sj.keyTree.map((k, v) => Seq(k, v.mkString(", "))).toSeq
+        )
+    )
+    Seq(
+      QuickTabs()
+        .withTabs("Root Keys", "Key Tree")
+        .withTabPanels(
+          rootKeyPanel,
+          keyTreePanel
+        )
+    ).render()
+    session.waitTillUserClosesSession()

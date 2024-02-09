@@ -12,8 +12,8 @@ object Disclosure:
       commonBox(text = "Tabs"),
       Tabs().withChildren(
         TabList().withChildren(
-          Tab(text = "tab-one", _selected = Map("color" -> "white", "bg" -> "blue.500")),
-          Tab(text = "tab-two", _selected = Map("color" -> "white", "bg" -> "green.400")),
+          Tab(text = "tab-one").withSelected(Map("color" -> "white", "bg" -> "blue.500")),
+          Tab(text = "tab-two").withSelected(Map("color" -> "white", "bg" -> "green.400")),
           Tab(text = "tab-three")
         ),
         TabPanels().withChildren(
