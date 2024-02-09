@@ -9,7 +9,6 @@ import org.terminal21.config.Config
 import org.terminal21.ui.std.SessionsServiceCallerFactory
 
 import java.util.concurrent.atomic.AtomicBoolean
-import scala.util.Using.Releasable
 
 object Sessions:
   case class SessionBuilder(id: String, name: String, componentLibs: Seq[ComponentLib] = Seq(StdElementEncoding)):

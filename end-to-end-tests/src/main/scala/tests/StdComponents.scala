@@ -32,7 +32,8 @@ import org.terminal21.client.components.std.*
         Paragraph(text = "A Form ").withChildren(
           input
         ),
-        output
+        output,
+        Cookie(name = "std-components-test-cookie", value = "test-cookie-value")
       ).render()
 
       session.waitTillUserClosesSession()

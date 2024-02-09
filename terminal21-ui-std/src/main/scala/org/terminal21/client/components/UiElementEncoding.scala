@@ -4,7 +4,7 @@ import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.terminal21.client.components.chakra.{Box, CEJson, ChakraElement}
-import org.terminal21.client.components.std.{StdEJson, StdElement}
+import org.terminal21.client.components.std.{StdEJson, StdElement, StdHttp}
 
 class UiElementEncoding(libs: Seq[ComponentLib]):
   given uiElementEncoder: Encoder[UiElement] =
@@ -35,3 +35,4 @@ object StdElementEncoding extends ComponentLib:
     case c: UiComponent =>
       val b: ChakraElement[Box] = Box(key = c.key, text = "")
       b.asJson.mapObject(o => o.add("type", "Chakra".asJson))
+    case std: StdHttp   => std.asJson.mapObject(o => o.add("type", "Std".asJson))
