@@ -92,7 +92,7 @@ class ViewServerState(session: ConnectedSession):
         .withCaption("Root Keys")
         .headers("Root Key")
         .rows(
-          sj.rootKeys.map(k => Seq(k))
+          sj.rootKeys.sorted.map(k => Seq(k))
         )
     )
 
@@ -101,7 +101,7 @@ class ViewServerState(session: ConnectedSession):
         .withCaption("Key Tree")
         .headers("Key", "Children")
         .rows(
-          sj.keyTree.map((k, v) => Seq(k, v.mkString(", "))).toSeq
+          sj.keyTree.toSeq.sortBy(_._1).map((k, v) => Seq(k, v.mkString(", ")))
         )
     )
     Seq(
