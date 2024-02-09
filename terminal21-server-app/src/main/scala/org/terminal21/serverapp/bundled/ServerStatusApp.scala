@@ -99,30 +99,18 @@ class ViewServerState(session: ConnectedSession):
     val keyTreePanel = Seq(
       QuickTable()
         .withCaption("Key Tree")
-        .headers("Key", "Children")
+        .headers("Key", "Component Json", "Children")
         .rows(
-          sj.keyTree.toSeq.sortBy(_._1).map((k, v) => Seq(k, v.mkString(", ")))
+          sj.keyTree.toSeq.sortBy(_._1).map((k, v) => Seq(k, sj.elements(k).noSpaces, v.mkString(", ")))
         )
     )
 
-    val componentJson = Seq(
-      QuickTable()
-        .withCaption("Component Json")
-        .headers("Key", "Json")
-        .rows(
-          sj.elements.toSeq
-            .sortBy(_._1)
-            .map: (k, j) =>
-              Seq(k, j.noSpaces)
-        )
-    )
     Seq(
       QuickTabs()
-        .withTabs("Root Keys", "Key Tree", "Component Json")
+        .withTabs("Root Keys", "Key Tree")
         .withTabPanels(
           rootKeyPanel,
-          keyTreePanel,
-          componentJson
+          keyTreePanel
         )
     ).render()
     session.waitTillUserClosesSession()

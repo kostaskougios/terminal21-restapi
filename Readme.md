@@ -167,8 +167,9 @@ Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi
 
 ## Version 0.30
 
-- apps can now run on the server
+- apps can now run on the server + server management bundled apps
 - session builders refactoring for more flexible creation of sessions
+- QuickTabs
 
 ## Version 0.21
 
