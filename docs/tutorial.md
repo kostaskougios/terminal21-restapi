@@ -15,7 +15,7 @@ This tutorial will use `scala-cli` but the same applies for `sbt` or `mill` proj
 have `scala-cli` installed on your box, you're good to go, there are no other requirements to run terminal21 scripts. Jdk and
 dependencies will be downloaded by `scala-cli` for us.
 
-All example code is under `example-scripts` of this repo, feel free to check the repo and run them.
+All example code is under `example-scripts` of this repo, feel free to checkout the repo and run them.
 
 ## Starting the terminal21 server
 
