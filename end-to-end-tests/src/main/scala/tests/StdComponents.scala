@@ -10,8 +10,9 @@ import org.terminal21.client.components.std.*
     .connect: session =>
       given ConnectedSession = session
 
-      val input  = Input(defaultValue = Some("Please enter your name"))
-      val output = Paragraph(text = "This will reflect what you type in the input")
+      val input       = Input(defaultValue = Some("Please enter your name"))
+      val output      = Paragraph(text = "This will reflect what you type in the input")
+      val cookieValue = Paragraph(text = "This will display the value of the cookie")
       input.onChange: newValue =>
         output.withText(newValue).renderChanges()
 
@@ -33,7 +34,10 @@ import org.terminal21.client.components.std.*
           input
         ),
         output,
-        Cookie(name = "std-components-test-cookie", value = "test-cookie-value")
+        Cookie(name = "std-components-test-cookie", value = "test-cookie-value"),
+        CookieReader(name = "std-components-test-cookie").onChange: newValue =>
+          cookieValue.withText(s"Cookie value $newValue").renderChanges(),
+        cookieValue
       ).render()
 
       session.waitTillUserClosesSession()
