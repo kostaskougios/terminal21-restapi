@@ -19,6 +19,8 @@ sealed trait StdHttp extends UiElement:
   def requestId: String
 
 /** On the browser, https://github.com/js-cookie/js-cookie is used.
+  *
+  * Set a cookie on the browser.
   */
 case class Cookie(
     key: String = Keys.nextKey,
@@ -29,6 +31,8 @@ case class Cookie(
     requestId: String = TransientRequest.newRequestId()
 ) extends StdHttp
 
+/** Read a cookie value. The value, when read from the ui, it will reflect in `value`. Also the onChange handler will be called once with the value.
+  */
 case class CookieReader(
     key: String = Keys.nextKey,
     name: String = "cookie.name",
