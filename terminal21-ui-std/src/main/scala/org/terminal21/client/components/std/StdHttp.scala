@@ -1,10 +1,19 @@
 package org.terminal21.client.components.std
 
-import org.terminal21.client.components.{Keys, UiElement}
+import org.terminal21.client.components.{Keys, TransientRequest, UiElement}
 
 /** Elements mapping to Http functionality
   */
-sealed trait StdHttp extends UiElement
+sealed trait StdHttp extends UiElement:
+  /** Each requestId will be processed only once per browser.
+    *
+    * I.e. lets say we have the Cookie(). If we add a cookie, we send it to the UI which in turn checks if it already set the cookie via the requestId. If it
+    * did, it skips it, if it didn't it sets the cookie.
+    *
+    * @return
+    *   Should always be TransientRequest.newRequestId()
+    */
+  def requestId: String
 
 /** On the browser, https://github.com/js-cookie/js-cookie is used.
   */
@@ -13,5 +22,6 @@ case class Cookie(
     name: String = "cookie.name",
     value: String = "cookie.value",
     path: Option[String] = None,
-    expireDays: Option[Int] = None
+    expireDays: Option[Int] = None,
+    requestId: String = TransientRequest.newRequestId()
 ) extends StdHttp
