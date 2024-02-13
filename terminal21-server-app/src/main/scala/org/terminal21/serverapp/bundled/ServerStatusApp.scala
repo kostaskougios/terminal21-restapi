@@ -16,7 +16,7 @@ class ServerStatusApp extends ServerSideApp:
 
   override def createSession(serverSideSessions: ServerSideSessions, dependencies: Dependencies): Unit =
     serverSideSessions
-      .withNewSession("server-status", "ZServer Status")
+      .withNewSession("server-status", "Server Status")
       .andOptions(SessionOptions(closeTabWhenTerminated = true))
       .connect: session =>
         given ConnectedSession = session
