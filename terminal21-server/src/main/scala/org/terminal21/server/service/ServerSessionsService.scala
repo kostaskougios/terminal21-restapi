@@ -35,7 +35,7 @@ class ServerSessionsService extends SessionsService:
     sessions -= session
     sessions += session.close -> state.close
     sessionChangeNotificationRegistry.notifyAll(allSessions)
-    if (session.sessionOptions.deleteWhenTerminated) removeSession(session.close)
+    if (session.options.closeTabWhenTerminated) removeSession(session.close)
 
   def terminateAndRemove(session: Session): Unit =
     terminateSession(session)

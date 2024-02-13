@@ -17,7 +17,7 @@ class SettingsApp extends ServerSideApp:
   override def createSession(serverSideSessions: ServerSideSessions, dependencies: Dependencies): Unit =
     serverSideSessions
       .withNewSession("frontend-settings", "Settings")
-      .andOptions(SessionOptions(deleteWhenTerminated = true))
+      .andOptions(SessionOptions(closeTabWhenTerminated = true))
       .connect: session =>
         given ConnectedSession = session
         new SettingsAppInstance().run()

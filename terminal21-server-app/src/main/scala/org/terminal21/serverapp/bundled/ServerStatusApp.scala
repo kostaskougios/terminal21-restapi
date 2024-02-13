@@ -4,7 +4,7 @@ import functions.fibers.FiberExecutor
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
-import org.terminal21.model.Session
+import org.terminal21.model.{Session, SessionOptions}
 import org.terminal21.server.Dependencies
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.service.ServerSessionsService
@@ -17,6 +17,7 @@ class ServerStatusApp extends ServerSideApp:
   override def createSession(serverSideSessions: ServerSideSessions, dependencies: Dependencies): Unit =
     serverSideSessions
       .withNewSession("server-status", "Server Status")
+      .andOptions(SessionOptions(closeTabWhenTerminated = true))
       .connect: session =>
         given ConnectedSession = session
         new ServerStatusAppInternal(serverSideSessions, dependencies.sessionsService, dependencies.fiberExecutor).run()

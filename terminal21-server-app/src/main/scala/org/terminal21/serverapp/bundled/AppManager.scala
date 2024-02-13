@@ -4,6 +4,7 @@ import functions.fibers.FiberExecutor
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.model.SessionOptions
 import org.terminal21.server.Dependencies
 import org.terminal21.serverapp.{ServerSideApp, ServerSideSessions}
 
@@ -12,6 +13,7 @@ class AppManager(serverSideSessions: ServerSideSessions, fiberExecutor: FiberExe
     fiberExecutor.submit:
       serverSideSessions
         .withNewSession("app-manager", "Terminal 21")
+        .andOptions(SessionOptions(alwaysOpen = true))
         .connect: session =>
           given ConnectedSession = session
 

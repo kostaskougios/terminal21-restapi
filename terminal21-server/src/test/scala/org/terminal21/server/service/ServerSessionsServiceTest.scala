@@ -52,7 +52,7 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
 
   test("terminateSession removes session if marked to be deleted when terminated"):
     new App:
-      val session = createSession(SessionOptions(deleteWhenTerminated = true))
+      val session = createSession(SessionOptions(closeTabWhenTerminated = true))
       serverSessionsService.setSessionJsonState(session, serverJson())
       serverSessionsService.terminateSession(session)
       serverSessionsService.allSessions should be(Nil)
