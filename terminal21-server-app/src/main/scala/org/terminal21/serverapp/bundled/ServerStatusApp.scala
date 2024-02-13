@@ -16,7 +16,7 @@ class ServerStatusApp extends ServerSideApp:
 
   override def createSession(serverSideSessions: ServerSideSessions, dependencies: Dependencies): Unit =
     serverSideSessions
-      .withNewSession("server-status", "Server Status")
+      .withNewSession("server-status", "ZServer Status")
       .andOptions(SessionOptions(closeTabWhenTerminated = true))
       .connect: session =>
         given ConnectedSession = session
@@ -77,6 +77,7 @@ class ServerStatusAppInternal(serverSideSessions: ServerSideSessions, sessionsSe
           .onClick: () =>
             serverSideSessions
               .withNewSession(session.id + "-server-state", s"Server State:${session.id}")
+              .andOptions(SessionOptions.CloseTabWhenTerminated)
               .connect: sSession =>
                 new ViewServerState(sSession).runFor(sessionsService.sessionStateOf(session))
       )
