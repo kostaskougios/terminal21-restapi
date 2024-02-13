@@ -11,7 +11,7 @@ class AppManager(serverSideSessions: ServerSideSessions, fiberExecutor: FiberExe
   def start(): Unit =
     fiberExecutor.submit:
       serverSideSessions
-        .withNewSession("app-manager", "Apps")
+        .withNewSession("app-manager", "Terminal 21")
         .connect: session =>
           given ConnectedSession = session
 
