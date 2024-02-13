@@ -10,20 +10,20 @@ import org.terminal21.ui.std.StdExportsBuilders.serverJson
 class ServerSessionsServiceTest extends AnyFunSuiteLike:
   test("sessionById"):
     new App:
-      val session = createSession
+      val session = createSession()
       serverSessionsService.setSessionJsonState(session, serverJson())
       serverSessionsService.sessionById(session.id) should be(session)
 
   test("sessionStateOf"):
     new App:
-      val session = createSession
+      val session = createSession()
       val sj      = serverJson()
       serverSessionsService.setSessionJsonState(session, sj)
       serverSessionsService.sessionStateOf(session).serverJson should be(sj)
 
   test("removeSession"):
     new App:
-      val session = createSession
+      val session = createSession()
       serverSessionsService.setSessionJsonState(session, serverJson())
       serverSessionsService.removeSession(session)
       an[IllegalArgumentException] should be thrownBy:
@@ -31,7 +31,7 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
 
   test("removeSession notifies listeners"):
     new App:
-      val session        = createSession
+      val session        = createSession()
       serverSessionsService.setSessionJsonState(session, serverJson())
       var listenerCalled = 0
       serverSessionsService.notifyMeWhenSessionsChange: sessions =>
@@ -45,14 +45,21 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
 
   test("terminateSession marks session as closed"):
     new App:
-      val session = createSession
+      val session = createSession()
       serverSessionsService.setSessionJsonState(session, serverJson())
       serverSessionsService.terminateSession(session)
       serverSessionsService.sessionById(session.id).isOpen should be(false)
 
+  test("terminateSession removes session if marked to be deleted when terminated"):
+    new App:
+      val session = createSession(SessionOptions(deleteWhenTerminated = true))
+      serverSessionsService.setSessionJsonState(session, serverJson())
+      serverSessionsService.terminateSession(session)
+      serverSessionsService.allSessions should be(Nil)
+
   test("terminateSession notifies session listeners"):
     new App:
-      val session     = createSession
+      val session     = createSession()
       serverSessionsService.setSessionJsonState(session, serverJson())
       var eventCalled = false
       serverSessionsService.notifyMeOnSessionEvents(session): event =>
@@ -64,7 +71,7 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
 
   test("terminateSession notifies sessions listeners"):
     new App:
-      val session        = createSession
+      val session        = createSession()
       serverSessionsService.setSessionJsonState(session, serverJson())
       var listenerCalled = 0
       serverSessionsService.notifyMeWhenSessionsChange: sessions =>
@@ -86,12 +93,12 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
         listenerCalled += 1
         true
 
-      createSession
+      createSession()
       listenerCalled should be(2)
 
   test("changeSessionJsonState changes session's state"):
     new App:
-      val session = createSession
+      val session = createSession()
       val sj1     = serverJson(elements = Map("e1" -> Json.fromString("e1v")))
       serverSessionsService.setSessionJsonState(session, sj1)
       val sj2     = serverJson(elements = Map("e2" -> Json.fromString("e2v")))
@@ -102,7 +109,7 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
 
   test("changeSessionJsonState notifies listeners"):
     new App:
-      val session = createSession
+      val session = createSession()
       val sj1     = serverJson(elements = Map("e1" -> Json.fromString("e1v")))
       serverSessionsService.setSessionJsonState(session, sj1)
       val sj2     = serverJson(elements = Map("e2" -> Json.fromString("e2v")))
@@ -123,7 +130,7 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
 
   test("triggerUiEvent notifies listeners for clicks"):
     new App:
-      val session = createSession
+      val session = createSession()
       var called  = false
       serverSessionsService.notifyMeOnSessionEvents(session): e =>
         called = true
@@ -135,7 +142,7 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
 
   test("triggerUiEvent notifies listeners for change"):
     new App:
-      val session = createSession
+      val session = createSession()
       var called  = false
       serverSessionsService.notifyMeOnSessionEvents(session): e =>
         called = true
@@ -146,5 +153,5 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
       called should be(true)
 
   class App:
-    val serverSessionsService = new ServerSessionsService
-    def createSession         = serverSessionsService.createSession("test", "Test", SessionOptions.Defaults)
+    val serverSessionsService                                            = new ServerSessionsService
+    def createSession(options: SessionOptions = SessionOptions.Defaults) = serverSessionsService.createSession("test", "Test", options)
