@@ -35,13 +35,14 @@ class ServerSessionsService extends SessionsService:
     sessions -= session
     sessions += session.close -> state.close
     sessionChangeNotificationRegistry.notifyAll(allSessions)
+    if (session.sessionOptions.deleteWhenTerminated) removeSession(session.close)
 
   def terminateAndRemove(session: Session): Unit =
     terminateSession(session)
     removeSession(session.close)
 
-  override def createSession(id: String, name: String): Session =
-    val s     = Session(id, name, UUID.randomUUID().toString, true)
+  override def createSession(id: String, name: String, sessionOptions: SessionOptions): Session =
+    val s     = Session(id, name, UUID.randomUUID().toString, true, sessionOptions)
     logger.info(s"Creating session $s")
     sessions.keys.toList.foreach(s => if s.id == id then sessions.remove(s))
     val state = SessionState(ServerJson.Empty, new NotificationRegistry)

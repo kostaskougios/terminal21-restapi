@@ -4,19 +4,26 @@ import functions.fibers.FiberExecutor
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.{ComponentLib, StdElementEncoding, UiElementEncoding}
 import org.terminal21.config.Config
+import org.terminal21.model.SessionOptions
 import org.terminal21.server.service.ServerSessionsService
 
 import java.util.concurrent.atomic.AtomicBoolean
 
 class ServerSideSessions(sessionsService: ServerSessionsService, executor: FiberExecutor):
-  case class ServerSideSessionBuilder(id: String, name: String, componentLibs: Seq[ComponentLib] = Seq(StdElementEncoding)):
+  case class ServerSideSessionBuilder(
+      id: String,
+      name: String,
+      componentLibs: Seq[ComponentLib] = Seq(StdElementEncoding),
+      sessionOptions: SessionOptions = SessionOptions.Defaults
+  ):
     def andLibraries(libraries: ComponentLib*): ServerSideSessionBuilder = copy(componentLibs = componentLibs ++ libraries)
+    def andOptions(sessionOptions: SessionOptions)                       = copy(sessionOptions = sessionOptions)
 
     def connect[R](f: ConnectedSession => R): R =
       val config    = Config.Default
       val serverUrl = s"http://${config.host}:${config.port}"
 
-      val session   = sessionsService.createSession(id, name)
+      val session   = sessionsService.createSession(id, name, sessionOptions)
       val encoding  = new UiElementEncoding(Seq(StdElementEncoding) ++ componentLibs)
       val isStopped = new AtomicBoolean(false)
 

@@ -6,13 +6,20 @@ import io.helidon.webclient.api.WebClient
 import io.helidon.webclient.websocket.WsClient
 import org.terminal21.client.components.{ComponentLib, StdElementEncoding, UiElementEncoding}
 import org.terminal21.config.Config
+import org.terminal21.model.SessionOptions
 import org.terminal21.ui.std.SessionsServiceCallerFactory
 
 import java.util.concurrent.atomic.AtomicBoolean
 
 object Sessions:
-  case class SessionBuilder(id: String, name: String, componentLibs: Seq[ComponentLib] = Seq(StdElementEncoding)):
+  case class SessionBuilder(
+      id: String,
+      name: String,
+      componentLibs: Seq[ComponentLib] = Seq(StdElementEncoding),
+      sessionOptions: SessionOptions = SessionOptions.Defaults
+  ):
     def andLibraries(libraries: ComponentLib*): SessionBuilder = copy(componentLibs = componentLibs ++ libraries)
+    def andOptions(sessionOptions: SessionOptions)             = copy(sessionOptions = sessionOptions)
 
     def connect[R](f: ConnectedSession => R): R =
       val config          = Config.Default
@@ -22,7 +29,7 @@ object Sessions:
         .build
       val transport       = new HelidonTransport(client)
       val sessionsService = SessionsServiceCallerFactory.newHelidonJsonSessionsService(transport)
-      val session         = sessionsService.createSession(id, name)
+      val session         = sessionsService.createSession(id, name, sessionOptions)
       val wsClient        = WsClient.builder
         .baseUri(s"ws://${config.host}:${config.port}")
         .build

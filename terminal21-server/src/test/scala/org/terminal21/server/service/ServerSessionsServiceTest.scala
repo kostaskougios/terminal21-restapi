@@ -3,7 +3,7 @@ package org.terminal21.server.service
 import io.circe.Json
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
-import org.terminal21.model.{OnChange, OnClick, SessionClosed}
+import org.terminal21.model.{OnChange, OnClick, SessionClosed, SessionOptions}
 import org.terminal21.server.json
 import org.terminal21.ui.std.StdExportsBuilders.serverJson
 
@@ -147,4 +147,4 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
 
   class App:
     val serverSessionsService = new ServerSessionsService
-    def createSession         = serverSessionsService.createSession("test", "Test")
+    def createSession         = serverSessionsService.createSession("test", "Test", SessionOptions.Defaults)
