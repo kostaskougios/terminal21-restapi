@@ -1940,6 +1940,7 @@ case class Link(
     text: String = "link.text",
     href: String = "#",
     isExternal: Option[Boolean] = None,
+    color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Link]
@@ -1949,5 +1950,8 @@ case class Link(
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withIsExternal(v: Option[Boolean])      = copy(isExternal = v)
+  def withIsExternal(v: Boolean)              = copy(isExternal = Some(v))
   def withHref(v: String)                     = copy(href = v)
   def withText(v: String)                     = copy(text = v)
+  def withColor(v: String)                    = copy(color = Some(v))
+  def withColor(v: Option[String])            = copy(color = v)

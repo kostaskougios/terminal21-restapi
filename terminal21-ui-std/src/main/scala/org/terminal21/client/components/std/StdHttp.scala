@@ -31,7 +31,8 @@ case class Cookie(
     requestId: String = TransientRequest.newRequestId()
 ) extends StdHttp
 
-/** Read a cookie value. The value, when read from the ui, it will reflect in `value`. Also the onChange handler will be called once with the value.
+/** Read a cookie value. The value, when read from the ui, it will reflect in `value` assuming the UI had the time to send the value back. Also the onChange
+  * handler will be called once with the value.
   */
 case class CookieReader(
     key: String = Keys.nextKey,

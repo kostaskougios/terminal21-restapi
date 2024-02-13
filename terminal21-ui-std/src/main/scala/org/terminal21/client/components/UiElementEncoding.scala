@@ -5,6 +5,7 @@ import io.circe.generic.auto.*
 import io.circe.syntax.*
 import org.terminal21.client.components.chakra.{Box, CEJson, ChakraElement}
 import org.terminal21.client.components.std.{StdEJson, StdElement, StdHttp}
+import org.terminal21.client.components.ui.FrontEndElement
 
 class UiElementEncoding(libs: Seq[ComponentLib]):
   given uiElementEncoder: Encoder[UiElement] =
@@ -30,9 +31,10 @@ object StdElementEncoding extends ComponentLib:
     Json.obj(vs: _*)
 
   override def toJson(using Encoder[UiElement]): PartialFunction[UiElement, Json] =
-    case std: StdEJson  => std.asJson.mapObject(o => o.add("type", "Std".asJson))
-    case c: CEJson      => c.asJson.mapObject(o => o.add("type", "Chakra".asJson))
-    case c: UiComponent =>
+    case std: StdEJson       => std.asJson.mapObject(o => o.add("type", "Std".asJson))
+    case c: CEJson           => c.asJson.mapObject(o => o.add("type", "Chakra".asJson))
+    case c: UiComponent      =>
       val b: ChakraElement[Box] = Box(key = c.key, text = "")
       b.asJson.mapObject(o => o.add("type", "Chakra".asJson))
-    case std: StdHttp   => std.asJson.mapObject(o => o.add("type", "Std".asJson))
+    case std: StdHttp        => std.asJson.mapObject(o => o.add("type", "Std".asJson))
+    case fe: FrontEndElement => fe.asJson.mapObject(o => o.add("type", "FrontEnd".asJson))
