@@ -1,10 +1,10 @@
 package org.terminal21.serverapp.bundled
 
 import org.terminal21.client.ConnectedSession
-import org.terminal21.client.components.ui.ThemeToggle
 import org.terminal21.client.components.*
-import org.terminal21.client.components.chakra.{ExternalLinkIcon, Link, Text}
+import org.terminal21.client.components.chakra.{ExternalLinkIcon, Link}
 import org.terminal21.client.components.std.{Paragraph, Span}
+import org.terminal21.client.components.ui.ThemeToggle
 import org.terminal21.server.Dependencies
 import org.terminal21.serverapp.{ServerSideApp, ServerSideSessions}
 
@@ -24,7 +24,7 @@ class SettingsAppInstance(using session: ConnectedSession):
   def run() =
     Seq(
       ThemeToggle(),
-      Paragraph().withChildren(
+      Paragraph(style = Map("margin" -> "25px")).withChildren(
         Span(text = "Have a question? Please ask at "),
         Link(
           text = "terminal21's discussion board ",
