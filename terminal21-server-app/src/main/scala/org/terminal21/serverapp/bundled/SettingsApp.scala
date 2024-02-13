@@ -12,7 +12,7 @@ import org.terminal21.serverapp.{ServerSideApp, ServerSideSessions}
 class SettingsApp extends ServerSideApp:
   override def name = "Settings"
 
-  override def description = "Settings for terminal21"
+  override def description = "Terminal21 Settings"
 
   override def createSession(serverSideSessions: ServerSideSessions, dependencies: Dependencies): Unit =
     serverSideSessions
