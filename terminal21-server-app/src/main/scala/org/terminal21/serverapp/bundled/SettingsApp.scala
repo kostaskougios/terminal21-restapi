@@ -3,8 +3,8 @@ package org.terminal21.serverapp.bundled
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.ui.ThemeToggle
 import org.terminal21.client.components.*
-import org.terminal21.client.components.chakra.{Link, Text}
-import org.terminal21.client.components.std.Paragraph
+import org.terminal21.client.components.chakra.{ExternalLinkIcon, Link, Text}
+import org.terminal21.client.components.std.{Paragraph, Span}
 import org.terminal21.server.Dependencies
 import org.terminal21.serverapp.{ServerSideApp, ServerSideSessions}
 
@@ -25,13 +25,13 @@ class SettingsAppInstance(using session: ConnectedSession):
     Seq(
       ThemeToggle(),
       Paragraph().withChildren(
-        Text(text = "Have a question? Please ask at "),
+        Span(text = "Have a question? Please ask at "),
         Link(
-          text = "terminal21's discussion board",
+          text = "terminal21's discussion board ",
           href = "https://github.com/kostaskougios/terminal21-restapi/discussions",
           color = Some("teal.500"),
           isExternal = Some(true)
-        )
+        ).withChildren(ExternalLinkIcon(mx = Some("2px")))
       )
     ).render()
     session.waitTillUserClosesSession()
