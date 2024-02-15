@@ -31,6 +31,7 @@ class ServerSessionsService extends SessionsService:
 
   override def terminateSession(session: Session): Unit =
     val state = sessions.getOrElse(session, throw new IllegalArgumentException(s"Session ${session.id} doesn't exist"))
+    if session.options.alwaysOpen then throw new IllegalArgumentException("Can't terminate a session that should be always open")
     state.eventsNotificationRegistry.notifyAll(SessionClosed("-"))
     sessions -= session
     sessions += session.close -> state.close

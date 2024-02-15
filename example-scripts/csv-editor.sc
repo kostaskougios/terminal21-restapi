@@ -9,6 +9,7 @@ import org.terminal21.client.*
 
 import java.util.concurrent.atomic.AtomicBoolean
 import org.terminal21.client.components.*
+import org.terminal21.model.SessionOptions
 // use the chakra components for menus, forms etc, https://chakra-ui.com/docs/components
 // The scala case classes : https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/chakra/ChakraElement.scala
 import org.terminal21.client.components.chakra.*
@@ -28,6 +29,7 @@ val contents =
   if file.exists() then FileUtils.readFileToString(file, "UTF-8")
   else "type,damage points,hit points\nmage,10dp,20hp\nwarrior,20dp,30hp"
 
+println(s"Contents: $contents")
 val csv = contents.split("\n").map(_.split(","))
 
 // store the csv data in a more usable Map
@@ -57,52 +59,54 @@ def saveCsvMap() =
   // this will be set to true when we have to exit
 val exitFlag = new AtomicBoolean(false)
 
-Sessions.withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName"): session =>
-  given ConnectedSession = session
+Sessions
+  .withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName")
+  .connect: session =>
+    given ConnectedSession = session
 
-  val status = Box()
-  val saveAndExit = Button(text = "Save & Exit")
-    .onClick: () =>
-      saveCsvMap()
-      status.withText("Csv file saved, exiting.").renderChanges()
-      exitFlag.set(true)
+    val status = Box()
+    val saveAndExit = Button(text = "Save & Exit")
+      .onClick: () =>
+        saveCsvMap()
+        status.withText("Csv file saved, exiting.").renderChanges()
+        exitFlag.set(true)
 
-  val exit = Button(text = "Exit Without Saving")
-    .onClick: () =>
-      exitFlag.set(true)
+    val exit = Button(text = "Exit Without Saving")
+      .onClick: () =>
+        exitFlag.set(true)
 
-  def newEditable(x: Int, y: Int, value: String) =
-    Editable(defaultValue = value)
-      .withChildren(
-        EditablePreview(),
-        EditableInput()
-      )
-      .onChange: newValue =>
-        csvMap((x, y)) = newValue
-        status.withText(s"($x,$y) value changed to $newValue").renderChanges()
-
-  Seq(
-    TableContainer().withChildren(
-      Table(variant = "striped", colorScheme = Some("teal"), size = "mg")
+    def newEditable(x: Int, y: Int, value: String) =
+      Editable(defaultValue = value)
         .withChildren(
-          TableCaption(text = "Please edit the csv contents above and click save to save and exit"),
-          Thead(),
-          Tbody(
-            children = csv.zipWithIndex.map: (row, y) =>
-              Tr(
-                children = row.zipWithIndex.map: (column, x) =>
-                  Td().withChildren(newEditable(x, y, column))
-              )
-          )
+          EditablePreview(),
+          EditableInput()
         )
-    ),
-    HStack().withChildren(
-      saveAndExit,
-      exit,
-      status
-    )
-  ).render()
+        .onChange: newValue =>
+          csvMap((x, y)) = newValue
+          status.withText(s"($x,$y) value changed to $newValue").renderChanges()
 
-  println(s"Now open ${session.uiUrl} to view the UI")
-  // wait for one of the save/exit buttons to be pressed.
-  session.waitTillUserClosesSessionOr(exitFlag.get())
+    Seq(
+      TableContainer().withChildren(
+        Table(variant = "striped", colorScheme = Some("teal"), size = "mg")
+          .withChildren(
+            TableCaption(text = "Please edit the csv contents above and click save to save and exit"),
+            Thead(),
+            Tbody(
+              children = csv.zipWithIndex.map: (row, y) =>
+                Tr(
+                  children = row.zipWithIndex.map: (column, x) =>
+                    Td().withChildren(newEditable(x, y, column))
+                )
+            )
+          )
+      ),
+      HStack().withChildren(
+        saveAndExit,
+        exit,
+        status
+      )
+    ).render()
+
+    println(s"Now open ${session.uiUrl} to view the UI")
+    // wait for one of the save/exit buttons to be pressed.
+    session.waitTillUserClosesSessionOr(exitFlag.get())

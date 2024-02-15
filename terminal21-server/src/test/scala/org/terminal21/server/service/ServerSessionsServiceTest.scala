@@ -45,10 +45,17 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
 
   test("terminateSession marks session as closed"):
     new App:
-      val session = createSession()
+      val session = createSession(SessionOptions.LeaveOpenWhenTerminated)
       serverSessionsService.setSessionJsonState(session, serverJson())
       serverSessionsService.terminateSession(session)
       serverSessionsService.sessionById(session.id).isOpen should be(false)
+
+  test("terminateSession doesn't terminate a session that should always be open"):
+    new App:
+      val session = createSession(SessionOptions(alwaysOpen = true))
+      serverSessionsService.setSessionJsonState(session, serverJson())
+      an[IllegalArgumentException] should be thrownBy:
+        serverSessionsService.terminateSession(session)
 
   test("terminateSession removes session if marked to be deleted when terminated"):
     new App:
@@ -78,10 +85,11 @@ class ServerSessionsServiceTest extends AnyFunSuiteLike:
         listenerCalled match
           case 0 => sessions should be(Seq(session))
           case 1 => sessions should be(Seq(session.close))
+          case 2 => sessions should be(Nil)
         listenerCalled += 1
         true
       serverSessionsService.terminateSession(session)
-      listenerCalled should be(2)
+      listenerCalled should be(3)
 
   test("createSession notifies listeners"):
     new App:

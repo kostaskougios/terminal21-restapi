@@ -77,7 +77,6 @@ class ServerStatusAppInternal(serverSideSessions: ServerSideSessions, sessionsSe
           .onClick: () =>
             serverSideSessions
               .withNewSession(session.id + "-server-state", s"Server State:${session.id}")
-              .andOptions(SessionOptions.CloseTabWhenTerminated)
               .connect: sSession =>
                 new ViewServerState(sSession).runFor(sessionsService.sessionStateOf(session))
       )
