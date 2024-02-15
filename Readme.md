@@ -168,6 +168,7 @@ Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi
 ## Version 0.30
 
 - apps can now run on the server + server management bundled apps
+- Cookie setter and reader.
 - session builders refactoring for more flexible creation of sessions
 - QuickTabs
 - bug fix for old react state re-rendering on new session
