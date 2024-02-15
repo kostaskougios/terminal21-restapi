@@ -4,6 +4,10 @@ import org.terminal21.client.{ConnectedSession, EventHandler}
 
 trait UiElement:
   def key: String
+
+  /** @return
+    *   this element along all it's children flattened
+    */
   def flat: Seq[UiElement] = Seq(this)
 
   def render()(using session: ConnectedSession): Unit =

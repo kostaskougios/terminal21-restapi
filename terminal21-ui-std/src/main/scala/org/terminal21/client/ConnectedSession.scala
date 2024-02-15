@@ -103,7 +103,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     sessionsService.setSessionJsonState(session, j)
 
   def renderChanges(es: UiElement*): Unit =
-    for e <- es do modified(e)
+    for e <- es.flatMap(_.flat) do modified(e)
     val j = toJson(es)
     sessionsService.changeSessionJsonState(session, j)
 
