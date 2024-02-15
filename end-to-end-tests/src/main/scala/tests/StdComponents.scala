@@ -30,7 +30,7 @@ import org.terminal21.client.components.std.*
           NewLine(),
           Span(text = "And the last line")
         ),
-        Paragraph(text = "A Form ").withChildren(
+        Paragraph(text = "A Form").withChildren(
           input
         ),
         output,

@@ -7,10 +7,20 @@ import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.ConnectedSessionMock.encoder
 import org.terminal21.client.components.chakra.Editable
 import org.terminal21.client.components.std.{Paragraph, Span}
-import org.terminal21.model.OnChange
+import org.terminal21.model.{CommandEvent, OnChange}
 import org.terminal21.ui.std.ServerJson
 
 class ConnectedSessionTest extends AnyFunSuiteLike:
+
+  test("global event handler is called on event"):
+    given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
+    val editable                             = Editable()
+    var received                             = Option.empty[CommandEvent]
+    connectedSession.withGlobalEventHandler: event =>
+      received = Some(event)
+    val event                                = OnChange(editable.key, "new value")
+    connectedSession.fireEvent(event)
+    received should be(Some(event))
 
   test("default event handlers are invoked before user handlers"):
     given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock

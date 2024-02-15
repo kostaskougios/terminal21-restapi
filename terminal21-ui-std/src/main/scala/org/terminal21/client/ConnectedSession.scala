@@ -19,10 +19,14 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   private val handlers = new EventHandlers(this)
 
   def uiUrl: String = serverUrl + "/ui"
+
+  /** Clears all UI elements and event handlers. Renders a blank UI
+    */
   def clear(): Unit =
     render()
     handlers.clear()
     modifiedElements.clear()
+    removeGlobalEventHandler()
 
   def addEventHandler(key: String, handler: EventHandler): Unit = handlers.addEventHandler(key, handler)
 
@@ -58,6 +62,18 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   def click(e: UiElement): Unit = fireEvent(OnClick(e.key))
 
+  @volatile private var globalEventHandler: Option[GlobalEventHandler] = None
+
+  /** Registers a global event handler who will handle all received events.
+    *
+    * @param h
+    *   GlobalEventHandler
+    */
+  def withGlobalEventHandler(h: GlobalEventHandler): Unit =
+    globalEventHandler = Some(h)
+
+  def removeGlobalEventHandler(): Unit = globalEventHandler = None
+
   def fireEvent(event: CommandEvent): Unit =
     try
       event match
@@ -75,6 +91,8 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
                   case x                                                    => logger.error(s"Unknown event handling combination : $x")
             case None           =>
               logger.warn(s"There is no event handler for event $event")
+
+      for h <- globalEventHandler do h.onEvent(event)
     catch
       case t: Throwable =>
         logger.error(s"Session ${session.id}: An error occurred while handling $event", t)

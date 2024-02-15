@@ -1,6 +1,7 @@
 package org.terminal21.client
 
 import org.terminal21.client.components.UiElement
+import org.terminal21.model.CommandEvent
 
 trait EventHandler
 
@@ -33,3 +34,6 @@ object OnChangeBooleanEventHandler:
     def onChange(h: OnChangeBooleanEventHandler)(using session: ConnectedSession): A =
       session.addEventHandler(key, h)
       this
+
+trait GlobalEventHandler extends EventHandler:
+  def onEvent(event: CommandEvent): Unit
