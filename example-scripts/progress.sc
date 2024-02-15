@@ -4,9 +4,11 @@ import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.std.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.model.SessionOptions
 
 Sessions
   .withNewSession("universe-generation", "Universe Generation Progress")
+  .andOptions(SessionOptions.LeaveOpenWhenTerminated) /* leave the session tab open after terminating */
   .connect: session =>
     given ConnectedSession = session
 
