@@ -1,5 +1,6 @@
 package org.terminal21.client.components.std
 
+import org.terminal21.client.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.components.UiElement.{Current, HasChildren, HasEventHandler, HasStyle}
 import org.terminal21.client.components.{Keys, UiElement}
 import org.terminal21.client.{ConnectedSession, OnChangeEventHandler}
@@ -70,14 +71,11 @@ case class Input(
     style: Map[String, Any] = Map.empty,
     value: Option[String] = None
 ) extends StdElement[Input]
-    with HasEventHandler:
+    with HasEventHandler
+    with CanHandleOnChangeEvent[Input]:
   override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = Some(newValue)))
   override def withStyle(v: Map[String, Any])                                       = copy(style = v)
   def withKey(v: String)                                                            = copy(key = v)
   def withType(v: String)                                                           = copy(`type` = v)
   def withDefaultValue(v: Option[String])                                           = copy(defaultValue = v)
   def withValue(v: Option[String])                                                  = copy(value = v)
-
-  def onChange(h: OnChangeEventHandler)(using session: ConnectedSession): Input =
-    session.addEventHandler(key, h)
-    this

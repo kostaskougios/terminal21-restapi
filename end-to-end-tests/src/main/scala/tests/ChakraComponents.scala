@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean
         val latch = new CountDownLatch(1)
 
         // react tests reset the session to clear state
-        val krButton = Button(text = "Keep Running").onClick: () =>
+        val krButton = Button(text = "Reset state").onClick: () =>
           keepRunning.set(true)
           latch.countDown()
 

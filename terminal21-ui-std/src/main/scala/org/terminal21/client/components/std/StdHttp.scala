@@ -1,5 +1,6 @@
 package org.terminal21.client.components.std
 
+import org.terminal21.client.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.{ConnectedSession, EventHandler, OnChangeEventHandler}
 import org.terminal21.client.components.UiElement.HasEventHandler
 import org.terminal21.client.components.{Keys, TransientRequest, UiElement}
@@ -40,9 +41,6 @@ case class CookieReader(
     value: Option[String] = None, // will be set when/if cookie value is read
     requestId: String = TransientRequest.newRequestId()
 ) extends StdHttp
-    with HasEventHandler:
+    with HasEventHandler
+    with CanHandleOnChangeEvent[CookieReader]:
   override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = Some(newValue)))
-
-  def onChange(h: OnChangeEventHandler)(using session: ConnectedSession): CookieReader =
-    session.addEventHandler(key, h)
-    this
