@@ -40,8 +40,15 @@ case class QuickTable(
     val tableContainer = TableContainer(key = key + "-tc", style = style, children = Seq(table))
     Seq(tableContainer)
 
-  def headers(headers: String*): QuickTable               = copy(headers = headers.map(h => Text(text = h)))
-  def headersElements(headers: UiElement*): QuickTable    = copy(headers = headers)
+  def headers(headers: String*): QuickTable            = copy(headers = headers.map(h => Text(text = h)))
+  def headersElements(headers: UiElement*): QuickTable = copy(headers = headers)
+
+  /** @param data
+    *   A mix of plain types or UiElement. If it is a UiElement, it will be rendered otherwise if it is anything else the `.toString` method will be used to
+    *   render it.
+    * @return
+    *   QuickTable
+    */
   def rows(data: Seq[Seq[Any]]): QuickTable               = copy(rows = data.map(_.map:
     case u: UiElement => u
     case c            => Text(text = c.toString)

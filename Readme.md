@@ -99,7 +99,7 @@ session it has with the server and terminate the app.
 
 # Usecases
 
-Due to it's client-server architecture, terminal21 gives a UI to scripts running i.e. on servers without a desktop environment and
+Due to its client-server architecture, terminal21 gives a UI to scripts running i.e. on servers without a desktop environment and
 can be used for things like:
 - creating text file editors which run on desktop-less servers but still allows us to edit the text file on our browser, see [textedit.sc](example-scripts/textedit.sc)
 
@@ -170,6 +170,7 @@ Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi
 - apps can now run on the server + server management bundled apps
 - session builders refactoring for more flexible creation of sessions
 - QuickTabs
+- bug fix for old react state re-rendering on new session
 
 ## Version 0.21
 

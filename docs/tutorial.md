@@ -28,6 +28,7 @@ The easiest way to start the terminal21 server is to have a `scala-cli` script o
 
 //> using jvm "21"
 //> using scala 3
+//> using javaOpt -Xmx128m
 //> using dep io.github.kostaskougios::terminal21-server:_VERSION_
 
 import org.terminal21.server.Terminal21Server
@@ -61,15 +62,19 @@ To do this we can create a [hello-world.sc](../example-scripts/hello-world.sc) i
 ```scala
 #!/usr/bin/env -S scala-cli project.scala
 
+// always import these
 import org.terminal21.client.*
 import org.terminal21.client.components.*
+// std components, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala
 import org.terminal21.client.components.std.*
 
-Sessions.withNewSession("hello-world", "Hello World Example"): session =>
-  given ConnectedSession = session
+Sessions
+  .withNewSession("hello-world", "Hello World Example")
+  .connect: session =>
+    given ConnectedSession = session
 
-  Paragraph(text = "Hello World!").render()
-  session.leaveSessionOpenAfterExiting()
+    Paragraph(text = "Hello World!").render()
+    session.leaveSessionOpenAfterExiting()
 ```
 
 The first line, `#!/usr/bin/env -S scala-cli project.scala`, makes our script runnable from the command line.
@@ -89,8 +94,10 @@ Next it creates a session. Each session has a unique id (globally unique across 
 title, "Hello World Example", that will be displayed on the browser.
 
 ```scala
-Sessions.withNewSession("hello-world", "Hello World Example"): session =>
-  ...
+Sessions
+  .withNewSession("hello-world", "Hello World Example")
+  .connect: session =>
+    ...
 ```
 
 ![hello-world](images/hello-world.png)
@@ -129,30 +136,34 @@ import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.std.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.model.SessionOptions
 
-Sessions.withNewSession("universe-generation", "Universe Generation Progress"): session =>
-  given ConnectedSession = session
+Sessions
+  .withNewSession("universe-generation", "Universe Generation Progress")
+  .andOptions(SessionOptions.LeaveOpenWhenTerminated) /* leave the session tab open after terminating */
+  .connect: session =>
+    given ConnectedSession = session
 
-  val msg = Paragraph(text = "Generating universe ...")
-  val progress = Progress(value = 1)
+    val msg = Paragraph(text = "Generating universe ...")
+    val progress = Progress(value = 1)
 
-  Seq(msg, progress).render()
+    Seq(msg, progress).render()
 
-  for i <- 1 to 100 do
-    val p = progress.withValue(i)
-    val m =
-      if i < 10 then msg
-      else if i < 30 then msg.withText("Creating atoms")
-      else if i < 50 then msg.withText("Big bang!")
-      else if i < 80 then msg.withText("Inflating")
-      else msg.withText("Life evolution")
+    for i <- 1 to 100 do
+      val p = progress.withValue(i)
+      val m =
+        if i < 10 then msg
+        else if i < 30 then msg.withText("Creating atoms")
+        else if i < 50 then msg.withText("Big bang!")
+        else if i < 80 then msg.withText("Inflating")
+        else msg.withText("Life evolution")
 
-    Seq(p, m).renderChanges()
-    Thread.sleep(100)
+      Seq(p, m).renderChanges()
+      Thread.sleep(100)
 
-  // clear UI
-  session.clear()
-  Paragraph(text = "Universe ready!").render()
+    // clear UI
+    session.clear()
+    Paragraph(text = "Universe ready!").render()
 ```
 
 Here we create a paragraph and a progress bar.
@@ -202,19 +213,23 @@ import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.std.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.model.SessionOptions
 
-Sessions.withNewSession("on-click-example", "On Click Handler"): session =>
-  given ConnectedSession = session
+Sessions
+  .withNewSession("on-click-example", "On Click Handler")
+  .andOptions(SessionOptions.LeaveOpenWhenTerminated)
+  .connect: session =>
+    given ConnectedSession = session
 
-  @volatile var exit = false
-  val msg = Paragraph(text = "Waiting for user to click the button")
-  val button = Button(text = "Please click me").onClick: () =>
-    msg.withText("Button clicked.").renderChanges()
-    exit = true
-
-  Seq(msg, button).render()
-
-  session.waitTillUserClosesSessionOr(exit)
+    @volatile var exit = false
+    val msg = Paragraph(text = "Waiting for user to click the button")
+    val button = Button(text = "Please click me").onClick: () =>
+      msg.withText("Button clicked.").renderChanges()
+      exit = true
+    
+    Seq(msg, button).render()
+    
+    session.waitTillUserClosesSessionOr(exit)
 ```
 
 First we create the paragraph and button. We attach an `onClick` handler on the button:
@@ -254,29 +269,31 @@ import org.terminal21.client.components.*
 import org.terminal21.client.components.std.Paragraph
 import org.terminal21.client.components.chakra.*
 
-Sessions.withNewSession("read-changed-value-example", "Read Changed Value"): session =>
-  given ConnectedSession = session
+Sessions
+  .withNewSession("read-changed-value-example", "Read Changed Value")
+  .connect: session =>
+    given ConnectedSession = session
 
-  val email = Input(`type` = "email", value = "my@email.com")
-  val output = Box()
+    val email = Input(`type` = "email", value = "my@email.com")
+    val output = Box()
 
-  Seq(
-    FormControl().withChildren(
-      FormLabel(text = "Email address"),
-      InputGroup().withChildren(
-        InputLeftAddon().withChildren(EmailIcon()),
-        email
+    Seq(
+      FormControl().withChildren(
+        FormLabel(text = "Email address"),
+        InputGroup().withChildren(
+          InputLeftAddon().withChildren(EmailIcon()),
+          email
+        ),
+        FormHelperText(text = "We'll never share your email.")
       ),
-      FormHelperText(text = "We'll never share your email.")
-    ),
-    Button(text = "Read Value").onClick: () =>
-      val value = email.current.value
-      output.current.addChildren(Paragraph(text = s"The value now is $value")).renderChanges()
-    ,
-    output
-  ).render()
+      Button(text = "Read Value").onClick: () =>
+        val value = email.current.value
+        output.current.addChildren(Paragraph(text = s"The value now is $value")).renderChanges()
+      ,
+      output
+    ).render()
 
-  session.waitTillUserClosesSession()
+    session.waitTillUserClosesSession()
 ```
 
 The important bit is this:
@@ -306,26 +323,28 @@ import org.terminal21.client.components.*
 import org.terminal21.client.components.std.Paragraph
 import org.terminal21.client.components.chakra.*
 
-Sessions.withNewSession("on-change-example", "On Change event handler"): session =>
-  given ConnectedSession = session
+Sessions
+  .withNewSession("on-change-example", "On Change event handler")
+  .connect: session =>
+    given ConnectedSession = session
 
-  val output = Paragraph(text = "Please modify the email.")
-  val email = Input(`type` = "email", value = "my@email.com").onChange: v =>
-    output.withText(s"Email value : $v").renderChanges()
-
-  Seq(
-    FormControl().withChildren(
-      FormLabel(text = "Email address"),
-      InputGroup().withChildren(
-        InputLeftAddon().withChildren(EmailIcon()),
-        email
+    val output = Paragraph(text = "Please modify the email.")
+    val email = Input(`type` = "email", value = "my@email.com").onChange: v =>
+      output.withText(s"Email value : $v").renderChanges()
+    
+    Seq(
+      FormControl().withChildren(
+        FormLabel(text = "Email address"),
+        InputGroup().withChildren(
+          InputLeftAddon().withChildren(EmailIcon()),
+          email
+        ),
+        FormHelperText(text = "We'll never share your email.")
       ),
-      FormHelperText(text = "We'll never share your email.")
-    ),
-    output
-  ).render()
-
-  session.waitTillUserClosesSession()
+      output
+    ).render()
+    
+    session.waitTillUserClosesSession()
 ```
 
 The important bit are these lines:

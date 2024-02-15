@@ -5,6 +5,8 @@ simplify creation of this components.
 
 ## QuickTable
 
+This class helps creating tables quickly.
+
 ```scala
 val conversionTable = QuickTable().headers("To convert", "into", "multiply by")
   .caption("Imperial to metric conversion factors")
@@ -14,3 +16,19 @@ val tableRows:Seq[Seq[String]] = Seq(
 )
 conversionTable.rows(tableRows)
 ```
+
+## QuickTabs
+
+This class simplifies the creation of tabs.
+
+```scala
+
+QuickTabs()
+  .withTabs("Tab 1", "Tab 2")
+  .withTabPanels(
+    Paragraph(text="Tab 1 content"),
+    Paragraph(text="Tab 2 content")
+  )
+
+```
+
