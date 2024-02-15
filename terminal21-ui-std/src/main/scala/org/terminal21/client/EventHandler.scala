@@ -36,4 +36,4 @@ object OnChangeBooleanEventHandler:
       this
 
 trait GlobalEventHandler extends EventHandler:
-  def onEvent(event: CommandEvent): Unit
+  def onEvent(event: CommandEvent, receivedBy: UiElement): Unit

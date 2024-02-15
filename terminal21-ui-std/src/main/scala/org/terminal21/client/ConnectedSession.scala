@@ -72,6 +72,8 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   def withGlobalEventHandler(h: GlobalEventHandler): Unit =
     globalEventHandler = Some(h)
 
+  /** removes the global event handler (if any). No more events will be received by that handler.
+    */
   def removeGlobalEventHandler(): Unit = globalEventHandler = None
 
   def fireEvent(event: CommandEvent): Unit =
@@ -92,12 +94,14 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
             case None           =>
               logger.warn(s"There is no event handler for event $event")
 
-      for h <- globalEventHandler do h.onEvent(event)
+      for h <- globalEventHandler do h.onEvent(event, modifiedElements(event.key))
     catch
       case t: Throwable =>
         logger.error(s"Session ${session.id}: An error occurred while handling $event", t)
         throw t
-  def render(es: UiElement*): Unit         =
+
+  def render(es: UiElement*): Unit =
+    for e <- es.flatMap(_.flat) do modified(e)
     handlers.registerEventHandlers(es)
     val j = toJson(es)
     sessionsService.setSessionJsonState(session, j)

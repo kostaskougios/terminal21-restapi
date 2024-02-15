@@ -15,9 +15,11 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
   test("global event handler is called on event"):
     given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
     val editable                             = Editable()
+    editable.render()
     var received                             = Option.empty[CommandEvent]
-    connectedSession.withGlobalEventHandler: event =>
+    connectedSession.withGlobalEventHandler: (event, e) =>
       received = Some(event)
+      e should be(editable.withValue("new value"))
     val event                                = OnChange(editable.key, "new value")
     connectedSession.fireEvent(event)
     received should be(Some(event))
