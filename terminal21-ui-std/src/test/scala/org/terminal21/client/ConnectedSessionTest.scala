@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.ConnectedSessionMock.encoder
 import org.terminal21.client.components.chakra.Editable
 import org.terminal21.client.components.std.{Paragraph, Span}
-import org.terminal21.client.model.GlobalEvent
+import org.terminal21.client.model.{GlobalEvent, UiEvent}
 import org.terminal21.model.{CommandEvent, OnChange}
 import org.terminal21.ui.std.ServerJson
 
@@ -25,8 +25,8 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
     connectedSession.clear()
     it.toList should be(
       List(
-        GlobalEvent(event1, editable.withValue("v1")),
-        GlobalEvent(event2, editable.withValue("v2"))
+        UiEvent(event1, editable.withValue("v1")),
+        UiEvent(event2, editable.withValue("v2"))
       )
     )
 

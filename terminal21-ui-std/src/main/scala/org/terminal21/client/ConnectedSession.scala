@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement.HasChildren
 import org.terminal21.client.components.{UiComponent, UiElement, UiElementEncoding}
 import org.terminal21.client.internal.EventHandlers
-import org.terminal21.client.model.GlobalEvent
+import org.terminal21.client.model.{GlobalEvent, SessionClosedEvent, UiEvent}
 import org.terminal21.collections.SEList
 import org.terminal21.model.*
 import org.terminal21.ui.std.{ServerJson, SessionsService}
@@ -87,9 +87,14 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     try
       event match
         case SessionClosed(_) =>
+          events.add(SessionClosedEvent)
           exitLatch.countDown()
           onCloseHandler()
         case _                =>
+          val globalEvent = UiEvent(event, modifiedElements(event.key))
+          for h <- globalEventHandler do h.onEvent(globalEvent)
+          events.add(globalEvent)
+
           handlers.getEventHandler(event.key) match
             case Some(handlers) =>
               for handler <- handlers do
@@ -101,9 +106,6 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
             case None           =>
               logger.warn(s"There is no event handler for event $event")
 
-      val globalEvent = GlobalEvent(event, modifiedElements(event.key))
-      for h <- globalEventHandler do h.onEvent(globalEvent)
-      events.add(globalEvent)
     catch
       case t: Throwable =>
         logger.error(s"Session ${session.id}: An error occurred while handling $event", t)
@@ -149,4 +151,5 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   private val modifiedElements                             = TrieMap.empty[String, UiElement]
   def modified(e: UiElement): Unit                         =
     modifiedElements += e.key -> e
-  def currentState[A <: UiElement](e: A): A = modifiedElements.getOrElse(e.key, e).asInstanceOf[A]
+  def currentState[A <: UiElement](e: A): A =
+    modifiedElements.getOrElse(e.key, throw new IllegalStateException(s"Key ${e.key} doesn't exist or was removed")).asInstanceOf[A]
