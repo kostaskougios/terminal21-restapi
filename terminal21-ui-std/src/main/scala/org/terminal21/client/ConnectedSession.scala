@@ -3,9 +3,11 @@ package org.terminal21.client
 import io.circe.*
 import io.circe.generic.auto.*
 import org.slf4j.LoggerFactory
-import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, allDeep}
+import org.terminal21.client.components.UiElement.HasChildren
 import org.terminal21.client.components.{UiComponent, UiElement, UiElementEncoding}
 import org.terminal21.client.internal.EventHandlers
+import org.terminal21.client.model.GlobalEvent
+import org.terminal21.collections.SEList
 import org.terminal21.model.*
 import org.terminal21.ui.std.{ServerJson, SessionsService}
 
@@ -15,8 +17,9 @@ import scala.annotation.tailrec
 import scala.collection.concurrent.TrieMap
 
 class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
-  private val logger   = LoggerFactory.getLogger(getClass)
-  private val handlers = new EventHandlers(this)
+  private val logger           = LoggerFactory.getLogger(getClass)
+  private val handlers         = new EventHandlers(this)
+  @volatile private var events = SEList[GlobalEvent]()
 
   def uiUrl: String = serverUrl + "/ui"
 
@@ -27,6 +30,8 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     handlers.clear()
     modifiedElements.clear()
     removeGlobalEventHandler()
+    events.poisonPill()
+    events = SEList()
 
   def addEventHandler(key: String, handler: EventHandler): Unit = handlers.addEventHandler(key, handler)
 
@@ -72,6 +77,8 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   def withGlobalEventHandler(h: GlobalEventHandler): Unit =
     globalEventHandler = Some(h)
 
+  def globalEventIterator: Iterator[GlobalEvent] = events.iterator
+
   /** removes the global event handler (if any). No more events will be received by that handler.
     */
   def removeGlobalEventHandler(): Unit = globalEventHandler = None
@@ -94,7 +101,9 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
             case None           =>
               logger.warn(s"There is no event handler for event $event")
 
-      for h <- globalEventHandler do h.onEvent(event, modifiedElements(event.key))
+      val globalEvent = GlobalEvent(event, modifiedElements(event.key))
+      for h <- globalEventHandler do h.onEvent(globalEvent)
+      events.add(globalEvent)
     catch
       case t: Throwable =>
         logger.error(s"Session ${session.id}: An error occurred while handling $event", t)

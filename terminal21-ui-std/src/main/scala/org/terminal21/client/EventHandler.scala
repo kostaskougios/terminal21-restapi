@@ -1,6 +1,7 @@
 package org.terminal21.client
 
 import org.terminal21.client.components.UiElement
+import org.terminal21.client.model.GlobalEvent
 import org.terminal21.model.CommandEvent
 
 trait EventHandler
@@ -36,4 +37,4 @@ object OnChangeBooleanEventHandler:
       this
 
 trait GlobalEventHandler extends EventHandler:
-  def onEvent(event: CommandEvent, receivedBy: UiElement): Unit
+  def onEvent(event: GlobalEvent): Unit

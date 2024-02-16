@@ -7,19 +7,37 @@ import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.ConnectedSessionMock.encoder
 import org.terminal21.client.components.chakra.Editable
 import org.terminal21.client.components.std.{Paragraph, Span}
+import org.terminal21.client.model.GlobalEvent
 import org.terminal21.model.{CommandEvent, OnChange}
 import org.terminal21.ui.std.ServerJson
 
 class ConnectedSessionTest extends AnyFunSuiteLike:
+
+  test("global event iterator"):
+    given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
+    val editable                             = Editable()
+    editable.render()
+    val it                                   = connectedSession.globalEventIterator
+    val event1                               = OnChange(editable.key, "v1")
+    val event2                               = OnChange(editable.key, "v2")
+    connectedSession.fireEvent(event1)
+    connectedSession.fireEvent(event2)
+    connectedSession.clear()
+    it.toList should be(
+      List(
+        GlobalEvent(event1, editable.withValue("v1")),
+        GlobalEvent(event2, editable.withValue("v2"))
+      )
+    )
 
   test("global event handler is called on event"):
     given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
     val editable                             = Editable()
     editable.render()
     var received                             = Option.empty[CommandEvent]
-    connectedSession.withGlobalEventHandler: (event, e) =>
-      received = Some(event)
-      e should be(editable.withValue("new value"))
+    connectedSession.withGlobalEventHandler: ge =>
+      received = Some(ge.event)
+      ge.receivedBy should be(editable.withValue("new value"))
     val event                                = OnChange(editable.key, "new value")
     connectedSession.fireEvent(event)
     received should be(Some(event))
