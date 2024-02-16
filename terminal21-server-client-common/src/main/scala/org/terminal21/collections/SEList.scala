@@ -28,10 +28,11 @@ class SEBlockingIterator[A](@volatile var currentNode: NormalNode[A]) extends It
     if v == PoisonPillNode then false else true
 
   override def next(): A =
-    hasNext
-    val v = currentNode.value
-    currentNode = currentNode.next
-    v
+    if hasNext then
+      val v = currentNode.value
+      currentNode = currentNode.next
+      v
+    else throw new NoSuchElementException("next() called but there is no next element. The SEList has been poisoned and we reached the PoisonPill")
 
 sealed trait Node[+A]
 case object EndNode        extends Node[Nothing]

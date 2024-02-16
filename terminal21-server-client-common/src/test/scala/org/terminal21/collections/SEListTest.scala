@@ -6,6 +6,7 @@ import org.scalatest.matchers.should.Matchers.*
 
 class SEListTest extends AnyFunSuiteLike:
   val executor = FiberExecutor()
+
   test("when empty, it.hasNext should wait"):
     val l  = SEList[Int]()
     val it = l.iterator
@@ -52,6 +53,19 @@ class SEListTest extends AnyFunSuiteLike:
     l.add(2)
     l.poisonPill()
     it.toList should be(List(2))
+
+  test("hasNext & next()"):
+    val l  = SEList[Int]()
+    val it = l.iterator
+    l.add(1)
+    l.add(2)
+    l.poisonPill()
+    it.hasNext should be(true)
+    it.next() should be(1)
+    it.hasNext should be(true)
+    it.next() should be(2)
+    it.hasNext should be(false)
+    an[NoSuchElementException] should be thrownBy (it.next())
 
   test("multiple iterators and multi threading"):
     val l         = SEList[Int]()
