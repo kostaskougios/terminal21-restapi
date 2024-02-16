@@ -45,9 +45,17 @@ class SEListTest extends AnyFunSuiteLike:
     it1.toList should be(List(1, 2))
     it2.toList should be(List(1, 2))
 
+  test("iterator after added items"):
+    val l  = SEList[Int]()
+    l.add(1)
+    val it = l.iterator
+    l.add(2)
+    l.poisonPill()
+    it.toList should be(List(2))
+
   test("multiple iterators and multi threading"):
     val l         = SEList[Int]()
-    val iterators = for _ <- 1 to 100 yield
+    val iterators = for _ <- 1 to 1000 yield
       val it = l.iterator
       executor.submit:
         it.toList
