@@ -44,3 +44,19 @@ class SEListTest extends AnyFunSuiteLike:
     l.poisonPill()
     it1.toList should be(List(1, 2))
     it2.toList should be(List(1, 2))
+
+  test("multiple iterators and multi threading"):
+    val l         = SEList[Int]()
+    val iterators = for _ <- 1 to 100 yield
+      val it = l.iterator
+      executor.submit:
+        it.toList
+
+    for i <- 1 to 100 do
+      Thread.sleep(1)
+      l.add(i)
+
+    l.poisonPill()
+
+    val expected = (1 to 100).toList
+    for f <- iterators do f.get() should be(expected)
