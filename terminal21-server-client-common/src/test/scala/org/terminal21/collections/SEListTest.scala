@@ -12,7 +12,7 @@ class SEListTest extends AnyFunSuiteLike:
     l.poisonPill()
     it.toList should be(Nil)
 
-  test("when empty with 2 starters"):
+  test("when empty with 2 iterators"):
     val l   = SEList[Int]()
     val it1 = l.iterator
     val it2 = l.iterator
@@ -34,3 +34,13 @@ class SEListTest extends AnyFunSuiteLike:
     l.add(2)
     l.poisonPill()
     it.toList should be(List(1, 2))
+
+  test("with 2 items and 2 iterators"):
+    val l   = SEList[Int]()
+    val it1 = l.iterator
+    val it2 = l.iterator
+    l.add(1)
+    l.add(2)
+    l.poisonPill()
+    it1.toList should be(List(1, 2))
+    it2.toList should be(List(1, 2))
