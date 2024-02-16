@@ -42,12 +42,10 @@ import org.terminal21.client.components.chakra.*
         ),
         submitButton
       ).render()
-      session.globalEventIterator
-        .filter(_.isReceivedBy(submitButton))
-        .take(1)
-        .foreach: ge =>
-          println(s"""
-              |email = ${email.current.value}
-              |desc  = ${description.current.value}
-              |pwd   = ${password.current.value}
-              |""".stripMargin)
+      val o            = session.globalEventIterator
+        .takeWhile(e => !e.isSessionClose && !e.isReceivedBy(submitButton))
+        .map: _ =>
+          (email.current.value, password.current.value)
+        .toList
+        .lastOption
+      println(o)

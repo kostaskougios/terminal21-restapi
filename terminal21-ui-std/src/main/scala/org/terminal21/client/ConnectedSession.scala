@@ -88,6 +88,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
       event match
         case SessionClosed(_) =>
           events.add(SessionClosedEvent)
+          events.poisonPill()
           exitLatch.countDown()
           onCloseHandler()
         case _                =>
