@@ -25,14 +25,6 @@ import org.terminal21.client.components.chakra.*
           FormHelperText(text = "We'll never share your email.")
         ),
         FormControl().withChildren(
-          FormLabel(text = "Description"),
-          InputGroup().withChildren(
-            InputLeftAddon().withChildren(EditIcon()),
-            description
-          ),
-          FormHelperText(text = "We'll never share your email.")
-        ),
-        FormControl().withChildren(
           FormLabel(text = "Password"),
           InputGroup().withChildren(
             InputLeftAddon().withChildren(ViewOffIcon()),
@@ -44,9 +36,9 @@ import org.terminal21.client.components.chakra.*
       ).render()
 
       case class PersonSubmitted(email: String, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean)
-      val o = session.globalEventIterator
+      val p = session.eventIterator
         .map: e =>
-          PersonSubmitted(email.current.value, password.current.value, e.isReceivedBy(submitButton), e.isSessionClose)
+          PersonSubmitted(email.current.value, password.current.value, e.isTarget(submitButton), e.isSessionClose)
         .dropWhile(p => !p.isSubmitted && !p.userClosedSession)
-        .nextOption()
-      println(o.mkString("\n"))
+        .next()
+      println(p)

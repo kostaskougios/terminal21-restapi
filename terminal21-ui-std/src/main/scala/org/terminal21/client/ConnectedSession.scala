@@ -77,7 +77,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   def withGlobalEventHandler(h: GlobalEventHandler): Unit =
     globalEventHandler = Some(h)
 
-  def globalEventIterator: Iterator[GlobalEvent] = events.iterator
+  def eventIterator: Iterator[GlobalEvent] = events.iterator
 
   /** removes the global event handler (if any). No more events will be received by that handler.
     */

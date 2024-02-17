@@ -17,7 +17,7 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
     given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
     val editable                             = Editable()
     editable.render()
-    val it                                   = connectedSession.globalEventIterator
+    val it                                   = connectedSession.eventIterator
     val event1                               = OnChange(editable.key, "v1")
     val event2                               = OnChange(editable.key, "v2")
     connectedSession.fireEvent(event1)
