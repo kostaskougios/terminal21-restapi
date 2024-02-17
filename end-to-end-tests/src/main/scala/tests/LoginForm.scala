@@ -10,17 +10,20 @@ import org.terminal21.client.components.chakra.*
     .connect: session =>
       given ConnectedSession = session
 
-      val email        = Input(`type` = "email", value = "my@email.com")
-      val description  = Textarea(placeholder = "Please enter a few things about you")
-      val submitButton = Button(text = "Submit")
-      val password     = Input(`type` = "password", value = "mysecret")
+      val emailInput      = Input(`type` = "email", value = "my@email.com")
+      val description     = Textarea(placeholder = "Please enter a few things about you")
+      val submitButton    = Button(text = "Submit")
+      val password        = Input(`type` = "password", value = "mysecret")
+      val okIcon          = CheckCircleIcon(color = Some("green"))
+      val notOkIcon       = WarningTwoIcon(color = Some("red"))
+      val emailRightAddon = InputRightAddon().withChildren(okIcon)
       Seq(
         FormControl().withChildren(
           FormLabel(text = "Email address"),
           InputGroup().withChildren(
             InputLeftAddon().withChildren(EmailIcon()),
-            email,
-            InputRightAddon().withChildren(CheckCircleIcon(color = Some("green")))
+            emailInput,
+            emailRightAddon
           ),
           FormHelperText(text = "We'll never share your email.")
         ),
@@ -35,10 +38,16 @@ import org.terminal21.client.components.chakra.*
         submitButton
       ).render()
 
-      case class PersonSubmitted(email: String, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean)
+      case class PersonSubmitted(email: String, isValidEmail: Boolean, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean)
       val p = session.eventIterator
         .map: e =>
-          PersonSubmitted(email.current.value, password.current.value, e.isTarget(submitButton), e.isSessionClose)
-        .dropWhile(p => !p.isSubmitted && !p.userClosedSession)
+          println(e)
+          val email = emailInput.current.value
+          PersonSubmitted(email, email.contains("@"), password.current.value, e.isTarget(submitButton), e.isSessionClose)
+        .tapEach: p =>
+          println(p)
+          val emailAddon = if p.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)
+          emailAddon.renderChanges()
+        .dropWhile(p => !(p.isSubmitted && p.isValidEmail) && !p.userClosedSession)
         .next()
-      println(p)
+      println("Result:" + p)
