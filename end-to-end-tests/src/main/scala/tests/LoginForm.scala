@@ -6,7 +6,7 @@ import org.terminal21.client.components.chakra.*
 
 @main def loginForm(): Unit =
   Sessions
-    .withNewSession("std-components", "Std Components")
+    .withNewSession("login-form", "Login Form")
     .connect: session =>
       given ConnectedSession = session
 
@@ -17,15 +17,14 @@ import org.terminal21.client.components.chakra.*
       val notOkIcon       = WarningTwoIcon(color = Some("red"))
       val emailRightAddon = InputRightAddon().withChildren(okIcon)
       Seq(
-        FormControl().withChildren(
-          FormLabel(text = "Email address"),
-          InputGroup().withChildren(
+        QuickFormControl()
+          .withLabel("Email address")
+          .withHelperText("We'll never share your email.")
+          .withInputGroup(
             InputLeftAddon().withChildren(EmailIcon()),
             emailInput,
             emailRightAddon
           ),
-          FormHelperText(text = "We'll never share your email.")
-        ),
         FormControl().withChildren(
           FormLabel(text = "Password"),
           InputGroup().withChildren(
@@ -40,10 +39,12 @@ import org.terminal21.client.components.chakra.*
       case class PersonSubmitted(email: String, isValidEmail: Boolean, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean)
       val p = session.eventIterator
         .map: e =>
+          println(e)
           val email = emailInput.current.value
           val pwd   = passwordInput.current.value
           PersonSubmitted(email, email.contains("@"), pwd, e.isTarget(submitButton), e.isSessionClose)
         .tapEach: p =>
+          println(p)
           val emailAddon = if p.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)
           emailAddon.renderChanges()
         .dropWhile(p => !(p.isSubmitted && p.isValidEmail) && !p.userClosedSession)

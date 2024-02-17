@@ -19,12 +19,6 @@ trait UiElement:
     session.renderChanges(this)
 
 object UiElement:
-  def allDeep(elements: Seq[UiElement]): Seq[UiElement] =
-    elements ++ elements
-      .collect:
-        case hc: HasChildren[_] => allDeep(hc.children)
-      .flatten
-
   trait Current[A <: UiElement]:
     this: UiElement =>
     def current(using session: ConnectedSession): A = session.currentState(this.asInstanceOf[A])
