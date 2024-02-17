@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.ConnectedSessionMock.encoder
 import org.terminal21.client.components.chakra.Editable
 import org.terminal21.client.components.std.{Paragraph, Span}
-import org.terminal21.client.model.{GlobalEvent, UiEvent}
+import org.terminal21.client.model.UiEvent
 import org.terminal21.model.{CommandEvent, OnChange}
 import org.terminal21.ui.std.ServerJson
 
