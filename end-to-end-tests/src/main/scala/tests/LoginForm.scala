@@ -11,9 +11,8 @@ import org.terminal21.client.components.chakra.*
       given ConnectedSession = session
 
       val emailInput      = Input(`type` = "email", value = "my@email.com")
-      val description     = Textarea(placeholder = "Please enter a few things about you")
       val submitButton    = Button(text = "Submit")
-      val password        = Input(`type` = "password", value = "mysecret")
+      val passwordInput   = Input(`type` = "password", value = "mysecret")
       val okIcon          = CheckCircleIcon(color = Some("green"))
       val notOkIcon       = WarningTwoIcon(color = Some("red"))
       val emailRightAddon = InputRightAddon().withChildren(okIcon)
@@ -31,7 +30,7 @@ import org.terminal21.client.components.chakra.*
           FormLabel(text = "Password"),
           InputGroup().withChildren(
             InputLeftAddon().withChildren(ViewOffIcon()),
-            password
+            passwordInput
           ),
           FormHelperText(text = "Don't share with anyone")
         ),
@@ -41,11 +40,10 @@ import org.terminal21.client.components.chakra.*
       case class PersonSubmitted(email: String, isValidEmail: Boolean, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean)
       val p = session.eventIterator
         .map: e =>
-          println(e)
           val email = emailInput.current.value
-          PersonSubmitted(email, email.contains("@"), password.current.value, e.isTarget(submitButton), e.isSessionClose)
+          val pwd   = passwordInput.current.value
+          PersonSubmitted(email, email.contains("@"), pwd, e.isTarget(submitButton), e.isSessionClose)
         .tapEach: p =>
-          println(p)
           val emailAddon = if p.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)
           emailAddon.renderChanges()
         .dropWhile(p => !(p.isSubmitted && p.isValidEmail) && !p.userClosedSession)
