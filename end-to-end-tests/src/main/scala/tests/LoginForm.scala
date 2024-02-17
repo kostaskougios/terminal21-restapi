@@ -42,10 +42,11 @@ import org.terminal21.client.components.chakra.*
         ),
         submitButton
       ).render()
-      val o            = session.globalEventIterator
-        .takeWhile(e => !e.isSessionClose && !e.isReceivedBy(submitButton))
-        .map: _ =>
-          (email.current.value, password.current.value)
-        .toList
-        .lastOption
-      println(o)
+
+      case class PersonSubmitted(email: String, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean)
+      val o = session.globalEventIterator
+        .map: e =>
+          PersonSubmitted(email.current.value, password.current.value, e.isReceivedBy(submitButton), e.isSessionClose)
+        .dropWhile(p => !p.isSubmitted && !p.userClosedSession)
+        .nextOption()
+      println(o.mkString("\n"))

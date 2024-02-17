@@ -105,7 +105,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
                   case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
                   case x                                                    => logger.error(s"Unknown event handling combination : $x")
             case None           =>
-              logger.warn(s"There is no event handler for event $event")
+          // nop
 
     catch
       case t: Throwable =>
