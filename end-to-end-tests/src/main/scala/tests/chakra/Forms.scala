@@ -20,7 +20,7 @@ object Forms:
         if newValue.contains("@") then emailRightAddOn.withChildren(okIcon) else emailRightAddOn.withChildren(notOkIcon)
       ).renderChanges()
 
-    val description = Textarea(placeholder = "Please enter a few things about you")
+    val description = Textarea(placeholder = "Please enter a few things about you", defaultValue = "desc")
     description.onChange: newValue =>
       status.withText(s"description input new value = $newValue, verify description.value = ${description.current.value}").renderChanges()
 

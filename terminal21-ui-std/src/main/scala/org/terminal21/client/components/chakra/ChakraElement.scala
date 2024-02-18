@@ -1386,19 +1386,21 @@ case class Textarea(
     placeholder: String = "",
     size: String = "md",
     variant: Option[String] = None,
-    value: String = "",
+    defaultValue: String = "",
+    valueReceived: Option[String] = None, // use value instead
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Textarea]
     with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Textarea]:
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = newValue))
+  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(valueReceived = Some(newValue)))
   override def withStyle(v: Map[String, Any])                                       = copy(style = v)
   def withKey(v: String)                                                            = copy(key = v)
   def withType(v: String)                                                           = copy(`type` = v)
   def withPlaceholder(v: String)                                                    = copy(placeholder = v)
   def withSize(v: String)                                                           = copy(size = v)
   def withVariant(v: Option[String])                                                = copy(variant = v)
-  def withValue(v: String)                                                          = copy(value = v)
+  def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
+  def value                                                                         = valueReceived.getOrElse(defaultValue)
 
 /** https://chakra-ui.com/docs/components/switch
   */
