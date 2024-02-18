@@ -32,7 +32,7 @@ object Forms:
     select1.onChange: newValue =>
       status.withText(s"select1 input new value = $newValue, verify select1.value = ${select1.current.value}").renderChanges()
 
-    val select2 = Select(value = "1", bg = Some("tomato"), color = Some("black"), borderColor = Some("yellow")).withChildren(
+    val select2 = Select(defaultValue = "1", bg = Some("tomato"), color = Some("black"), borderColor = Some("yellow")).withChildren(
       Option_(text = "First", value = "1"),
       Option_(text = "Second", value = "2")
     )

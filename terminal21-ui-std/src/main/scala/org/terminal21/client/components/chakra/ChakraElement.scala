@@ -1427,7 +1427,8 @@ case class Switch(
 case class Select(
     key: String = Keys.nextKey,
     placeholder: String = "",
-    value: String = "",
+    defaultValue: String = "",
+    valueReceived: Option[String] = None, // use value instead
     bg: Option[String] = None,
     color: Option[String] = None,
     borderColor: Option[String] = None,
@@ -1437,15 +1438,16 @@ case class Select(
     with HasEventHandler
     with HasChildren[Select]
     with OnChangeEventHandler.CanHandleOnChangeEvent[Select]:
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = newValue))
+  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(valueReceived = Some(newValue)))
   override def withStyle(v: Map[String, Any])                                       = copy(style = v)
   override def withChildren(cn: UiElement*)                                         = copy(children = cn)
   def withKey(v: String)                                                            = copy(key = v)
   def withPlaceholder(v: String)                                                    = copy(placeholder = v)
-  def withValue(v: String)                                                          = copy(value = v)
+  def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
   def withBg(v: Option[String])                                                     = copy(bg = v)
   def withColor(v: Option[String])                                                  = copy(color = v)
   def withBorderColor(v: Option[String])                                            = copy(borderColor = v)
+  def value                                                                         = valueReceived.getOrElse(defaultValue)
 
 case class Option_(
     key: String = Keys.nextKey,
