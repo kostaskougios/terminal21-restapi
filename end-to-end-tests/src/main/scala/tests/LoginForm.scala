@@ -37,16 +37,19 @@ import org.terminal21.client.components.chakra.*
       ).render()
 
       case class PersonSubmitted(email: String, isValidEmail: Boolean, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean)
+
+      def validate(p: PersonSubmitted): Unit =
+        println(p)
+        val emailAddon = if p.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)
+        emailAddon.renderChanges()
+
       val p = session.eventIterator
         .map: e =>
           println(e)
           val email = emailInput.current.value
           val pwd   = passwordInput.current.value
           PersonSubmitted(email, email.contains("@"), pwd, e.isTarget(submitButton), e.isSessionClose)
-        .tapEach: p =>
-          println(p)
-          val emailAddon = if p.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)
-          emailAddon.renderChanges()
+        .tapEach(validate)
         .dropWhile(p => !(p.isSubmitted && p.isValidEmail) && !p.userClosedSession)
         .next()
       println("Result:" + p)

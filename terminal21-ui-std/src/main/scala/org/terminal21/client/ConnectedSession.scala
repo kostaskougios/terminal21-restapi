@@ -116,9 +116,10 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     sessionsService.setSessionJsonState(session, j)
 
   def renderChanges(es: UiElement*): Unit =
-    for e <- es.flatMap(_.flat) do modified(e)
-    val j = toJson(es)
-    sessionsService.changeSessionJsonState(session, j)
+    if !isClosed then
+      for e <- es.flatMap(_.flat) do modified(e)
+      val j = toJson(es)
+      sessionsService.changeSessionJsonState(session, j)
 
   private def toJson(elements: Seq[UiElement]): ServerJson =
     val flat = elements.flatMap(_.flat)
