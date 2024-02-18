@@ -149,7 +149,7 @@ case class SimpleGrid(
 case class Editable(
     key: String = Keys.nextKey,
     defaultValue: String = "",
-    value: String = "",
+    valueReceived: Option[String] = None, // use value instead
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Editable]
@@ -157,12 +157,12 @@ case class Editable(
     with HasChildren[Editable]
     with OnChangeEventHandler.CanHandleOnChangeEvent[Editable]:
   override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler =
-    newValue => session.modified(copy(value = newValue))
+    newValue => session.modified(copy(valueReceived = Some(newValue)))
   override def withChildren(cn: UiElement*)                                         = copy(children = cn)
   override def withStyle(v: Map[String, Any])                                       = copy(style = v)
   def withKey(v: String)                                                            = copy(key = v)
   def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
-  def withValue(v: String)                                                          = copy(value = v)
+  def value                                                                         = valueReceived.getOrElse(defaultValue)
 
 case class EditablePreview(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty) extends ChakraElement[EditablePreview]:
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -227,7 +227,7 @@ case class Input(
     size: String = "md",
     variant: Option[String] = None,
     defaultValue: String = "",
-    valueReceived: Option[String] = None,
+    valueReceived: Option[String] = None, // use value instead
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Input]
     with HasEventHandler

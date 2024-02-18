@@ -25,8 +25,8 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
     connectedSession.clear()
     it.toList should be(
       List(
-        UiEvent(event1, editable.withValue("v1")),
-        UiEvent(event2, editable.withValue("v2"))
+        UiEvent(event1, editable.copy(valueReceived = Some("v1"))),
+        UiEvent(event2, editable.copy(valueReceived = Some("v2")))
       )
     )
 
@@ -37,7 +37,7 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
     var received                             = Option.empty[CommandEvent]
     connectedSession.withGlobalEventHandler: ge =>
       received = Some(ge.event)
-      ge.receivedBy should be(editable.withValue("new value"))
+      ge.receivedBy should be(editable.copy(valueReceived = Some("new value")))
     val event                                = OnChange(editable.key, "new value")
     connectedSession.fireEvent(event)
     received should be(Some(event))
