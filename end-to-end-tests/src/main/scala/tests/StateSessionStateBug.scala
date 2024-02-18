@@ -35,7 +35,7 @@ import java.util.Date
               ),
               Seq(
                 "Date - Std Input",
-                std.Input(defaultValue = Some(date.toString))
+                std.Input(defaultValue = date.toString)
               )
             )
           ),

@@ -67,15 +67,15 @@ case class Paragraph(
 case class Input(
     key: String = Keys.nextKey,
     `type`: String = "text",
-    defaultValue: Option[String] = None,
+    defaultValue: String = "",
     style: Map[String, Any] = Map.empty,
-    value: Option[String] = None
+    valueReceived: Option[String] = None // use value instead
 ) extends StdElement[Input]
     with HasEventHandler
     with CanHandleOnChangeEvent[Input]:
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = Some(newValue)))
+  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(valueReceived = Some(newValue)))
   override def withStyle(v: Map[String, Any])                                       = copy(style = v)
   def withKey(v: String)                                                            = copy(key = v)
   def withType(v: String)                                                           = copy(`type` = v)
-  def withDefaultValue(v: Option[String])                                           = copy(defaultValue = v)
-  def withValue(v: Option[String])                                                  = copy(value = v)
+  def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
+  def value                                                                         = valueReceived.getOrElse(defaultValue)
