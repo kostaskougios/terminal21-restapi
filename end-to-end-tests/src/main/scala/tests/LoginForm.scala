@@ -36,17 +36,12 @@ import org.terminal21.client.components.chakra.*
         submitButton
       ).render()
 
-      case class PersonSubmitted(email: String, isValidEmail: Boolean, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean):
-        def isReady: Boolean = (isSubmitted && isValidEmail) || userClosedSession
-
       def validate(p: PersonSubmitted): Unit =
-        println(p)
         val emailAddon = if p.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)
         emailAddon.renderChanges()
 
       val p = session.eventIterator
         .map: e =>
-          println(e)
           val email = emailInput.current.value
           val pwd   = passwordInput.current.value
           PersonSubmitted(email, email.contains("@"), pwd, e.isTarget(submitButton), e.isSessionClose)
@@ -54,3 +49,7 @@ import org.terminal21.client.components.chakra.*
         .dropWhile(!_.isReady)
         .next()
       println("Result:" + p)
+      if p.isSubmitted then println("Saving person") else println("Not saving, user closed app")
+
+case class PersonSubmitted(email: String, isValidEmail: Boolean, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean):
+  def isReady: Boolean = (isSubmitted && isValidEmail) || userClosedSession
