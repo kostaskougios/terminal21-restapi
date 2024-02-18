@@ -36,7 +36,8 @@ import org.terminal21.client.components.chakra.*
         submitButton
       ).render()
 
-      case class PersonSubmitted(email: String, isValidEmail: Boolean, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean)
+      case class PersonSubmitted(email: String, isValidEmail: Boolean, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean):
+        def isReady: Boolean = (isSubmitted && isValidEmail) || userClosedSession
 
       def validate(p: PersonSubmitted): Unit =
         println(p)
@@ -50,6 +51,6 @@ import org.terminal21.client.components.chakra.*
           val pwd   = passwordInput.current.value
           PersonSubmitted(email, email.contains("@"), pwd, e.isTarget(submitButton), e.isSessionClose)
         .tapEach(validate)
-        .dropWhile(p => !(p.isSubmitted && p.isValidEmail) && !p.userClosedSession)
+        .dropWhile(!_.isReady)
         .next()
       println("Result:" + p)
