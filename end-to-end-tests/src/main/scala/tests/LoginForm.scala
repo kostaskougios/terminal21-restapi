@@ -49,7 +49,7 @@ import org.terminal21.client.components.chakra.*
         .dropWhile(!_.isReady)
         .next()
       println("Result:" + p)
-      if p.isSubmitted then println("Saving person") else println("Not saving, user closed app")
+      if p.isSubmitted then println("Submitted person information") else println("User closed app")
 
 case class PersonSubmitted(email: String, isValidEmail: Boolean, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean):
   def isReady: Boolean = (isSubmitted && isValidEmail) || userClosedSession
