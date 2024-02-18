@@ -10,9 +10,9 @@ import org.terminal21.client.components.chakra.*
     .connect: session =>
       given ConnectedSession = session
 
-      val emailInput      = Input(`type` = "email", value = "my@email.com")
+      val emailInput      = Input(`type` = "email", defaultValue = "my@email.com")
       val submitButton    = Button(text = "Submit")
-      val passwordInput   = Input(`type` = "password", value = "mysecret")
+      val passwordInput   = Input(`type` = "password", defaultValue = "mysecret")
       val okIcon          = CheckCircleIcon(color = Some("green"))
       val notOkIcon       = WarningTwoIcon(color = Some("red"))
       val emailRightAddon = InputRightAddon().withChildren(okIcon)

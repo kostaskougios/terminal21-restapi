@@ -13,7 +13,7 @@ object Forms:
 
     val emailRightAddOn = InputRightAddon().withChildren(okIcon)
 
-    val email = Input(`type` = "email", value = "my@email.com")
+    val email = Input(`type` = "email", defaultValue = "my@email.com")
     email.onChange: newValue =>
       Seq(
         status.withText(s"email input new value = $newValue, verify email.value = ${email.current.value}"),
@@ -37,7 +37,7 @@ object Forms:
       Option_(text = "Second", value = "2")
     )
 
-    val password = Input(`type` = "password", value = "mysecret")
+    val password = Input(`type` = "password", defaultValue = "mysecret")
     val dob      = Input(`type` = "datetime-local")
     dob.onChange: newValue =>
       status.withText(s"dob = $newValue , verify dob.value = ${dob.current.value}").renderChanges()

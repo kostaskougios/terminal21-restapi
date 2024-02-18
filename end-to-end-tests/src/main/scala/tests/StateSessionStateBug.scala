@@ -31,7 +31,7 @@ import java.util.Date
               ),
               Seq(
                 "Date - Input",
-                Input(value = date.toString)
+                Input(defaultValue = date.toString)
               ),
               Seq(
                 "Date - Std Input",

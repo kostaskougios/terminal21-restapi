@@ -226,19 +226,21 @@ case class Input(
     placeholder: String = "",
     size: String = "md",
     variant: Option[String] = None,
-    value: String = "",
+    defaultValue: String = "",
+    valueReceived: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Input]
     with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Input]:
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(value = newValue))
-  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
-  def withKey(v: String)                                                            = copy(key = v)
-  def withType(v: String)                                                           = copy(`type` = v)
-  def withPlaceholder(v: String)                                                    = copy(placeholder = v)
-  def withSize(v: String)                                                           = copy(size = v)
-  def withVariant(v: Option[String])                                                = copy(variant = v)
-  def withValue(v: String)                                                          = copy(value = v)
+  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(valueReceived = Some(newValue)))
+  override def withStyle(v: Map[String, Any]): Input                                = copy(style = v)
+  def withKey(v: String): Input                                                     = copy(key = v)
+  def withType(v: String): Input                                                    = copy(`type` = v)
+  def withPlaceholder(v: String): Input                                             = copy(placeholder = v)
+  def withSize(v: String): Input                                                    = copy(size = v)
+  def withVariant(v: Option[String]): Input                                         = copy(variant = v)
+  def withDefaultValue(v: String): Input                                            = copy(defaultValue = v)
+  def value: String                                                                 = valueReceived.getOrElse(defaultValue)
 
 case class InputGroup(
     key: String = Keys.nextKey,
