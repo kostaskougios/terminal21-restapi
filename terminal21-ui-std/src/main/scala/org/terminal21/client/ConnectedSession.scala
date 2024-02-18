@@ -101,9 +101,9 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
                   case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
                   case x                                                    => logger.error(s"Unknown event handling combination : $x")
             case None           => // nop
-      val globalEvent = UiEvent(event, modifiedElements(event.key))
-      for h <- globalEventHandler do h.onEvent(globalEvent)
-      events.add(globalEvent)
+          val globalEvent = UiEvent(event, modifiedElements(event.key))
+          for h <- globalEventHandler do h.onEvent(globalEvent)
+          events.add(globalEvent)
     catch
       case t: Throwable =>
         logger.error(s"Session ${session.id}: An error occurred while handling $event", t)
