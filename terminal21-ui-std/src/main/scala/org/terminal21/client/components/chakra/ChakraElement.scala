@@ -316,7 +316,7 @@ case class Radio(
 case class RadioGroup(
     key: String = Keys.nextKey,
     defaultValue: String = "",
-    valueV: Option[String] = None,
+    valueV: Option[String] = None, // use value
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[RadioGroup]
@@ -1410,7 +1410,7 @@ case class Switch(
     defaultChecked: Boolean = false,
     isDisabled: Boolean = false,
     style: Map[String, Any] = Map.empty,
-    checkedV: Option[Boolean] = None
+    checkedV: Option[Boolean] = None // use checked
 ) extends ChakraElement[Switch]
     with HasEventHandler
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Switch]:
