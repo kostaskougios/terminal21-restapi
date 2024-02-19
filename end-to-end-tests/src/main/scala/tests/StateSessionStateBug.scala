@@ -18,8 +18,8 @@ import java.util.Date
       Seq(
         Paragraph(text = s"Now: $date"),
         QuickTable()
-          .headers("Title", "Value")
-          .rows(
+          .withHeaders("Title", "Value")
+          .withRows(
             Seq(
               Seq(
                 "Date - Editable",

@@ -14,9 +14,9 @@ object DataDisplay:
       Th(text = "multiply by", isNumeric = true)
     )
     val quickTable1 = QuickTable()
-      .headers("id", "name")
+      .withHeaders("id", "name")
       .caption("Quick Table Caption")
-      .rows(
+      .withRows(
         Seq(
           Seq(1, "Kostas"),
           Seq(2, "Andreas")

@@ -81,17 +81,12 @@ Sessions
         Cell((x, y), newEditable(column))
 
     Seq(
-      TableContainer().withChildren(
-        Table(variant = "striped", colorScheme = Some("teal"), size = "mg")
-          .withChildren(
-            TableCaption(text = "Please edit the csv contents above and click save to save and exit"),
-            Thead(),
-            Tbody(
-              children = tableCells.map: rowCells =>
-                Tr(children = rowCells.map(c => Td().withChildren(c.editable)))
-            )
-          )
-      ),
+      QuickTable(variant = "striped", colorScheme = "teal", size = "mg")
+        .withCaption("Please edit the csv contents above and click save to save and exit")
+        .withRows(
+          tableCells.toSeq.map: rowCells =>
+            rowCells.map(_.editable)
+        ),
       HStack().withChildren(
         saveAndExit,
         exit,

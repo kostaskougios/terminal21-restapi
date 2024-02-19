@@ -25,25 +25,25 @@ import scala.util.Using
 
         val headers = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate", "timestamp")
 
-        val sortedFilesTable = QuickTable().headers(headers: _*).caption("Files sorted by createdDate and numOfWords")
-        val codeFilesTable   = QuickTable().headers(headers: _*).caption("Unsorted files")
+        val sortedFilesTable = QuickTable().withHeaders(headers: _*).caption("Files sorted by createdDate and numOfWords")
+        val codeFilesTable   = QuickTable().withHeaders(headers: _*).caption("Unsorted files")
 
         val sortedSourceFilesDS = sortedSourceFiles(sourceFiles())
         val sortedCalc          = sortedSourceFilesDS.visualize("Sorted files", sortedFilesTable): results =>
           val tableRows = results.take(3).toList.map(_.toData)
-          sortedFilesTable.rows(tableRows)
+          sortedFilesTable.withRows(tableRows)
 
         val codeFilesCalculation = sourceFiles().visualize("Code files", codeFilesTable): results =>
           val dt = results.take(3).toList
-          codeFilesTable.rows(dt.map(_.toData))
+          codeFilesTable.withRows(dt.map(_.toData))
 
-        val sortedFilesTableDF = QuickTable().headers(headers: _*).caption("Files sorted by createdDate and numOfWords ASC and as DF")
+        val sortedFilesTableDF = QuickTable().withHeaders(headers: _*).caption("Files sorted by createdDate and numOfWords ASC and as DF")
         val sortedCalcAsDF     = sourceFiles()
           .sort($"createdDate".asc, $"numOfWords".asc)
           .toDF()
           .visualize("Sorted files DF", sortedFilesTableDF): results =>
             val tableRows = results.take(4).toList
-            sortedFilesTableDF.rows(tableRows.toUiTable)
+            sortedFilesTableDF.withRows(tableRows.toUiTable)
 
         val chart = ResponsiveLine(
           data = Seq(

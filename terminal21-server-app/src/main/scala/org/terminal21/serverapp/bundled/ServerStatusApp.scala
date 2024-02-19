@@ -38,8 +38,8 @@ class ServerStatusAppInternal(serverSideSessions: ServerSideSessions, sessionsSe
     val runtime = Runtime.getRuntime
 
     val jvmTable      = QuickTable(caption = Some("JVM"))
-      .headers("Property", "Value", "Actions")
-      .rows(
+      .withHeaders("Property", "Value", "Actions")
+      .withRows(
         Seq(
           Seq("Free Memory", toMb(runtime.freeMemory()), ""),
           Seq("Max Memory", toMb(runtime.maxMemory()), ""),
@@ -58,7 +58,7 @@ class ServerStatusAppInternal(serverSideSessions: ServerSideSessions, sessionsSe
       rows = sessions.map: session =>
         Seq(Text(text = session.id), Text(text = session.name), if session.isOpen then CheckIcon() else NotAllowedIcon(), actionsFor(session))
     )
-      .headers("Id", "Name", "Is Open", "Actions")
+      .withHeaders("Id", "Name", "Is Open", "Actions")
 
     Seq(jvmTable, sessionsTable).render()
 
@@ -91,8 +91,8 @@ class ViewServerState(session: ConnectedSession):
     val rootKeyPanel = Seq(
       QuickTable()
         .withCaption("Root Keys")
-        .headers("Root Key")
-        .rows(
+        .withHeaders("Root Key")
+        .withRows(
           sj.rootKeys.sorted.map(k => Seq(k))
         )
     )
@@ -100,8 +100,8 @@ class ViewServerState(session: ConnectedSession):
     val keyTreePanel = Seq(
       QuickTable()
         .withCaption("Key Tree")
-        .headers("Key", "Component Json", "Children")
-        .rows(
+        .withHeaders("Key", "Component Json", "Children")
+        .withRows(
           sj.keyTree.toSeq.sortBy(_._1).map((k, v) => Seq(k, sj.elements(k).noSpaces, v.mkString(", ")))
         )
     )

@@ -14,14 +14,12 @@ case class QuickTable(
     rows: Seq[Seq[UiElement]] = Nil
 ) extends UiComponent
     with HasStyle[QuickTable]:
-  def withKey(v: String)               = copy(key = v)
-  def withVariant(v: String)           = copy(variant = v)
-  def withColorScheme(v: String)       = copy(colorScheme = v)
-  def withSize(v: String)              = copy(size = v)
-  def withCaption(v: Option[String])   = copy(caption = v)
-  def withCaption(v: String)           = copy(caption = Some(v))
-  def withHeaders(v: Seq[UiElement])   = copy(headers = v)
-  def withRows(v: Seq[Seq[UiElement]]) = copy(rows = v)
+  def withKey(v: String)             = copy(key = v)
+  def withVariant(v: String)         = copy(variant = v)
+  def withColorScheme(v: String)     = copy(colorScheme = v)
+  def withSize(v: String)            = copy(size = v)
+  def withCaption(v: Option[String]) = copy(caption = v)
+  def withCaption(v: String)         = copy(caption = Some(v))
 
   override lazy val rendered: Seq[UiElement] =
     val head           = Thead(key = key + "-th", children = Seq(Tr(children = headers.map(h => Th(children = Seq(h))))))
@@ -40,8 +38,8 @@ case class QuickTable(
     val tableContainer = TableContainer(key = key + "-tc", style = style, children = Seq(table))
     Seq(tableContainer)
 
-  def headers(headers: String*): QuickTable            = copy(headers = headers.map(h => Text(text = h)))
-  def headersElements(headers: UiElement*): QuickTable = copy(headers = headers)
+  def withHeaders(headers: String*): QuickTable            = copy(headers = headers.map(h => Text(text = h)))
+  def withHeadersElements(headers: UiElement*): QuickTable = copy(headers = headers)
 
   /** @param data
     *   A mix of plain types or UiElement. If it is a UiElement, it will be rendered otherwise if it is anything else the `.toString` method will be used to
@@ -49,11 +47,11 @@ case class QuickTable(
     * @return
     *   QuickTable
     */
-  def rows(data: Seq[Seq[Any]]): QuickTable               = copy(rows = data.map(_.map:
+  def withRows(data: Seq[Seq[Any]]): QuickTable               = copy(rows = data.map(_.map:
     case u: UiElement => u
     case c            => Text(text = c.toString)
   ))
-  def rowsElements(data: Seq[Seq[UiElement]]): QuickTable = copy(rows = data)
+  def withRowsElements(data: Seq[Seq[UiElement]]): QuickTable = copy(rows = data)
 
   def caption(text: String): QuickTable                   = copy(caption = Some(text))
   override def withStyle(v: Map[String, Any]): QuickTable = copy(style = v)
