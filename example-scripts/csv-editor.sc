@@ -64,21 +64,20 @@ Sessions
 
     println(s"Now open ${session.uiUrl} to view the UI")
 
-    case class EditorState(saveAndExitClicked: Boolean, exitWithoutSavingClicked: Boolean, changed: Option[String]):
+    case class EditorState(saveAndExitClicked: Boolean, exitWithoutSavingClicked: Boolean):
       def terminated = saveAndExitClicked || exitWithoutSavingClicked
 
-    session.eventIterator
-      .scanLeft(EditorState(false, false, None)):
-        case (state, UiEvent(OnChange(key, value), receivedBy)) =>
-          state.copy(changed = Some(value))
-        case (state, event) => state.copy(saveAndExitClicked = event.isTarget(saveAndExit), exitWithoutSavingClicked = event.isTarget(exit), changed = None)
-      .tapEach: state =>
-        for value <- state.changed do status.withText(s"Changed a cell value to $value").renderChanges()
-      .dropWhile(!_.terminated)
-      .take(1)
-      .filter(_.saveAndExitClicked)
-      .foreach: state =>
+    Controller(EditorState(false, false))
+      .onClick(saveAndExit): event =>
+        event.handled.withModel(event.model.copy(saveAndExitClicked = true)).terminate
+      .onClick(exit): click =>
+        click.handled.withModel(click.model.copy(exitWithoutSavingClicked = true)).terminate
+      .onChange(tableCells.flatten*): event =>
+        event.handled.withRenderChanges(status.withText(s"Changed a cell value to ${event.newValue}"))
+      .lastModelOption match
+      case Some(state) if state.saveAndExitClicked =>
         val data = tableCells.map(_.map(_.current.value).mkString(",")).mkString("\n")
         FileUtils.writeStringToFile(file, data, "UTF-8")
         status.withText("Csv file saved, exiting.").renderChanges()
         Thread.sleep(1000)
+      case _ => // just exit

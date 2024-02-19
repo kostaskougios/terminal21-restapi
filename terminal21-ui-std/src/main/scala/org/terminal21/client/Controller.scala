@@ -16,11 +16,11 @@ class Controller[M](
   def onEvent(handler: M => M) =
     new Controller(session, initialModel, eventHandlers :+ handler, clickHandlers, changeHandlers)
 
-  def onClick(e: UiElement & CanHandleOnClickEvent[_])(handler: ControllerClickEvent[M] => HandledEvent[M]) =
-    new Controller(session, initialModel, eventHandlers, clickHandlers + (e.key -> handler), changeHandlers)
+  def onClick(elements: UiElement & CanHandleOnClickEvent[_]*)(handler: ControllerClickEvent[M] => HandledEvent[M]) =
+    new Controller(session, initialModel, eventHandlers, clickHandlers ++ elements.map(e => e.key -> handler), changeHandlers)
 
-  def onChange(e: UiElement & CanHandleOnChangeEvent[_])(handler: ControllerChangeEvent[M] => HandledEvent[M]) =
-    new Controller(session, initialModel, eventHandlers, clickHandlers, changeHandlers + (e.key -> handler))
+  def onChange(elements: UiElement & CanHandleOnChangeEvent[_]*)(handler: ControllerChangeEvent[M] => HandledEvent[M]) =
+    new Controller(session, initialModel, eventHandlers, clickHandlers, changeHandlers ++ elements.map(e => e.key -> handler))
 
   def iterator: Iterator[M] =
     session.eventIterator
