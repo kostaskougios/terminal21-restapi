@@ -1,6 +1,6 @@
 package tests
 
-import org.terminal21.client.{ConnectedSession, Sessions}
+import org.terminal21.client.{ConnectedSession, Controller, Sessions}
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 
@@ -10,9 +10,11 @@ import org.terminal21.client.components.chakra.*
     .connect: session =>
       given ConnectedSession = session
 
-      val emailInput      = Input(`type` = "email", defaultValue = "my@email.com")
+      val initialModel = Login("my@email.com", "mysecret")
+
+      val emailInput      = Input(`type` = "email", defaultValue = initialModel.email)
       val submitButton    = Button(text = "Submit")
-      val passwordInput   = Input(`type` = "password", defaultValue = "mysecret")
+      val passwordInput   = Input(`type` = "password", defaultValue = initialModel.pwd)
       val okIcon          = CheckCircleIcon(color = Some("green"))
       val notOkIcon       = WarningTwoIcon(color = Some("red"))
       val emailRightAddon = InputRightAddon().withChildren(okIcon)
@@ -25,31 +27,33 @@ import org.terminal21.client.components.chakra.*
             emailInput,
             emailRightAddon
           ),
-        FormControl().withChildren(
-          FormLabel(text = "Password"),
-          InputGroup().withChildren(
+        QuickFormControl()
+          .withLabel("Password")
+          .withHelperText("Don't share with anyone")
+          .withInputGroup(
             InputLeftAddon().withChildren(ViewOffIcon()),
             passwordInput
           ),
-          FormHelperText(text = "Don't share with anyone")
-        ),
         submitButton
       ).render()
 
-      def validate(p: PersonSubmitted): Unit =
-        val emailAddon = if p.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)
-        emailAddon.renderChanges()
+      def validate(login: Login): InputRightAddon =
+        if login.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)
 
-      val p = session.eventIterator
-        .map: e =>
-          val email = emailInput.current.value
-          val pwd   = passwordInput.current.value
-          PersonSubmitted(email, email.contains("@"), pwd, e.isTarget(submitButton), e.isSessionClose)
-        .tapEach(validate)
-        .dropWhile(!_.isReady)
-        .next()
-      println("Result:" + p)
-      if p.isSubmitted then println("Submitted person information") else println("User closed app")
+      Controller(initialModel)
+        .onClick(submitButton): clickEvent =>
+          clickEvent.handled.withShouldTerminate(clickEvent.model.isValidEmail)
+        .onChange(emailInput): changeEvent =>
+          val newEmail = changeEvent.newValue
+          val model    = changeEvent.model.copy(email = newEmail)
+          changeEvent.handled
+            .withModel(model)
+            .withRenderChanges(validate(model))
+        .iterator
+        .toList
+        .lastOption match
+        case Some(login) if !session.isClosed => println(s"Login will be processed: $login")
+        case _                                => println("Login cancelled")
 
-case class PersonSubmitted(email: String, isValidEmail: Boolean, pwd: String, isSubmitted: Boolean, userClosedSession: Boolean):
-  def isReady: Boolean = (isSubmitted && isValidEmail) || userClosedSession
+private case class Login(email: String, pwd: String):
+  def isValidEmail: Boolean = email.contains("@")
