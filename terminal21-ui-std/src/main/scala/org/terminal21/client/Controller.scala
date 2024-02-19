@@ -32,9 +32,11 @@ class Controller[M](
           val handled = handler(ControllerChangeEvent(receivedBy, h.model, value))
           session.renderChanges(handled.renderChanges: _*)
           handled
-        case x                                                                              => throw new IllegalStateException(s"unexpected state $x")
+        case (handled, _)                                                                   => handled
       .takeWhile(!_.shouldTerminate)
       .map(_.model)
+
+  def lastModelOption: Option[M] = iterator.toList.lastOption
 
 object Controller:
   def apply[M](initialModel: M)(using session: ConnectedSession) = new Controller(session, initialModel, Map.empty, Map.empty)

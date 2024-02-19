@@ -49,9 +49,7 @@ import org.terminal21.client.components.chakra.*
           changeEvent.handled
             .withModel(model)
             .withRenderChanges(validate(model))
-        .iterator
-        .toList
-        .lastOption match
+        .lastModelOption match
         case Some(login) if !session.isClosed => println(s"Login will be processed: $login")
         case _                                => println("Login cancelled")
 
