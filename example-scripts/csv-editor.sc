@@ -103,14 +103,17 @@ Sessions
 
     val editableToCoords = tableCells.flatten.map(cell => (cell.editable.key, cell.coords)).toMap
 
-    case class EditorState(saveAndExitClicked: Boolean, exitWithoutSavingClicked: Boolean, csvMap: CsvMap):
+    case class EditorState(saveAndExitClicked: Boolean, exitWithoutSavingClicked: Boolean, csvMap: CsvMap, changed: Option[Coords]):
       def terminated = saveAndExitClicked || exitWithoutSavingClicked
 
     session.eventIterator
-      .scanLeft(EditorState(false, false, csvMap = initialCsvMap)):
+      .scanLeft(EditorState(false, false, csvMap = initialCsvMap, None)):
         case (state, UiEvent(OnChange(key, value), receivedBy)) if editableToCoords.contains(key) =>
-          state.copy(csvMap = state.csvMap + (editableToCoords(key) -> value))
-        case (state, event) => state.copy(saveAndExitClicked = event.isTarget(saveAndExit), exitWithoutSavingClicked = event.isTarget(exit))
+          val coords = editableToCoords(key)
+          state.copy(csvMap = state.csvMap + (coords -> value), changed = Some(coords))
+        case (state, event) => state.copy(saveAndExitClicked = event.isTarget(saveAndExit), exitWithoutSavingClicked = event.isTarget(exit), changed = None)
+      .tapEach: state =>
+        for coords <- state.changed do status.withText(s"Changed value at $coords, new value is ${state.csvMap(coords)}").renderChanges()
       .dropWhile(!_.terminated)
       .take(1)
       .filter(_.saveAndExitClicked)
