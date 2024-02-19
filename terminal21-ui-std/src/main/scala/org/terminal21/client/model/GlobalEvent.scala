@@ -8,9 +8,9 @@ sealed trait GlobalEvent:
   def isSessionClose: Boolean
 
 case class UiEvent(event: CommandEvent, receivedBy: UiElement) extends GlobalEvent:
-  override def isTarget(e: UiElement): Boolean = e == receivedBy
-  override def isSessionClose: Boolean             = false
+  override def isTarget(e: UiElement): Boolean = e.key == receivedBy.key
+  override def isSessionClose: Boolean         = false
 
 case object SessionClosedEvent extends GlobalEvent:
   override def isTarget(e: UiElement): Boolean = false
-  override def isSessionClose: Boolean             = true
+  override def isSessionClose: Boolean         = true

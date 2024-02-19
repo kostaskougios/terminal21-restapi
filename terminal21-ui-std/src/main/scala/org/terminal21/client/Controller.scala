@@ -9,44 +9,52 @@ import org.terminal21.model.{OnChange, OnClick}
 class Controller[M](
     session: ConnectedSession,
     initialModel: M,
+    eventHandlers: Seq[M => M],
     clickHandlers: Map[String, ControllerClickEvent[M] => HandledEvent[M]],
     changeHandlers: Map[String, ControllerChangeEvent[M] => HandledEvent[M]]
 ):
+  def onEvent(handler: M => M) =
+    new Controller(session, initialModel, eventHandlers :+ handler, clickHandlers, changeHandlers)
+
   def onClick(e: UiElement & CanHandleOnClickEvent[_])(handler: ControllerClickEvent[M] => HandledEvent[M]) =
-    new Controller(session, initialModel, clickHandlers + (e.key -> handler), changeHandlers)
+    new Controller(session, initialModel, eventHandlers, clickHandlers + (e.key -> handler), changeHandlers)
 
   def onChange(e: UiElement & CanHandleOnChangeEvent[_])(handler: ControllerChangeEvent[M] => HandledEvent[M]) =
-    new Controller(session, initialModel, clickHandlers, changeHandlers + (e.key -> handler))
+    new Controller(session, initialModel, eventHandlers, clickHandlers, changeHandlers + (e.key -> handler))
 
   def iterator: Iterator[M] =
     session.eventIterator
       .takeWhile(!_.isSessionClose)
-      .scanLeft(HandledEvent(initialModel, Nil, false)):
-        case (h, UiEvent(OnClick(key), receivedBy)) if clickHandlers.contains(key)          =>
-          val handler = clickHandlers(key)
-          val handled = handler(ControllerClickEvent(receivedBy, h.model))
-          session.renderChanges(handled.renderChanges: _*)
-          handled
-        case (h, UiEvent(OnChange(key, value), receivedBy)) if changeHandlers.contains(key) =>
-          val handler = changeHandlers(key)
-          val handled = handler(ControllerChangeEvent(receivedBy, h.model, value))
-          session.renderChanges(handled.renderChanges: _*)
-          handled
-        case (handled, _)                                                                   => handled
+      .scanLeft(HandledEvent(initialModel, Nil, false)): (oldHandled, event) =>
+        val newModel = eventHandlers.foldLeft(oldHandled.model): (model, f) =>
+          f(model)
+
+        val h       = oldHandled.copy(model = newModel)
+        val handled = event match
+          case UiEvent(OnClick(key), receivedBy) if clickHandlers.contains(key)          =>
+            val handler = clickHandlers(key)
+            val handled = handler(ControllerClickEvent(receivedBy, h.model))
+            handled
+          case UiEvent(OnChange(key, value), receivedBy) if changeHandlers.contains(key) =>
+            val handler = changeHandlers(key)
+            val handled = handler(ControllerChangeEvent(receivedBy, h.model, value))
+            handled
+          case _                                                                         => h
+        session.renderChanges(handled.renderChanges: _*)
+        handled
       .takeWhile(!_.shouldTerminate)
       .map(_.model)
 
   def lastModelOption: Option[M] = iterator.toList.lastOption
 
 object Controller:
-  def apply[M](initialModel: M)(using session: ConnectedSession) = new Controller(session, initialModel, Map.empty, Map.empty)
+  def apply[M](initialModel: M)(using session: ConnectedSession) = new Controller(session, initialModel, Nil, Map.empty, Map.empty)
 
 trait ControllerEvent[M]:
   def model: M
   def handled: HandledEvent[M] = HandledEvent(model, Nil, false)
 
-case class ControllerClickEvent[M](clicked: UiElement, model: M) extends ControllerEvent[M]
-
+case class ControllerClickEvent[M](clicked: UiElement, model: M)                    extends ControllerEvent[M]
 case class ControllerChangeEvent[M](changed: UiElement, model: M, newValue: String) extends ControllerEvent[M]
 
 case class HandledEvent[M](model: M, renderChanges: Seq[UiElement], shouldTerminate: Boolean):
