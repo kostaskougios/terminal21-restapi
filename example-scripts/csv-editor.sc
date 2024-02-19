@@ -9,6 +9,8 @@ import org.terminal21.client.*
 
 import java.util.concurrent.atomic.AtomicBoolean
 import org.terminal21.client.components.*
+import org.terminal21.client.model.*
+import org.terminal21.model.*
 import org.terminal21.model.SessionOptions
 // use the chakra components for menus, forms etc, https://chakra-ui.com/docs/components
 // The scala case classes : https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/chakra/ChakraElement.scala
@@ -39,10 +41,11 @@ val initialCsvMap = csv.zipWithIndex
       .map: (col, x) =>
         ((x, y), col)
   .toMap
-val csvMap = TrieMap.empty[(Int, Int), String] ++ initialCsvMap
 
+type Coords = (Int, Int)
+type CsvMap = Map[Coords, String]
 // save the map back to the csv file
-def saveCsvMap() =
+def saveCsvMap(csvMap: CsvMap): Unit =
   val coords = csvMap.keySet
   val maxX = coords.map(_._1).max
   val maxY = coords.map(_._2).max
@@ -56,9 +59,6 @@ def saveCsvMap() =
     .mkString("\n")
   FileUtils.writeStringToFile(file, s, "UTF-8")
 
-  // this will be set to true when we have to exit
-val exitFlag = new AtomicBoolean(false)
-
 Sessions
   .withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName")
   .connect: session =>
@@ -66,24 +66,19 @@ Sessions
 
     val status = Box()
     val saveAndExit = Button(text = "Save & Exit")
-      .onClick: () =>
-        saveCsvMap()
-        status.withText("Csv file saved, exiting.").renderChanges()
-        exitFlag.set(true)
-
     val exit = Button(text = "Exit Without Saving")
-      .onClick: () =>
-        exitFlag.set(true)
 
-    def newEditable(x: Int, y: Int, value: String) =
+    def newEditable(value: String) =
       Editable(defaultValue = value)
         .withChildren(
           EditablePreview(),
           EditableInput()
         )
-        .onChange: newValue =>
-          csvMap((x, y)) = newValue
-          status.withText(s"($x,$y) value changed to $newValue").renderChanges()
+
+    case class Cell(coords: Coords, editable: Editable)
+    val tableCells = csv.zipWithIndex.map: (row, y) =>
+      row.zipWithIndex.map: (column, x) =>
+        Cell((x, y), newEditable(column))
 
     Seq(
       TableContainer().withChildren(
@@ -92,11 +87,8 @@ Sessions
             TableCaption(text = "Please edit the csv contents above and click save to save and exit"),
             Thead(),
             Tbody(
-              children = csv.zipWithIndex.map: (row, y) =>
-                Tr(
-                  children = row.zipWithIndex.map: (column, x) =>
-                    Td().withChildren(newEditable(x, y, column))
-                )
+              children = tableCells.map: rowCells =>
+                Tr(children = rowCells.map(c => Td().withChildren(c.editable)))
             )
           )
       ),
@@ -108,5 +100,21 @@ Sessions
     ).render()
 
     println(s"Now open ${session.uiUrl} to view the UI")
-    // wait for one of the save/exit buttons to be pressed.
-    session.waitTillUserClosesSessionOr(exitFlag.get())
+
+    val editableToCoords = tableCells.flatten.map(cell => (cell.editable.key, cell.coords)).toMap
+
+    case class EditorState(saveAndExitClicked: Boolean, exitWithoutSavingClicked: Boolean, csvMap: CsvMap):
+      def terminated = saveAndExitClicked || exitWithoutSavingClicked
+
+    session.eventIterator
+      .scanLeft(EditorState(false, false, csvMap = initialCsvMap)):
+        case (state, UiEvent(OnChange(key, value), receivedBy)) if editableToCoords.contains(key) =>
+          state.copy(csvMap = state.csvMap + (editableToCoords(key) -> value))
+        case (state, event) => state.copy(saveAndExitClicked = event.isTarget(saveAndExit), exitWithoutSavingClicked = event.isTarget(exit))
+      .dropWhile(!_.terminated)
+      .take(1)
+      .filter(_.saveAndExitClicked)
+      .foreach: state =>
+        saveCsvMap(state.csvMap)
+        status.withText("Csv file saved, exiting.").renderChanges()
+        Thread.sleep(1000)

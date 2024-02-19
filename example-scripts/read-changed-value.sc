@@ -10,7 +10,7 @@ Sessions
   .connect: session =>
     given ConnectedSession = session
 
-    val email = Input(`type` = "email", value = "my@email.com")
+    val email = Input(`type` = "email", defaultValue = "my@email.com")
     val output = Box()
 
     Seq(

@@ -11,7 +11,7 @@ Sessions
     given ConnectedSession = session
 
     val output = Paragraph(text = "Please modify the email.")
-    val email = Input(`type` = "email", value = "my@email.com").onChange: v =>
+    val email = Input(`type` = "email", defaultValue = "my@email.com").onChange: v =>
       output.withText(s"Email value : $v").renderChanges()
 
     Seq(

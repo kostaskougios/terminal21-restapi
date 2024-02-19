@@ -38,7 +38,7 @@ Sessions
     // we will wait till the user clicks the "Exit" menu, this latch makes sure the main thread of the app waits.
     val exitLatch = new CountDownLatch(1)
     // the main editor area.
-    val editor = Textarea(value = contents)
+    val editor = Textarea(defaultValue = contents)
     // This will display a "saved" badge for a second when the user saves the file
     val status = Badge()
     // This will display an asterisk when the contents of the file are changed in the editor
