@@ -25,15 +25,6 @@ class SettingsApp extends ServerSideApp:
 class SettingsAppInstance(using session: ConnectedSession):
   def run() =
     Seq(
-      ThemeToggle(),
-      Paragraph(style = Map("margin" -> "25px")).withChildren(
-        Span(text = "Have a question? Please ask at "),
-        Link(
-          text = "terminal21's discussion board ",
-          href = "https://github.com/kostaskougios/terminal21-restapi/discussions",
-          color = Some("teal.500"),
-          isExternal = Some(true)
-        ).withChildren(ExternalLinkIcon(mx = Some("2px")))
-      )
+      ThemeToggle()
     ).render()
     session.waitTillUserClosesSession()

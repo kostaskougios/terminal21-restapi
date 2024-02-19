@@ -4,6 +4,7 @@ import functions.fibers.FiberExecutor
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.client.components.std.{Header1, Paragraph, Span}
 import org.terminal21.model.SessionOptions
 import org.terminal21.server.Dependencies
 import org.terminal21.serverapp.{ServerSideApp, ServerSideSessions}
@@ -22,12 +23,26 @@ class AppManager(serverSideSessions: ServerSideSessions, fiberExecutor: FiberExe
               startApp(app)
             Seq[UiElement](link, Text(text = app.description))
           val appsTable = QuickTable(
-            caption = Some("Apps installed on the server"),
+            caption = Some("Apps installed on the server, click one to run it."),
             rows = appRows
           ).withHeaders("App Name", "Description")
 
           Seq(
-            appsTable
+            Header1(text = "Terminal 21 Manager"),
+            Paragraph(
+              text = """
+                |Here you can run all the installed apps on the server.""".stripMargin
+            ),
+            appsTable,
+            Paragraph().withChildren(
+              Span(text = "Have a question? Please ask at "),
+              Link(
+                text = "terminal21's discussion board ",
+                href = "https://github.com/kostaskougios/terminal21-restapi/discussions",
+                color = Some("teal.500"),
+                isExternal = Some(true)
+              ).withChildren(ExternalLinkIcon(mx = Some("2px")))
+            )
           ).render()
 
           session.waitTillUserClosesSession()
