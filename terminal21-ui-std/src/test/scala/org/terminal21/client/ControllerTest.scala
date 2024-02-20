@@ -1,22 +1,39 @@
 package org.terminal21.client
 
 import org.scalatest.funsuite.AnyFunSuiteLike
-import org.terminal21.client.components.chakra.Button
+import org.scalatest.matchers.should.Matchers.*
+import org.terminal21.client.components.chakra.{Button, Checkbox}
+import org.terminal21.client.components.std.Input
 import org.terminal21.client.model.UiEvent
 import org.terminal21.model.{OnChange, OnClick}
-import org.scalatest.matchers.should.Matchers.*
-import org.terminal21.client.components.std.Input
 
 class ControllerTest extends AnyFunSuiteLike:
-  val button      = Button()
-  val buttonClick = UiEvent(OnClick(button.key), button)
-  val input       = Input()
-  val inputChange = UiEvent(OnChange(input.key, "new-value"), input)
+  val button         = Button()
+  val buttonClick    = UiEvent(OnClick(button.key), button)
+  val input          = Input()
+  val inputChange    = UiEvent(OnChange(input.key, "new-value"), input)
+  val checkbox       = Checkbox()
+  val checkBoxChange = UiEvent(OnChange(checkbox.key, "true"), checkbox)
 
   test("onEvent is called"):
     Controller(0, Iterator(buttonClick))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
+      .iterator
+      .toList should be(List(0, 1))
+
+  test("onEvent is called for change"):
+    Controller(0, Iterator(inputChange))
+      .onEvent: event =>
+        if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
+      .iterator
+      .toList should be(List(0, 1))
+
+  test("onEvent is called for change/boolean"):
+    Controller(0, Iterator(checkBoxChange))
+      .onEvent:
+        case event @ ControllerChangeBooleanEvent(`checkbox`, 0, true) =>
+          if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
       .iterator
       .toList should be(List(0, 1))
 
@@ -30,6 +47,13 @@ class ControllerTest extends AnyFunSuiteLike:
   test("onChange is called"):
     Controller(0, Iterator(inputChange))
       .onChange(input): event =>
+        event.handled.withModel(100).terminate
+      .iterator
+      .toList should be(List(0, 100))
+
+  test("onChange/boolean is called"):
+    Controller(0, Iterator(checkBoxChange))
+      .onChange(checkbox): event =>
         event.handled.withModel(100).terminate
       .iterator
       .toList should be(List(0, 100))
