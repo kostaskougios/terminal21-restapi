@@ -64,7 +64,7 @@ class Controller[M](
   def handledIterator: Iterator[HandledEvent[M]] =
     eventIteratorFactory
       .takeWhile(!_.isSessionClose)
-      .scanLeft(HandledEvent(initialModel, Nil, false)): (oldHandled, event) =>
+      .scanLeft(HandledEvent(initialModel, Nil, Nil, false)): (oldHandled, event) =>
         val h = eventHandlers.foldLeft(oldHandled): (h, f) =>
           event match
             case UiEvent(OnClick(_), receivedBy)         =>
@@ -93,6 +93,10 @@ class Controller[M](
         handled
       .tapEach: handled =>
         renderChanges(handled.renderChanges)
+        for trc <- handled.timedRenderChanges do
+          fiberExecutor.submit:
+            Thread.sleep(trc.waitInMs)
+            renderChanges(trc.renderChanges)
       .flatMap: h =>
         // trick to make sure we take the last state of the model when shouldTerminate=true
         if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
@@ -105,14 +109,19 @@ object Controller:
 
 trait ControllerEvent[M]:
   def model: M
-  def handled: HandledEvent[M] = HandledEvent(model, Nil, false)
+  def handled: HandledEvent[M] = HandledEvent(model, Nil, Nil, false)
 
 case class ControllerClickEvent[M](clicked: UiElement, model: M)                            extends ControllerEvent[M]
 case class ControllerChangeEvent[M](changed: UiElement, model: M, newValue: String)         extends ControllerEvent[M]
 case class ControllerChangeBooleanEvent[M](changed: UiElement, model: M, newValue: Boolean) extends ControllerEvent[M]
 
-case class HandledEvent[M](model: M, renderChanges: Seq[UiElement], shouldTerminate: Boolean):
-  def terminate: HandledEvent[M]                              = copy(shouldTerminate = true)
-  def withShouldTerminate(t: Boolean): HandledEvent[M]        = copy(shouldTerminate = t)
-  def withModel(m: M): HandledEvent[M]                        = copy(model = m)
-  def withRenderChanges(changed: UiElement*): HandledEvent[M] = copy(renderChanges = changed)
+case class HandledEvent[M](model: M, renderChanges: Seq[UiElement], timedRenderChanges: Seq[TimedRenderChanges], shouldTerminate: Boolean):
+  def terminate: HandledEvent[M]                                            = copy(shouldTerminate = true)
+  def withShouldTerminate(t: Boolean): HandledEvent[M]                      = copy(shouldTerminate = t)
+  def withModel(m: M): HandledEvent[M]                                      = copy(model = m)
+  def withRenderChanges(changed: UiElement*): HandledEvent[M]               = copy(renderChanges = changed)
+  def withTimedRenderChanges(changed: TimedRenderChanges*): HandledEvent[M] = copy(timedRenderChanges = changed)
+
+case class TimedRenderChanges(waitInMs: Long, renderChanges: Seq[UiElement])
+object TimedRenderChanges:
+  def apply(waitInMs: Long, renderChanges: UiElement): TimedRenderChanges = TimedRenderChanges(waitInMs, Seq(renderChanges))

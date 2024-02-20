@@ -81,3 +81,14 @@ class ControllerTest extends AnyFunSuiteLike:
       .toList should be(List(0, 1))
 
     rendered should be(Seq(button.withText("changed")))
+
+  test("timed changes are rendered"):
+    @volatile var rendered                = Seq.empty[UiElement]
+    def renderer(s: Seq[UiElement]): Unit = rendered = s
+    newController(0, Iterator(buttonClick), renderer)
+      .onEvent: event =>
+        event.handled.withModel(event.model + 1).withTimedRenderChanges(TimedRenderChanges(10, button.withText("changed"))).terminate
+      .iterator
+      .toList should be(List(0, 1))
+    Thread.sleep(15)
+    rendered should be(Seq(button.withText("changed")))
