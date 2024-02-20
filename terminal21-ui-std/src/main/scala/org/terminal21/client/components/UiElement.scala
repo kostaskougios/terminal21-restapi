@@ -2,7 +2,7 @@ package org.terminal21.client.components
 
 import org.terminal21.client.{ConnectedSession, EventHandler}
 
-trait UiElement:
+trait UiElement extends AnyElement:
   def key: String
 
   /** @return

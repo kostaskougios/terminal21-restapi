@@ -15,17 +15,17 @@ import org.terminal21.client.components.chakra.*
         case _                                => println("Login cancelled")
 
 class LoginForm(using session: ConnectedSession):
-  private val initialModel    = Login("my@email.com", "mysecret")
-  private val okIcon          = CheckCircleIcon(color = Some("green"))
-  private val notOkIcon       = WarningTwoIcon(color = Some("red"))
-  private val emailRightAddon = InputRightAddon().withChildren(okIcon)
-  private val emailInput      = Input(`type` = "email", defaultValue = initialModel.email)
-  private val submitButton    = Button(text = "Submit")
-  private val passwordInput   = Input(`type` = "password", defaultValue = initialModel.pwd)
+  private val initialModel = Login("my@email.com", "mysecret")
+  val okIcon               = CheckCircleIcon(color = Some("green"))
+  val notOkIcon            = WarningTwoIcon(color = Some("red"))
+  val emailRightAddon      = InputRightAddon().withChildren(okIcon)
+  val emailInput           = Input(`type` = "email", defaultValue = initialModel.email)
+  val submitButton         = Button(text = "Submit")
+  val passwordInput        = Input(`type` = "password", defaultValue = initialModel.pwd)
 
   def run(): Option[Login] =
     components.render()
-    processEvents
+    controller.lastModelOption
 
   def components: Seq[UiElement] =
     Seq(
@@ -47,17 +47,14 @@ class LoginForm(using session: ConnectedSession):
       submitButton
     )
 
-  def processEvents: Option[Login] = registerHandlers(Controller(initialModel)).lastModelOption
-
-  def registerHandlers(controller: Controller[Login]): Controller[Login] =
-    controller
-      .onEvent: event =>
-        val newModel = event.model.copy(email = emailInput.current.value, pwd = passwordInput.current.value)
-        event.handled.withModel(newModel)
-      .onClick(submitButton): clickEvent =>
-        clickEvent.handled.withShouldTerminate(clickEvent.model.isValidEmail)
-      .onChange(emailInput): changeEvent =>
-        changeEvent.handled.withRenderChanges(validate(changeEvent.model))
+  def controller: Controller[Login] = Controller(initialModel)
+    .onEvent: event =>
+      val newModel = event.model.copy(email = emailInput.current.value, pwd = passwordInput.current.value)
+      event.handled.withModel(newModel)
+    .onClick(submitButton): clickEvent =>
+      clickEvent.handled.withShouldTerminate(clickEvent.model.isValidEmail)
+    .onChange(emailInput): changeEvent =>
+      changeEvent.handled.withRenderChanges(validate(changeEvent.model))
 
   private def validate(login: Login): InputRightAddon =
     if login.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)

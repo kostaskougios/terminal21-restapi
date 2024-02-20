@@ -160,7 +160,7 @@ lazy val `end-to-end-tests` = project
     publish := {},
     libraryDependencies ++= Seq(ScalaTest, LogBack)
   )
-  .dependsOn(`terminal21-ui-std`, `terminal21-nivo`, `terminal21-mathjax`)
+  .dependsOn(`terminal21-ui-std` % "compile->compile;test->test", `terminal21-nivo`, `terminal21-mathjax`)
 
 lazy val `terminal21-nivo` = project
   .settings(

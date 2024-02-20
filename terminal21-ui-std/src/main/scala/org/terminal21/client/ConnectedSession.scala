@@ -83,6 +83,8 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     */
   def removeGlobalEventHandler(): Unit = globalEventHandler = None
 
+  def fireEvents(events: CommandEvent*): Unit = for e <- events do fireEvent(e)
+
   def fireEvent(event: CommandEvent): Unit =
     try
       event match
