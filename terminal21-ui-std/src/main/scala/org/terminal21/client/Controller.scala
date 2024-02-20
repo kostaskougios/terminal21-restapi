@@ -103,9 +103,6 @@ object Controller:
   def apply[M](initialModel: M)(using session: ConnectedSession): Controller[M] =
     new Controller(session.eventIterator, session.renderChanges, initialModel, Nil, Map.empty, Map.empty, Map.empty)
 
-  def apply[M](initialModel: M, eventIterator: => Iterator[GlobalEvent], renderChanges: Seq[UiElement] => Unit = _ => ()): Controller[M] =
-    new Controller(eventIterator, renderChanges, initialModel, Nil, Map.empty, Map.empty, Map.empty)
-
 trait ControllerEvent[M]:
   def model: M
   def handled: HandledEvent[M] = HandledEvent(model, Nil, false)
