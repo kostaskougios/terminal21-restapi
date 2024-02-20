@@ -24,8 +24,9 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("onEvent is called for change"):
     Controller(0, Iterator(inputChange))
-      .onEvent: event =>
-        if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
+      .onEvent:
+        case event @ ControllerChangeEvent(`input`, 0, "new-value") =>
+          if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
       .iterator
       .toList should be(List(0, 1))
 
