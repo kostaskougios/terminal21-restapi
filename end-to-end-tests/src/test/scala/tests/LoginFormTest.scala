@@ -27,7 +27,7 @@ class LoginFormTest extends AnyFunSuiteLike:
         CommandEvent.onChange(form.emailInput, "an@email.com"),
         CommandEvent.onChange(form.passwordInput, "secret"),
         CommandEvent.onClick(form.submitButton),
-        CommandEvent.sessionClosed
+        CommandEvent.sessionClosed // every test should close the session so that the iterator doesn't block if converted to a list.
       )
 
       eventsIt.toList.lastOption should be(Some(Login("an@email.com", "secret")))
