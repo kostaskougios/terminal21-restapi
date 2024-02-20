@@ -59,7 +59,9 @@ class Controller[M](
       changeBooleanHandlers ++ elements.map(e => e.key -> handler)
     )
 
-  def iterator: Iterator[M] =
+  def iterator: Iterator[M] = handledIterator.takeWhile(!_.shouldTerminate).map(_.model)
+
+  def handledIterator: Iterator[HandledEvent[M]] =
     eventIteratorFactory
       .takeWhile(!_.isSessionClose)
       .scanLeft(HandledEvent(initialModel, Nil, false)): (oldHandled, event) =>
@@ -94,8 +96,6 @@ class Controller[M](
       .flatMap: h =>
         // trick to make sure we take the last state of the model when shouldTerminate=true
         if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
-      .takeWhile(!_.shouldTerminate)
-      .map(_.model)
 
   def lastModelOption: Option[M] = iterator.toList.lastOption
 

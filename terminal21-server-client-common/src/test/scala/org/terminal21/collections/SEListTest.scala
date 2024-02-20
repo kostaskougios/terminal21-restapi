@@ -67,6 +67,13 @@ class SEListTest extends AnyFunSuiteLike:
     it.hasNext should be(false)
     an[NoSuchElementException] should be thrownBy (it.next())
 
+  test("it.isNextAvailable"):
+    val l  = SEList[Int]()
+    val it = l.iterator
+    it.isNextAvailable should be(false)
+    l.add(1)
+    it.isNextAvailable should be(true)
+
   test("multiple iterators and multi threading"):
     val l         = SEList[Int]()
     val iterators = for _ <- 1 to 1000 yield

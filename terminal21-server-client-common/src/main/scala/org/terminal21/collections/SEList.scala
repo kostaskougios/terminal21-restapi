@@ -4,13 +4,23 @@ import java.util.concurrent.CountDownLatch
 
 class SEList[A]:
   @volatile private var currentNode: NormalNode[A] = NormalNode(None, EndNode)
-  def iterator: Iterator[A]                        = new SEBlockingIterator(currentNode)
 
+  /** @return
+    *   A new iterator that only reads elements that are added before the iterator is created.
+    */
+  def iterator: SEBlockingIterator[A] = new SEBlockingIterator(currentNode)
+
+  /** Add a poison pill to terminate all iterators.
+    */
   def poisonPill(): Unit =
     synchronized:
       currentNode.valueAndNext = (None, PoisonPillNode)
       currentNode.latch.countDown()
 
+  /** Adds an item that will be visible to all iterators that were created before this item was added.
+    * @param item
+    *   the item
+    */
   def add(item: A): Unit =
     val cn = synchronized:
       val cn = currentNode
@@ -22,11 +32,22 @@ class SEList[A]:
     cn.latch.countDown()
 
 class SEBlockingIterator[A](@volatile var currentNode: NormalNode[A]) extends Iterator[A]:
+  /** @return
+    *   true if hasNext & next() will return immediately with the next value. This won't block.
+    */
+  def isNextAvailable: Boolean = currentNode.hasValue
+
+  /** @return
+    *   true if there is a next() but blocks otherwise till next() becomes available or we are at the end of the iterator.
+    */
   override def hasNext: Boolean =
     currentNode.waitValue()
     val v = currentNode.valueAndNext._2
     if v == PoisonPillNode then false else true
 
+  /** @return
+    *   the next element or blocks until the next element becomes available
+    */
   override def next(): A =
     if hasNext then
       val v = currentNode.value
