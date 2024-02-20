@@ -45,7 +45,9 @@ class LoginFormTest extends AnyFunSuiteLike:
       // the form shouldn't have terminated because of the email error
       allHandled.exists(_.shouldTerminate) should be(false)
       // the email right addon should have rendered with the notOkIcon
-      allHandled.flatMap(_.renderChanges) should be(Seq(form.emailRightAddon.withChildren(form.notOkIcon)))
+      allHandled.flatMap(_.renderChanges) should be(
+        Seq(form.emailRightAddon.withChildren(form.notOkIcon), form.errorsBox.withChildren(form.errorMsgInvalidEmail))
+      )
 
   class App:
     given session: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock

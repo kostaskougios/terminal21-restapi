@@ -24,6 +24,7 @@ class LoginForm(using session: ConnectedSession):
   val submitButton         = Button(text = "Submit")
   val passwordInput        = Input(`type` = "password", defaultValue = initialModel.pwd)
   val errorsBox            = Box()
+  val errorMsgInvalidEmail = Paragraph(text = "Invalid Email", style = Map("color" -> "red"))
 
   def run(): Option[Login] =
     components.render()
@@ -58,7 +59,7 @@ class LoginForm(using session: ConnectedSession):
       // if the email is invalid, we will not terminate. We also will render an error that will be visible for 2 seconds
       val isValidEmail = clickEvent.model.isValidEmail
       val messageBox   =
-        if isValidEmail then errorsBox.current else errorsBox.current.addChildren(Paragraph(text = "Invalid Email", style = Map("color" -> "red")))
+        if isValidEmail then errorsBox.current else errorsBox.current.addChildren(errorMsgInvalidEmail)
       clickEvent.handled.withShouldTerminate(isValidEmail).withRenderChanges(messageBox).addTimedRenderChange(2000, errorsBox)
     .onChange(emailInput): changeEvent =>
       changeEvent.handled.withRenderChanges(validate(changeEvent.model))
