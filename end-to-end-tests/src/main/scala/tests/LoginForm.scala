@@ -1,8 +1,9 @@
 package tests
 
-import org.terminal21.client.{ConnectedSession, Controller, Sessions}
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.client.components.std.Paragraph
+import org.terminal21.client.{ConnectedSession, Controller, Sessions}
 
 @main def loginFormApp(): Unit =
   Sessions
@@ -22,6 +23,7 @@ class LoginForm(using session: ConnectedSession):
   val emailInput           = Input(`type` = "email", defaultValue = initialModel.email)
   val submitButton         = Button(text = "Submit")
   val passwordInput        = Input(`type` = "password", defaultValue = initialModel.pwd)
+  val errorsBox            = Box()
 
   def run(): Option[Login] =
     components.render()
@@ -44,7 +46,8 @@ class LoginForm(using session: ConnectedSession):
           InputLeftAddon().withChildren(ViewOffIcon()),
           passwordInput
         ),
-      submitButton
+      submitButton,
+      errorsBox
     )
 
   def controller: Controller[Login] = Controller(initialModel)
@@ -52,7 +55,11 @@ class LoginForm(using session: ConnectedSession):
       val newModel = event.model.copy(email = emailInput.current.value, pwd = passwordInput.current.value)
       event.handled.withModel(newModel)
     .onClick(submitButton): clickEvent =>
-      clickEvent.handled.withShouldTerminate(clickEvent.model.isValidEmail)
+      // if the email is invalid, we will not terminate. We also will render an error that will be visible for 2 seconds
+      val isValidEmail = clickEvent.model.isValidEmail
+      val messageBox   =
+        if isValidEmail then errorsBox.current else errorsBox.current.addChildren(Paragraph(text = "Invalid Email", style = Map("color" -> "red")))
+      clickEvent.handled.withShouldTerminate(isValidEmail).withRenderChanges(messageBox).addTimedRenderChange(2000, errorsBox)
     .onChange(emailInput): changeEvent =>
       changeEvent.handled.withRenderChanges(validate(changeEvent.model))
 

@@ -116,11 +116,13 @@ case class ControllerChangeEvent[M](changed: UiElement, model: M, newValue: Stri
 case class ControllerChangeBooleanEvent[M](changed: UiElement, model: M, newValue: Boolean) extends ControllerEvent[M]
 
 case class HandledEvent[M](model: M, renderChanges: Seq[UiElement], timedRenderChanges: Seq[TimedRenderChanges], shouldTerminate: Boolean):
-  def terminate: HandledEvent[M]                                            = copy(shouldTerminate = true)
-  def withShouldTerminate(t: Boolean): HandledEvent[M]                      = copy(shouldTerminate = t)
-  def withModel(m: M): HandledEvent[M]                                      = copy(model = m)
-  def withRenderChanges(changed: UiElement*): HandledEvent[M]               = copy(renderChanges = changed)
-  def withTimedRenderChanges(changed: TimedRenderChanges*): HandledEvent[M] = copy(timedRenderChanges = changed)
+  def terminate: HandledEvent[M]                                                      = copy(shouldTerminate = true)
+  def withShouldTerminate(t: Boolean): HandledEvent[M]                                = copy(shouldTerminate = t)
+  def withModel(m: M): HandledEvent[M]                                                = copy(model = m)
+  def withRenderChanges(changed: UiElement*): HandledEvent[M]                         = copy(renderChanges = changed)
+  def withTimedRenderChanges(changed: TimedRenderChanges*): HandledEvent[M]           = copy(timedRenderChanges = changed)
+  def addTimedRenderChange(waitInMs: Long, renderChanges: UiElement): HandledEvent[M] =
+    copy(timedRenderChanges = timedRenderChanges :+ TimedRenderChanges(waitInMs, renderChanges))
 
 case class TimedRenderChanges(waitInMs: Long, renderChanges: Seq[UiElement])
 object TimedRenderChanges:
