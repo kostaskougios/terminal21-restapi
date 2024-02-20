@@ -67,14 +67,14 @@ class Controller[M](
       .scanLeft(HandledEvent(initialModel, Nil, false)): (oldHandled, event) =>
         val h = eventHandlers.foldLeft(oldHandled): (h, f) =>
           event match
-            case UiEvent(OnClick(_), receivedBy)           =>
+            case UiEvent(OnClick(_), receivedBy)         =>
               f(ControllerClickEvent(receivedBy, h.model))
-            case UiEvent(OnChange(key, value), receivedBy) =>
+            case UiEvent(OnChange(_, value), receivedBy) =>
               val e = receivedBy match
                 case _: OnChangeEventHandler.CanHandleOnChangeEvent[_]        => ControllerChangeEvent(receivedBy, h.model, value)
                 case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_] => ControllerChangeBooleanEvent(receivedBy, h.model, value.toBoolean)
               f(e)
-            case x                                         => throw new IllegalStateException(s"Unexpected state $x")
+            case x                                       => throw new IllegalStateException(s"Unexpected state $x")
 
         val handled = event match
           case UiEvent(OnClick(key), receivedBy) if clickHandlers.contains(key)                 =>
