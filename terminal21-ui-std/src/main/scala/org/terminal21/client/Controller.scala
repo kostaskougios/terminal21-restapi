@@ -61,6 +61,9 @@ class Controller[M](
           case _                                                                         => h
         renderChanges(handled.renderChanges)
         handled
+      .flatMap: h =>
+        // trick to make sure we take the last state of the model when shouldTerminate=true
+        if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
       .takeWhile(!_.shouldTerminate)
       .map(_.model)
 
