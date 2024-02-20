@@ -2,6 +2,7 @@ package org.terminal21.client
 
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
+import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.{Button, Checkbox}
 import org.terminal21.client.components.std.Input
 import org.terminal21.client.model.UiEvent
@@ -65,3 +66,15 @@ class ControllerTest extends AnyFunSuiteLike:
         if event.model > 1 then event.handled.terminate.withModel(100) else event.handled.withModel(event.model + 1)
       .iterator
       .toList should be(List(0, 1, 2, 100))
+
+  test("changes are rendered"):
+    var rendered                          = Seq.empty[UiElement]
+    def renderer(s: Seq[UiElement]): Unit = rendered = s
+
+    Controller(0, Iterator(buttonClick), renderer)
+      .onEvent: event =>
+        event.handled.withModel(event.model + 1).withRenderChanges(button.withText("changed")).terminate
+      .iterator
+      .toList should be(List(0, 1))
+
+    rendered should be(Seq(button.withText("changed")))
