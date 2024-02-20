@@ -34,23 +34,28 @@ Sessions
   .withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName")
   .connect: session =>
     given ConnectedSession = session
+    println(s"Now open ${session.uiUrl} to view the UI")
+    val editor = new CsvEditor(csv)
+    editor.run()
 
-    val status = Box()
-    val saveAndExit = Button(text = "Save & Exit")
-    val exit = Button(text = "Exit Without Saving")
+class CsvEditor(csv: Seq[Seq[String]])(using session: ConnectedSession):
+  val saveAndExit = Button(text = "Save & Exit")
+  val exit = Button(text = "Exit Without Saving")
+  val status = Box()
 
-    def newEditable(value: String) =
-      Editable(defaultValue = value)
-        .withChildren(
-          EditablePreview(),
-          EditableInput()
-        )
+  val tableCells =
+    csv.map: row =>
+      row.map: column =>
+        newEditable(column)
 
-    val tableCells =
-      csv.map: row =>
-        row.map: column =>
-          newEditable(column)
+  def run(): Unit =
+    components.render()
+    if processEvents then
+      save()
+      status.withText("Csv file saved, exiting.").renderChanges()
+      Thread.sleep(1000)
 
+  def components: Seq[UiElement] =
     Seq(
       QuickTable(variant = "striped", colorScheme = "teal", size = "mg")
         .withCaption("Please edit the csv contents above and click save to save and exit")
@@ -60,21 +65,32 @@ Sessions
         exit,
         status
       )
-    ).render()
+    )
 
-    println(s"Now open ${session.uiUrl} to view the UI")
+  /** @return
+    *   true if the user clicked "Save", false if the user clicked "Exit" or closed the session
+    */
+  def processEvents: Boolean =
+    registerCsvEditorEventHandlers(Controller(false)).lastModelOption.getOrElse(false)
 
-    Controller(false)
+  def save(): Unit =
+    val data = currentCsvValue
+    FileUtils.writeStringToFile(file, data, "UTF-8")
+
+  def currentCsvValue: String = tableCells.map(_.map(_.current.value).mkString(",")).mkString("\n")
+
+  private def newEditable(value: String) =
+    Editable(defaultValue = value)
+      .withChildren(
+        EditablePreview(),
+        EditableInput()
+      )
+
+  def registerCsvEditorEventHandlers(controller: Controller[Boolean]) =
+    controller
       .onClick(saveAndExit): event =>
         event.handled.withModel(true).terminate
       .onClick(exit): click =>
         click.handled.withModel(false).terminate
-      .onChange(tableCells.flatten*): event =>
+      .onChanged(tableCells.flatten*): event =>
         event.handled.withRenderChanges(status.withText(s"Changed a cell value to ${event.newValue}"))
-      .lastModelOption match
-      case Some(true) =>
-        val data = tableCells.map(_.map(_.current.value).mkString(",")).mkString("\n")
-        FileUtils.writeStringToFile(file, data, "UTF-8")
-        status.withText("Csv file saved, exiting.").renderChanges()
-        Thread.sleep(1000)
-      case x => // just exit
