@@ -3,33 +3,52 @@ package org.terminal21.client
 import org.terminal21.client.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.OnClickEventHandler.CanHandleOnClickEvent
 import org.terminal21.client.components.UiElement
-import org.terminal21.client.model.UiEvent
+import org.terminal21.client.model.{GlobalEvent, UiEvent}
 import org.terminal21.model.{OnChange, OnClick}
 
 class Controller[M](
-    session: ConnectedSession,
+    eventIteratorFactory: => Iterator[GlobalEvent],
+    renderChanges: Seq[UiElement] => Unit,
     initialModel: M,
-    eventHandlers: Seq[M => M],
+    eventHandlers: Seq[ControllerEvent[M] => HandledEvent[M]],
     clickHandlers: Map[String, ControllerClickEvent[M] => HandledEvent[M]],
     changeHandlers: Map[String, ControllerChangeEvent[M] => HandledEvent[M]]
 ):
-  def onEvent(handler: M => M) =
-    new Controller(session, initialModel, eventHandlers :+ handler, clickHandlers, changeHandlers)
+  def onEvent(handler: ControllerEvent[M] => HandledEvent[M]) =
+    new Controller(eventIteratorFactory, renderChanges, initialModel, eventHandlers :+ handler, clickHandlers, changeHandlers)
 
   def onClick(elements: UiElement & CanHandleOnClickEvent[_]*)(handler: ControllerClickEvent[M] => HandledEvent[M]) =
-    new Controller(session, initialModel, eventHandlers, clickHandlers ++ elements.map(e => e.key -> handler), changeHandlers)
+    new Controller(
+      eventIteratorFactory,
+      renderChanges,
+      initialModel,
+      eventHandlers,
+      clickHandlers ++ elements.map(e => e.key -> handler),
+      changeHandlers
+    )
 
   def onChange(elements: UiElement & CanHandleOnChangeEvent[_]*)(handler: ControllerChangeEvent[M] => HandledEvent[M]) =
-    new Controller(session, initialModel, eventHandlers, clickHandlers, changeHandlers ++ elements.map(e => e.key -> handler))
+    new Controller(
+      eventIteratorFactory,
+      renderChanges,
+      initialModel,
+      eventHandlers,
+      clickHandlers,
+      changeHandlers ++ elements.map(e => e.key -> handler)
+    )
 
   def iterator: Iterator[M] =
-    session.eventIterator
+    eventIteratorFactory
       .takeWhile(!_.isSessionClose)
       .scanLeft(HandledEvent(initialModel, Nil, false)): (oldHandled, event) =>
-        val newModel = eventHandlers.foldLeft(oldHandled.model): (model, f) =>
-          f(model)
+        val h = eventHandlers.foldLeft(oldHandled): (h, f) =>
+          event match
+            case UiEvent(OnClick(_), receivedBy)         =>
+              f(ControllerClickEvent(receivedBy, h.model))
+            case UiEvent(OnChange(_, value), receivedBy) =>
+              f(ControllerChangeEvent(receivedBy, h.model, value))
+            case x                                       => throw new IllegalStateException(s"Unexpected state $x")
 
-        val h       = oldHandled.copy(model = newModel)
         val handled = event match
           case UiEvent(OnClick(key), receivedBy) if clickHandlers.contains(key)          =>
             val handler = clickHandlers(key)
@@ -40,7 +59,7 @@ class Controller[M](
             val handled = handler(ControllerChangeEvent(receivedBy, h.model, value))
             handled
           case _                                                                         => h
-        session.renderChanges(handled.renderChanges: _*)
+        renderChanges(handled.renderChanges)
         handled
       .takeWhile(!_.shouldTerminate)
       .map(_.model)
@@ -48,7 +67,11 @@ class Controller[M](
   def lastModelOption: Option[M] = iterator.toList.lastOption
 
 object Controller:
-  def apply[M](initialModel: M)(using session: ConnectedSession) = new Controller(session, initialModel, Nil, Map.empty, Map.empty)
+  def apply[M](initialModel: M)(using session: ConnectedSession): Controller[M] =
+    new Controller(session.eventIterator, session.renderChanges, initialModel, Nil, Map.empty, Map.empty)
+
+  def apply[M](initialModel: M, eventIterator: => Iterator[GlobalEvent], renderChanges: Seq[UiElement] => Unit = _ => ()): Controller[M] =
+    new Controller(eventIterator, renderChanges, initialModel, Nil, Map.empty, Map.empty)
 
 trait ControllerEvent[M]:
   def model: M

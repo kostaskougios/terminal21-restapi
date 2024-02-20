@@ -41,8 +41,9 @@ import org.terminal21.client.components.chakra.*
         if login.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)
 
       Controller(initialModel)
-        .onEvent: model =>
-          model.copy(email = emailInput.current.value, pwd = passwordInput.current.value)
+        .onEvent: event =>
+          val newModel = event.model.copy(email = emailInput.current.value, pwd = passwordInput.current.value)
+          event.handled.withModel(newModel)
         .onClick(submitButton): clickEvent =>
           clickEvent.handled.withShouldTerminate(clickEvent.model.isValidEmail)
         .onChange(emailInput): changeEvent =>

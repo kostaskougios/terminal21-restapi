@@ -64,20 +64,17 @@ Sessions
 
     println(s"Now open ${session.uiUrl} to view the UI")
 
-    case class EditorState(saveAndExitClicked: Boolean, exitWithoutSavingClicked: Boolean):
-      def terminated = saveAndExitClicked || exitWithoutSavingClicked
-
-    Controller(EditorState(false, false))
+    Controller(false)
       .onClick(saveAndExit): event =>
-        event.handled.withModel(event.model.copy(saveAndExitClicked = true)).terminate
+        event.handled.withModel(true).terminate
       .onClick(exit): click =>
-        click.handled.withModel(click.model.copy(exitWithoutSavingClicked = true)).terminate
+        click.handled.withModel(false).terminate
       .onChange(tableCells.flatten*): event =>
         event.handled.withRenderChanges(status.withText(s"Changed a cell value to ${event.newValue}"))
       .lastModelOption match
-      case Some(state) if state.saveAndExitClicked =>
+      case Some(true) =>
         val data = tableCells.map(_.map(_.current.value).mkString(",")).mkString("\n")
         FileUtils.writeStringToFile(file, data, "UTF-8")
         status.withText("Csv file saved, exiting.").renderChanges()
         Thread.sleep(1000)
-      case _ => // just exit
+      case x => // just exit
