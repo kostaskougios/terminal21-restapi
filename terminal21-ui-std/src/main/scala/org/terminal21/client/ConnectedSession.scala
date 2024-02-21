@@ -26,7 +26,6 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   /** Clears all UI elements and event handlers. Renders a blank UI
     */
   def clear(): Unit =
-    render()
     handlers.clear()
     modifiedElements.clear()
     removeGlobalEventHandler()

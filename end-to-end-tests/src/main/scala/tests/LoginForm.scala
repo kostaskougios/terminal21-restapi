@@ -2,7 +2,7 @@ package tests
 
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
-import org.terminal21.client.components.std.Paragraph
+import org.terminal21.client.components.std.{NewLine, Paragraph}
 import org.terminal21.client.{ConnectedSession, Controller, Sessions}
 
 @main def loginFormApp(): Unit =
@@ -10,10 +10,12 @@ import org.terminal21.client.{ConnectedSession, Controller, Sessions}
     .withNewSession("login-form", "Login Form")
     .connect: session =>
       given ConnectedSession = session
-      val form               = new LoginForm()
-      form.run() match
-        case Some(login) if !session.isClosed => println(s"Login will be processed: $login")
-        case _                                => println("Login cancelled")
+      val confirmed          = for
+        login <- new LoginForm().run()
+        isYes <- new LoggedIn(login).run()
+      yield isYes
+
+      if confirmed.getOrElse(false) then println("User confirmed the details") else println("Not confirmed")
 
 class LoginForm(using session: ConnectedSession):
   private val initialModel = Login("my@email.com", "mysecret")
@@ -69,3 +71,32 @@ class LoginForm(using session: ConnectedSession):
 
 private case class Login(email: String, pwd: String):
   def isValidEmail: Boolean = email.contains("@")
+
+class LoggedIn(login: Login)(using session: ConnectedSession):
+  val yesButton = Button(text = "Yes")
+  val noButton  = Button(text = "No")
+
+  def run(): Option[Boolean] =
+    session.clear()
+    components.render()
+    controller.eventsIterator.lastOption
+
+  def components = Seq(
+    Paragraph().withChildren(
+      Text(text = "Are your details correct?"),
+      NewLine(),
+      Text(text = s"email : ${login.email}"),
+      NewLine(),
+      Text(text = s"password : ${login.pwd}")
+    ),
+    HStack().withChildren(yesButton, noButton)
+  )
+
+  /** @return
+    *   A controller with a boolean value, true if user clicked "Yes", false for "No"
+    */
+  def controller = Controller(false)
+    .onClick(yesButton): e =>
+      e.handled.withModel(true).terminate
+    .onClick(noButton): e =>
+      e.handled.withModel(false).terminate
