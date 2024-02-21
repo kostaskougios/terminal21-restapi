@@ -26,9 +26,9 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   /** Clears all UI elements and event handlers. Renders a blank UI
     */
   def clear(): Unit =
+    removeGlobalEventHandler()
     handlers.clear()
     modifiedElements.clear()
-    removeGlobalEventHandler()
     events.poisonPill()
     events = SEList()
 
@@ -76,16 +76,16 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   def withGlobalEventHandler(h: GlobalEventHandler): Unit =
     globalEventHandler = Some(h)
 
+  /** removes the global event handler (if any). No more events will be received by that handler.
+    */
+  def removeGlobalEventHandler(): Unit = globalEventHandler = None
+
   def eventIterator: Iterator[GlobalEvent] = events.iterator
 
   /** Waits until at least 1 event iterator was created for the current page. Useful for testing purposes if i.e. one thread runs the main loop and gets an
     * eventIterator at some point and an other thread needs to fire events.
     */
   def waitUntilAtLeast1EventIteratorWasCreated(): Unit = events.waitUntilAtLeast1IteratorWasCreated()
-
-  /** removes the global event handler (if any). No more events will be received by that handler.
-    */
-  def removeGlobalEventHandler(): Unit = globalEventHandler = None
 
   def fireEvents(events: CommandEvent*): Unit = for e <- events do fireEvent(e)
 

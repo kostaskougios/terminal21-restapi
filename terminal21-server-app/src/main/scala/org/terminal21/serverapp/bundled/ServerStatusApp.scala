@@ -19,12 +19,11 @@ class ServerStatusApp extends ServerSideApp:
       .withNewSession("server-status", "Server Status")
       .connect: session =>
         given ConnectedSession = session
-        new ServerStatusPage(serverSideSessions, dependencies.sessionsService, dependencies.fiberExecutor).run()
+        new ServerStatusPage(serverSideSessions, dependencies.sessionsService).run()
 
 class ServerStatusPage(
     serverSideSessions: ServerSideSessions,
-    sessionsService: ServerSessionsService,
-    executor: FiberExecutor
+    sessionsService: ServerSessionsService
 )(using session: ConnectedSession):
   def run(): Unit =
     while !session.isClosed do
@@ -34,11 +33,9 @@ class ServerStatusPage(
   private def toMb(v: Long)        = s"${v / (1024 * 1024)} MB"
   private val xs                   = Some("2xs")
   private def updateStatus(): Unit =
-    components.render()
+    components(Runtime.getRuntime, sessionsService.allSessions).render()
 
-  def components: Seq[UiElement] =
-    val runtime = Runtime.getRuntime
-
+  def components(runtime: Runtime, sessions: Seq[Session]): Seq[UiElement] =
     val jvmTable      = QuickTable(caption = Some("JVM"))
       .withHeaders("Property", "Value", "Actions")
       .withRows(
@@ -54,7 +51,6 @@ class ServerStatusPage(
           Seq("Available processors", runtime.availableProcessors(), "")
         )
       )
-    val sessions      = sessionsService.allSessions
     val sessionsTable = QuickTable(
       caption = Some("All sessions"),
       rows = sessions.map: session =>
