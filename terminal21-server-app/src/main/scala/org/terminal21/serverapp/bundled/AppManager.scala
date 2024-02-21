@@ -17,38 +17,43 @@ class AppManager(serverSideSessions: ServerSideSessions, fiberExecutor: FiberExe
         .andOptions(SessionOptions(alwaysOpen = true))
         .connect: session =>
           given ConnectedSession = session
-
-          val appRows   = apps.map: app =>
-            val link = Link(text = app.name).onClick: () =>
-              startApp(app)
-            Seq[UiElement](link, Text(text = app.description))
-          val appsTable = QuickTable(
-            caption = Some("Apps installed on the server, click one to run it."),
-            rows = appRows
-          ).withHeaders("App Name", "Description")
-
-          Seq(
-            Header1(text = "Terminal 21 Manager"),
-            Paragraph(
-              text = """
-                |Here you can run all the installed apps on the server.""".stripMargin
-            ),
-            appsTable,
-            Paragraph().withChildren(
-              Span(text = "Have a question? Please ask at "),
-              Link(
-                text = "terminal21's discussion board ",
-                href = "https://github.com/kostaskougios/terminal21-restapi/discussions",
-                color = Some("teal.500"),
-                isExternal = Some(true)
-              ).withChildren(ExternalLinkIcon(mx = Some("2px")))
-            )
-          ).render()
-
-          session.waitTillUserClosesSession()
+          new AppManagerPage(apps, startApp).run()
 
   private def startApp(app: ServerSideApp): Unit =
     app.createSession(serverSideSessions, dependencies)
+
+class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(using session: ConnectedSession):
+  def run(): Unit =
+    components.render()
+    session.waitTillUserClosesSession()
+
+  def components =
+    val appRows   = apps.map: app =>
+      val link = Link(text = app.name).onClick: () =>
+        startApp(app)
+      Seq[UiElement](link, Text(text = app.description))
+    val appsTable = QuickTable(
+      caption = Some("Apps installed on the server, click one to run it."),
+      rows = appRows
+    ).withHeaders("App Name", "Description")
+
+    Seq(
+      Header1(text = "Terminal 21 Manager"),
+      Paragraph(
+        text = """
+                |Here you can run all the installed apps on the server.""".stripMargin
+      ),
+      appsTable,
+      Paragraph().withChildren(
+        Span(text = "Have a question? Please ask at "),
+        Link(
+          text = "terminal21's discussion board ",
+          href = "https://github.com/kostaskougios/terminal21-restapi/discussions",
+          color = Some("teal.500"),
+          isExternal = Some(true)
+        ).withChildren(ExternalLinkIcon(mx = Some("2px")))
+      )
+    )
 
 trait AppManagerBeans:
   def serverSideSessions: ServerSideSessions
