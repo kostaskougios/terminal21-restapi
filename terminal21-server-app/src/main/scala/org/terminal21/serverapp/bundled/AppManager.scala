@@ -60,13 +60,12 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
 
   case class Model(startApp: Option[ServerSideApp] = None)
   def controller: Controller[Model] =
-    val clickControllers = appRows.map: appRow =>
-      appRow.link.onClickController[Model]: event =>
-        event.handled.withModel(Model(startApp = Some(appRow.app)))
-    Controller(Model())
-      .onClick(clickControllers)
+    appRows
+      .foldLeft(Controller(Model())): (c, appRow) =>
+        c.onClick(appRow.link): event =>
+          event.handled.withModel(Model(startApp = Some(appRow.app)))
       .onEvent: event =>
-        // for every event, initially reset the model
+        // for every event, reset the model
         event.handled.withModel(event.model.copy(startApp = None))
 
   def eventsIterator: Iterator[Model] =
