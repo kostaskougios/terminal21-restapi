@@ -17,6 +17,11 @@ import org.terminal21.client.{ConnectedSession, Controller, Sessions}
 
       if confirmed.getOrElse(false) then println("User confirmed the details") else println("Not confirmed")
 
+private case class Login(email: String, pwd: String):
+  def isValidEmail: Boolean = email.contains("@")
+
+/** The login form. Displays an email and password input and a submit button. When run() it will fill in the Login(email,pwd) model.
+  */
 class LoginForm(using session: ConnectedSession):
   private val initialModel = Login("my@email.com", "mysecret")
   val okIcon               = CheckCircleIcon(color = Some("green"))
@@ -30,7 +35,7 @@ class LoginForm(using session: ConnectedSession):
 
   def run(): Option[Login] =
     components.render()
-    controller.eventsIterator.lastOption
+    controller.eventsIterator.lastOptionOrNoneIfSessionClosed
 
   def components: Seq[UiElement] =
     Seq(
@@ -69,16 +74,13 @@ class LoginForm(using session: ConnectedSession):
   private def validate(login: Login): InputRightAddon =
     if login.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)
 
-private case class Login(email: String, pwd: String):
-  def isValidEmail: Boolean = email.contains("@")
-
 class LoggedIn(login: Login)(using session: ConnectedSession):
   val yesButton = Button(text = "Yes")
   val noButton  = Button(text = "No")
 
   def run(): Option[Boolean] =
-    session.clear()
-    components.render()
+    session.clear()     // when transitioning to a new UI page, we need to clear previous event handlers, iterators etc.
+    components.render() // this will clear the UI and render the components for this form
     controller.eventsIterator.lastOption
 
   def components = Seq(

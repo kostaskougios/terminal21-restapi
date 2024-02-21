@@ -2,6 +2,8 @@ package org.terminal21.client.collections
 
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
+import org.terminal21.client.ConnectedSessionMock
+import org.terminal21.model.{CommandEvent, SessionClosed}
 
 class EventIteratorTest extends AnyFunSuiteLike:
   test("works as normal iterator"):
@@ -15,3 +17,12 @@ class EventIteratorTest extends AnyFunSuiteLike:
 
   test("lastOption when not available"):
     EventIterator().lastOption should be(None)
+
+  test("lastOptionOrNoneIfSessionClosed when session open"):
+    val session = ConnectedSessionMock.newConnectedSessionMock
+    EventIterator(1, 2).lastOptionOrNoneIfSessionClosed(using session) should be(Some(2))
+
+  test("lastOptionOrNoneIfSessionClosed when session closed"):
+    val session = ConnectedSessionMock.newConnectedSessionMock
+    session.fireEvent(CommandEvent.sessionClosed)
+    EventIterator(1, 2).lastOptionOrNoneIfSessionClosed(using session) should be(None)
