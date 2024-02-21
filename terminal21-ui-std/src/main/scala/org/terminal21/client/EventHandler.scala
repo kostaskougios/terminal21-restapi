@@ -1,7 +1,7 @@
 package org.terminal21.client
 
 import org.terminal21.client.components.UiElement
-import org.terminal21.client.model.{GlobalEvent, OnClickController, UiEvent}
+import org.terminal21.client.model.{GlobalEvent, UiEvent}
 import org.terminal21.model.CommandEvent
 
 trait EventHandler
@@ -12,9 +12,6 @@ trait OnClickEventHandler extends EventHandler:
 object OnClickEventHandler:
   trait CanHandleOnClickEvent[A <: UiElement]:
     this: A =>
-    def onClickController[M](handler: ControllerClickEvent[M] => HandledEvent[M]): OnClickController[M] =
-      OnClickController(this, handler)
-
     def onClick(h: OnClickEventHandler)(using session: ConnectedSession): A =
       session.addEventHandler(key, h)
       this
