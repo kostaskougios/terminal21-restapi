@@ -78,6 +78,11 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   def eventIterator: Iterator[GlobalEvent] = events.iterator
 
+  /** Waits until at least 1 event iterator was created for the current page. Useful for testing purposes if i.e. one thread runs the main loop and gets an
+    * eventIterator at some point and an other thread needs to fire events.
+    */
+  def waitUntilAtLeast1EventIteratorWasCreated(): Unit = events.waitUntilAtLeast1IteratorWasCreated()
+
   /** removes the global event handler (if any). No more events will be received by that handler.
     */
   def removeGlobalEventHandler(): Unit = globalEventHandler = None
@@ -157,3 +162,5 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     modifiedElements += e.key -> e
   def currentState[A <: UiElement](e: A): A =
     modifiedElements.getOrElse(e.key, throw new IllegalStateException(s"Key ${e.key} doesn't exist or was removed")).asInstanceOf[A]
+
+  def currentlyRendered: Seq[UiElement] = modifiedElements.values.toSeq

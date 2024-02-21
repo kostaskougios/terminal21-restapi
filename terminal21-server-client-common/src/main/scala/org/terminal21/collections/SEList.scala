@@ -5,10 +5,16 @@ import java.util.concurrent.CountDownLatch
 class SEList[A]:
   @volatile private var currentNode: NormalNode[A] = NormalNode(None, EndNode)
 
+  private val atLeastOneIterator = new CountDownLatch(1)
+
   /** @return
     *   A new iterator that only reads elements that are added before the iterator is created.
     */
-  def iterator: SEBlockingIterator[A] = new SEBlockingIterator(currentNode)
+  def iterator: SEBlockingIterator[A] =
+    atLeastOneIterator.countDown()
+    new SEBlockingIterator(currentNode)
+
+  def waitUntilAtLeast1IteratorWasCreated(): Unit = atLeastOneIterator.await()
 
   /** Add a poison pill to terminate all iterators.
     */

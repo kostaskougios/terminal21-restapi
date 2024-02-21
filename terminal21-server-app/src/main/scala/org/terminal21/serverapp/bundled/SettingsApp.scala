@@ -1,6 +1,6 @@
 package org.terminal21.serverapp.bundled
 
-import org.terminal21.client.ConnectedSession
+import org.terminal21.client.{ConnectedSession, Controller}
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.{ExternalLinkIcon, Link}
 import org.terminal21.client.components.std.{Paragraph, Span}
@@ -17,14 +17,16 @@ class SettingsApp extends ServerSideApp:
   override def createSession(serverSideSessions: ServerSideSessions, dependencies: Dependencies): Unit =
     serverSideSessions
       .withNewSession("frontend-settings", "Settings")
-      .andOptions(SessionOptions(closeTabWhenTerminated = true))
       .connect: session =>
         given ConnectedSession = session
-        new SettingsAppInstance().run()
+        new SettingsPage().run()
 
-class SettingsAppInstance(using session: ConnectedSession):
-  def run() =
-    Seq(
-      ThemeToggle()
-    ).render()
-    session.waitTillUserClosesSession()
+class SettingsPage(using session: ConnectedSession):
+  val themeToggle = ThemeToggle()
+  def run()       =
+    components.render()
+    controller.eventsIterator.lastOption
+
+  def components = Seq(themeToggle)
+
+  def controller = Controller(())
