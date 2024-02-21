@@ -102,7 +102,11 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
                   case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
                   case x                                                    => logger.error(s"Unknown event handling combination : $x")
             case None           => // nop
-          val globalEvent = UiEvent(event, modifiedElements(event.key))
+          val globalEvent =
+            UiEvent(
+              event,
+              modifiedElements.getOrElse(event.key, throw new IllegalArgumentException(s"Not found UiElement with key ${event.key}, was this rendered?"))
+            )
           for h <- globalEventHandler do h.onEvent(globalEvent)
           events.add(globalEvent)
     catch

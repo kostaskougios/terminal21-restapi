@@ -4,10 +4,12 @@ import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatestplus.mockito.MockitoSugar.mock
+import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.{Link, Text}
 import org.terminal21.client.{ConnectedSession, ConnectedSessionMock}
 import org.terminal21.serverapp.ServerSideApp
 import org.scalatest.matchers.should.Matchers.*
+import org.terminal21.model.CommandEvent
 
 class AppManagerPageTest extends AnyFunSuiteLike:
   def mockApp(name: String, description: String) =
@@ -17,9 +19,10 @@ class AppManagerPageTest extends AnyFunSuiteLike:
     app
 
   class App(apps: ServerSideApp*):
-    given session: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
-    val page                        = new AppManagerPage(apps, _ => ())
-    def allComponents               = page.components.flatMap(_.flat)
+    given session: ConnectedSession       = ConnectedSessionMock.newConnectedSessionMock
+    var startedApp: Option[ServerSideApp] = None
+    val page                              = new AppManagerPage(apps, app => startedApp = Some(app))
+    def allComponents                     = page.components.flatMap(_.flat)
 
   test("renders app links"):
     new App(mockApp("app1", "the-app1-desc")):
@@ -34,3 +37,21 @@ class AppManagerPageTest extends AnyFunSuiteLike:
         .collect:
           case t: Text if t.text == "the-app1-desc" => t
         .size should be(1)
+
+  test("starts app when app link is clicked"):
+    val app = mockApp("app1", "the-app1-desc")
+    new App(app):
+      page.components.render()
+      val eventsIt = page.eventsIterator
+      session.fireEvents(CommandEvent.onClick(page.appRows.head.link), CommandEvent.sessionClosed)
+      eventsIt.toList
+      startedApp should be(Some(app))
+
+  test("resets startApp state on other events"):
+    val app = mockApp("app1", "the-app1-desc")
+    new App(app):
+      val other    = Link()
+      (page.components :+ other).render()
+      val eventsIt = page.eventsIterator
+      session.fireEvents(CommandEvent.onClick(page.appRows.head.link), CommandEvent.onClick(other), CommandEvent.sessionClosed)
+      eventsIt.toList.last.startApp should be(None)

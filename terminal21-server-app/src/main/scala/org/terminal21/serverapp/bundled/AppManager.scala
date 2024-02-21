@@ -26,10 +26,7 @@ class AppManager(serverSideSessions: ServerSideSessions, fiberExecutor: FiberExe
 class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(using session: ConnectedSession):
   def run(): Unit =
     components.render()
-    controller.eventsIterator
-      .tapEach: m =>
-        for app <- m.startApp do startApp(app)
-      .foreach(_ => ())
+    eventsIterator.foreach(_ => ())
 
   case class AppRow(app: ServerSideApp, link: Link, text: Text):
     def row: Seq[UiElement] = Seq(link, text)
@@ -62,11 +59,19 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
     )
 
   case class Model(startApp: Option[ServerSideApp] = None)
-  def controller: Controller[Model] =
+  def controller: Controller[Model]   =
     val clickControllers = appRows.map: appRow =>
       appRow.link.onClickController[Model]: event =>
         event.handled.withModel(Model(startApp = Some(appRow.app)))
-    Controller(Model()).onClick(clickControllers)
+    Controller(Model())
+      .onClick(clickControllers)
+      .onEvent: event =>
+        // for every event, initially reset the model
+        event.handled.withModel(event.model.copy(startApp = None))
+  def eventsIterator: Iterator[Model] =
+    controller.eventsIterator
+      .tapEach: m =>
+        for app <- m.startApp do startApp(app)
 
 trait AppManagerBeans:
   def serverSideSessions: ServerSideSessions
