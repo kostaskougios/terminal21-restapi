@@ -17,24 +17,26 @@ class ServerStatusApp extends ServerSideApp:
   override def createSession(serverSideSessions: ServerSideSessions, dependencies: Dependencies): Unit =
     serverSideSessions
       .withNewSession("server-status", "Server Status")
-      .andOptions(SessionOptions(closeTabWhenTerminated = true))
       .connect: session =>
         given ConnectedSession = session
-        new ServerStatusAppInternal(serverSideSessions, dependencies.sessionsService, dependencies.fiberExecutor).run()
+        new ServerStatusPage(serverSideSessions, dependencies.sessionsService, dependencies.fiberExecutor).run()
 
-class ServerStatusAppInternal(serverSideSessions: ServerSideSessions, sessionsService: ServerSessionsService, executor: FiberExecutor)(using
-    session: ConnectedSession
-):
+class ServerStatusPage(
+    serverSideSessions: ServerSideSessions,
+    sessionsService: ServerSessionsService,
+    executor: FiberExecutor
+)(using session: ConnectedSession):
   def run(): Unit =
-    executor.submit:
-      while !session.isClosed do
-        updateStatus()
-        Thread.sleep(1000)
-    session.waitTillUserClosesSession()
+    while !session.isClosed do
+      updateStatus()
+      Thread.sleep(1000)
 
   private def toMb(v: Long)        = s"${v / (1024 * 1024)} MB"
   private val xs                   = Some("2xs")
   private def updateStatus(): Unit =
+    components.render()
+
+  def components: Seq[UiElement] =
     val runtime = Runtime.getRuntime
 
     val jvmTable      = QuickTable(caption = Some("JVM"))
@@ -60,7 +62,7 @@ class ServerStatusAppInternal(serverSideSessions: ServerSideSessions, sessionsSe
     )
       .withHeaders("Id", "Name", "Is Open", "Actions")
 
-    Seq(jvmTable, sessionsTable).render()
+    Seq(jvmTable, sessionsTable)
 
   private def actionsFor(session: Session)(using ConnectedSession): UiElement =
     if session.isOpen then
@@ -78,11 +80,11 @@ class ServerStatusAppInternal(serverSideSessions: ServerSideSessions, sessionsSe
             serverSideSessions
               .withNewSession(session.id + "-server-state", s"Server State:${session.id}")
               .connect: sSession =>
-                new ViewServerState(sSession).runFor(sessionsService.sessionStateOf(session))
+                new ViewServerStatePage(sSession).runFor(sessionsService.sessionStateOf(session))
       )
     else NotAllowedIcon()
 
-class ViewServerState(session: ConnectedSession):
+class ViewServerStatePage(session: ConnectedSession):
   given ConnectedSession = session
 
   def runFor(state: SessionState): Unit =
