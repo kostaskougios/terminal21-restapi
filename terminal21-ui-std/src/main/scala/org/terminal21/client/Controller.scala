@@ -4,7 +4,7 @@ import org.terminal21.client.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.OnClickEventHandler.CanHandleOnClickEvent
 import org.terminal21.client.collections.EventIterator
 import org.terminal21.client.components.UiElement
-import org.terminal21.client.model.{GlobalEvent, UiEvent}
+import org.terminal21.client.model.{GlobalEvent, OnClickController, UiEvent}
 import org.terminal21.model.{OnChange, OnClick}
 
 class Controller[M](
@@ -18,6 +18,11 @@ class Controller[M](
 ):
   def onEvent(handler: ControllerEvent[M] => HandledEvent[M]) =
     new Controller(eventIteratorFactory, renderChanges, initialModel, eventHandlers :+ handler, clickHandlers, changeHandlers, changeBooleanHandlers)
+
+  def onClick(controller: OnClickController[M]): Controller[M]       = onClick(controller.element)(controller.handler)
+  def onClick(controllers: Seq[OnClickController[M]]): Controller[M] =
+    controllers.foldLeft(this): (c, h) =>
+      c.onClick(h.element)(h.handler)
 
   def onClick(element: UiElement & CanHandleOnClickEvent[_])(handler: ControllerClickEvent[M] => HandledEvent[M]): Controller[M] = onClicked(element)(handler)
   def onClicked(elements: UiElement & CanHandleOnClickEvent[_]*)(handler: ControllerClickEvent[M] => HandledEvent[M]): Controller[M] =

@@ -2,7 +2,9 @@ package org.terminal21.client.collections
 
 import org.terminal21.client.ConnectedSession
 
-class EventIterator[A](it: Iterator[A]) extends Iterator[A]:
+import scala.collection.AbstractIterator
+
+class EventIterator[A](it: Iterator[A]) extends AbstractIterator[A]:
   override def hasNext: Boolean = it.hasNext
   override def next(): A        = it.next()
 

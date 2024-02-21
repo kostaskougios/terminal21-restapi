@@ -1,7 +1,7 @@
 package org.terminal21.serverapp.bundled
 
 import functions.fibers.FiberExecutor
-import org.terminal21.client.ConnectedSession
+import org.terminal21.client.{ConnectedSession, Controller}
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.std.{Header1, Paragraph, Span}
@@ -20,21 +20,27 @@ class AppManager(serverSideSessions: ServerSideSessions, fiberExecutor: FiberExe
           new AppManagerPage(apps, startApp).run()
 
   private def startApp(app: ServerSideApp): Unit =
-    app.createSession(serverSideSessions, dependencies)
+    fiberExecutor.submit:
+      app.createSession(serverSideSessions, dependencies)
 
 class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(using session: ConnectedSession):
   def run(): Unit =
     components.render()
-    session.waitTillUserClosesSession()
+    controller.eventsIterator
+      .tapEach: m =>
+        for app <- m.startApp do startApp(app)
+      .foreach(_ => ())
+
+  case class AppRow(app: ServerSideApp, link: Link, text: Text):
+    def row: Seq[UiElement] = Seq(link, text)
+
+  val appRows = apps.map: app =>
+    AppRow(app, Link(text = app.name), Text(text = app.description))
 
   def components =
-    val appRows   = apps.map: app =>
-      val link = Link(text = app.name).onClick: () =>
-        startApp(app)
-      Seq[UiElement](link, Text(text = app.description))
     val appsTable = QuickTable(
       caption = Some("Apps installed on the server, click one to run it."),
-      rows = appRows
+      rows = appRows.map(_.row)
     ).withHeaders("App Name", "Description")
 
     Seq(
@@ -54,6 +60,13 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
         ).withChildren(ExternalLinkIcon(mx = Some("2px")))
       )
     )
+
+  case class Model(startApp: Option[ServerSideApp])
+  def controller: Controller[Model] =
+    val clickControllers = appRows.map: appRow =>
+      appRow.link.onClickController[Model]: event =>
+        event.handled.withModel(event.model.copy(startApp = Some(appRow.app)))
+    Controller(Model(None)).onClick(clickControllers)
 
 trait AppManagerBeans:
   def serverSideSessions: ServerSideSessions
