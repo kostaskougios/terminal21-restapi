@@ -28,7 +28,7 @@ class LoginForm(using session: ConnectedSession):
 
   def run(): Option[Login] =
     components.render()
-    controller.lastModelOption
+    controller.eventsIterator.lastOption
 
   def components: Seq[UiElement] =
     Seq(

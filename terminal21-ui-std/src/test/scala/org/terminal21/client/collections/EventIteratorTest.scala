@@ -1,0 +1,17 @@
+package org.terminal21.client.collections
+
+import org.scalatest.funsuite.AnyFunSuiteLike
+import org.scalatest.matchers.should.Matchers.*
+
+class EventIteratorTest extends AnyFunSuiteLike:
+  test("works as normal iterator"):
+    EventIterator(1, 2, 3).toList should be(List(1, 2, 3))
+
+  test("works as normal iterator when empty"):
+    EventIterator().toList should be(Nil)
+
+  test("lastOption when available"):
+    EventIterator(1, 2, 3).lastOption should be(Some(3))
+
+  test("lastOption when not available"):
+    EventIterator().lastOption should be(None)

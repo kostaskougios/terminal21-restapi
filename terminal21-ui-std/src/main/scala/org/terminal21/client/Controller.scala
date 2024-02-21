@@ -2,6 +2,7 @@ package org.terminal21.client
 
 import org.terminal21.client.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.OnClickEventHandler.CanHandleOnClickEvent
+import org.terminal21.client.collections.EventIterator
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.model.{GlobalEvent, UiEvent}
 import org.terminal21.model.{OnChange, OnClick}
@@ -43,12 +44,14 @@ class Controller[M](
       changeBooleanHandlers
     )
 
-  def onChange(element: UiElement & OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_])(handler: ControllerChangeBooleanEvent[M] => HandledEvent[M]) =
+  def onChange(element: UiElement & OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_])(
+      handler: ControllerChangeBooleanEvent[M] => HandledEvent[M]
+  ): Controller[M] =
     onChangedBoolean(element)(handler)
 
   def onChangedBoolean(
       elements: UiElement & OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_]*
-  )(handler: ControllerChangeBooleanEvent[M] => HandledEvent[M]) =
+  )(handler: ControllerChangeBooleanEvent[M] => HandledEvent[M]): Controller[M] =
     new Controller(
       eventIteratorFactory,
       renderChanges,
@@ -59,49 +62,49 @@ class Controller[M](
       changeBooleanHandlers ++ elements.map(e => e.key -> handler)
     )
 
-  def iterator: Iterator[M] = handledIterator.takeWhile(!_.shouldTerminate).map(_.model)
+  def eventsIterator: EventIterator[M] = new EventIterator(handledEventsIterator.takeWhile(!_.shouldTerminate).map(_.model))
 
-  def handledIterator: Iterator[HandledEvent[M]] =
-    eventIteratorFactory
-      .takeWhile(!_.isSessionClose)
-      .scanLeft(HandledEvent(initialModel, Nil, Nil, false)): (oldHandled, event) =>
-        val h = eventHandlers.foldLeft(oldHandled): (h, f) =>
-          event match
-            case UiEvent(OnClick(_), receivedBy)         =>
-              f(ControllerClickEvent(receivedBy, h.model))
-            case UiEvent(OnChange(_, value), receivedBy) =>
-              val e = receivedBy match
-                case _: OnChangeEventHandler.CanHandleOnChangeEvent[_]        => ControllerChangeEvent(receivedBy, h.model, value)
-                case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_] => ControllerChangeBooleanEvent(receivedBy, h.model, value.toBoolean)
-              f(e)
-            case x                                       => throw new IllegalStateException(s"Unexpected state $x")
+  def handledEventsIterator: EventIterator[HandledEvent[M]] =
+    new EventIterator(
+      eventIteratorFactory
+        .takeWhile(!_.isSessionClose)
+        .scanLeft(HandledEvent(initialModel, Nil, Nil, false)): (oldHandled, event) =>
+          val h = eventHandlers.foldLeft(oldHandled): (h, f) =>
+            event match
+              case UiEvent(OnClick(_), receivedBy)         =>
+                f(ControllerClickEvent(receivedBy, h.model))
+              case UiEvent(OnChange(_, value), receivedBy) =>
+                val e = receivedBy match
+                  case _: OnChangeEventHandler.CanHandleOnChangeEvent[_]        => ControllerChangeEvent(receivedBy, h.model, value)
+                  case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_] => ControllerChangeBooleanEvent(receivedBy, h.model, value.toBoolean)
+                f(e)
+              case x                                       => throw new IllegalStateException(s"Unexpected state $x")
 
-        val handled = event match
-          case UiEvent(OnClick(key), receivedBy) if clickHandlers.contains(key)                 =>
-            val handler = clickHandlers(key)
-            val handled = handler(ControllerClickEvent(receivedBy, h.model))
-            handled
-          case UiEvent(OnChange(key, value), receivedBy) if changeHandlers.contains(key)        =>
-            val handler = changeHandlers(key)
-            val handled = handler(ControllerChangeEvent(receivedBy, h.model, value))
-            handled
-          case UiEvent(OnChange(key, value), receivedBy) if changeBooleanHandlers.contains(key) =>
-            val handler = changeBooleanHandlers(key)
-            val handled = handler(ControllerChangeBooleanEvent(receivedBy, h.model, value.toBoolean))
-            handled
-          case _                                                                                => h
-        handled
-      .tapEach: handled =>
-        renderChanges(handled.renderChanges)
-        for trc <- handled.timedRenderChanges do
-          fiberExecutor.submit:
-            Thread.sleep(trc.waitInMs)
-            renderChanges(trc.renderChanges)
-      .flatMap: h =>
-        // trick to make sure we take the last state of the model when shouldTerminate=true
-        if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
-
-  def lastModelOption: Option[M] = iterator.toList.lastOption
+          val handled = event match
+            case UiEvent(OnClick(key), receivedBy) if clickHandlers.contains(key)                 =>
+              val handler = clickHandlers(key)
+              val handled = handler(ControllerClickEvent(receivedBy, h.model))
+              handled
+            case UiEvent(OnChange(key, value), receivedBy) if changeHandlers.contains(key)        =>
+              val handler = changeHandlers(key)
+              val handled = handler(ControllerChangeEvent(receivedBy, h.model, value))
+              handled
+            case UiEvent(OnChange(key, value), receivedBy) if changeBooleanHandlers.contains(key) =>
+              val handler = changeBooleanHandlers(key)
+              val handled = handler(ControllerChangeBooleanEvent(receivedBy, h.model, value.toBoolean))
+              handled
+            case _                                                                                => h
+          handled
+        .tapEach: handled =>
+          renderChanges(handled.renderChanges)
+          for trc <- handled.timedRenderChanges do
+            fiberExecutor.submit:
+              Thread.sleep(trc.waitInMs)
+              renderChanges(trc.renderChanges)
+        .flatMap: h =>
+          // trick to make sure we take the last state of the model when shouldTerminate=true
+          if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
+    )
 
 object Controller:
   def apply[M](initialModel: M)(using session: ConnectedSession): Controller[M] =

@@ -23,7 +23,7 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(0, Iterator(buttonClick))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
-      .iterator
+      .eventsIterator
       .toList should be(List(0, 1))
 
   test("onEvent is called for change"):
@@ -31,7 +31,7 @@ class ControllerTest extends AnyFunSuiteLike:
       .onEvent:
         case event @ ControllerChangeEvent(`input`, 0, "new-value") =>
           if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
-      .iterator
+      .eventsIterator
       .toList should be(List(0, 1))
 
   test("onEvent is called for change/boolean"):
@@ -39,35 +39,35 @@ class ControllerTest extends AnyFunSuiteLike:
       .onEvent:
         case event @ ControllerChangeBooleanEvent(`checkbox`, 0, true) =>
           if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
-      .iterator
+      .eventsIterator
       .toList should be(List(0, 1))
 
   test("onClick is called"):
     newController(0, Iterator(buttonClick))
       .onClick(button): event =>
         event.handled.withModel(100).terminate
-      .iterator
+      .eventsIterator
       .toList should be(List(0, 100))
 
   test("onChange is called"):
     newController(0, Iterator(inputChange))
       .onChange(input): event =>
         event.handled.withModel(100).terminate
-      .iterator
+      .eventsIterator
       .toList should be(List(0, 100))
 
   test("onChange/boolean is called"):
     newController(0, Iterator(checkBoxChange))
       .onChange(checkbox): event =>
         event.handled.withModel(100).terminate
-      .iterator
+      .eventsIterator
       .toList should be(List(0, 100))
 
   test("terminate is obeyed and latest model state is iterated"):
     newController(0, Iterator(buttonClick, buttonClick, buttonClick))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate.withModel(100) else event.handled.withModel(event.model + 1)
-      .iterator
+      .eventsIterator
       .toList should be(List(0, 1, 2, 100))
 
   test("changes are rendered"):
@@ -77,7 +77,7 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(0, Iterator(buttonClick), renderer)
       .onEvent: event =>
         event.handled.withModel(event.model + 1).withRenderChanges(button.withText("changed")).terminate
-      .iterator
+      .eventsIterator
       .toList should be(List(0, 1))
 
     rendered should be(Seq(button.withText("changed")))
@@ -88,7 +88,7 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(0, Iterator(buttonClick), renderer)
       .onEvent: event =>
         event.handled.withModel(event.model + 1).withTimedRenderChanges(TimedRenderChanges(10, button.withText("changed"))).terminate
-      .iterator
+      .eventsIterator
       .toList should be(List(0, 1))
     Thread.sleep(15)
     rendered should be(Seq(button.withText("changed")))

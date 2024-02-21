@@ -7,6 +7,12 @@ import org.terminal21.client.{ConnectedSession, ConnectedSessionMock}
 import org.terminal21.model.CommandEvent
 
 class LoginFormTest extends AnyFunSuiteLike:
+
+  class App:
+    given session: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
+    val form                        = new LoginForm(using session)
+    def allComponents               = form.components.flatMap(_.flat)
+
   test("renders email input"):
     new App:
       allComponents should contain(form.emailInput)
@@ -22,7 +28,7 @@ class LoginFormTest extends AnyFunSuiteLike:
   test("user submits validated data"):
     new App:
       form.components.render()
-      val eventsIt = form.controller.iterator // get the iterator before we fire the events, otherwise the iterator will be empty
+      val eventsIt = form.controller.eventsIterator // get the iterator before we fire the events, otherwise the iterator will be empty
       session.fireEvents(
         CommandEvent.onChange(form.emailInput, "an@email.com"),
         CommandEvent.onChange(form.passwordInput, "secret"),
@@ -30,26 +36,21 @@ class LoginFormTest extends AnyFunSuiteLike:
         CommandEvent.sessionClosed // every test should close the session so that the iterator doesn't block if converted to a list.
       )
 
-      eventsIt.toList.lastOption should be(Some(Login("an@email.com", "secret")))
+      eventsIt.lastOption should be(Some(Login("an@email.com", "secret")))
 
   test("user submits invalid email"):
     new App:
       form.components.render()
-      val eventsIt   = form.controller.handledIterator // get the iterator that iterates Handled instances so that we can assert on renderChanges
+      val eventsIt   = form.controller.handledEventsIterator // get the iterator that iterates Handled instances so that we can assert on renderChanges
       session.fireEvents(
-        CommandEvent.onChange(form.emailInput, "anemail.com"),
+        CommandEvent.onChange(form.emailInput, "invalid-email.com"),
         CommandEvent.onClick(form.submitButton),
         CommandEvent.sessionClosed
       )
       val allHandled = eventsIt.toList
-      // the form shouldn't have terminated because of the email error
+      // the event processing shouldn't have terminated because of the email error
       allHandled.exists(_.shouldTerminate) should be(false)
-      // the email right addon should have rendered with the notOkIcon
-      allHandled.flatMap(_.renderChanges) should be(
-        Seq(form.emailRightAddon.withChildren(form.notOkIcon), form.errorsBox.withChildren(form.errorMsgInvalidEmail))
-      )
-
-  class App:
-    given session: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
-    val form                        = new LoginForm(using session)
-    def allComponents               = form.components.flatMap(_.flat)
+      // the email right addon should have rendered with the notOkIcon when the user typed the incorrect email
+      allHandled(1).renderChanges should be(Seq(form.emailRightAddon.withChildren(form.notOkIcon)))
+      // An error message in the errorsBox should be displayed when the user clicked on the submit
+      allHandled(2).renderChanges should be(Seq(form.errorsBox.withChildren(form.errorMsgInvalidEmail)))
