@@ -61,12 +61,12 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
       )
     )
 
-  case class Model(startApp: Option[ServerSideApp])
+  case class Model(startApp: Option[ServerSideApp] = None)
   def controller: Controller[Model] =
     val clickControllers = appRows.map: appRow =>
       appRow.link.onClickController[Model]: event =>
-        event.handled.withModel(event.model.copy(startApp = Some(appRow.app)))
-    Controller(Model(None)).onClick(clickControllers)
+        event.handled.withModel(Model(startApp = Some(appRow.app)))
+    Controller(Model()).onClick(clickControllers)
 
 trait AppManagerBeans:
   def serverSideSessions: ServerSideSessions
