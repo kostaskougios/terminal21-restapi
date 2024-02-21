@@ -110,7 +110,11 @@ lazy val `terminal21-server-app` = project
       Mockito510
     )
   )
-  .dependsOn(`terminal21-server` % "compile->compile;test->test", `terminal21-ui-std`, `terminal21-server-client-common` % "compile->compile;test->test")
+  .dependsOn(
+    `terminal21-server`               % "compile->compile;test->test",
+    `terminal21-ui-std`               % "compile->compile;test->test",
+    `terminal21-server-client-common` % "compile->compile;test->test"
+  )
 
 lazy val `terminal21-ui-std-exports` = project
   .settings(
