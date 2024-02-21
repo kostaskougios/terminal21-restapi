@@ -38,6 +38,13 @@ class AppManagerPageTest extends AnyFunSuiteLike:
           case t: Text if t.text == "the-app1-desc" => t
         .size should be(1)
 
+  test("renders the discussions link"):
+    new App():
+      allComponents
+        .collect:
+          case l: Link if l.href == "https://github.com/kostaskougios/terminal21-restapi/discussions" => l
+        .size should be(1)
+
   test("starts app when app link is clicked"):
     val app = mockApp("app1", "the-app1-desc")
     new App(app):
