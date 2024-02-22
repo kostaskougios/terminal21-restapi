@@ -1,10 +1,9 @@
 package org.terminal21.serverapp.bundled
 
-import functions.fibers.FiberExecutor
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
-import org.terminal21.model.{Session, SessionOptions}
+import org.terminal21.model.Session
 import org.terminal21.server.Dependencies
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.service.ServerSessionsService
@@ -76,12 +75,11 @@ class ServerStatusPage(
             serverSideSessions
               .withNewSession(session.id + "-server-state", s"Server State:${session.id}")
               .connect: sSession =>
-                new ViewServerStatePage(sSession).runFor(sessionsService.sessionStateOf(session))
+                new ViewServerStatePage(using sSession).runFor(sessionsService.sessionStateOf(session))
       )
     else NotAllowedIcon()
 
-class ViewServerStatePage(session: ConnectedSession):
-  given ConnectedSession = session
+class ViewServerStatePage(using session: ConnectedSession):
 
   def runFor(state: SessionState): Unit =
     val sj = state.serverJson
