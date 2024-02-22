@@ -2,6 +2,8 @@ package org.terminal21.model
 
 import org.terminal21.client.components.AnyElement
 
+/** These are the events as they arrive from the server
+  */
 sealed trait CommandEvent:
   def key: String
 
