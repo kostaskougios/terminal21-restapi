@@ -1,4 +1,4 @@
-package org.terminal21.client.components.ui
+package org.terminal21.client.components.frontend
 
 import org.terminal21.client.components.{Keys, UiElement}
 

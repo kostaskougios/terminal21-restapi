@@ -1,7 +1,7 @@
 package org.terminal21.serverapp.bundled
 
 import org.terminal21.client.components.*
-import org.terminal21.client.components.ui.ThemeToggle
+import org.terminal21.client.components.frontend.ThemeToggle
 import org.terminal21.client.{ConnectedSession, Controller}
 import org.terminal21.server.Dependencies
 import org.terminal21.serverapp.{ServerSideApp, ServerSideSessions}
