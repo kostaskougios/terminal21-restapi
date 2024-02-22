@@ -1,6 +1,7 @@
 package org.terminal21.client.components.std
 
 import org.terminal21.client.OnChangeEventHandler.CanHandleOnChangeEvent
+import org.terminal21.client.collections.TypedMap
 import org.terminal21.client.components.UiElement.{Current, HasChildren, HasEventHandler, HasStyle}
 import org.terminal21.client.components.{Keys, UiElement}
 import org.terminal21.client.{ConnectedSession, OnChangeEventHandler}
@@ -69,7 +70,8 @@ case class Input(
     `type`: String = "text",
     defaultValue: String = "",
     style: Map[String, Any] = Map.empty,
-    valueReceived: Option[String] = None // use value instead
+    valueReceived: Option[String] = None, // use value instead
+    dataStore: TypedMap = TypedMap.empty
 ) extends StdElement[Input]
     with HasEventHandler
     with CanHandleOnChangeEvent[Input]:
@@ -79,3 +81,4 @@ case class Input(
   def withType(v: String)                                                           = copy(`type` = v)
   def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
   def value                                                                         = valueReceived.getOrElse(defaultValue)
+  override def withDataStore(ds: TypedMap): Input                                   = copy(dataStore = ds)

@@ -10,10 +10,9 @@ import org.terminal21.client.components.std.*
     .connect: session =>
       given ConnectedSession = session
 
-      val input       = Input(defaultValue = "Please enter your name")
       val output      = Paragraph(text = "This will reflect what you type in the input")
       val cookieValue = Paragraph(text = "This will display the value of the cookie")
-      input.onChange: newValue =>
+      val input       = Input(defaultValue = "Please enter your name").onChange: newValue =>
         output.withText(newValue).renderChanges()
 
       Seq(

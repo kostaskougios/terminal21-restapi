@@ -92,8 +92,13 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   def fireEvent(event: CommandEvent): Unit =
     val renderedHandlers = modifiedElements.values
+      .flatMap(_.flat)
       .collect:
-        case h: OnClickEventHandler.CanHandleOnClickEvent[_] => (h.key, h.dataStore.getOrElse(OnClickEventHandler.Key, Nil))
+        case h: OnClickEventHandler.CanHandleOnClickEvent[_]          => (h.key, h.dataStore.getOrElse(OnClickEventHandler.Key, Nil))
+        case h: OnChangeEventHandler.CanHandleOnChangeEvent[_]        =>
+          (h.key, h.defaultEventHandler(this) +: h.dataStore.getOrElse(OnChangeEventHandler.Key, Nil))
+        case h: OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_] =>
+          (h.key, h.defaultEventHandler(this) +: h.dataStore.getOrElse(OnChangeBooleanEventHandler.Key, Nil))
       .toMap
       .withDefault(_ => Nil)
 

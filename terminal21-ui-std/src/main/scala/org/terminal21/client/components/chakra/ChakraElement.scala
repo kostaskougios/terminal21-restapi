@@ -154,7 +154,8 @@ case class Editable(
     defaultValue: String = "",
     valueReceived: Option[String] = None, // use value instead
     style: Map[String, Any] = Map.empty,
-    children: Seq[UiElement] = Nil
+    children: Seq[UiElement] = Nil,
+    dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Editable]
     with HasEventHandler
     with HasChildren[Editable]
@@ -166,6 +167,7 @@ case class Editable(
   def withKey(v: String)                                                            = copy(key = v)
   def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
   def value                                                                         = valueReceived.getOrElse(defaultValue)
+  override def withDataStore(ds: TypedMap): Editable                                = copy(dataStore = ds)
 
 case class EditablePreview(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty) extends ChakraElement[EditablePreview]:
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -231,7 +233,8 @@ case class Input(
     variant: Option[String] = None,
     defaultValue: String = "",
     valueReceived: Option[String] = None, // use value instead
-    style: Map[String, Any] = Map.empty
+    style: Map[String, Any] = Map.empty,
+    dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Input]
     with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Input]:
@@ -244,6 +247,7 @@ case class Input(
   def withVariant(v: Option[String]): Input                                         = copy(variant = v)
   def withDefaultValue(v: String): Input                                            = copy(defaultValue = v)
   def value: String                                                                 = valueReceived.getOrElse(defaultValue)
+  override def withDataStore(ds: TypedMap): Input                                   = copy(dataStore = ds)
 
 case class InputGroup(
     key: String = Keys.nextKey,
@@ -289,7 +293,8 @@ case class Checkbox(
     defaultChecked: Boolean = false,
     isDisabled: Boolean = false,
     style: Map[String, Any] = Map.empty,
-    checkedV: Option[Boolean] = None
+    checkedV: Option[Boolean] = None,
+    dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Checkbox]
     with HasEventHandler
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Checkbox]:
@@ -300,6 +305,7 @@ case class Checkbox(
   def withText(v: String)                                                           = copy(text = v)
   def withDefaultChecked(v: Boolean)                                                = copy(defaultChecked = v)
   def withIsDisabled(v: Boolean)                                                    = copy(isDisabled = v)
+  override def withDataStore(ds: TypedMap): Checkbox                                = copy(dataStore = ds)
 
 /** https://chakra-ui.com/docs/components/radio
   */
@@ -321,7 +327,8 @@ case class RadioGroup(
     defaultValue: String = "",
     valueReceived: Option[String] = None, // use value instead
     style: Map[String, Any] = Map.empty,
-    children: Seq[UiElement] = Nil
+    children: Seq[UiElement] = Nil,
+    dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[RadioGroup]
     with HasEventHandler
     with HasChildren[RadioGroup]
@@ -332,6 +339,7 @@ case class RadioGroup(
   def value: String                                                                 = valueReceived.getOrElse(defaultValue)
   def withKey(v: String)                                                            = copy(key = v)
   def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
+  override def withDataStore(ds: TypedMap): RadioGroup                              = copy(dataStore = ds)
 
 case class Center(
     key: String = Keys.nextKey,
@@ -1391,7 +1399,8 @@ case class Textarea(
     variant: Option[String] = None,
     defaultValue: String = "",
     valueReceived: Option[String] = None, // use value instead
-    style: Map[String, Any] = Map.empty
+    style: Map[String, Any] = Map.empty,
+    dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Textarea]
     with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Textarea]:
@@ -1404,6 +1413,7 @@ case class Textarea(
   def withVariant(v: Option[String])                                                = copy(variant = v)
   def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
   def value                                                                         = valueReceived.getOrElse(defaultValue)
+  override def withDataStore(ds: TypedMap): Textarea                                = copy(dataStore = ds)
 
 /** https://chakra-ui.com/docs/components/switch
   */
@@ -1413,7 +1423,8 @@ case class Switch(
     defaultChecked: Boolean = false,
     isDisabled: Boolean = false,
     style: Map[String, Any] = Map.empty,
-    checkedV: Option[Boolean] = None // use checked
+    checkedV: Option[Boolean] = None, // use checked
+    dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Switch]
     with HasEventHandler
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Switch]:
@@ -1424,6 +1435,7 @@ case class Switch(
   def withText(v: String)                                                           = copy(text = v)
   def withDefaultChecked(v: Boolean)                                                = copy(defaultChecked = v)
   def withIsDisabled(v: Boolean)                                                    = copy(isDisabled = v)
+  override def withDataStore(ds: TypedMap): Switch                                  = copy(dataStore = ds)
 
 /** https://chakra-ui.com/docs/components/select
   */
@@ -1436,7 +1448,8 @@ case class Select(
     color: Option[String] = None,
     borderColor: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    children: Seq[UiElement] = Nil
+    children: Seq[UiElement] = Nil,
+    dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Select]
     with HasEventHandler
     with HasChildren[Select]
@@ -1451,6 +1464,7 @@ case class Select(
   def withColor(v: Option[String])                                                  = copy(color = v)
   def withBorderColor(v: Option[String])                                            = copy(borderColor = v)
   def value                                                                         = valueReceived.getOrElse(defaultValue)
+  override def withDataStore(ds: TypedMap): Select                                  = copy(dataStore = ds)
 
 case class Option_(
     key: String = Keys.nextKey,
