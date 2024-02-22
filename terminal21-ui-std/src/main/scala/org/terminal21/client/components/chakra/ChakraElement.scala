@@ -1,5 +1,6 @@
 package org.terminal21.client.components.chakra
 
+import org.terminal21.client.collections.TypedMap
 import org.terminal21.client.components.UiElement.{Current, HasChildren, HasEventHandler, HasStyle}
 import org.terminal21.client.components.{Keys, UiElement}
 import org.terminal21.client.{ConnectedSession, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler}
@@ -27,7 +28,8 @@ case class Button(
     isDisabled: Option[Boolean] = None,
     isLoading: Option[Boolean] = None,
     isAttached: Option[Boolean] = None,
-    spacing: Option[String] = None
+    spacing: Option[String] = None,
+    dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Button]
     with OnClickEventHandler.CanHandleOnClickEvent[Button]:
   override def withStyle(v: Map[String, Any]): Button = copy(style = v)
@@ -45,6 +47,7 @@ case class Button(
   def withIsLoading(v: Option[Boolean])               = copy(isLoading = v)
   def withIsAttached(v: Option[Boolean])              = copy(isAttached = v)
   def withSpacing(v: Option[String])                  = copy(spacing = v)
+  override def withDataStore(ds: TypedMap): Button    = copy(dataStore = ds)
 
 /** https://chakra-ui.com/docs/components/button
   */
@@ -1601,14 +1604,16 @@ case class MenuItem(
     key: String = Keys.nextKey,
     style: Map[String, Any] = Map.empty,
     text: String = "",
-    children: Seq[UiElement] = Nil
+    children: Seq[UiElement] = Nil,
+    dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[MenuItem]
     with HasChildren[MenuItem]
     with OnClickEventHandler.CanHandleOnClickEvent[MenuItem]:
-  override def withChildren(cn: UiElement*)   = copy(children = cn)
-  override def withStyle(v: Map[String, Any]) = copy(style = v)
-  def withKey(v: String)                      = copy(key = v)
-  def withText(v: String)                     = copy(text = v)
+  override def withChildren(cn: UiElement*)          = copy(children = cn)
+  override def withStyle(v: Map[String, Any])        = copy(style = v)
+  def withKey(v: String)                             = copy(key = v)
+  def withText(v: String)                            = copy(text = v)
+  override def withDataStore(ds: TypedMap): MenuItem = copy(dataStore = ds)
 
 case class MenuDivider(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty) extends ChakraElement[MenuDivider]:
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1933,15 +1938,17 @@ case class BreadcrumbLink(
     text: String = "breadcrumblink.text",
     href: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    children: Seq[UiElement] = Nil
+    children: Seq[UiElement] = Nil,
+    dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[BreadcrumbLink]
     with HasChildren[BreadcrumbLink]
     with OnClickEventHandler.CanHandleOnClickEvent[BreadcrumbLink]:
-  def withKey(v: String)                      = copy(key = v)
-  override def withChildren(cn: UiElement*)   = copy(children = cn)
-  override def withStyle(v: Map[String, Any]) = copy(style = v)
-  def withHref(v: Option[String])             = copy(href = v)
-  def withText(v: String)                     = copy(text = v)
+  def withKey(v: String)                                   = copy(key = v)
+  override def withChildren(cn: UiElement*)                = copy(children = cn)
+  override def withStyle(v: Map[String, Any])              = copy(style = v)
+  def withHref(v: Option[String])                          = copy(href = v)
+  def withText(v: String)                                  = copy(text = v)
+  override def withDataStore(ds: TypedMap): BreadcrumbLink = copy(dataStore = ds)
 
 case class Link(
     key: String = Keys.nextKey,
@@ -1950,16 +1957,18 @@ case class Link(
     isExternal: Option[Boolean] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    children: Seq[UiElement] = Nil
+    children: Seq[UiElement] = Nil,
+    dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Link]
     with HasChildren[Link]
     with OnClickEventHandler.CanHandleOnClickEvent[Link]:
-  def withKey(v: String)                      = copy(key = v)
-  override def withChildren(cn: UiElement*)   = copy(children = cn)
-  override def withStyle(v: Map[String, Any]) = copy(style = v)
-  def withIsExternal(v: Option[Boolean])      = copy(isExternal = v)
-  def withIsExternal(v: Boolean)              = copy(isExternal = Some(v))
-  def withHref(v: String)                     = copy(href = v)
-  def withText(v: String)                     = copy(text = v)
-  def withColor(v: String)                    = copy(color = Some(v))
-  def withColor(v: Option[String])            = copy(color = v)
+  def withKey(v: String)                         = copy(key = v)
+  override def withChildren(cn: UiElement*)      = copy(children = cn)
+  override def withStyle(v: Map[String, Any])    = copy(style = v)
+  def withIsExternal(v: Option[Boolean])         = copy(isExternal = v)
+  def withIsExternal(v: Boolean)                 = copy(isExternal = Some(v))
+  def withHref(v: String)                        = copy(href = v)
+  def withText(v: String)                        = copy(text = v)
+  def withColor(v: String)                       = copy(color = Some(v))
+  def withColor(v: Option[String])               = copy(color = v)
+  override def withDataStore(ds: TypedMap): Link = copy(dataStore = ds)

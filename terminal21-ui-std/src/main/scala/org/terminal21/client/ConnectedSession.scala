@@ -91,6 +91,12 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   def fireEvents(events: CommandEvent*): Unit = for e <- events do fireEvent(e)
 
   def fireEvent(event: CommandEvent): Unit =
+    val renderedHandlers = modifiedElements.values
+      .collect:
+        case h: OnClickEventHandler.CanHandleOnClickEvent[_] => (h.key, h.dataStore.getOrElse(OnClickEventHandler.Key, Nil))
+      .toMap
+      .withDefault(_ => Nil)
+
     try
       event match
         case SessionClosed(_) =>
@@ -99,6 +105,14 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
           exitLatch.countDown()
           onCloseHandler()
         case _                =>
+          for handler <- renderedHandlers(event.key) do
+            (event, handler) match
+              case (_: OnClick, h: OnClickEventHandler)                 => h.onClick()
+              case (onChange: OnChange, h: OnChangeEventHandler)        => h.onChange(onChange.value)
+              case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
+              case x                                                    => logger.error(s"Unknown event handling combination : $x")
+
+          // TODO:DROP
           handlers.getEventHandler(event.key) match
             case Some(handlers) =>
               for handler <- handlers do

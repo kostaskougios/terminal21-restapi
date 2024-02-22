@@ -3,6 +3,7 @@ package org.terminal21.client.json
 import io.circe.*
 import io.circe.generic.auto.*
 import io.circe.syntax.*
+import org.terminal21.client.collections.TypedMap
 import org.terminal21.client.components.chakra.{Box, CEJson, ChakraElement}
 import org.terminal21.client.components.std.{StdEJson, StdElement, StdHttp}
 import org.terminal21.client.components.ui.FrontEndElement
@@ -30,6 +31,8 @@ object StdElementEncoding extends ComponentLib:
           case _         => throw new IllegalArgumentException(s"type $v not supported, either use one of the supported ones or open a bug request")
       )
     Json.obj(vs: _*)
+
+  given Encoder[TypedMap] = _ => Json.Null
 
   override def toJson(using Encoder[UiElement]): PartialFunction[UiElement, Json] =
     case std: StdEJson       => std.asJson.mapObject(o => o.add("type", "Std".asJson))

@@ -1,5 +1,6 @@
 package org.terminal21.client.components
 
+import org.terminal21.client.collections.{TypedMap, TypedMapKey}
 import org.terminal21.client.{ConnectedSession, EventHandler}
 
 trait UiElement extends AnyElement:
@@ -38,3 +39,9 @@ object UiElement:
     def style: Map[String, Any]
     def withStyle(v: Map[String, Any]): A
     def withStyle(vs: (String, Any)*): A = withStyle(vs.toMap)
+
+  trait HasDataStore[A <: UiElement]:
+    this: A =>
+    def dataStore: TypedMap
+    def withDataStore(ds: TypedMap): A
+    def store[V](key: TypedMapKey[V], value: V): A = withDataStore(dataStore + (key -> value))
