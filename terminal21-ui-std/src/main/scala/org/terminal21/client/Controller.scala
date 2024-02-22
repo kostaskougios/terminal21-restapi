@@ -3,6 +3,7 @@ package org.terminal21.client
 import org.terminal21.client.collections.{EventIterator, TypedMapKey}
 import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
+import org.terminal21.client.components.UiElement.HasEventHandler
 import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
 import org.terminal21.model.{CommandEvent, OnChange, OnClick}
 
@@ -49,7 +50,15 @@ class Controller[M](
       eventIteratorFactory
         .takeWhile(!_.isSessionClosed)
         .scanLeft(HandledEvent(initialModel.value, componentsByKey, Nil, Nil, false)): (oldHandled, event) =>
-          val h = eventHandlers.foldLeft(oldHandled.copy(renderChanges = Nil, timedRenderChanges = Nil)): (h, f) =>
+          val initHandled = oldHandled.componentsByKey(event.key) match
+            case e: UiElement with HasEventHandler[_] =>
+              event match
+                case OnChange(key, value) =>
+                  oldHandled.copy(componentsByKey = oldHandled.componentsByKey + (key -> e.defaultEventHandler(value)))
+                case _                    => oldHandled
+            case _                                    => oldHandled
+
+          val h = eventHandlers.foldLeft(initHandled.copy(renderChanges = Nil, timedRenderChanges = Nil)): (h, f) =>
             event match
               case OnClick(key)         =>
                 f(ControllerClickEvent(componentsByKey(key), h))
@@ -102,8 +111,9 @@ object Controller:
     new Controller(session.eventIterator, session.renderChanges, components, initialModel, Nil)
 
 trait ControllerEvent[M]:
-  def model: M = handled.model
+  def model: M                                                                    = handled.model
   def handled: HandledEvent[M]
+  extension [A <: UiElement](e: UiElement with HasEventHandler[A]) def current: A = handled.componentsByKey(e.key).asInstanceOf[A]
 
 case class ControllerClickEvent[M](clicked: UiElement, handled: HandledEvent[M])                            extends ControllerEvent[M]
 case class ControllerChangeEvent[M](changed: UiElement, handled: HandledEvent[M], newValue: String)         extends ControllerEvent[M]

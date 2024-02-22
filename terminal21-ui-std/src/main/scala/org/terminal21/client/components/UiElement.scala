@@ -1,7 +1,7 @@
 package org.terminal21.client.components
 
+import org.terminal21.client.HandledEvent
 import org.terminal21.client.collections.{TypedMap, TypedMapKey}
-import org.terminal21.client.ConnectedSession
 
 trait UiElement extends AnyElement:
   def key: String
@@ -12,10 +12,6 @@ trait UiElement extends AnyElement:
   def flat: Seq[UiElement] = Seq(this)
 
 object UiElement:
-  trait Current[A <: UiElement]:
-    this: UiElement =>
-    def current: A = ???
-
   trait HasChildren[A <: UiElement]:
     this: A =>
     def children: Seq[UiElement]
@@ -24,7 +20,7 @@ object UiElement:
     def noChildren: A                  = withChildren()
     def addChildren(cn: UiElement*): A = withChildren(children ++ cn: _*)
 
-  trait HasEventHandler[A]:
+  trait HasEventHandler[A <: UiElement]:
     def defaultEventHandler: String => A
 
   trait HasStyle[A <: UiElement]:

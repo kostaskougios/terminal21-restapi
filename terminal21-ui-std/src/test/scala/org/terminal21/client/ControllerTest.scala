@@ -112,3 +112,15 @@ class ControllerTest extends AnyFunSuiteLike:
       .toList should be(List(0, 1))
     Thread.sleep(15)
     rendered should be(Seq(button.withText("changed")))
+
+  test("current value for OnChange"):
+    val model = Model(0)
+    newController(
+      model,
+      Iterator(inputChange),
+      Seq(
+        input.onChange(using model): event =>
+          import event.*
+          handled.withModel(if input.current.value == "new-value" then 100 else -1).terminate
+      )
+    ).eventsIterator.toList should be(List(0, 100))

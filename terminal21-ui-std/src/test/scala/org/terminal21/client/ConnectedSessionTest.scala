@@ -59,21 +59,3 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
         Map(p1.key -> Seq(span1.key), span1.key             -> Nil)
       )
     )
-
-  test("renderChanges updates current version of component"):
-    given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
-
-    val p1    = Paragraph(text = "p1")
-    val span1 = Span(text = "span1")
-    connectedSession.render(Seq(p1))
-    connectedSession.renderChanges(Seq(p1.withChildren(span1)))
-    p1.current.children should be(Seq(span1))
-
-  test("renderChanges updates current version of component when component deeply nested"):
-    given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
-
-    val span1 = Span(text = "span1")
-    val p1    = Paragraph(text = "p1").withChildren(span1)
-    connectedSession.render(Seq(p1))
-    connectedSession.renderChanges(Seq(p1.withChildren(span1.withText("span-text-changed"))))
-    span1.current.text should be("span-text-changed")

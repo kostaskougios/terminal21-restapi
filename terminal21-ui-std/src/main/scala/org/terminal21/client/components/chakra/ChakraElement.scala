@@ -2,7 +2,7 @@ package org.terminal21.client.components.chakra
 
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.collections.TypedMap
-import org.terminal21.client.components.UiElement.{Current, HasChildren, HasEventHandler, HasStyle}
+import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, HasStyle}
 import org.terminal21.client.components.*
 
 sealed trait CEJson extends UiElement
@@ -11,7 +11,7 @@ sealed trait CEJson extends UiElement
   * https://github.com/kostaskougios/terminal21-restapi/blob/main/examples/src/main/scala/tests/ChakraComponents.scala and it's related scala files under
   * https://github.com/kostaskougios/terminal21-restapi/tree/main/examples/src/main/scala/tests/chakra
   */
-sealed trait ChakraElement[A <: ChakraElement[A]] extends CEJson with HasStyle[A] with Current[A]
+sealed trait ChakraElement[A <: ChakraElement[A]] extends CEJson with HasStyle[A]
 
 /** https://chakra-ui.com/docs/components/button
   */
