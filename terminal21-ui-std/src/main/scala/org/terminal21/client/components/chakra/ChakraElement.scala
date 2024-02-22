@@ -2,8 +2,8 @@ package org.terminal21.client.components.chakra
 
 import org.terminal21.client.collections.TypedMap
 import org.terminal21.client.components.UiElement.{Current, HasChildren, HasEventHandler, HasStyle}
-import org.terminal21.client.components.{Keys, UiElement}
-import org.terminal21.client.{ConnectedSession, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler}
+import org.terminal21.client.components.{Keys, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
+import org.terminal21.client.ConnectedSession
 
 sealed trait CEJson extends UiElement
 

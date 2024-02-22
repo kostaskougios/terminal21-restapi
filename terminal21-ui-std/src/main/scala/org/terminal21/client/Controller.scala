@@ -1,9 +1,9 @@
 package org.terminal21.client
 
-import org.terminal21.client.OnChangeEventHandler.CanHandleOnChangeEvent
-import org.terminal21.client.OnClickEventHandler.CanHandleOnClickEvent
+import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
+import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
 import org.terminal21.client.collections.EventIterator
-import org.terminal21.client.components.UiElement
+import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, UiElement}
 import org.terminal21.client.model.{GlobalEvent, UiEvent}
 import org.terminal21.model.{OnChange, OnClick}
 

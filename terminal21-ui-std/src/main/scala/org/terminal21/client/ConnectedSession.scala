@@ -4,7 +4,7 @@ import io.circe.*
 import io.circe.generic.auto.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement.HasChildren
-import org.terminal21.client.components.{UiComponent, UiElement}
+import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiComponent, UiElement}
 import org.terminal21.client.json.UiElementEncoding
 import org.terminal21.client.model.{GlobalEvent, SessionClosedEvent, UiEvent}
 import org.terminal21.collections.SEList

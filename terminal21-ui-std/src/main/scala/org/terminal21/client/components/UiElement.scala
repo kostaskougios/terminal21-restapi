@@ -1,7 +1,7 @@
 package org.terminal21.client.components
 
 import org.terminal21.client.collections.{TypedMap, TypedMapKey}
-import org.terminal21.client.{ConnectedSession, EventHandler}
+import org.terminal21.client.ConnectedSession
 
 trait UiElement extends AnyElement:
   def key: String
