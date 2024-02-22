@@ -5,7 +5,6 @@ import io.circe.generic.auto.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement.HasChildren
 import org.terminal21.client.components.{UiComponent, UiElement}
-import org.terminal21.client.internal.EventHandlers
 import org.terminal21.client.json.UiElementEncoding
 import org.terminal21.client.model.{GlobalEvent, SessionClosedEvent, UiEvent}
 import org.terminal21.collections.SEList
@@ -19,7 +18,6 @@ import scala.collection.concurrent.TrieMap
 
 class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
   private val logger           = LoggerFactory.getLogger(getClass)
-  private val handlers         = new EventHandlers(this)
   @volatile private var events = SEList[GlobalEvent]()
 
   def uiUrl: String = serverUrl + "/ui"
@@ -28,12 +26,9 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     */
   def clear(): Unit =
     removeGlobalEventHandler()
-    handlers.clear()
     modifiedElements.clear()
     events.poisonPill()
     events = SEList()
-
-  def addEventHandler(key: String, handler: EventHandler): Unit = handlers.addEventHandler(key, handler)
 
   private val exitLatch = new CountDownLatch(1)
 
@@ -116,23 +111,12 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
               case (onChange: OnChange, h: OnChangeEventHandler)        => h.onChange(onChange.value)
               case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
               case x                                                    => logger.error(s"Unknown event handling combination : $x")
-
-          // TODO:DROP
-          handlers.getEventHandler(event.key) match
-            case Some(handlers) =>
-              for handler <- handlers do
-                (event, handler) match
-                  case (_: OnClick, h: OnClickEventHandler)                 => h.onClick()
-                  case (onChange: OnChange, h: OnChangeEventHandler)        => h.onChange(onChange.value)
-                  case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
-                  case x                                                    => logger.error(s"Unknown event handling combination : $x")
-            case None           => // nop
           val globalEvent =
             UiEvent(
               event,
               modifiedElements.getOrElse(event.key, throw new IllegalArgumentException(s"Not found UiElement with key ${event.key}, was this rendered?"))
             )
-          for h <- globalEventHandler do h.onEvent(globalEvent)
+          for h       <- globalEventHandler do h.onEvent(globalEvent)
           events.add(globalEvent)
     catch
       case t: Throwable =>
@@ -141,7 +125,6 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   def render(es: UiElement*): Unit =
     for e <- es.flatMap(_.flat) do modified(e)
-    handlers.registerEventHandlers(es)
     val j = toJson(es)
     sessionsService.setSessionJsonState(session, j)
 
