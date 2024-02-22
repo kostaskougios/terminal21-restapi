@@ -13,7 +13,7 @@ object Forms:
 
     val emailRightAddOn = InputRightAddon().withChildren(okIcon)
 
-    val emailI = Input(`type` = "email", defaultValue = "my@email.com")
+    val emailI = Input(`type` = "email", defaultValue = "the-test-email@email.com")
     val email  = emailI.onChange: newValue =>
       Seq(
         status.withText(s"email input new value = $newValue, verify email.value = ${emailI.current.value}"),
@@ -81,7 +81,7 @@ object Forms:
     Seq(
       commonBox(text = "Forms"),
       FormControl().withChildren(
-        FormLabel(text = "Email address"),
+        FormLabel(text = "Test-Email-Address"),
         InputGroup().withChildren(
           InputLeftAddon().withChildren(EmailIcon()),
           email,
