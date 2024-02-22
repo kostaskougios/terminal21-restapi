@@ -17,8 +17,7 @@ class ServerStatusApp extends ServerSideApp:
     serverSideSessions
       .withNewSession("server-status", "Server Status")
       .connect: session =>
-        given ConnectedSession = session
-        new ServerStatusPage(serverSideSessions, dependencies.sessionsService).run()
+        new ServerStatusPage(serverSideSessions, dependencies.sessionsService)(using session).run()
 
 class ServerStatusPage(
     serverSideSessions: ServerSideSessions,
