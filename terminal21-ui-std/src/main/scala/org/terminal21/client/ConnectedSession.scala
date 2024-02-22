@@ -25,7 +25,6 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   /** Clears all UI elements and event handlers. Renders a blank UI
     */
   def clear(): Unit =
-    removeGlobalEventHandler()
     modifiedElements.clear()
     events.poisonPill()
     events = SEList()
@@ -61,20 +60,6 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   def isClosed: Boolean = exitLatch.getCount == 0
 
   def click(e: UiElement): Unit = fireEvent(OnClick(e.key))
-
-  @volatile private var globalEventHandler: Option[GlobalEventHandler] = None
-
-  /** Registers a global event handler who will handle all received events.
-    *
-    * @param h
-    *   GlobalEventHandler
-    */
-  def withGlobalEventHandler(h: GlobalEventHandler): Unit =
-    globalEventHandler = Some(h)
-
-  /** removes the global event handler (if any). No more events will be received by that handler.
-    */
-  def removeGlobalEventHandler(): Unit = globalEventHandler = None
 
   def eventIterator: Iterator[GlobalEvent] = events.iterator
 
@@ -116,7 +101,6 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
               event,
               modifiedElements.getOrElse(event.key, throw new IllegalArgumentException(s"Not found UiElement with key ${event.key}, was this rendered?"))
             )
-          for h       <- globalEventHandler do h.onEvent(globalEvent)
           events.add(globalEvent)
     catch
       case t: Throwable =>
