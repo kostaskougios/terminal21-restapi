@@ -36,7 +36,7 @@ object OnChangeBooleanEventHandler:
   object Key                                   extends TypedMapKey[Seq[OnChangeBooleanEventHandler]]
   trait CanHandleOnChangeEvent[A <: UiElement] extends HasDataStore[A] with HasEventHandler:
     this: A =>
-    def onChange(h: OnChangeBooleanEventHandler)(using session: ConnectedSession): A =
+    def onChange(h: OnChangeBooleanEventHandler): A =
       val handlers = dataStore.getOrElse(Key, Nil)
       store(Key, handlers :+ h)
 
