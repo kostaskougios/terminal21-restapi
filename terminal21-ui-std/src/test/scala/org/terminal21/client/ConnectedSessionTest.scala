@@ -5,11 +5,13 @@ import org.mockito.Mockito.verify
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.ConnectedSessionMock.encoder
-import org.terminal21.client.components.chakra.Editable
+import org.terminal21.client.components.chakra.{Button, Checkbox, Editable, Input}
 import org.terminal21.client.components.std.{Paragraph, Span}
 import org.terminal21.client.model.UiEvent
 import org.terminal21.model.{CommandEvent, OnChange}
 import org.terminal21.ui.std.ServerJson
+
+import java.util.concurrent.atomic.AtomicBoolean
 
 class ConnectedSessionTest extends AnyFunSuiteLike:
 
@@ -42,11 +44,38 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
     connectedSession.fireEvent(event)
     received should be(Some(event))
 
+  test("click events are processed by onClick handlers"):
+    given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
+    var clicked                              = false
+    val button                               = Button().onClick: () =>
+      clicked = true
+    connectedSession.render(button)
+    connectedSession.fireEvent(CommandEvent.onClick(button))
+    clicked should be(true)
+
+  test("change events are processed by onChange handlers"):
+    given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
+    var value                                = ""
+    val input                                = Input().onChange: newValue =>
+      value = newValue
+    connectedSession.render(input)
+    connectedSession.fireEvent(CommandEvent.onChange(input, "new-value"))
+    value should be("new-value")
+
+  test("change boolean events are processed by onChange handlers"):
+    given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
+    var value                                = false
+    val checkbox                             = Checkbox().onChange: newValue =>
+      value = newValue
+    connectedSession.render(checkbox)
+    connectedSession.fireEvent(CommandEvent.onChange(checkbox, true))
+    value should be(true)
+
   test("default event handlers are invoked before user handlers"):
     given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
-    val editable                             = Editable()
-    editable.onChange: newValue =>
-      editable.current.value should be(newValue)
+    val editableI                            = Editable()
+    val editable                             = editableI.onChange: newValue =>
+      editableI.current.value should be(newValue)
 
     connectedSession.render(editable)
     connectedSession.fireEvent(OnChange(editable.key, "new value"))
