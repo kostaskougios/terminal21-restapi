@@ -1,10 +1,8 @@
 package org.terminal21.client.components
 
 import org.terminal21.client.collections.TypedMapKey
-import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.UiElement.{HasDataStore, HasEventHandler}
 import org.terminal21.client.model.UiEvent
-import org.terminal21.client.components.{EventHandler, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler}
 
 trait EventHandler
 
