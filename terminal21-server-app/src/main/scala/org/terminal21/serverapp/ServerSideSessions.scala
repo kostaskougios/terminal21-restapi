@@ -2,7 +2,8 @@ package org.terminal21.serverapp
 
 import functions.fibers.FiberExecutor
 import org.terminal21.client.ConnectedSession
-import org.terminal21.client.components.{ComponentLib, StdElementEncoding, UiElementEncoding}
+import org.terminal21.client.components.ComponentLib
+import org.terminal21.client.json.{StdElementEncoding, UiElementEncoding}
 import org.terminal21.config.Config
 import org.terminal21.model.SessionOptions
 import org.terminal21.server.service.ServerSessionsService

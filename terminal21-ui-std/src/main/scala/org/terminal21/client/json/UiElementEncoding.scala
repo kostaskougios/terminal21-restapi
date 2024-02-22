@@ -1,4 +1,4 @@
-package org.terminal21.client.components
+package org.terminal21.client.json
 
 import io.circe.*
 import io.circe.generic.auto.*
@@ -6,6 +6,7 @@ import io.circe.syntax.*
 import org.terminal21.client.components.chakra.{Box, CEJson, ChakraElement}
 import org.terminal21.client.components.std.{StdEJson, StdElement, StdHttp}
 import org.terminal21.client.components.ui.FrontEndElement
+import org.terminal21.client.components.{ComponentLib, UiComponent, UiElement}
 
 class UiElementEncoding(libs: Seq[ComponentLib]):
   given uiElementEncoder: Encoder[UiElement] =

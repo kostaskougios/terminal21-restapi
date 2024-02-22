@@ -4,7 +4,8 @@ import functions.fibers.FiberExecutor
 import functions.helidon.transport.HelidonTransport
 import io.helidon.webclient.api.WebClient
 import io.helidon.webclient.websocket.WsClient
-import org.terminal21.client.components.{ComponentLib, StdElementEncoding, UiElementEncoding}
+import org.terminal21.client.components.ComponentLib
+import org.terminal21.client.json.{StdElementEncoding, UiElementEncoding}
 import org.terminal21.config.Config
 import org.terminal21.model.SessionOptions
 import org.terminal21.ui.std.SessionsServiceCallerFactory
