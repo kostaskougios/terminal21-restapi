@@ -11,18 +11,10 @@ trait UiElement extends AnyElement:
     */
   def flat: Seq[UiElement] = Seq(this)
 
-  def render()(using session: ConnectedSession): Unit =
-    session.render(this)
-
-  /** Renders any changes for this element and it's children (if any). The element must previously have been added to the session.
-    */
-  def renderChanges()(using session: ConnectedSession): Unit =
-    session.renderChanges(this)
-
 object UiElement:
   trait Current[A <: UiElement]:
     this: UiElement =>
-    def current(using session: ConnectedSession): A = session.currentState(this.asInstanceOf[A])
+    def current: A = ???
 
   trait HasChildren[A <: UiElement]:
     this: A =>
@@ -32,8 +24,8 @@ object UiElement:
     def noChildren: A                  = withChildren()
     def addChildren(cn: UiElement*): A = withChildren(children ++ cn: _*)
 
-  trait HasEventHandler:
-    def defaultEventHandler(session: ConnectedSession): EventHandler
+  trait HasEventHandler[A]:
+    def defaultEventHandler: String => A
 
   trait HasStyle[A <: UiElement]:
     def style: Map[String, Any]

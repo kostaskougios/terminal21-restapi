@@ -4,9 +4,8 @@ import io.circe.*
 import io.circe.generic.auto.*
 import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement.HasChildren
-import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiComponent, UiElement}
+import org.terminal21.client.components.{UiComponent, UiElement}
 import org.terminal21.client.json.UiElementEncoding
-import org.terminal21.client.model.{GlobalEvent, SessionClosedEvent, UiEvent}
 import org.terminal21.collections.SEList
 import org.terminal21.model.*
 import org.terminal21.ui.std.{ServerJson, SessionsService}
@@ -18,14 +17,13 @@ import scala.collection.concurrent.TrieMap
 
 class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
   private val logger           = LoggerFactory.getLogger(getClass)
-  @volatile private var events = SEList[GlobalEvent]()
+  @volatile private var events = SEList[CommandEvent]()
 
   def uiUrl: String = serverUrl + "/ui"
 
   /** Clears all UI elements and event handlers. Renders a blank UI
     */
   def clear(): Unit =
-    modifiedElements.clear()
     events.poisonPill()
     events = SEList()
 
@@ -61,7 +59,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   def click(e: UiElement): Unit = fireEvent(OnClick(e.key))
 
-  def eventIterator: Iterator[GlobalEvent] = events.iterator
+  def eventIterator: Iterator[CommandEvent] = events.iterator
 
   /** Waits until at least 1 event iterator was created for the current page. Useful for testing purposes if i.e. one thread runs the main loop and gets an
     * eventIterator at some point and an other thread needs to fire events.
@@ -71,50 +69,20 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   def fireEvents(events: CommandEvent*): Unit = for e <- events do fireEvent(e)
 
   def fireEvent(event: CommandEvent): Unit =
-    val renderedHandlers = modifiedElements.values
-      .flatMap(_.flat)
-      .collect:
-        case h: OnClickEventHandler.CanHandleOnClickEvent[_]          => (h.key, h.dataStore.getOrElse(OnClickEventHandler.Key, Nil))
-        case h: OnChangeEventHandler.CanHandleOnChangeEvent[_]        =>
-          (h.key, h.defaultEventHandler(this) +: h.dataStore.getOrElse(OnChangeEventHandler.Key, Nil))
-        case h: OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_] =>
-          (h.key, h.defaultEventHandler(this) +: h.dataStore.getOrElse(OnChangeBooleanEventHandler.Key, Nil))
-      .toMap
-      .withDefault(_ => Nil)
+    events.add(event)
+    event match
+      case SessionClosed(_) =>
+        events.poisonPill()
+        exitLatch.countDown()
+        onCloseHandler()
+      case _                =>
 
-    try
-      event match
-        case SessionClosed(_) =>
-          events.add(SessionClosedEvent)
-          events.poisonPill()
-          exitLatch.countDown()
-          onCloseHandler()
-        case _                =>
-          for handler <- renderedHandlers(event.key) do
-            (event, handler) match
-              case (_: OnClick, h: OnClickEventHandler)                 => h.onClick()
-              case (onChange: OnChange, h: OnChangeEventHandler)        => h.onChange(onChange.value)
-              case (onChange: OnChange, h: OnChangeBooleanEventHandler) => h.onChange(onChange.value.toBoolean)
-              case x                                                    => logger.error(s"Unknown event handling combination : $x")
-          val globalEvent =
-            UiEvent(
-              event,
-              modifiedElements.getOrElse(event.key, throw new IllegalArgumentException(s"Not found UiElement with key ${event.key}, was this rendered?"))
-            )
-          events.add(globalEvent)
-    catch
-      case t: Throwable =>
-        logger.error(s"Session ${session.id}: An error occurred while handling $event", t)
-        throw t
-
-  def render(es: UiElement*): Unit =
-    for e <- es.flatMap(_.flat) do modified(e)
+  def render(es: Seq[UiElement]): Unit =
     val j = toJson(es)
     sessionsService.setSessionJsonState(session, j)
 
-  def renderChanges(es: UiElement*): Unit =
+  def renderChanges(es: Seq[UiElement]): Unit =
     if !isClosed && es.nonEmpty then
-      for e <- es.flatMap(_.flat) do modified(e)
       val j = toJson(es)
       sessionsService.changeSessionJsonState(session, j)
 
@@ -144,10 +112,3 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
         .toMap
     )
     sj
-  private val modifiedElements                             = TrieMap.empty[String, UiElement]
-  def modified(e: UiElement): Unit                         =
-    modifiedElements += e.key -> e
-  def currentState[A <: UiElement](e: A): A =
-    modifiedElements.getOrElse(e.key, throw new IllegalStateException(s"Key ${e.key} doesn't exist or was removed")).asInstanceOf[A]
-
-  def currentlyRendered: Seq[UiElement] = modifiedElements.values.toSeq

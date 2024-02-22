@@ -1,6 +1,6 @@
 package org.terminal21.serverapp.bundled
 
-import org.terminal21.client.ConnectedSession
+import org.terminal21.client.{ConnectedSession, Controller}
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.model.Session
@@ -31,9 +31,10 @@ class ServerStatusPage(
   private def toMb(v: Long)        = s"${v / (1024 * 1024)} MB"
   private val xs                   = Some("2xs")
   private def updateStatus(): Unit =
+    given Controller[Unit] = Controller(())
     components(Runtime.getRuntime, sessionsService.allSessions).render()
 
-  def components(runtime: Runtime, sessions: Seq[Session]): Seq[UiElement] =
+  def components(runtime: Runtime, sessions: Seq[Session])(using Controller[Unit]): Seq[UiElement] =
     val jvmTable      = QuickTable(caption = Some("JVM"))
       .withHeaders("Property", "Value", "Actions")
       .withRows(
@@ -43,8 +44,9 @@ class ServerStatusPage(
           Seq(
             "Total Memory",
             toMb(runtime.totalMemory()),
-            Button(size = xs, text = "Run GC").onClick: () =>
+            Button(size = xs, text = "Run GC").onClick: event =>
               System.gc()
+              event.handled
           ),
           Seq("Available processors", runtime.availableProcessors(), "")
         )

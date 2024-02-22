@@ -18,14 +18,13 @@ import java.util.concurrent.atomic.AtomicBoolean
       .withNewSession("chakra-components", "Chakra Components")
       .connect: session =>
         keepRunning.set(false)
-        given ConnectedSession = session
-
-        val latch = new CountDownLatch(1)
+        given ConnectedSession                = session
+        given controller: Controller[Boolean] = Controller(false)
 
         // react tests reset the session to clear state
-        val krButton = Button(text = "Reset state").onClick: () =>
+        val krButton = Button(text = "Reset state").onClick: event =>
           keepRunning.set(true)
-          latch.countDown()
+          event.handled.terminate
 
         (Overlay.components ++ Forms.components ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components(
           latch

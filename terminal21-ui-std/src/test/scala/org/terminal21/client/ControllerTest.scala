@@ -5,66 +5,86 @@ import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.{Button, Checkbox}
 import org.terminal21.client.components.std.Input
-import org.terminal21.client.model.{GlobalEvent, UiEvent}
-import org.terminal21.model.{OnChange, OnClick}
+import org.terminal21.model.{CommandEvent, OnChange, OnClick}
 
 class ControllerTest extends AnyFunSuiteLike:
   val button         = Button()
-  val buttonClick    = UiEvent(OnClick(button.key), button)
+  val buttonClick    = OnClick(button.key)
   val input          = Input()
-  val inputChange    = UiEvent(OnChange(input.key, "new-value"), input)
+  val inputChange    = OnChange(input.key, "new-value")
   val checkbox       = Checkbox()
-  val checkBoxChange = UiEvent(OnChange(checkbox.key, "true"), checkbox)
+  val checkBoxChange = OnChange(checkbox.key, "true")
 
-  def newController[M](initialModel: M, eventIterator: => Iterator[GlobalEvent], renderChanges: Seq[UiElement] => Unit = _ => ()): Controller[M] =
-    new Controller(eventIterator, renderChanges, initialModel, Nil, Map.empty, Map.empty, Map.empty)
+  def newController[M](
+      initialModel: Model[M],
+      eventIterator: => Iterator[CommandEvent],
+      components: Seq[UiElement],
+      renderChanges: Seq[UiElement] => Unit = _ => ()
+  ): Controller[M] =
+    new Controller(eventIterator, renderChanges, components, initialModel, Nil)
 
   test("onEvent is called"):
-    newController(0, Iterator(buttonClick))
+    val model = Model(0)
+    newController(model, Iterator(buttonClick), Seq(button))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
       .eventsIterator
       .toList should be(List(0, 1))
 
   test("onEvent is called for change"):
-    newController(0, Iterator(inputChange))
+    val model = Model(0)
+    newController(model, Iterator(inputChange), Seq(input))
       .onEvent:
-        case event @ ControllerChangeEvent(`input`, 0, "new-value") =>
-          if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
+        case event @ ControllerChangeEvent(`input`, handled, "new-value") =>
+          if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
       .eventsIterator
       .toList should be(List(0, 1))
 
   test("onEvent is called for change/boolean"):
-    newController(0, Iterator(checkBoxChange))
+    val model = Model(0)
+    newController(model, Iterator(checkBoxChange), Seq(checkbox))
       .onEvent:
-        case event @ ControllerChangeBooleanEvent(`checkbox`, 0, true) =>
-          if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
+        case event @ ControllerChangeBooleanEvent(`checkbox`, handled, true) =>
+          if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
       .eventsIterator
       .toList should be(List(0, 1))
 
   test("onClick is called"):
-    newController(0, Iterator(buttonClick))
-      .onClick(button): event =>
-        event.handled.withModel(100).terminate
-      .eventsIterator
-      .toList should be(List(0, 100))
+    given model: Model[Int] = Model(0)
+    newController(
+      model,
+      Iterator(buttonClick),
+      Seq(
+        button.onClick: event =>
+          event.handled.withModel(100).terminate
+      )
+    ).eventsIterator.toList should be(List(0, 100))
 
   test("onChange is called"):
-    newController(0, Iterator(inputChange))
-      .onChange(input): event =>
-        event.handled.withModel(100).terminate
-      .eventsIterator
-      .toList should be(List(0, 100))
+    given model: Model[Int] = Model(0)
+    newController(
+      model,
+      Iterator(inputChange),
+      Seq(
+        input.onChange: event =>
+          event.handled.withModel(100).terminate
+      )
+    ).eventsIterator.toList should be(List(0, 100))
 
   test("onChange/boolean is called"):
-    newController(0, Iterator(checkBoxChange))
-      .onChange(checkbox): event =>
-        event.handled.withModel(100).terminate
-      .eventsIterator
-      .toList should be(List(0, 100))
+    given model: Model[Int] = Model(0)
+    newController(
+      model,
+      Iterator(checkBoxChange),
+      Seq(
+        checkbox.onChange: event =>
+          event.handled.withModel(100).terminate
+      )
+    ).eventsIterator.toList should be(List(0, 100))
 
   test("terminate is obeyed and latest model state is iterated"):
-    newController(0, Iterator(buttonClick, buttonClick, buttonClick))
+    val model = Model(0)
+    newController(model, Iterator(buttonClick, buttonClick, buttonClick), Seq(button))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate.withModel(100) else event.handled.withModel(event.model + 1)
       .eventsIterator
@@ -74,7 +94,7 @@ class ControllerTest extends AnyFunSuiteLike:
     var rendered                          = Seq.empty[UiElement]
     def renderer(s: Seq[UiElement]): Unit = rendered = s
 
-    newController(0, Iterator(buttonClick), renderer)
+    newController(Model(0), Iterator(buttonClick), Seq(button), renderer)
       .onEvent: event =>
         event.handled.withModel(event.model + 1).withRenderChanges(button.withText("changed")).terminate
       .eventsIterator
@@ -85,7 +105,7 @@ class ControllerTest extends AnyFunSuiteLike:
   test("timed changes are rendered"):
     @volatile var rendered                = Seq.empty[UiElement]
     def renderer(s: Seq[UiElement]): Unit = rendered = s
-    newController(0, Iterator(buttonClick), renderer)
+    newController(Model(0), Iterator(buttonClick), Seq(button), renderer)
       .onEvent: event =>
         event.handled.withModel(event.model + 1).withTimedRenderChanges(TimedRenderChanges(10, button.withText("changed"))).terminate
       .eventsIterator

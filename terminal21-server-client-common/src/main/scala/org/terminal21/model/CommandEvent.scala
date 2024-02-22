@@ -6,6 +6,7 @@ import org.terminal21.client.components.AnyElement
   */
 sealed trait CommandEvent:
   def key: String
+  def isSessionClosed: Boolean
 
 object CommandEvent:
   def onClick(receivedBy: AnyElement): OnClick                   = OnClick(receivedBy.key)
@@ -13,7 +14,11 @@ object CommandEvent:
   def onChange(receivedBy: AnyElement, value: Boolean): OnChange = OnChange(receivedBy.key, value.toString)
   def sessionClosed: SessionClosed                               = SessionClosed("-")
 
-case class OnClick(key: String)                 extends CommandEvent
-case class OnChange(key: String, value: String) extends CommandEvent
+case class OnClick(key: String) extends CommandEvent:
+  override def isSessionClosed: Boolean = false
 
-case class SessionClosed(key: String) extends CommandEvent
+case class OnChange(key: String, value: String) extends CommandEvent:
+  override def isSessionClosed: Boolean = false
+
+case class SessionClosed(key: String) extends CommandEvent:
+  override def isSessionClosed: Boolean = true

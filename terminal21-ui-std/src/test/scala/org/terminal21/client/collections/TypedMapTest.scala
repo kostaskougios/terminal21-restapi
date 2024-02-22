@@ -17,3 +17,9 @@ class TypedMapTest extends AnyFunSuiteLike:
 
   test("getOrElse when key available"):
     (TypedMap.empty + (IntKey -> 5)).getOrElse(IntKey, 2) should be(5)
+
+  test("contains key positive"):
+    (TypedMap.empty + (IntKey -> 5)).contains(IntKey) should be(true)
+
+  test("contains key negative"):
+    TypedMap.empty.contains(IntKey) should be(false)

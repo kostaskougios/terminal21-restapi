@@ -73,12 +73,11 @@ case class Input(
     valueReceived: Option[String] = None, // use value instead
     dataStore: TypedMap = TypedMap.empty
 ) extends StdElement[Input]
-    with HasEventHandler
     with CanHandleOnChangeEvent[Input]:
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(valueReceived = Some(newValue)))
-  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
-  def withKey(v: String)                                                            = copy(key = v)
-  def withType(v: String)                                                           = copy(`type` = v)
-  def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
-  def value                                                                         = valueReceived.getOrElse(defaultValue)
-  override def withDataStore(ds: TypedMap): Input                                   = copy(dataStore = ds)
+  override def defaultEventHandler                = newValue => copy(valueReceived = Some(newValue))
+  override def withStyle(v: Map[String, Any])     = copy(style = v)
+  def withKey(v: String)                          = copy(key = v)
+  def withType(v: String)                         = copy(`type` = v)
+  def withDefaultValue(v: String)                 = copy(defaultValue = v)
+  def value                                       = valueReceived.getOrElse(defaultValue)
+  override def withDataStore(ds: TypedMap): Input = copy(dataStore = ds)

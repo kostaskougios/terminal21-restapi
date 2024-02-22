@@ -1,9 +1,9 @@
 package org.terminal21.client.components.chakra
 
+import org.terminal21.client.ConnectedSession
 import org.terminal21.client.collections.TypedMap
 import org.terminal21.client.components.UiElement.{Current, HasChildren, HasEventHandler, HasStyle}
-import org.terminal21.client.components.{Keys, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
-import org.terminal21.client.ConnectedSession
+import org.terminal21.client.components.*
 
 sealed trait CEJson extends UiElement
 
@@ -157,17 +157,16 @@ case class Editable(
     children: Seq[UiElement] = Nil,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Editable]
-    with HasEventHandler
     with HasChildren[Editable]
     with OnChangeEventHandler.CanHandleOnChangeEvent[Editable]:
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler =
-    newValue => session.modified(copy(valueReceived = Some(newValue)))
-  override def withChildren(cn: UiElement*)                                         = copy(children = cn)
-  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
-  def withKey(v: String)                                                            = copy(key = v)
-  def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
-  def value                                                                         = valueReceived.getOrElse(defaultValue)
-  override def withDataStore(ds: TypedMap): Editable                                = copy(dataStore = ds)
+  override def defaultEventHandler                   =
+    newValue => copy(valueReceived = Some(newValue))
+  override def withChildren(cn: UiElement*)          = copy(children = cn)
+  override def withStyle(v: Map[String, Any])        = copy(style = v)
+  def withKey(v: String)                             = copy(key = v)
+  def withDefaultValue(v: String)                    = copy(defaultValue = v)
+  def value                                          = valueReceived.getOrElse(defaultValue)
+  override def withDataStore(ds: TypedMap): Editable = copy(dataStore = ds)
 
 case class EditablePreview(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty) extends ChakraElement[EditablePreview]:
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -236,18 +235,17 @@ case class Input(
     style: Map[String, Any] = Map.empty,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Input]
-    with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Input]:
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(valueReceived = Some(newValue)))
-  override def withStyle(v: Map[String, Any]): Input                                = copy(style = v)
-  def withKey(v: String): Input                                                     = copy(key = v)
-  def withType(v: String): Input                                                    = copy(`type` = v)
-  def withPlaceholder(v: String): Input                                             = copy(placeholder = v)
-  def withSize(v: String): Input                                                    = copy(size = v)
-  def withVariant(v: Option[String]): Input                                         = copy(variant = v)
-  def withDefaultValue(v: String): Input                                            = copy(defaultValue = v)
-  def value: String                                                                 = valueReceived.getOrElse(defaultValue)
-  override def withDataStore(ds: TypedMap): Input                                   = copy(dataStore = ds)
+  override def defaultEventHandler                   = newValue => copy(valueReceived = Some(newValue))
+  override def withStyle(v: Map[String, Any]): Input = copy(style = v)
+  def withKey(v: String): Input                      = copy(key = v)
+  def withType(v: String): Input                     = copy(`type` = v)
+  def withPlaceholder(v: String): Input              = copy(placeholder = v)
+  def withSize(v: String): Input                     = copy(size = v)
+  def withVariant(v: Option[String]): Input          = copy(variant = v)
+  def withDefaultValue(v: String): Input             = copy(defaultValue = v)
+  def value: String                                  = valueReceived.getOrElse(defaultValue)
+  override def withDataStore(ds: TypedMap): Input    = copy(dataStore = ds)
 
 case class InputGroup(
     key: String = Keys.nextKey,
@@ -296,16 +294,15 @@ case class Checkbox(
     checkedV: Option[Boolean] = None,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Checkbox]
-    with HasEventHandler
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Checkbox]:
-  def checked: Boolean                                                              = checkedV.getOrElse(defaultChecked)
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(checkedV = Some(newValue.toBoolean)))
-  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
-  def withKey(v: String)                                                            = copy(key = v)
-  def withText(v: String)                                                           = copy(text = v)
-  def withDefaultChecked(v: Boolean)                                                = copy(defaultChecked = v)
-  def withIsDisabled(v: Boolean)                                                    = copy(isDisabled = v)
-  override def withDataStore(ds: TypedMap): Checkbox                                = copy(dataStore = ds)
+  def checked: Boolean                               = checkedV.getOrElse(defaultChecked)
+  override def defaultEventHandler                   = newValue => copy(checkedV = Some(newValue.toBoolean))
+  override def withStyle(v: Map[String, Any])        = copy(style = v)
+  def withKey(v: String)                             = copy(key = v)
+  def withText(v: String)                            = copy(text = v)
+  def withDefaultChecked(v: Boolean)                 = copy(defaultChecked = v)
+  def withIsDisabled(v: Boolean)                     = copy(isDisabled = v)
+  override def withDataStore(ds: TypedMap): Checkbox = copy(dataStore = ds)
 
 /** https://chakra-ui.com/docs/components/radio
   */
@@ -330,16 +327,15 @@ case class RadioGroup(
     children: Seq[UiElement] = Nil,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[RadioGroup]
-    with HasEventHandler
     with HasChildren[RadioGroup]
     with OnChangeEventHandler.CanHandleOnChangeEvent[RadioGroup]:
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(valueReceived = Some(newValue)))
-  override def withChildren(cn: UiElement*)                                         = copy(children = cn)
-  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
-  def value: String                                                                 = valueReceived.getOrElse(defaultValue)
-  def withKey(v: String)                                                            = copy(key = v)
-  def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
-  override def withDataStore(ds: TypedMap): RadioGroup                              = copy(dataStore = ds)
+  override def defaultEventHandler                     = newValue => copy(valueReceived = Some(newValue))
+  override def withChildren(cn: UiElement*)            = copy(children = cn)
+  override def withStyle(v: Map[String, Any])          = copy(style = v)
+  def value: String                                    = valueReceived.getOrElse(defaultValue)
+  def withKey(v: String)                               = copy(key = v)
+  def withDefaultValue(v: String)                      = copy(defaultValue = v)
+  override def withDataStore(ds: TypedMap): RadioGroup = copy(dataStore = ds)
 
 case class Center(
     key: String = Keys.nextKey,
@@ -1402,18 +1398,17 @@ case class Textarea(
     style: Map[String, Any] = Map.empty,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Textarea]
-    with HasEventHandler
     with OnChangeEventHandler.CanHandleOnChangeEvent[Textarea]:
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(valueReceived = Some(newValue)))
-  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
-  def withKey(v: String)                                                            = copy(key = v)
-  def withType(v: String)                                                           = copy(`type` = v)
-  def withPlaceholder(v: String)                                                    = copy(placeholder = v)
-  def withSize(v: String)                                                           = copy(size = v)
-  def withVariant(v: Option[String])                                                = copy(variant = v)
-  def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
-  def value                                                                         = valueReceived.getOrElse(defaultValue)
-  override def withDataStore(ds: TypedMap): Textarea                                = copy(dataStore = ds)
+  override def defaultEventHandler                   = newValue => copy(valueReceived = Some(newValue))
+  override def withStyle(v: Map[String, Any])        = copy(style = v)
+  def withKey(v: String)                             = copy(key = v)
+  def withType(v: String)                            = copy(`type` = v)
+  def withPlaceholder(v: String)                     = copy(placeholder = v)
+  def withSize(v: String)                            = copy(size = v)
+  def withVariant(v: Option[String])                 = copy(variant = v)
+  def withDefaultValue(v: String)                    = copy(defaultValue = v)
+  def value                                          = valueReceived.getOrElse(defaultValue)
+  override def withDataStore(ds: TypedMap): Textarea = copy(dataStore = ds)
 
 /** https://chakra-ui.com/docs/components/switch
   */
@@ -1426,16 +1421,15 @@ case class Switch(
     checkedV: Option[Boolean] = None, // use checked
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Switch]
-    with HasEventHandler
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Switch]:
-  def checked: Boolean                                                              = checkedV.getOrElse(defaultChecked)
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(checkedV = Some(newValue.toBoolean)))
-  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
-  def withKey(v: String)                                                            = copy(key = v)
-  def withText(v: String)                                                           = copy(text = v)
-  def withDefaultChecked(v: Boolean)                                                = copy(defaultChecked = v)
-  def withIsDisabled(v: Boolean)                                                    = copy(isDisabled = v)
-  override def withDataStore(ds: TypedMap): Switch                                  = copy(dataStore = ds)
+  def checked: Boolean                             = checkedV.getOrElse(defaultChecked)
+  override def defaultEventHandler                 = newValue => copy(checkedV = Some(newValue.toBoolean))
+  override def withStyle(v: Map[String, Any])      = copy(style = v)
+  def withKey(v: String)                           = copy(key = v)
+  def withText(v: String)                          = copy(text = v)
+  def withDefaultChecked(v: Boolean)               = copy(defaultChecked = v)
+  def withIsDisabled(v: Boolean)                   = copy(isDisabled = v)
+  override def withDataStore(ds: TypedMap): Switch = copy(dataStore = ds)
 
 /** https://chakra-ui.com/docs/components/select
   */
@@ -1451,20 +1445,19 @@ case class Select(
     children: Seq[UiElement] = Nil,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Select]
-    with HasEventHandler
     with HasChildren[Select]
     with OnChangeEventHandler.CanHandleOnChangeEvent[Select]:
-  override def defaultEventHandler(session: ConnectedSession): OnChangeEventHandler = newValue => session.modified(copy(valueReceived = Some(newValue)))
-  override def withStyle(v: Map[String, Any])                                       = copy(style = v)
-  override def withChildren(cn: UiElement*)                                         = copy(children = cn)
-  def withKey(v: String)                                                            = copy(key = v)
-  def withPlaceholder(v: String)                                                    = copy(placeholder = v)
-  def withDefaultValue(v: String)                                                   = copy(defaultValue = v)
-  def withBg(v: Option[String])                                                     = copy(bg = v)
-  def withColor(v: Option[String])                                                  = copy(color = v)
-  def withBorderColor(v: Option[String])                                            = copy(borderColor = v)
-  def value                                                                         = valueReceived.getOrElse(defaultValue)
-  override def withDataStore(ds: TypedMap): Select                                  = copy(dataStore = ds)
+  override def defaultEventHandler                 = newValue => copy(valueReceived = Some(newValue))
+  override def withStyle(v: Map[String, Any])      = copy(style = v)
+  override def withChildren(cn: UiElement*)        = copy(children = cn)
+  def withKey(v: String)                           = copy(key = v)
+  def withPlaceholder(v: String)                   = copy(placeholder = v)
+  def withDefaultValue(v: String)                  = copy(defaultValue = v)
+  def withBg(v: Option[String])                    = copy(bg = v)
+  def withColor(v: Option[String])                 = copy(color = v)
+  def withBorderColor(v: Option[String])           = copy(borderColor = v)
+  def value                                        = valueReceived.getOrElse(defaultValue)
+  override def withDataStore(ds: TypedMap): Select = copy(dataStore = ds)
 
 case class Option_(
     key: String = Keys.nextKey,
