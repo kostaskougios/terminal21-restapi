@@ -118,7 +118,8 @@ class ControllerTest extends AnyFunSuiteLike:
       renderer
     ).handledEventsIterator.toList
 
-    println(handled.mkString("\n"))
+    handled(1).renderChanges should be(List(button.withText("changed")))
+    handled(2).renderChanges should be(Nil)
 
   test("timed changes are rendered"):
     @volatile var rendered                = Seq.empty[UiElement]
