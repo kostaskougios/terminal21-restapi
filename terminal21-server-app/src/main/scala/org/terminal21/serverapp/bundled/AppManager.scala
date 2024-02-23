@@ -67,7 +67,7 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
     Controller(components)
       .onEvent: event =>
         import event.*
-        // for every event, reset the model
+        // for every event, reset the startApp so that it doesn't start the same app on each event
         handled.withModel(model.copy(startApp = None))
 
   def controller: Controller[ManagerModel] =
