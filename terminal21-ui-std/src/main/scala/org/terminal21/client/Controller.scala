@@ -97,7 +97,8 @@ class Controller[M](
       case _                                                           => h
 
   private def includeRendered(handled: HandledEvent[M]): HandledEvent[M] =
-    val newComponentsByKey = handled.renderChanges.flatMap(_.flat).map(e => (e.key, e)).toMap
+    val newComponentsByKey =
+      (handled.renderChanges.flatMap(_.flat) ++ handled.timedRenderChanges.flatMap(_.renderChanges).flatMap(_.flat)).map(e => (e.key, e)).toMap
     handled.copy(componentsByKey = handled.componentsByKey ++ newComponentsByKey)
 
   def handledEventsIterator: EventIterator[HandledEvent[M]] =
@@ -125,9 +126,9 @@ object Controller:
     new Controller(session.eventIterator, session.renderChanges, components, initialModel, Nil)
 
 trait ControllerEvent[M]:
-  def model: M                                                                    = handled.model
+  def model: M                                    = handled.model
   def handled: HandledEvent[M]
-  extension [A <: UiElement](e: UiElement with HasEventHandler[A]) def current: A = handled.componentsByKey(e.key).asInstanceOf[A]
+  extension [A <: UiElement](e: A) def current: A = handled.current(e)
 
 case class ControllerClickEvent[M](clicked: UiElement, handled: HandledEvent[M])                            extends ControllerEvent[M]
 case class ControllerChangeEvent[M](changed: UiElement, handled: HandledEvent[M], newValue: String)         extends ControllerEvent[M]
@@ -147,6 +148,7 @@ case class HandledEvent[M](
   def withTimedRenderChanges(changed: TimedRenderChanges*): HandledEvent[M]           = copy(timedRenderChanges = changed)
   def addTimedRenderChange(waitInMs: Long, renderChanges: UiElement): HandledEvent[M] =
     copy(timedRenderChanges = timedRenderChanges :+ TimedRenderChanges(waitInMs, renderChanges))
+  def current[A <: UiElement](e: A): A                                                = componentsByKey(e.key).asInstanceOf[A]
 
 type OnClickEventHandlerFunction[M]         = ControllerClickEvent[M] => HandledEvent[M]
 type OnChangeEventHandlerFunction[M]        = ControllerChangeEvent[M] => HandledEvent[M]

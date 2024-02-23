@@ -132,6 +132,17 @@ class ControllerTest extends AnyFunSuiteLike:
     Thread.sleep(15)
     rendered should be(Seq(button.withText("changed")))
 
+  test("timed changes are visible"):
+    val model = Model(0)
+    newController(
+      model,
+      Iterator(buttonClick),
+      Seq(
+        button.onClick(using model): event =>
+          event.handled.withTimedRenderChanges(TimedRenderChanges(10, button.withText("changed"))).terminate
+      )
+    ).handledEventsIterator.toList(1).current(button) should be(button.withText("changed"))
+
   test("current value for OnChange"):
     val model = Model(0)
     newController(
