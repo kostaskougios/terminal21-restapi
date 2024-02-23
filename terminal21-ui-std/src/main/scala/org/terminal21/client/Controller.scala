@@ -27,6 +27,7 @@ class Controller[M](
       eventHandlers :+ handler
     )
 
+  def lastEventOption: Option[M]       = eventsIterator.lastOption
   def eventsIterator: EventIterator[M] = new EventIterator(handledEventsIterator.takeWhile(!_.shouldTerminate).map(_.model))
 
   private def clickHandlersMap(h: HandledEvent[M]): Map[String, Seq[OnClickEventHandlerFunction[M]]]                 =

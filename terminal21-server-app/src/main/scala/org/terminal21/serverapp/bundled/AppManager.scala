@@ -71,12 +71,12 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
         handled.withModel(model.copy(startApp = None))
 
   def controller: Controller[ManagerModel] =
-    val c = controller(components)
-    c.render()
-    c
+    controller(components)
 
   def eventsIterator: Iterator[ManagerModel] =
-    controller.eventsIterator
+    controller
+      .render()
+      .eventsIterator
       .tapEach: m =>
         for app <- m.startApp do startApp(app)
 
