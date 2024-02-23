@@ -3,7 +3,7 @@ package org.terminal21.client
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.components.UiElement
-import org.terminal21.client.components.chakra.{Button, Checkbox}
+import org.terminal21.client.components.chakra.{Box, Button, Checkbox}
 import org.terminal21.client.components.std.Input
 import org.terminal21.model.{CommandEvent, OnChange, OnClick}
 
@@ -34,18 +34,18 @@ class ControllerTest extends AnyFunSuiteLike:
   test("onEvent is called for change"):
     val model = Model(0)
     newController(model, Iterator(inputChange), Seq(input))
-      .onEvent:
-        case event @ ControllerChangeEvent(`input`, handled, "new-value") =>
-          if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
+      .onEvent: event =>
+        import event.*
+        if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
       .eventsIterator
       .toList should be(List(0, 1))
 
   test("onEvent is called for change/boolean"):
     val model = Model(0)
     newController(model, Iterator(checkBoxChange), Seq(checkbox))
-      .onEvent:
-        case event @ ControllerChangeBooleanEvent(`checkbox`, handled, true) =>
-          if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
+      .onEvent: event =>
+        import event.*
+        if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
       .eventsIterator
       .toList should be(List(0, 1))
 
@@ -155,3 +155,13 @@ class ControllerTest extends AnyFunSuiteLike:
           handled.withModel(if checkbox.current.checked then 100 else -1).terminate
       )
     ).eventsIterator.toList should be(List(0, 100))
+
+  test("newly rendered elements are visible"):
+    val model         = Model(0)
+    lazy val box: Box = Box().withChildren(
+      button.onClick(using model): event =>
+        event.handled.withRenderChanges(box.withChildren(button, checkbox))
+    )
+
+    val handledEvents = newController(model, Iterator(buttonClick), Seq(box)).handledEventsIterator.toList
+    handledEvents(1).componentsByKey(checkbox.key) should be(checkbox)

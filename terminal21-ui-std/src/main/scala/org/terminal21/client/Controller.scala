@@ -10,7 +10,7 @@ import org.terminal21.model.{CommandEvent, OnChange, OnClick}
 class Controller[M](
     eventIteratorFactory: => Iterator[CommandEvent],
     renderChanges: Seq[UiElement] => Unit,
-    components: Seq[UiElement],
+    initialComponents: Seq[UiElement],
     initialModel: Model[M],
     eventHandlers: Seq[ControllerEvent[M] => HandledEvent[M]]
 ):
@@ -18,7 +18,7 @@ class Controller[M](
     new Controller(
       eventIteratorFactory,
       renderChanges,
-      components,
+      initialComponents,
       initialModel,
       eventHandlers :+ handler
     )
@@ -42,8 +42,12 @@ class Controller[M](
           (e.key, e.dataStore(initialModel.ChangeBooleanKey))
       .toMap
 
-  private def componentsByKeyMap: Map[String, UiElement] =
-    components.flatMap(_.flat).map(c => (c.key, c)).toMap.withDefault(key => throw new IllegalArgumentException(s"Component with key=$key is not available"))
+  private def initialComponentsByKeyMap: Map[String, UiElement] =
+    initialComponents
+      .flatMap(_.flat)
+      .map(c => (c.key, c))
+      .toMap
+      .withDefault(key => throw new IllegalArgumentException(s"Component with key=$key is not available"))
 
   private def updateComponentsByKeyFromEvent(handled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
     handled.componentsByKey(event.key) match
@@ -54,13 +58,13 @@ class Controller[M](
           case _                    => handled
       case _                                    => handled
 
-  private def invokeEventHandlers(handled: HandledEvent[M], componentsByKey: Map[String, UiElement], event: CommandEvent): HandledEvent[M] =
+  private def invokeEventHandlers(handled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
     eventHandlers.foldLeft(handled.copy(renderChanges = Nil, timedRenderChanges = Nil)): (h, f) =>
       event match
         case OnClick(key)         =>
-          f(ControllerClickEvent(componentsByKey(key), h))
+          f(ControllerClickEvent(h.componentsByKey(key), h))
         case OnChange(key, value) =>
-          val receivedBy = componentsByKey(key)
+          val receivedBy = h.componentsByKey(key)
           val e          = receivedBy match
             case _: OnChangeEventHandler.CanHandleOnChangeEvent[_]        => ControllerChangeEvent(receivedBy, h, value)
             case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_] => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean)
@@ -92,17 +96,19 @@ class Controller[M](
         handled
       case _                                                           => h
 
-  def handledEventsIterator: EventIterator[HandledEvent[M]] =
-    val componentsByKey = componentsByKeyMap
+  private def includeRendered(handled: HandledEvent[M]): HandledEvent[M] =
+    val newComponentsByKey = handled.renderChanges.flatMap(_.flat).map(e => (e.key, e)).toMap
+    handled.copy(componentsByKey = handled.componentsByKey ++ newComponentsByKey)
 
+  def handledEventsIterator: EventIterator[HandledEvent[M]] =
     new EventIterator(
       eventIteratorFactory
         .takeWhile(!_.isSessionClosed)
-        .scanLeft(HandledEvent(initialModel.value, componentsByKey, Nil, Nil, false)): (oldHandled, event) =>
-          val initHandled = updateComponentsByKeyFromEvent(oldHandled, event)
-          val h           = invokeEventHandlers(initHandled, componentsByKey, event)
-          val handled     = invokeComponentEventHandlers(h, event)
-          handled
+        .scanLeft(HandledEvent(initialModel.value, initialComponentsByKeyMap, Nil, Nil, false)): (oldHandled, event) =>
+          val handled1 = includeRendered(updateComponentsByKeyFromEvent(oldHandled, event))
+          val handled2 = includeRendered(invokeEventHandlers(handled1, event))
+          val handled3 = includeRendered(invokeComponentEventHandlers(handled2, event))
+          handled3
         .tapEach: handled =>
           renderChanges(handled.renderChanges)
           for trc <- handled.timedRenderChanges do
