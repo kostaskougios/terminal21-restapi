@@ -70,7 +70,10 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
         // for every event, reset the model
         handled.withModel(model.copy(startApp = None))
 
-  def controller: Controller[ManagerModel] = controller(components)
+  def controller: Controller[ManagerModel] =
+    val c = controller(components)
+    c.render()
+    c
 
   def eventsIterator: Iterator[ManagerModel] =
     controller.eventsIterator

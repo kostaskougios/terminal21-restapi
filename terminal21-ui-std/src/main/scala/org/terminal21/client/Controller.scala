@@ -14,6 +14,10 @@ class Controller[M](
     initialModel: Model[M],
     eventHandlers: Seq[ControllerEvent[M] => HandledEvent[M]]
 ):
+  def render()(using session: ConnectedSession): this.type =
+    session.render(initialComponents)
+    this
+
   def onEvent(handler: ControllerEvent[M] => HandledEvent[M]) =
     new Controller(
       eventIteratorFactory,

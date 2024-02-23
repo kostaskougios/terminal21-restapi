@@ -24,7 +24,10 @@ class ServerStatusPage(
     sessionsService: ServerSessionsService
 )(using session: ConnectedSession):
   import Model.unitModel
-  def run(): Unit = controller(Runtime.getRuntime, sessionsService.allSessions).eventsIterator.lastOption
+  def run(): Unit =
+    val c = controller(Runtime.getRuntime, sessionsService.allSessions)
+    c.render()
+    c.eventsIterator.lastOption
 
   private def toMb(v: Long) = s"${v / (1024 * 1024)} MB"
   private val xs            = Some("2xs")
