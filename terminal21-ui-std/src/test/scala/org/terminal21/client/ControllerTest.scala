@@ -143,6 +143,19 @@ class ControllerTest extends AnyFunSuiteLike:
       )
     ).handledEventsIterator.toList(1).current(button) should be(button.withText("changed"))
 
+  test("timed changes event handlers are called"):
+    val model = Model(0)
+    val c     = checkbox.onChange(using model): event =>
+      event.handled.withModel(2)
+    newController(
+      model,
+      Iterator(buttonClick, checkBoxChange),
+      Seq(
+        button.onClick(using model): event =>
+          event.handled.withTimedRenderChanges(TimedRenderChanges(10, c))
+      )
+    ).eventsIterator.toList should be(List(0, 0, 2))
+
   test("current value for OnChange"):
     val model = Model(0)
     newController(

@@ -49,7 +49,7 @@ class Controller[M](
       .toMap
       .withDefault(key => throw new IllegalArgumentException(s"Component with key=$key is not available"))
 
-  private def updateComponentsByKeyFromEvent(handled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
+  private def updateComponentsFromEvent(handled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
     handled.componentsByKey(event.key) match
       case e: UiElement with HasEventHandler[_] =>
         event match
@@ -106,7 +106,7 @@ class Controller[M](
       eventIteratorFactory
         .takeWhile(!_.isSessionClosed)
         .scanLeft(HandledEvent(initialModel.value, initialComponentsByKeyMap, Nil, Nil, false)): (oldHandled, event) =>
-          val handled1 = includeRendered(updateComponentsByKeyFromEvent(oldHandled, event))
+          val handled1 = includeRendered(updateComponentsFromEvent(oldHandled, event))
           val handled2 = includeRendered(invokeEventHandlers(handled1, event))
           val handled3 = includeRendered(invokeComponentEventHandlers(handled2, event))
           handled3
