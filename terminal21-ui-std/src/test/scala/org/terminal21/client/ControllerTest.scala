@@ -126,7 +126,7 @@ class ControllerTest extends AnyFunSuiteLike:
     def renderer(s: Seq[UiElement]): Unit = rendered = s
     newController(Model(0), Iterator(buttonClick), Seq(button), renderer)
       .onEvent: event =>
-        event.handled.withModel(event.model + 1).withTimedRenderChanges(TimedRenderChanges(10, button.withText("changed"))).terminate
+        event.handled.withModel(1).withTimedRenderChanges(TimedRenderChanges(10, button.withText("changed"))).terminate
       .eventsIterator
       .toList should be(List(0, 1))
     Thread.sleep(15)
