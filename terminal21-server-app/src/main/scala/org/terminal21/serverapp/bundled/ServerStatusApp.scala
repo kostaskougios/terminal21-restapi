@@ -1,9 +1,9 @@
 package org.terminal21.serverapp.bundled
 
-import org.terminal21.client.{ConnectedSession, Controller}
+import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
-import org.terminal21.model.Session
+import org.terminal21.model.{Session, SessionOptions}
 import org.terminal21.server.Dependencies
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.service.ServerSessionsService
@@ -23,18 +23,16 @@ class ServerStatusPage(
     serverSideSessions: ServerSideSessions,
     sessionsService: ServerSessionsService
 )(using session: ConnectedSession):
-  def run(): Unit =
-    while !session.isClosed do
-      updateStatus()
-      Thread.sleep(1000)
+  import Model.unitModel
+  def run(): Unit = controller(Runtime.getRuntime, sessionsService.allSessions).eventsIterator.lastOption
 
-  private def toMb(v: Long)        = s"${v / (1024 * 1024)} MB"
-  private val xs                   = Some("2xs")
-  private def updateStatus(): Unit =
-    given Controller[Unit] = Controller(())
-    components(Runtime.getRuntime, sessionsService.allSessions).render()
+  private def toMb(v: Long) = s"${v / (1024 * 1024)} MB"
+  private val xs            = Some("2xs")
 
-  def components(runtime: Runtime, sessions: Seq[Session])(using Controller[Unit]): Seq[UiElement] =
+  def controller(runtime: Runtime, sessions: Seq[Session]): Controller[Unit] =
+    Controller(components(runtime, sessions))
+
+  def components(runtime: Runtime, sessions: Seq[Session]): Seq[UiElement] =
     val jvmTable      = QuickTable(caption = Some("JVM"))
       .withHeaders("Property", "Value", "Actions")
       .withRows(
@@ -60,23 +58,26 @@ class ServerStatusPage(
 
     Seq(jvmTable, sessionsTable)
 
-  private def actionsFor(session: Session)(using ConnectedSession): UiElement =
+  private def actionsFor(session: Session): UiElement =
     if session.isOpen then
       Box().withChildren(
         Button(text = "Close", size = xs)
           .withLeftIcon(SmallCloseIcon())
-          .onClick: () =>
+          .onClick: event =>
+            import event.*
             sessionsService.terminateAndRemove(session)
-            updateStatus()
+            handled
         ,
         Text(text = " "),
         Button(text = "View State", size = xs)
           .withLeftIcon(ChatIcon())
-          .onClick: () =>
+          .onClick: event =>
             serverSideSessions
               .withNewSession(session.id + "-server-state", s"Server State:${session.id}")
+              .andOptions(SessionOptions.LeaveOpenWhenTerminated)
               .connect: sSession =>
                 new ViewServerStatePage(using sSession).runFor(sessionsService.sessionStateOf(session))
+            event.handled
       )
     else NotAllowedIcon()
 
@@ -103,12 +104,12 @@ class ViewServerStatePage(using session: ConnectedSession):
         )
     )
 
-    Seq(
+    val components = Seq(
       QuickTabs()
         .withTabs("Root Keys", "Key Tree")
         .withTabPanels(
           rootKeyPanel,
           keyTreePanel
         )
-    ).render()
-    session.waitTillUserClosesSession()
+    )
+    session.render(components)

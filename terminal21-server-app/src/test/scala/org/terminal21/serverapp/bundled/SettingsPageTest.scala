@@ -13,11 +13,3 @@ class SettingsPageTest extends AnyFunSuiteLike:
   test("Should render the ThemeToggle component"):
     new App:
       page.components should contain(page.themeToggle)
-
-  test("run() should render all components"):
-    new App:
-      fiberExecutor.submit:
-        page.run()
-      session.waitUntilAtLeast1EventIteratorWasCreated()
-      session.fireEvents(CommandEvent.sessionClosed)
-      session.currentlyRendered should be(page.components)

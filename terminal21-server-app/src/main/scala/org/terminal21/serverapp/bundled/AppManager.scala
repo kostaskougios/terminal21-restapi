@@ -1,7 +1,7 @@
 package org.terminal21.serverapp.bundled
 
 import functions.fibers.FiberExecutor
-import org.terminal21.client.{ConnectedSession, Controller}
+import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.std.{Header1, Paragraph, Span}
@@ -24,15 +24,24 @@ class AppManager(serverSideSessions: ServerSideSessions, fiberExecutor: FiberExe
       app.createSession(serverSideSessions, dependencies)
 
 class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(using session: ConnectedSession):
+  case class ManagerModel(startApp: Option[ServerSideApp] = None)
+  given Model[ManagerModel] = Model(ManagerModel())
+
   def run(): Unit =
-    components.render()
     eventsIterator.foreach(_ => ())
 
   case class AppRow(app: ServerSideApp, link: Link, text: Text):
     def row: Seq[UiElement] = Seq(link, text)
 
   val appRows = apps.map: app =>
-    AppRow(app, Link(text = app.name), Text(text = app.description))
+    AppRow(
+      app,
+      Link(text = app.name).onClick: event =>
+        import event.*
+        handled.withModel(model.copy(startApp = Some(app)))
+      ,
+      Text(text = app.description)
+    )
 
   def components =
     val appsTable = QuickTable(
@@ -58,17 +67,16 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
       )
     )
 
-  case class Model(startApp: Option[ServerSideApp] = None)
-  def controller: Controller[Model] =
-    appRows
-      .foldLeft(Controller(Model())): (c, appRow) =>
-        c.onClick(appRow.link): event =>
-          event.handled.withModel(Model(startApp = Some(appRow.app)))
+  def controller(components: Seq[UiElement]): Controller[ManagerModel] =
+    Controller(components)
       .onEvent: event =>
+        import event.*
         // for every event, reset the model
-        event.handled.withModel(event.model.copy(startApp = None))
+        handled.withModel(model.copy(startApp = None))
 
-  def eventsIterator: Iterator[Model] =
+  def controller: Controller[ManagerModel] = controller(components)
+
+  def eventsIterator: Iterator[ManagerModel] =
     controller.eventsIterator
       .tapEach: m =>
         for app <- m.startApp do startApp(app)
