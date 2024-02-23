@@ -75,7 +75,6 @@ class ServerStatusPage(
           .onClick: event =>
             serverSideSessions
               .withNewSession(session.id + "-server-state", s"Server State:${session.id}")
-              .andOptions(SessionOptions.LeaveOpenWhenTerminated)
               .connect: sSession =>
                 new ViewServerStatePage(using sSession).runFor(sessionsService.sessionStateOf(session))
             event.handled
@@ -114,3 +113,4 @@ class ViewServerStatePage(using session: ConnectedSession):
         )
     )
     session.render(components)
+    session.leaveSessionOpenAfterExiting()
