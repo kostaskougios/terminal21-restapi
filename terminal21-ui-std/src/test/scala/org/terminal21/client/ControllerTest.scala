@@ -6,7 +6,7 @@ import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.{Box, Button, Checkbox}
 import org.terminal21.client.components.std.Input
 import org.terminal21.collections.SEList
-import org.terminal21.model.{CommandEvent, OnChange, OnClick}
+import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
 class ControllerTest extends AnyFunSuiteLike:
   val button         = Button()
@@ -53,6 +53,19 @@ class ControllerTest extends AnyFunSuiteLike:
         if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
       .eventsIterator
       .toList should be(List(0, 1))
+
+  case class TestClientEvent(i: Int) extends ClientEvent
+
+  test("onEvent is called for ClientEvent"):
+    val model = Model(0)
+    newController(model, Seq(TestClientEvent(5)), Seq(button))
+      .onEvent:
+        case ControllerClientEvent(handled, event: TestClientEvent) =>
+          import event.*
+          handled.withModel(event.i).terminate
+        case event                                                  => event.handled
+      .eventsIterator
+      .toList should be(List(0, 5))
 
   test("onClick is called"):
     given model: Model[Int] = Model(0)

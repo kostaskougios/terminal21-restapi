@@ -6,7 +6,7 @@ import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEven
 import org.terminal21.client.components.UiElement.HasEventHandler
 import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
 import org.terminal21.collections.TypedMapKey
-import org.terminal21.model.{CommandEvent, OnChange, OnClick}
+import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
 class Controller[M](
     eventIteratorFactory: => Iterator[CommandEvent],
@@ -58,13 +58,16 @@ class Controller[M](
       .withDefault(key => throw new IllegalArgumentException(s"Component with key=$key is not available"))
 
   private def updateComponentsFromEvent(handled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
-    handled.componentsByKey(event.key) match
-      case e: UiElement with HasEventHandler[_] =>
-        event match
-          case OnChange(key, value) =>
-            handled.copy(componentsByKey = handled.componentsByKey + (key -> e.defaultEventHandler(value)))
-          case _                    => handled
-      case _                                    => handled
+    event match
+      case _: ClientEvent => handled
+      case _              =>
+        handled.componentsByKey(event.key) match
+          case e: UiElement with HasEventHandler[_] =>
+            event match
+              case OnChange(key, value) =>
+                handled.copy(componentsByKey = handled.componentsByKey + (key -> e.defaultEventHandler(value)))
+              case _                    => handled
+          case _                                    => handled
 
   private def invokeEventHandlers(handled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
     eventHandlers.foldLeft(handled.copy(renderChanges = Nil, timedRenderChanges = Nil)): (h, f) =>
@@ -77,6 +80,8 @@ class Controller[M](
             case _: OnChangeEventHandler.CanHandleOnChangeEvent[_]        => ControllerChangeEvent(receivedBy, h, value)
             case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_] => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean)
           f(e)
+        case ce: ClientEvent      =>
+          f(ControllerClientEvent(handled, ce))
         case x                    => throw new IllegalStateException(s"Unexpected state $x")
 
   private def invokeComponentEventHandlers(h: HandledEvent[M], event: CommandEvent) =
@@ -135,7 +140,7 @@ object Controller:
   def apply[M](components: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
     new Controller(session.eventIterator, session.fireEvent, session.renderChanges, components, initialModel, Nil)
 
-trait ControllerEvent[M]:
+sealed trait ControllerEvent[M]:
   def model: M                                    = handled.model
   def handled: HandledEvent[M]
   extension [A <: UiElement](e: A) def current: A = handled.current(e)
@@ -143,6 +148,7 @@ trait ControllerEvent[M]:
 case class ControllerClickEvent[M](clicked: UiElement, handled: HandledEvent[M])                            extends ControllerEvent[M]
 case class ControllerChangeEvent[M](changed: UiElement, handled: HandledEvent[M], newValue: String)         extends ControllerEvent[M]
 case class ControllerChangeBooleanEvent[M](changed: UiElement, handled: HandledEvent[M], newValue: Boolean) extends ControllerEvent[M]
+case class ControllerClientEvent[M](handled: HandledEvent[M], event: ClientEvent)                           extends ControllerEvent[M]
 
 case class HandledEvent[M](
     model: M,

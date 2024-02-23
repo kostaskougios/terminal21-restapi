@@ -42,4 +42,5 @@ case class SessionClosed(key: String) extends CommandEvent:
 /** Extend this to send your own messages
   */
 trait ClientEvent extends CommandEvent:
-  override def key = "client-event"
+  override def key                      = "client-event"
+  override def isSessionClosed: Boolean = false
