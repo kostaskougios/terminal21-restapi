@@ -11,7 +11,9 @@ import org.terminal21.client.components.mathjax.*
     .andLibraries(MathJaxLib)
     .connect: session =>
       given ConnectedSession = session
-      Seq(
+      import Model.unitModel
+
+      val components = Seq(
         HStack().withChildren(
           Text(text = "Lets write some math expressions that will wow everybody!"),
           MathJax(expression = """\[\sum_{n = 200}^{1000}\left(\frac{20\sqrt{n}}{n}\right)\]""")
@@ -21,5 +23,5 @@ import org.terminal21.client.components.mathjax.*
           expression = """Does it align correctly? \(ax^2 + bx + c = 0\) It does provided CHTML renderer is used.""",
           style = Map("backgroundColor" -> "gray")
         )
-      ).render()
-      session.leaveSessionOpenAfterExiting()
+      )
+      Controller(components).eventsIterator.lastOption

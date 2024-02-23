@@ -89,15 +89,15 @@ case class Box(
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Box]
     with HasChildren[Box]:
-  override def withChildren(cn: UiElement*)   = copy(children = cn)
-  override def withStyle(v: Map[String, Any]) = copy(style = v)
-  def withKey(v: String)                      = copy(key = v)
-  def withText(v: String)                     = copy(text = v)
-  def withBg(v: String)                       = copy(bg = v)
-  def withW(v: String)                        = copy(w = v)
-  def withP(v: Int)                           = copy(p = v)
-  def withColor(v: String)                    = copy(color = v)
-  def withAs(v: Option[String])               = copy(as = v)
+  override def withChildren(cn: UiElement*): Box   = copy(children = cn)
+  override def withStyle(v: Map[String, Any]): Box = copy(style = v)
+  def withKey(v: String): Box                      = copy(key = v)
+  def withText(v: String): Box                     = copy(text = v)
+  def withBg(v: String): Box                       = copy(bg = v)
+  def withW(v: String): Box                        = copy(w = v)
+  def withP(v: Int): Box                           = copy(p = v)
+  def withColor(v: String): Box                    = copy(color = v)
+  def withAs(v: Option[String]): Box               = copy(as = v)
 
 /** https://chakra-ui.com/docs/components/stack
   */

@@ -23,14 +23,12 @@ class LoggedInTest extends AnyFunSuiteLike:
 
   test("yes clicked"):
     new App:
-      form.components.render()
       val eventsIt = form.controller.eventsIterator
       session.fireEvents(CommandEvent.onClick(form.yesButton), CommandEvent.sessionClosed)
       eventsIt.lastOption should be(Some(true))
 
   test("no clicked"):
     new App:
-      form.components.render()
       val eventsIt = form.controller.eventsIterator
       session.fireEvents(CommandEvent.onClick(form.noButton), CommandEvent.sessionClosed)
       eventsIt.lastOption should be(Some(false))

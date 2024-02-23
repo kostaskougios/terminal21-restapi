@@ -11,5 +11,6 @@ import tests.nivo.{ResponsiveBarChart, ResponsiveLineChart}
     .andLibraries(NivoLib)
     .connect: session =>
       given ConnectedSession = session
-      (ResponsiveBarChart() ++ ResponsiveLineChart()).render()
-      session.waitTillUserClosesSession()
+      import Model.unitModel
+      val components         = ResponsiveBarChart() ++ ResponsiveLineChart()
+      Controller(components).eventsIterator.lastOption

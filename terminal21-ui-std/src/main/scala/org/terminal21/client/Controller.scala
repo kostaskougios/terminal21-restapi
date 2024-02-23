@@ -124,6 +124,8 @@ class Controller[M](
 object Controller:
   def apply[M](initialModel: Model[M], components: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
     new Controller(session.eventIterator, session.renderChanges, components, initialModel, Nil)
+  def apply[M](components: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
+    new Controller(session.eventIterator, session.renderChanges, components, initialModel, Nil)
 
 trait ControllerEvent[M]:
   def model: M                                    = handled.model
@@ -162,3 +164,8 @@ case class Model[M](value: M):
   object ClickKey         extends TypedMapKey[Seq[OnClickEventHandlerFunction[M]]]
   object ChangeKey        extends TypedMapKey[Seq[OnChangeEventHandlerFunction[M]]]
   object ChangeBooleanKey extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]
+
+object Model:
+  given unitModel: Model[Unit]            = Model(())
+  given booleanFalseModel: Model[Boolean] = Model(false)
+  given booleanTrueModel: Model[Boolean]  = Model(true)

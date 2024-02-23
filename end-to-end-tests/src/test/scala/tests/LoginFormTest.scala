@@ -27,7 +27,6 @@ class LoginFormTest extends AnyFunSuiteLike:
 
   test("user submits validated data"):
     new App:
-      form.components.render()
       val eventsIt = form.controller.eventsIterator // get the iterator before we fire the events, otherwise the iterator will be empty
       session.fireEvents(
         CommandEvent.onChange(form.emailInput, "an@email.com"),
@@ -40,7 +39,6 @@ class LoginFormTest extends AnyFunSuiteLike:
 
   test("user submits invalid email"):
     new App:
-      form.components.render()
       val eventsIt   = form.controller.handledEventsIterator // get the iterator that iterates Handled instances so that we can assert on renderChanges
       session.fireEvents(
         CommandEvent.onChange(form.emailInput, "invalid-email.com"),

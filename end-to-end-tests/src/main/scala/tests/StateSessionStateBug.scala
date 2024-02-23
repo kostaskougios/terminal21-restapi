@@ -3,7 +3,7 @@ package tests
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.std.Paragraph
-import org.terminal21.client.{ConnectedSession, Sessions}
+import org.terminal21.client.*
 
 import java.util.Date
 
@@ -12,10 +12,10 @@ import java.util.Date
     .withNewSession("state-session", "Stale Session")
     .connect: session =>
       given ConnectedSession = session
+      import Model.unitModel
 
-      var exitFlag = false
-      val date     = new Date()
-      Seq(
+      val date       = new Date()
+      val components = Seq(
         Paragraph(text = s"Now: $date"),
         QuickTable()
           .withHeaders("Title", "Value")
@@ -39,7 +39,7 @@ import java.util.Date
               )
             )
           ),
-        Button(text = "Close").onClick: () =>
-          exitFlag = true
-      ).render()
-      session.waitTillUserClosesSessionOr(exitFlag)
+        Button(text = "Close").onClick: event =>
+          event.handled.terminate
+      )
+      Controller(components).eventsIterator.lastOption

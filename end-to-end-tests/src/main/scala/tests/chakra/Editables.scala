@@ -1,12 +1,12 @@
 package tests.chakra
 
-import org.terminal21.client.ConnectedSession
+import org.terminal21.client.{ConnectedSession, Model}
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
 import tests.chakra.Common.*
 
 object Editables:
-  def components(using session: ConnectedSession): Seq[UiElement] =
+  def components(using ConnectedSession, Model[Boolean]): Seq[UiElement] =
     val status = Box(text = "This will reflect any changes in the form.")
 
     val editable1I = Editable(defaultValue = "Please type here").withChildren(
@@ -14,15 +14,17 @@ object Editables:
       EditableInput()
     )
 
-    val editable1 = editable1I.onChange: newValue =>
-      status.withText(s"editable1 newValue = $newValue, verify editable1.value = ${editable1I.current.value}").renderChanges()
+    val editable1 = editable1I.onChange: event =>
+      import event.*
+      handled.withRenderChanges(status.withText(s"editable1 newValue = $newValue, verify editable1.value = ${editable1I.current.value}"))
 
     val editable2I = Editable(defaultValue = "For longer maybe-editable texts\nUse an EditableTextarea\nIt uses a textarea control.").withChildren(
       EditablePreview(),
       EditableTextarea()
     )
-    val editable2  = editable2I.onChange: newValue =>
-      status.withText(s"editable2 newValue = $newValue, verify editable2.value = ${editable2I.current.value}").renderChanges()
+    val editable2  = editable2I.onChange: event =>
+      import event.*
+      handled.withRenderChanges(status.withText(s"editable2 newValue = $newValue, verify editable2.value = ${editable2I.current.value}"))
 
     Seq(
       commonBox(text = "Editables"),
