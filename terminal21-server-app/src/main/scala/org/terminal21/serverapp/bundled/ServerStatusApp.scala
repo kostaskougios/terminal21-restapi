@@ -3,7 +3,7 @@ package org.terminal21.serverapp.bundled
 import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
-import org.terminal21.model.{Session, SessionOptions}
+import org.terminal21.model.Session
 import org.terminal21.server.Dependencies
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.service.ServerSessionsService
