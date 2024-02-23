@@ -30,12 +30,8 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
   def run(): Unit =
     eventsIterator.foreach(_ => ())
 
-  case class AppRow(app: ServerSideApp, link: Link, text: Text):
-    def row: Seq[UiElement] = Seq(link, text)
-
-  val appRows = apps.map: app =>
-    AppRow(
-      app,
+  val appRows: Seq[Seq[UiElement]] = apps.map: app =>
+    Seq(
       Link(text = app.name).onClick: event =>
         import event.*
         handled.withModel(model.copy(startApp = Some(app)))
@@ -46,7 +42,7 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
   def components =
     val appsTable = QuickTable(
       caption = Some("Apps installed on the server, click one to run it."),
-      rows = appRows.map(_.row)
+      rows = appRows
     ).withHeaders("App Name", "Description")
 
     Seq(

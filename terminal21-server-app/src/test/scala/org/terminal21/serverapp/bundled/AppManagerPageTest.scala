@@ -49,7 +49,7 @@ class AppManagerPageTest extends AnyFunSuiteLike:
     val app = mockApp("app1", "the-app1-desc")
     new App(app):
       val eventsIt = page.eventsIterator
-      session.fireEvents(CommandEvent.onClick(page.appRows.head.link), CommandEvent.sessionClosed)
+      session.fireEvents(CommandEvent.onClick(page.appRows.head.head), CommandEvent.sessionClosed)
       eventsIt.toList
       startedApp should be(Some(app))
 
@@ -58,5 +58,5 @@ class AppManagerPageTest extends AnyFunSuiteLike:
     new App(app):
       val other    = Link()
       val eventsIt = page.controller(page.components :+ other).eventsIterator
-      session.fireEvents(CommandEvent.onClick(page.appRows.head.link), CommandEvent.onClick(other), CommandEvent.sessionClosed)
+      session.fireEvents(CommandEvent.onClick(page.appRows.head.head), CommandEvent.onClick(other), CommandEvent.sessionClosed)
       eventsIt.toList.last.startApp should be(None)
