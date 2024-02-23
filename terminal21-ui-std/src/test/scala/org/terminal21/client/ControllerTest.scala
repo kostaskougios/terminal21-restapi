@@ -165,3 +165,20 @@ class ControllerTest extends AnyFunSuiteLike:
 
     val handledEvents = newController(model, Iterator(buttonClick), Seq(box)).handledEventsIterator.toList
     handledEvents(1).componentsByKey(checkbox.key) should be(checkbox)
+
+  test("newly rendered elements event handlers are invoked"):
+    val model          = Model(0)
+    lazy val b: Button = button.onClick(using model): event =>
+      event.handled
+        .withModel(1)
+        .withRenderChanges(
+          box.withChildren(
+            b,
+            checkbox.onChange(using model): event =>
+              event.handled.withModel(2)
+          )
+        )
+
+    lazy val box: Box = Box().withChildren(b)
+
+    newController(model, Iterator(buttonClick, checkBoxChange), Seq(box)).eventsIterator.toList should be(List(0, 1, 2))
