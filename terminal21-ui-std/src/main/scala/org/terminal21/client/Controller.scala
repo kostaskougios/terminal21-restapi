@@ -42,58 +42,66 @@ class Controller[M](
           (e.key, e.dataStore(initialModel.ChangeBooleanKey))
       .toMap
 
+  private def componentsByKeyMap: Map[String, UiElement] =
+    components.flatMap(_.flat).map(c => (c.key, c)).toMap.withDefault(key => throw new IllegalArgumentException(s"Component with key=$key is not available"))
+
+  private def updateComponentsByKeyFromEvent(handled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
+    handled.componentsByKey(event.key) match
+      case e: UiElement with HasEventHandler[_] =>
+        event match
+          case OnChange(key, value) =>
+            handled.copy(componentsByKey = handled.componentsByKey + (key -> e.defaultEventHandler(value)))
+          case _                    => handled
+      case _                                    => handled
+
+  private def invokeEventHandlers(handled: HandledEvent[M], componentsByKey: Map[String, UiElement], event: CommandEvent): HandledEvent[M] =
+    eventHandlers.foldLeft(handled.copy(renderChanges = Nil, timedRenderChanges = Nil)): (h, f) =>
+      event match
+        case OnClick(key)         =>
+          f(ControllerClickEvent(componentsByKey(key), h))
+        case OnChange(key, value) =>
+          val receivedBy = componentsByKey(key)
+          val e          = receivedBy match
+            case _: OnChangeEventHandler.CanHandleOnChangeEvent[_]        => ControllerChangeEvent(receivedBy, h, value)
+            case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_] => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean)
+          f(e)
+        case x                    => throw new IllegalStateException(s"Unexpected state $x")
+
+  private def invokeComponentEventHandlers(h: HandledEvent[M], event: CommandEvent) =
+    lazy val clickHandlers         = clickHandlersMap(h)
+    lazy val changeHandlers        = changeHandlersMap(h)
+    lazy val changeBooleanHandlers = changeBooleanHandlersMap(h)
+    event match
+      case OnClick(key) if clickHandlers.contains(key)                 =>
+        val handlers   = clickHandlers(key)
+        val receivedBy = h.componentsByKey(key)
+        val handled    = handlers.foldLeft(h): (handled, handler) =>
+          handler(ControllerClickEvent(receivedBy, handled))
+        handled
+      case OnChange(key, value) if changeHandlers.contains(key)        =>
+        val handlers   = changeHandlers(key)
+        val receivedBy = h.componentsByKey(key)
+        val handled    = handlers.foldLeft(h): (handled, handler) =>
+          handler(ControllerChangeEvent(receivedBy, handled, value))
+        handled
+      case OnChange(key, value) if changeBooleanHandlers.contains(key) =>
+        val handlers   = changeBooleanHandlers(key)
+        val receivedBy = h.componentsByKey(key)
+        val handled    = handlers.foldLeft(h): (handled, handler) =>
+          handler(ControllerChangeBooleanEvent(receivedBy, handled, value.toBoolean))
+        handled
+      case _                                                           => h
+
   def handledEventsIterator: EventIterator[HandledEvent[M]] =
-    val componentsByKey =
-      components.flatMap(_.flat).map(c => (c.key, c)).toMap.withDefault(key => throw new IllegalArgumentException(s"Component with key=$key is not available"))
+    val componentsByKey = componentsByKeyMap
 
     new EventIterator(
       eventIteratorFactory
         .takeWhile(!_.isSessionClosed)
         .scanLeft(HandledEvent(initialModel.value, componentsByKey, Nil, Nil, false)): (oldHandled, event) =>
-          val initHandled = oldHandled.componentsByKey(event.key) match
-            case e: UiElement with HasEventHandler[_] =>
-              event match
-                case OnChange(key, value) =>
-                  oldHandled.copy(componentsByKey = oldHandled.componentsByKey + (key -> e.defaultEventHandler(value)))
-                case _                    => oldHandled
-            case _                                    => oldHandled
-
-          val h = eventHandlers.foldLeft(initHandled.copy(renderChanges = Nil, timedRenderChanges = Nil)): (h, f) =>
-            event match
-              case OnClick(key)         =>
-                f(ControllerClickEvent(componentsByKey(key), h))
-              case OnChange(key, value) =>
-                val receivedBy = componentsByKey(key)
-                val e          = receivedBy match
-                  case _: OnChangeEventHandler.CanHandleOnChangeEvent[_]        => ControllerChangeEvent(receivedBy, h, value)
-                  case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_] => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean)
-                f(e)
-              case x                    => throw new IllegalStateException(s"Unexpected state $x")
-
-          lazy val clickHandlers         = clickHandlersMap(h)
-          lazy val changeHandlers        = changeHandlersMap(h)
-          lazy val changeBooleanHandlers = changeBooleanHandlersMap(h)
-
-          val handled = event match
-            case OnClick(key) if clickHandlers.contains(key)                 =>
-              val handlers   = clickHandlers(key)
-              val receivedBy = h.componentsByKey(key)
-              val handled    = handlers.foldLeft(h): (handled, handler) =>
-                handler(ControllerClickEvent(receivedBy, handled))
-              handled
-            case OnChange(key, value) if changeHandlers.contains(key)        =>
-              val handlers   = changeHandlers(key)
-              val receivedBy = h.componentsByKey(key)
-              val handled    = handlers.foldLeft(h): (handled, handler) =>
-                handler(ControllerChangeEvent(receivedBy, handled, value))
-              handled
-            case OnChange(key, value) if changeBooleanHandlers.contains(key) =>
-              val handlers   = changeBooleanHandlers(key)
-              val receivedBy = h.componentsByKey(key)
-              val handled    = handlers.foldLeft(h): (handled, handler) =>
-                handler(ControllerChangeBooleanEvent(receivedBy, handled, value.toBoolean))
-              handled
-            case _                                                           => h
+          val initHandled = updateComponentsByKeyFromEvent(oldHandled, event)
+          val h           = invokeEventHandlers(initHandled, componentsByKey, event)
+          val handled     = invokeComponentEventHandlers(h, event)
           handled
         .tapEach: handled =>
           renderChanges(handled.renderChanges)

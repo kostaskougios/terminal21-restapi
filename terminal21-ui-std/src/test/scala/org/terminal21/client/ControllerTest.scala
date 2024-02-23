@@ -102,6 +102,24 @@ class ControllerTest extends AnyFunSuiteLike:
 
     rendered should be(Seq(button.withText("changed")))
 
+  test("changes are rendered once"):
+    var rendered                          = Seq.empty[UiElement]
+    def renderer(s: Seq[UiElement]): Unit = rendered = s
+
+    val model   = Model(0)
+    val handled = newController(
+      model,
+      Iterator(buttonClick, checkBoxChange),
+      Seq(
+        button.onClick(using model): event =>
+          event.handled.withRenderChanges(button.withText("changed")),
+        checkbox
+      ),
+      renderer
+    ).handledEventsIterator.toList
+
+    println(handled.mkString("\n"))
+
   test("timed changes are rendered"):
     @volatile var rendered                = Seq.empty[UiElement]
     def renderer(s: Seq[UiElement]): Unit = rendered = s
