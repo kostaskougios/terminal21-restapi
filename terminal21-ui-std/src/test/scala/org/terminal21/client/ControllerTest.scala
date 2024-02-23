@@ -124,3 +124,15 @@ class ControllerTest extends AnyFunSuiteLike:
           handled.withModel(if input.current.value == "new-value" then 100 else -1).terminate
       )
     ).eventsIterator.toList should be(List(0, 100))
+
+  test("current value for OnChange/boolean"):
+    val model = Model(0)
+    newController(
+      model,
+      Iterator(checkBoxChange),
+      Seq(
+        checkbox.onChange(using model): event =>
+          import event.*
+          handled.withModel(if checkbox.current.checked then 100 else -1).terminate
+      )
+    ).eventsIterator.toList should be(List(0, 100))
