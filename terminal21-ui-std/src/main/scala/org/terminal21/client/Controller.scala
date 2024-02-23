@@ -1,14 +1,16 @@
 package org.terminal21.client
 
-import org.terminal21.client.collections.{EventIterator, TypedMapKey}
+import org.terminal21.client.collections.EventIterator
 import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
 import org.terminal21.client.components.UiElement.HasEventHandler
 import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
+import org.terminal21.collections.TypedMapKey
 import org.terminal21.model.{CommandEvent, OnChange, OnClick}
 
 class Controller[M](
     eventIteratorFactory: => Iterator[CommandEvent],
+    fireEvent: CommandEvent => Unit,
     renderChanges: Seq[UiElement] => Unit,
     initialComponents: Seq[UiElement],
     initialModel: Model[M],
@@ -21,6 +23,7 @@ class Controller[M](
   def onEvent(handler: ControllerEvent[M] => HandledEvent[M]) =
     new Controller(
       eventIteratorFactory,
+      fireEvent,
       renderChanges,
       initialComponents,
       initialModel,
@@ -128,9 +131,9 @@ class Controller[M](
 
 object Controller:
   def apply[M](initialModel: Model[M], components: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
-    new Controller(session.eventIterator, session.renderChanges, components, initialModel, Nil)
+    new Controller(session.eventIterator, session.fireEvent, session.renderChanges, components, initialModel, Nil)
   def apply[M](components: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
-    new Controller(session.eventIterator, session.renderChanges, components, initialModel, Nil)
+    new Controller(session.eventIterator, session.fireEvent, session.renderChanges, components, initialModel, Nil)
 
 trait ControllerEvent[M]:
   def model: M                                    = handled.model

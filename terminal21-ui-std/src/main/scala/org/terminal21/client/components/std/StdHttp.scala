@@ -1,10 +1,10 @@
 package org.terminal21.client.components.std
 
 import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
-import org.terminal21.client.collections.TypedMap
 import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement.HasEventHandler
 import org.terminal21.client.components.{EventHandler, Keys, OnChangeEventHandler, TransientRequest, UiElement}
+import org.terminal21.collections.TypedMap
 import org.terminal21.model.OnChange
 
 /** Elements mapping to Http functionality

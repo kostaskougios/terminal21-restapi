@@ -1,9 +1,9 @@
 package org.terminal21.client.components.chakra
 
 import org.terminal21.client.ConnectedSession
-import org.terminal21.client.collections.TypedMap
 import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, HasStyle}
 import org.terminal21.client.components.*
+import org.terminal21.collections.TypedMap
 
 sealed trait CEJson extends UiElement
 

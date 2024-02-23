@@ -1,7 +1,8 @@
-package org.terminal21.client.collections
+package org.terminal21.collections
 
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
+import org.terminal21.collections.{TypedMap, TypedMapKey}
 
 class TypedMapTest extends AnyFunSuiteLike:
   object IntKey    extends TypedMapKey[Int]

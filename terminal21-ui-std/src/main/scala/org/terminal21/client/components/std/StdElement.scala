@@ -1,10 +1,10 @@
 package org.terminal21.client.components.std
 
 import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
-import org.terminal21.client.collections.TypedMap
 import org.terminal21.client.components.UiElement.{HasChildren, HasEventHandler, HasStyle}
 import org.terminal21.client.components.{Keys, OnChangeEventHandler, UiElement}
 import org.terminal21.client.ConnectedSession
+import org.terminal21.collections.TypedMap
 
 sealed trait StdEJson                   extends UiElement
 sealed trait StdElement[A <: UiElement] extends StdEJson with HasStyle[A]

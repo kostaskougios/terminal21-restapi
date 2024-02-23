@@ -1,4 +1,4 @@
-package org.terminal21.client.collections
+package org.terminal21.collections
 
 class TypedMap(val m: Map[TypedMapKey[_], Any]):
   def +[A](kv: (TypedMapKey[A], A)): TypedMap        = new TypedMap(m + kv)

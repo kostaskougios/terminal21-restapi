@@ -69,7 +69,7 @@ val commonSettings = Seq(
 lazy val `terminal21-server-client-common` = project
   .settings(
     commonSettings,
-    libraryDependencies ++= Seq(
+    libraryDependencies ++= Circe ++ Seq(
       ScalaTest,
       Slf4jApi,
       HelidonClientWebSocket,

@@ -5,6 +5,7 @@ import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.{Box, Button, Checkbox}
 import org.terminal21.client.components.std.Input
+import org.terminal21.collections.SEList
 import org.terminal21.model.{CommandEvent, OnChange, OnClick}
 
 class ControllerTest extends AnyFunSuiteLike:
@@ -17,15 +18,19 @@ class ControllerTest extends AnyFunSuiteLike:
 
   def newController[M](
       initialModel: Model[M],
-      eventIterator: => Iterator[CommandEvent],
+      events: => Seq[CommandEvent],
       components: Seq[UiElement],
       renderChanges: Seq[UiElement] => Unit = _ => ()
   ): Controller[M] =
-    new Controller(eventIterator, renderChanges, components, initialModel, Nil)
+    val seList = SEList[CommandEvent]()
+    val it     = seList.iterator
+    events.foreach(e => seList.add(e))
+    seList.add(CommandEvent.sessionClosed)
+    new Controller(it, event => (), renderChanges, components, initialModel, Nil)
 
   test("onEvent is called"):
     val model = Model(0)
-    newController(model, Iterator(buttonClick), Seq(button))
+    newController(model, Seq(buttonClick), Seq(button))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
       .eventsIterator
@@ -33,7 +38,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("onEvent is called for change"):
     val model = Model(0)
-    newController(model, Iterator(inputChange), Seq(input))
+    newController(model, Seq(inputChange), Seq(input))
       .onEvent: event =>
         import event.*
         if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
@@ -42,7 +47,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("onEvent is called for change/boolean"):
     val model = Model(0)
-    newController(model, Iterator(checkBoxChange), Seq(checkbox))
+    newController(model, Seq(checkBoxChange), Seq(checkbox))
       .onEvent: event =>
         import event.*
         if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
@@ -53,7 +58,7 @@ class ControllerTest extends AnyFunSuiteLike:
     given model: Model[Int] = Model(0)
     newController(
       model,
-      Iterator(buttonClick),
+      Seq(buttonClick),
       Seq(
         button.onClick: event =>
           event.handled.withModel(100).terminate
@@ -64,7 +69,7 @@ class ControllerTest extends AnyFunSuiteLike:
     given model: Model[Int] = Model(0)
     newController(
       model,
-      Iterator(inputChange),
+      Seq(inputChange),
       Seq(
         input.onChange: event =>
           event.handled.withModel(100).terminate
@@ -75,7 +80,7 @@ class ControllerTest extends AnyFunSuiteLike:
     given model: Model[Int] = Model(0)
     newController(
       model,
-      Iterator(checkBoxChange),
+      Seq(checkBoxChange),
       Seq(
         checkbox.onChange: event =>
           event.handled.withModel(100).terminate
@@ -84,7 +89,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("terminate is obeyed and latest model state is iterated"):
     val model = Model(0)
-    newController(model, Iterator(buttonClick, buttonClick, buttonClick), Seq(button))
+    newController(model, Seq(buttonClick, buttonClick, buttonClick), Seq(button))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate.withModel(100) else event.handled.withModel(event.model + 1)
       .eventsIterator
@@ -94,7 +99,7 @@ class ControllerTest extends AnyFunSuiteLike:
     var rendered                          = Seq.empty[UiElement]
     def renderer(s: Seq[UiElement]): Unit = rendered = s
 
-    newController(Model(0), Iterator(buttonClick), Seq(button), renderer)
+    newController(Model(0), Seq(buttonClick), Seq(button), renderer)
       .onEvent: event =>
         event.handled.withModel(event.model + 1).withRenderChanges(button.withText("changed")).terminate
       .eventsIterator
@@ -109,7 +114,7 @@ class ControllerTest extends AnyFunSuiteLike:
     val model   = Model(0)
     val handled = newController(
       model,
-      Iterator(buttonClick, checkBoxChange),
+      Seq(buttonClick, checkBoxChange),
       Seq(
         button.onClick(using model): event =>
           event.handled.withRenderChanges(button.withText("changed")),
@@ -124,7 +129,7 @@ class ControllerTest extends AnyFunSuiteLike:
   test("timed changes are rendered"):
     @volatile var rendered                = Seq.empty[UiElement]
     def renderer(s: Seq[UiElement]): Unit = rendered = s
-    newController(Model(0), Iterator(buttonClick), Seq(button), renderer)
+    newController(Model(0), Seq(buttonClick), Seq(button), renderer)
       .onEvent: event =>
         event.handled.withModel(1).withTimedRenderChanges(TimedRenderChanges(10, button.withText("changed"))).terminate
       .eventsIterator
@@ -136,7 +141,7 @@ class ControllerTest extends AnyFunSuiteLike:
     val model = Model(0)
     newController(
       model,
-      Iterator(buttonClick),
+      Seq(buttonClick),
       Seq(
         button.onClick(using model): event =>
           event.handled.withTimedRenderChanges(TimedRenderChanges(10, button.withText("changed"))).terminate
@@ -149,7 +154,7 @@ class ControllerTest extends AnyFunSuiteLike:
       event.handled.withModel(2)
     newController(
       model,
-      Iterator(buttonClick, checkBoxChange),
+      Seq(buttonClick, checkBoxChange),
       Seq(
         button.onClick(using model): event =>
           event.handled.withTimedRenderChanges(TimedRenderChanges(10, c))
@@ -160,7 +165,7 @@ class ControllerTest extends AnyFunSuiteLike:
     val model = Model(0)
     newController(
       model,
-      Iterator(inputChange),
+      Seq(inputChange),
       Seq(
         input.onChange(using model): event =>
           import event.*
@@ -172,7 +177,7 @@ class ControllerTest extends AnyFunSuiteLike:
     val model = Model(0)
     newController(
       model,
-      Iterator(checkBoxChange),
+      Seq(checkBoxChange),
       Seq(
         checkbox.onChange(using model): event =>
           import event.*
@@ -187,7 +192,7 @@ class ControllerTest extends AnyFunSuiteLike:
         event.handled.withRenderChanges(box.withChildren(button, checkbox))
     )
 
-    val handledEvents = newController(model, Iterator(buttonClick), Seq(box)).handledEventsIterator.toList
+    val handledEvents = newController(model, Seq(buttonClick), Seq(box)).handledEventsIterator.toList
     handledEvents(1).componentsByKey(checkbox.key) should be(checkbox)
 
   test("newly rendered elements event handlers are invoked"):
@@ -205,4 +210,4 @@ class ControllerTest extends AnyFunSuiteLike:
 
     lazy val box: Box = Box().withChildren(b)
 
-    newController(model, Iterator(buttonClick, checkBoxChange), Seq(box)).eventsIterator.toList should be(List(0, 1, 2))
+    newController(model, Seq(buttonClick, checkBoxChange), Seq(box)).eventsIterator.toList should be(List(0, 1, 2))
