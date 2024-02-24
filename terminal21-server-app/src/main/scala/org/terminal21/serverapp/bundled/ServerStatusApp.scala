@@ -34,30 +34,32 @@ class ServerStatusPage(
     Controller(components(runtime, sessions))
 
   def components(runtime: Runtime, sessions: Seq[Session]): Seq[UiElement] =
-    val jvmTable      = QuickTable(caption = Some("JVM"))
-      .withHeaders("Property", "Value", "Actions")
-      .withRows(
-        Seq(
-          Seq("Free Memory", toMb(runtime.freeMemory()), ""),
-          Seq("Max Memory", toMb(runtime.maxMemory()), ""),
-          Seq(
-            "Total Memory",
-            toMb(runtime.totalMemory()),
-            Button(size = xs, text = "Run GC").onClick: event =>
-              System.gc()
-              event.handled
-          ),
-          Seq("Available processors", runtime.availableProcessors(), "")
-        )
-      )
-    val sessionsTable = QuickTable(
-      caption = Some("All sessions"),
-      rows = sessions.map: session =>
-        Seq(Text(text = session.id), Text(text = session.name), if session.isOpen then CheckIcon() else NotAllowedIcon(), actionsFor(session))
-    )
-      .withHeaders("Id", "Name", "Is Open", "Actions")
+    Seq(jvmTable(runtime), sessionsTable(sessions))
 
-    Seq(jvmTable, sessionsTable)
+  def jvmTable(runtime: Runtime) = QuickTable(caption = Some("JVM"))
+    .withHeaders("Property", "Value", "Actions")
+    .withRows(
+      Seq(
+        Seq("Free Memory", toMb(runtime.freeMemory()), ""),
+        Seq("Max Memory", toMb(runtime.maxMemory()), ""),
+        Seq(
+          "Total Memory",
+          toMb(runtime.totalMemory()),
+          Button(size = xs, text = "Run GC").onClick: event =>
+            System.gc()
+            event.handled
+        ),
+        Seq("Available processors", runtime.availableProcessors(), "")
+      )
+    )
+
+  def sessionsTable(sessions: Seq[Session]) = QuickTable(
+    key = "sessions-table",
+    caption = Some("All sessions"),
+    rows = sessions.map: session =>
+      Seq(Text(text = session.id), Text(text = session.name), if session.isOpen then CheckIcon() else NotAllowedIcon(), actionsFor(session))
+  )
+    .withHeaders("Id", "Name", "Is Open", "Actions")
 
   private def actionsFor(session: Session): UiElement =
     if session.isOpen then
