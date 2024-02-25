@@ -1,9 +1,10 @@
 package org.terminal21.serverapp.bundled
 
+import functions.fibers.FiberExecutor
 import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
-import org.terminal21.model.Session
+import org.terminal21.model.{ClientEvent, Session}
 import org.terminal21.server.Dependencies
 import org.terminal21.server.model.SessionState
 import org.terminal21.server.service.ServerSessionsService
@@ -17,21 +18,31 @@ class ServerStatusApp extends ServerSideApp:
     serverSideSessions
       .withNewSession("server-status", "Server Status")
       .connect: session =>
-        new ServerStatusPage(serverSideSessions, dependencies.sessionsService)(using session).run()
+        new ServerStatusPage(serverSideSessions, dependencies.sessionsService)(using session, dependencies.fiberExecutor).run()
 
 class ServerStatusPage(
     serverSideSessions: ServerSideSessions,
     sessionsService: ServerSessionsService
-)(using appSession: ConnectedSession):
+)(using appSession: ConnectedSession, fiberExecutor: FiberExecutor):
   import Model.unitModel
+
+  case object Ticker extends ClientEvent
+
   def run(): Unit =
+    fiberExecutor.submit:
+      while !appSession.isClosed do
+        Thread.sleep(2000)
+        appSession.fireEvents(Ticker)
     controller(Runtime.getRuntime, sessionsService.allSessions).render().eventsIterator.lastOption
 
   private def toMb(v: Long) = s"${v / (1024 * 1024)} MB"
   private val xs            = Some("2xs")
 
   def controller(runtime: Runtime, sessions: Seq[Session]): Controller[Unit] =
-    Controller(components(runtime, sessions)) // .onEvent()
+    Controller(components(runtime, sessions)).onEvent:
+      case ControllerClientEvent(handled, Ticker) =>
+        println("Ticker")
+        handled.withRenderChanges(sessionsTable(sessionsService.allSessions))
 
   def components(runtime: Runtime, sessions: Seq[Session]): Seq[UiElement] =
     Seq(jvmTable(runtime), sessionsTable(sessions))
