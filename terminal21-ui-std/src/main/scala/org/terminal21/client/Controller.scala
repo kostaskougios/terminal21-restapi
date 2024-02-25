@@ -1,5 +1,6 @@
 package org.terminal21.client
 
+import org.terminal21.client.Controller.defaultEventHandlers
 import org.terminal21.client.collections.EventIterator
 import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
@@ -14,7 +15,7 @@ class Controller[M](
     renderChanges: Seq[UiElement] => Unit,
     initialComponents: Seq[UiElement],
     initialModel: Model[M],
-    eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
+    eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]] = defaultEventHandlers[M]
 ):
   def render()(using session: ConnectedSession): this.type =
     session.render(initialComponents)
@@ -137,10 +138,16 @@ class Controller[M](
     )
 
 object Controller:
+  private def renderChangesEventHandler[M]: PartialFunction[ControllerEvent[M], HandledEvent[M]] =
+    case ControllerClientEvent(handled, RenderChangesEvent(changes)) =>
+      handled.withRenderChanges(changes*)
+
+  private def defaultEventHandlers[M] = Seq(renderChangesEventHandler[M])
+
   def apply[M](initialModel: Model[M], components: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
-    new Controller(session.eventIterator, session.fireEvent, session.renderChanges, components, initialModel, Nil)
+    new Controller(session.eventIterator, session.fireEvent, session.renderChanges, components, initialModel)
   def apply[M](components: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
-    new Controller(session.eventIterator, session.fireEvent, session.renderChanges, components, initialModel, Nil)
+    new Controller(session.eventIterator, session.fireEvent, session.renderChanges, components, initialModel)
 
 sealed trait ControllerEvent[M]:
   def model: M                                    = handled.model
@@ -182,6 +189,13 @@ case class Model[M](value: M):
   object ChangeBooleanKey extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]
 
 object Model:
-  given unitModel: Model[Unit]            = Model(())
-  given booleanFalseModel: Model[Boolean] = Model(false)
-  given booleanTrueModel: Model[Boolean]  = Model(true)
+  object Standard:
+    given unitModel: Model[Unit]            = Model(())
+    given booleanFalseModel: Model[Boolean] = Model(false)
+    given booleanTrueModel: Model[Boolean]  = Model(true)
+
+/** Used to render changes outside the controller iteration
+  * @param changes
+  *   the changes to be rendered
+  */
+case class RenderChangesEvent(changes: Seq[UiElement]) extends ClientEvent

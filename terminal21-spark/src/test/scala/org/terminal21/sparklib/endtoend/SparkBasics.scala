@@ -20,6 +20,7 @@ import scala.util.Using
       .connect: session =>
         given ConnectedSession = session
         given SparkSession     = spark
+        given Model[Unit]      = Model.Standard.unitModel
         import scala3encoders.given
         import spark.implicits.*
 
@@ -65,14 +66,14 @@ import scala.util.Using
           val data = results.take(10).map(cf => Datum(StringUtils.substringBeforeLast(cf.name, ".scala"), cf.numOfLines)).toList
           chart.withData(Seq(Serie("Scala", data = data)))
 
-        Seq(
-          codeFilesCalculation,
-          sortedCalc,
-          sortedCalcAsDF,
-          sourceFileChart
-        ).render()
-
-        session.waitTillUserClosesSession()
+        Controller(
+          Seq(
+            codeFilesCalculation,
+            sortedCalc,
+            sortedCalcAsDF,
+            sourceFileChart
+          )
+        ).lastEventOption
 
 def sourceFiles()(using spark: SparkSession) =
   import scala3encoders.given

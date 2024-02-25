@@ -26,7 +26,7 @@ class ControllerTest extends AnyFunSuiteLike:
     val it     = seList.iterator
     events.foreach(e => seList.add(e))
     seList.add(CommandEvent.sessionClosed)
-    new Controller(it, event => (), renderChanges, components, initialModel, Nil)
+    new Controller(it, _ => (), renderChanges, components, initialModel)
 
   test("onEvent is called"):
     val model = Model(0)
@@ -252,3 +252,10 @@ class ControllerTest extends AnyFunSuiteLike:
     lazy val box: Box = Box().withChildren(b)
 
     newController(model, Seq(buttonClick, checkBoxChange), Seq(box)).eventsIterator.toList should be(List(0, 1, 2))
+
+  test("RenderChangesEvent renders changes"):
+    var rendered                          = Seq.empty[UiElement]
+    def renderer(s: Seq[UiElement]): Unit = rendered = s
+
+    newController(Model(0), Seq(RenderChangesEvent(Seq(button.withText("changed")))), Seq(button), renderer).eventsIterator.toList should be(List(0, 0))
+    rendered should be(Seq(button.withText("changed")))

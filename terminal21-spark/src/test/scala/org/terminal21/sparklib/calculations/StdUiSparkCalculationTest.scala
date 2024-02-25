@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.time.{Millis, Span}
 import org.terminal21.client.components.Keys
 import org.terminal21.client.components.chakra.*
-import org.terminal21.client.{ConnectedSession, ConnectedSessionMock, given}
+import org.terminal21.client.{ConnectedSession, ConnectedSessionMock, Model, given}
 import org.terminal21.sparklib.SparkSessions
 
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
@@ -15,6 +15,7 @@ import scala.util.Using
 
 class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
   given PatienceConfig = PatienceConfig(scaled(Span(3000, Millis)))
+  given Model[Unit]    = Model.Standard.unitModel
 
   test("calculates the correct result"):
     Using.resource(SparkSessions.newSparkSession()): spark =>
@@ -88,7 +89,7 @@ class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
       eventually:
         calc.calcCalledTimes.get() should be(2)
 
-class TestingCalculation(using session: ConnectedSession, spark: SparkSession, enc: Encoder[Int])
+class TestingCalculation(using spark: SparkSession)(using ConnectedSession, Model[_], Encoder[Int])
     extends StdUiSparkCalculation[Dataset[Int]](Keys.nextKey, "testing-calc", Box()):
   val calcCalledTimes = new AtomicInteger(0)
   invalidateCache()
