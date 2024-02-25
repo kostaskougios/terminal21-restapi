@@ -8,7 +8,6 @@ trait EventHandler
 object OnClickEventHandler:
   trait CanHandleOnClickEvent extends HasDataStore:
     this: UiElement =>
-    type This <: UiElement
     def onClick[M](using model: Model[M])(h: OnClickEventHandlerFunction[M]): This =
       val handlers = dataStore.getOrElse(model.ClickKey, Nil)
       store(model.ClickKey, handlers :+ h)
@@ -16,7 +15,6 @@ object OnClickEventHandler:
 object OnChangeEventHandler:
   trait CanHandleOnChangeEvent extends HasDataStore with HasEventHandler:
     this: UiElement =>
-    type This <: UiElement
     def onChange[M](using model: Model[M])(h: OnChangeEventHandlerFunction[M]): This =
       val handlers = dataStore.getOrElse(model.ChangeKey, Nil)
       store(model.ChangeKey, handlers :+ h)
@@ -24,7 +22,6 @@ object OnChangeEventHandler:
 object OnChangeBooleanEventHandler:
   trait CanHandleOnChangeEvent extends HasDataStore with HasEventHandler:
     this: UiElement =>
-    type This <: UiElement
     def onChange[M](using model: Model[M])(h: OnChangeBooleanEventHandlerFunction[M]): This =
       val handlers = dataStore.getOrElse(model.ChangeBooleanKey, Nil)
       store(model.ChangeBooleanKey, handlers :+ h)

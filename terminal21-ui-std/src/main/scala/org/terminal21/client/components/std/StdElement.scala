@@ -59,7 +59,8 @@ case class Paragraph(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends StdElement[Paragraph]
-    with HasChildren[Paragraph]:
+    with HasChildren:
+  type This = Paragraph
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)

@@ -64,7 +64,8 @@ case class ButtonGroup(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[ButtonGroup]
-    with HasChildren[ButtonGroup]:
+    with HasChildren:
+  type This = ButtonGroup
   override def withChildren(cn: UiElement*)                = copy(children = cn)
   override def withStyle(v: Map[String, Any]): ButtonGroup = copy(style = v)
   def withKey(v: String)                                   = copy(key = v)
@@ -89,7 +90,8 @@ case class Box(
     as: Option[String] = None,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Box]
-    with HasChildren[Box]:
+    with HasChildren:
+  type This = Box
   override def withChildren(cn: UiElement*): Box   = copy(children = cn)
   override def withStyle(v: Map[String, Any]): Box = copy(style = v)
   def withKey(v: String): Box                      = copy(key = v)
@@ -109,7 +111,8 @@ case class HStack(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[HStack]
-    with HasChildren[HStack]:
+    with HasChildren:
+  type This = HStack
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -123,7 +126,8 @@ case class VStack(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[VStack]
-    with HasChildren[VStack]:
+    with HasChildren:
+  type This = VStack
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -139,7 +143,8 @@ case class SimpleGrid(
     children: Seq[UiElement] = Nil,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[SimpleGrid]
-    with HasChildren[SimpleGrid]:
+    with HasChildren:
+  type This = SimpleGrid
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -158,7 +163,7 @@ case class Editable(
     children: Seq[UiElement] = Nil,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Editable]
-    with HasChildren[Editable]
+    with HasChildren
     with OnChangeEventHandler.CanHandleOnChangeEvent:
   type This = Editable
   override def defaultEventHandler                   =
@@ -190,7 +195,8 @@ case class FormControl(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[FormControl]
-    with HasChildren[FormControl]:
+    with HasChildren:
+  type This = FormControl
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -204,7 +210,8 @@ case class FormLabel(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[FormLabel]
-    with HasChildren[FormLabel]:
+    with HasChildren:
+  type This = FormLabel
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -218,7 +225,8 @@ case class FormHelperText(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[FormHelperText]
-    with HasChildren[FormHelperText]:
+    with HasChildren:
+  type This = FormHelperText
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -256,7 +264,8 @@ case class InputGroup(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[InputGroup]
-    with HasChildren[InputGroup]:
+    with HasChildren:
+  type This = InputGroup
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -268,7 +277,8 @@ case class InputLeftAddon(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[InputLeftAddon]
-    with HasChildren[InputLeftAddon]:
+    with HasChildren:
+  type This = InputLeftAddon
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -280,7 +290,8 @@ case class InputRightAddon(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[InputRightAddon]
-    with HasChildren[InputRightAddon]:
+    with HasChildren:
+  type This = InputRightAddon
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -331,7 +342,7 @@ case class RadioGroup(
     children: Seq[UiElement] = Nil,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[RadioGroup]
-    with HasChildren[RadioGroup]
+    with HasChildren
     with OnChangeEventHandler.CanHandleOnChangeEvent:
   type This = RadioGroup
   override def defaultEventHandler                     = newValue => copy(valueReceived = Some(newValue))
@@ -352,7 +363,8 @@ case class Center(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Center]
-    with HasChildren[Center]:
+    with HasChildren:
+  type This = Center
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -372,7 +384,8 @@ case class Circle(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Circle]
-    with HasChildren[Circle]:
+    with HasChildren:
+  type This = Circle
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -392,7 +405,8 @@ case class Square(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Square]
-    with HasChildren[Square]:
+    with HasChildren:
+  type This = Square
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1452,7 +1466,7 @@ case class Select(
     children: Seq[UiElement] = Nil,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Select]
-    with HasChildren[Select]
+    with HasChildren
     with OnChangeEventHandler.CanHandleOnChangeEvent:
   type This = Select
   override def defaultEventHandler                 = newValue => copy(valueReceived = Some(newValue))
@@ -1482,7 +1496,8 @@ case class Option_(
   */
 case class TableContainer(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty)
     extends ChakraElement[TableContainer]
-    with HasChildren[TableContainer]:
+    with HasChildren:
+  type This = TableContainer
   override def withStyle(v: Map[String, Any])                   = copy(style = v)
   def withKey(v: String)                                        = copy(key = v)
   def withRowStringData(data: Seq[Seq[String]]): TableContainer = withRowData(data.map(_.map(c => Text(text = c))))
@@ -1511,7 +1526,8 @@ case class Table(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Table]
-    with HasChildren[Table]:
+    with HasChildren:
+  type This = Table
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1524,23 +1540,20 @@ case class TableCaption(key: String = Keys.nextKey, text: String = "", style: Ma
   def withKey(v: String)                      = copy(key = v)
   def withText(v: String)                     = copy(text = v)
 
-case class Thead(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty)
-    extends ChakraElement[Thead]
-    with HasChildren[Thead]:
+case class Thead(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty) extends ChakraElement[Thead] with HasChildren:
+  type This = Thead
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
 
-case class Tbody(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty)
-    extends ChakraElement[Tbody]
-    with HasChildren[Tbody]:
+case class Tbody(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty) extends ChakraElement[Tbody] with HasChildren:
+  type This = Tbody
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
 
-case class Tfoot(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty)
-    extends ChakraElement[Tfoot]
-    with HasChildren[Tfoot]:
+case class Tfoot(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty) extends ChakraElement[Tfoot] with HasChildren:
+  type This = Tfoot
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1550,7 +1563,8 @@ case class Tr(
     children: Seq[UiElement] = Nil,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Tr]
-    with HasChildren[Tr]:
+    with HasChildren:
+  type This = Tr
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1562,7 +1576,8 @@ case class Th(
     children: Seq[UiElement] = Nil,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Th]
-    with HasChildren[Th]:
+    with HasChildren:
+  type This = Th
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1576,7 +1591,8 @@ case class Td(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Td]
-    with HasChildren[Td]:
+    with HasChildren:
+  type This = Td
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1585,9 +1601,8 @@ case class Td(
 
 /** https://chakra-ui.com/docs/components/menu/usage
   */
-case class Menu(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, children: Seq[UiElement] = Nil)
-    extends ChakraElement[Menu]
-    with HasChildren[Menu]:
+case class Menu(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, children: Seq[UiElement] = Nil) extends ChakraElement[Menu] with HasChildren:
+  type This = Menu
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1600,7 +1615,8 @@ case class MenuButton(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[MenuButton]
-    with HasChildren[MenuButton]:
+    with HasChildren:
+  type This = MenuButton
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1610,7 +1626,8 @@ case class MenuButton(
 
 case class MenuList(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, children: Seq[UiElement] = Nil)
     extends ChakraElement[MenuList]
-    with HasChildren[MenuList]:
+    with HasChildren:
+  type This = MenuList
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1622,7 +1639,7 @@ case class MenuItem(
     children: Seq[UiElement] = Nil,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[MenuItem]
-    with HasChildren[MenuItem]
+    with HasChildren
     with OnClickEventHandler.CanHandleOnClickEvent:
   type This = MenuItem
   override def withChildren(cn: UiElement*)          = copy(children = cn)
@@ -1644,7 +1661,8 @@ case class Badge(
     children: Seq[UiElement] = Nil,
     style: Map[String, Any] = Map.empty
 ) extends ChakraElement[Badge]
-    with HasChildren[Badge]:
+    with HasChildren:
+  type This = Badge
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1706,7 +1724,8 @@ case class Code(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Code]
-    with HasChildren[Code]:
+    with HasChildren:
+  type This = Code
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1719,7 +1738,8 @@ case class UnorderedList(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[UnorderedList]
-    with HasChildren[UnorderedList]:
+    with HasChildren:
+  type This = UnorderedList
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1731,7 +1751,8 @@ case class OrderedList(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[OrderedList]
-    with HasChildren[OrderedList]:
+    with HasChildren:
+  type This = OrderedList
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1743,7 +1764,8 @@ case class ListItem(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[ListItem]
-    with HasChildren[ListItem]:
+    with HasChildren:
+  type This = ListItem
   def withText(v: String)                     = copy(text = v)
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1755,7 +1777,8 @@ case class Alert(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Alert]
-    with HasChildren[Alert]:
+    with HasChildren:
+  type This = Alert
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1815,7 +1838,8 @@ case class Tooltip(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Seq(Text("use tooltip.withContent() to set this"))
 ) extends ChakraElement[Tooltip]
-    with HasChildren[Tooltip]:
+    with HasChildren:
+  type This = Tooltip
   override def withStyle(v: Map[String, Any])        = copy(style = v)
   def withContent(cn: UiElement)                     = withChildren(cn)
   def withKey(v: String)                             = copy(key = v)
@@ -1840,7 +1864,8 @@ case class Tabs(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Tabs]
-    with HasChildren[Tabs]:
+    with HasChildren:
+  type This = Tabs
   def withKey(v: String)                      = copy(key = v)
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1857,7 +1882,8 @@ case class TabList(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[TabList]
-    with HasChildren[TabList]:
+    with HasChildren:
+  type This = TabList
   def withKey(v: String)                      = copy(key = v)
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1874,7 +1900,8 @@ case class Tab(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Tab]
-    with HasChildren[Tab]:
+    with HasChildren:
+  type This = Tab
   def withKey(v: String)                        = copy(key = v)
   def withText(v: String)                       = copy(text = v)
   override def withChildren(cn: UiElement*)     = copy(children = cn)
@@ -1894,7 +1921,8 @@ case class TabPanels(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[TabPanels]
-    with HasChildren[TabPanels]:
+    with HasChildren:
+  type This = TabPanels
   def withKey(v: String)                      = copy(key = v)
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1906,7 +1934,8 @@ case class TabPanel(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[TabPanel]
-    with HasChildren[TabPanel]:
+    with HasChildren:
+  type This = TabPanel
   def withKey(v: String)                      = copy(key = v)
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1923,7 +1952,8 @@ case class Breadcrumb(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[Breadcrumb]
-    with HasChildren[Breadcrumb]:
+    with HasChildren:
+  type This = Breadcrumb
   def withKey(v: String)                      = copy(key = v)
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1941,7 +1971,8 @@ case class BreadcrumbItem(
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil
 ) extends ChakraElement[BreadcrumbItem]
-    with HasChildren[BreadcrumbItem]:
+    with HasChildren:
+  type This = BreadcrumbItem
   def withKey(v: String)                      = copy(key = v)
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1957,7 +1988,7 @@ case class BreadcrumbLink(
     children: Seq[UiElement] = Nil,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[BreadcrumbLink]
-    with HasChildren[BreadcrumbLink]
+    with HasChildren
     with OnClickEventHandler.CanHandleOnClickEvent:
   type This = BreadcrumbLink
   def withKey(v: String)                                   = copy(key = v)
@@ -1977,7 +2008,7 @@ case class Link(
     children: Seq[UiElement] = Nil,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Link]
-    with HasChildren[Link]
+    with HasChildren
     with OnClickEventHandler.CanHandleOnClickEvent:
   type This = Link
   def withKey(v: String)                         = copy(key = v)

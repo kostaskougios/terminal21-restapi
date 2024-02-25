@@ -3,6 +3,8 @@ package org.terminal21.client.components
 import org.terminal21.collections.{TypedMap, TypedMapKey}
 
 trait UiElement extends AnyElement:
+  type This <: UiElement
+
   def key: String
 
   /** @return
@@ -11,16 +13,16 @@ trait UiElement extends AnyElement:
   def flat: Seq[UiElement] = Seq(this)
 
 object UiElement:
-  trait HasChildren[A <: UiElement]:
-    this: A =>
+  trait HasChildren:
+    this: UiElement =>
     def children: Seq[UiElement]
-    override def flat: Seq[UiElement]  = Seq(this) ++ children.flatMap(_.flat)
-    def withChildren(cn: UiElement*): A
-    def noChildren: A                  = withChildren()
-    def addChildren(cn: UiElement*): A = withChildren(children ++ cn: _*)
+    override def flat: Seq[UiElement]     = Seq(this) ++ children.flatMap(_.flat)
+    def withChildren(cn: UiElement*): This
+    def noChildren: This                  = withChildren()
+    def addChildren(cn: UiElement*): This = withChildren(children ++ cn: _*)
 
   trait HasEventHandler:
-    type This <: UiElement
+    this: UiElement =>
     def defaultEventHandler: String => This
 
   trait HasStyle[A <: UiElement]:

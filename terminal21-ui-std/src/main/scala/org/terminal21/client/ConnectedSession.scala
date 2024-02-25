@@ -90,9 +90,9 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
           (
             el.key,
             el match
-              case e: UiComponent    => encoding.uiElementEncoder(e).deepDropNullValues
-              case e: HasChildren[_] => encoding.uiElementEncoder(e.noChildren).deepDropNullValues
-              case e                 => encoding.uiElementEncoder(e).deepDropNullValues
+              case e: UiComponent => encoding.uiElementEncoder(e).deepDropNullValues
+              case e: HasChildren => encoding.uiElementEncoder(e.noChildren).deepDropNullValues
+              case e              => encoding.uiElementEncoder(e).deepDropNullValues
           )
         .toMap,
       flat
@@ -100,9 +100,9 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
           (
             e.key,
             e match
-              case e: UiComponent    => e.rendered.map(_.key)
-              case e: HasChildren[_] => e.children.map(_.key)
-              case _                 => Nil
+              case e: UiComponent => e.rendered.map(_.key)
+              case e: HasChildren => e.children.map(_.key)
+              case _              => Nil
           )
         .toMap
     )
