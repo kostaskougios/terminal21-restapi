@@ -41,13 +41,12 @@ class ServerStatusPage(
   def controller(runtime: Runtime, sessions: Seq[Session]): Controller[Unit] =
     Controller(components(runtime, sessions)).onEvent:
       case ControllerClientEvent(handled, Ticker) =>
-        println("Ticker")
         handled.withRenderChanges(sessionsTable(sessionsService.allSessions))
 
   def components(runtime: Runtime, sessions: Seq[Session]): Seq[UiElement] =
     Seq(jvmTable(runtime), sessionsTable(sessions))
 
-  def jvmTable(runtime: Runtime) = QuickTable(caption = Some("JVM"))
+  def jvmTable(runtime: Runtime) = QuickTable(key = "jvmTable", caption = Some("JVM"))
     .withHeaders("Property", "Value", "Actions")
     .withRows(
       Seq(
