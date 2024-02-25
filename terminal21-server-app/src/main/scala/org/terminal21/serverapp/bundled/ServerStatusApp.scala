@@ -22,7 +22,7 @@ class ServerStatusApp extends ServerSideApp:
 class ServerStatusPage(
     serverSideSessions: ServerSideSessions,
     sessionsService: ServerSessionsService
-)(using session: ConnectedSession):
+)(using appSession: ConnectedSession):
   import Model.unitModel
   def run(): Unit =
     controller(Runtime.getRuntime, sessionsService.allSessions).render().eventsIterator.lastOption
