@@ -2,10 +2,10 @@ package org.terminal21.serverapp.bundled
 
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatestplus.mockito.MockitoSugar.mock
-import org.terminal21.client.components.chakra.{Button, CheckIcon, NotAllowedIcon}
+import org.terminal21.client.components.chakra.{Button, CheckIcon, NotAllowedIcon, Text}
 import org.terminal21.client.{ConnectedSession, ConnectedSessionMock}
 import org.terminal21.model.CommonModelBuilders.session
-import org.terminal21.model.{CommonModelBuilders, Session}
+import org.terminal21.model.{CommandEvent, CommonModelBuilders, Session}
 import org.terminal21.server.service.ServerSessionsService
 import org.terminal21.serverapp.ServerSideSessions
 import org.terminal21.client.given
@@ -53,3 +53,27 @@ class ServerStatusPageTest extends AnyFunSuiteLike:
         .collectFirst:
           case i: NotAllowedIcon => i
         .isEmpty should be(false)
+
+  test("sessions are rendered when Ticker event is fired"):
+    new App:
+      var times         = 0
+      def sessions      =
+        times += 1
+        times match
+          case 1 => Seq(session(id = "s1", name = "session 1")) // this is initially rendered
+          case 2 => Seq(session(id = "s2", name = "session 2")) // this is a change
+          case 3 => Seq(session(id = "s3", name = "session 3")) // this is also a change
+      val it            = page.controller(Runtime.getRuntime, sessions).handledEventsIterator
+      connectedSession.fireEvents(page.Ticker, page.Ticker, CommandEvent.sessionClosed)
+      val handledEvents = it.toList
+      handledEvents.head.renderChanges should be(Nil)
+      handledEvents(1).renderChanges
+        .flatMap(_.flat)
+        .collectFirst:
+          case t: Text if t.text == "session 2" => t
+        .size should be(1)
+      handledEvents(2).renderChanges
+        .flatMap(_.flat)
+        .collectFirst:
+          case t: Text if t.text == "session 3" => t
+        .size should be(1)

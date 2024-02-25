@@ -38,10 +38,10 @@ class ServerStatusPage(
   private def toMb(v: Long) = s"${v / (1024 * 1024)} MB"
   private val xs            = Some("2xs")
 
-  def controller(runtime: Runtime, sessions: Seq[Session]): Controller[Unit] =
+  def controller(runtime: Runtime, sessions: => Seq[Session]): Controller[Unit] =
     Controller(components(runtime, sessions)).onEvent:
       case ControllerClientEvent(handled, Ticker) =>
-        handled.withRenderChanges(sessionsTable(sessionsService.allSessions))
+        handled.withRenderChanges(sessionsTable(sessions))
 
   def components(runtime: Runtime, sessions: Seq[Session]): Seq[UiElement] =
     Seq(jvmTable(runtime), sessionsTable(sessions))
