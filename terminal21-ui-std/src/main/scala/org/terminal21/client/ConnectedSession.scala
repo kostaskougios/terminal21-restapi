@@ -1,8 +1,6 @@
 package org.terminal21.client
 
 import io.circe.*
-import io.circe.generic.auto.*
-import org.slf4j.LoggerFactory
 import org.terminal21.client.components.UiElement.HasChildren
 import org.terminal21.client.components.{UiComponent, UiElement}
 import org.terminal21.client.json.UiElementEncoding
@@ -13,10 +11,8 @@ import org.terminal21.ui.std.{ServerJson, SessionsService}
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 import scala.annotation.tailrec
-import scala.collection.concurrent.TrieMap
 
 class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
-  private val logger           = LoggerFactory.getLogger(getClass)
   @volatile private var events = SEList[CommandEvent]()
 
   def uiUrl: String = serverUrl + "/ui"
