@@ -20,16 +20,18 @@ object UiElement:
     def noChildren: A                  = withChildren()
     def addChildren(cn: UiElement*): A = withChildren(children ++ cn: _*)
 
-  trait HasEventHandler[A <: UiElement]:
-    def defaultEventHandler: String => A
+  trait HasEventHandler:
+    type This <: UiElement
+    def defaultEventHandler: String => This
 
   trait HasStyle[A <: UiElement]:
     def style: Map[String, Any]
     def withStyle(v: Map[String, Any]): A
     def withStyle(vs: (String, Any)*): A = withStyle(vs.toMap)
 
-  trait HasDataStore[A <: UiElement]:
-    this: A =>
+  trait HasDataStore:
+    this: UiElement =>
+    type This <: UiElement
     def dataStore: TypedMap
-    def withDataStore(ds: TypedMap): A
-    def store[V](key: TypedMapKey[V], value: V): A = withDataStore(dataStore + (key -> value))
+    def withDataStore(ds: TypedMap): This
+    def store[V](key: TypedMapKey[V], value: V): This = withDataStore(dataStore + (key -> value))

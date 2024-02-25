@@ -73,7 +73,8 @@ case class Input(
     valueReceived: Option[String] = None, // use value instead
     dataStore: TypedMap = TypedMap.empty
 ) extends StdElement[Input]
-    with CanHandleOnChangeEvent[Input]:
+    with CanHandleOnChangeEvent:
+  type This = Input
   override def defaultEventHandler                = newValue => copy(valueReceived = Some(newValue))
   override def withStyle(v: Map[String, Any])     = copy(style = v)
   def withKey(v: String)                          = copy(key = v)

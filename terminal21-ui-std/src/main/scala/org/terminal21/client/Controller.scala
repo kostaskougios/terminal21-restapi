@@ -36,17 +36,17 @@ class Controller[M](
   private def clickHandlersMap(h: HandledEvent[M]): Map[String, Seq[OnClickEventHandlerFunction[M]]]                 =
     h.componentsByKey.values
       .collect:
-        case e: OnClickEventHandler.CanHandleOnClickEvent[_] if e.dataStore.contains(initialModel.ClickKey) => (e.key, e.dataStore(initialModel.ClickKey))
+        case e: OnClickEventHandler.CanHandleOnClickEvent if e.dataStore.contains(initialModel.ClickKey) => (e.key, e.dataStore(initialModel.ClickKey))
       .toMap
   private def changeHandlersMap(h: HandledEvent[M]): Map[String, Seq[OnChangeEventHandlerFunction[M]]]               =
     h.componentsByKey.values
       .collect:
-        case e: OnChangeEventHandler.CanHandleOnChangeEvent[_] if e.dataStore.contains(initialModel.ChangeKey) => (e.key, e.dataStore(initialModel.ChangeKey))
+        case e: OnChangeEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(initialModel.ChangeKey) => (e.key, e.dataStore(initialModel.ChangeKey))
       .toMap
   private def changeBooleanHandlersMap(h: HandledEvent[M]): Map[String, Seq[OnChangeBooleanEventHandlerFunction[M]]] =
     h.componentsByKey.values
       .collect:
-        case e: OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_] if e.dataStore.contains(initialModel.ChangeBooleanKey) =>
+        case e: OnChangeBooleanEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(initialModel.ChangeBooleanKey) =>
           (e.key, e.dataStore(initialModel.ChangeBooleanKey))
       .toMap
 
@@ -62,12 +62,12 @@ class Controller[M](
       case _: ClientEvent => handled
       case _              =>
         handled.componentsByKey(event.key) match
-          case e: UiElement with HasEventHandler[_] =>
+          case e: UiElement with HasEventHandler =>
             event match
               case OnChange(key, value) =>
                 handled.copy(componentsByKey = handled.componentsByKey + (key -> e.defaultEventHandler(value)))
               case _                    => handled
-          case _                                    => handled
+          case _                                 => handled
 
   private def invokeEventHandlers(handled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
     eventHandlers.foldLeft(handled.copy(renderChanges = Nil, timedRenderChanges = Nil)): (h, f) =>
@@ -77,8 +77,8 @@ class Controller[M](
         case OnChange(key, value) =>
           val receivedBy = h.componentsByKey(key)
           val e          = receivedBy match
-            case _: OnChangeEventHandler.CanHandleOnChangeEvent[_]        => ControllerChangeEvent(receivedBy, h, value)
-            case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent[_] => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean)
+            case _: OnChangeEventHandler.CanHandleOnChangeEvent        => ControllerChangeEvent(receivedBy, h, value)
+            case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean)
           f(e)
         case ce: ClientEvent      =>
           f(ControllerClientEvent(handled, ce))

@@ -43,6 +43,7 @@ case class CookieReader(
     requestId: String = TransientRequest.newRequestId(),
     dataStore: TypedMap = TypedMap.empty
 ) extends StdHttp
-    with CanHandleOnChangeEvent[CookieReader]:
+    with CanHandleOnChangeEvent:
+  type This = CookieReader
   override def defaultEventHandler                       = newValue => copy(value = Some(newValue))
   override def withDataStore(ds: TypedMap): CookieReader = copy(dataStore = ds)

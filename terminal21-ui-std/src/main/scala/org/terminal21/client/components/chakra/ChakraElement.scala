@@ -31,7 +31,8 @@ case class Button(
     spacing: Option[String] = None,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Button]
-    with OnClickEventHandler.CanHandleOnClickEvent[Button]:
+    with OnClickEventHandler.CanHandleOnClickEvent:
+  type This = Button
   override def withStyle(v: Map[String, Any]): Button = copy(style = v)
   def withKey(v: String)                              = copy(key = v)
   def withText(v: String)                             = copy(text = v)
@@ -158,7 +159,8 @@ case class Editable(
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Editable]
     with HasChildren[Editable]
-    with OnChangeEventHandler.CanHandleOnChangeEvent[Editable]:
+    with OnChangeEventHandler.CanHandleOnChangeEvent:
+  type This = Editable
   override def defaultEventHandler                   =
     newValue => copy(valueReceived = Some(newValue))
   override def withChildren(cn: UiElement*)          = copy(children = cn)
@@ -235,7 +237,8 @@ case class Input(
     style: Map[String, Any] = Map.empty,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Input]
-    with OnChangeEventHandler.CanHandleOnChangeEvent[Input]:
+    with OnChangeEventHandler.CanHandleOnChangeEvent:
+  type This = Input
   override def defaultEventHandler                   = newValue => copy(valueReceived = Some(newValue))
   override def withStyle(v: Map[String, Any]): Input = copy(style = v)
   def withKey(v: String): Input                      = copy(key = v)
@@ -294,7 +297,8 @@ case class Checkbox(
     checkedV: Option[Boolean] = None,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Checkbox]
-    with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Checkbox]:
+    with OnChangeBooleanEventHandler.CanHandleOnChangeEvent:
+  type This = Checkbox
   def checked: Boolean                               = checkedV.getOrElse(defaultChecked)
   override def defaultEventHandler                   = newValue => copy(checkedV = Some(newValue.toBoolean))
   override def withStyle(v: Map[String, Any])        = copy(style = v)
@@ -328,7 +332,8 @@ case class RadioGroup(
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[RadioGroup]
     with HasChildren[RadioGroup]
-    with OnChangeEventHandler.CanHandleOnChangeEvent[RadioGroup]:
+    with OnChangeEventHandler.CanHandleOnChangeEvent:
+  type This = RadioGroup
   override def defaultEventHandler                     = newValue => copy(valueReceived = Some(newValue))
   override def withChildren(cn: UiElement*)            = copy(children = cn)
   override def withStyle(v: Map[String, Any])          = copy(style = v)
@@ -1398,7 +1403,8 @@ case class Textarea(
     style: Map[String, Any] = Map.empty,
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Textarea]
-    with OnChangeEventHandler.CanHandleOnChangeEvent[Textarea]:
+    with OnChangeEventHandler.CanHandleOnChangeEvent:
+  type This = Textarea
   override def defaultEventHandler                   = newValue => copy(valueReceived = Some(newValue))
   override def withStyle(v: Map[String, Any])        = copy(style = v)
   def withKey(v: String)                             = copy(key = v)
@@ -1421,7 +1427,8 @@ case class Switch(
     checkedV: Option[Boolean] = None, // use checked
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Switch]
-    with OnChangeBooleanEventHandler.CanHandleOnChangeEvent[Switch]:
+    with OnChangeBooleanEventHandler.CanHandleOnChangeEvent:
+  type This = Switch
   def checked: Boolean                             = checkedV.getOrElse(defaultChecked)
   override def defaultEventHandler                 = newValue => copy(checkedV = Some(newValue.toBoolean))
   override def withStyle(v: Map[String, Any])      = copy(style = v)
@@ -1446,7 +1453,8 @@ case class Select(
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Select]
     with HasChildren[Select]
-    with OnChangeEventHandler.CanHandleOnChangeEvent[Select]:
+    with OnChangeEventHandler.CanHandleOnChangeEvent:
+  type This = Select
   override def defaultEventHandler                 = newValue => copy(valueReceived = Some(newValue))
   override def withStyle(v: Map[String, Any])      = copy(style = v)
   override def withChildren(cn: UiElement*)        = copy(children = cn)
@@ -1615,7 +1623,8 @@ case class MenuItem(
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[MenuItem]
     with HasChildren[MenuItem]
-    with OnClickEventHandler.CanHandleOnClickEvent[MenuItem]:
+    with OnClickEventHandler.CanHandleOnClickEvent:
+  type This = MenuItem
   override def withChildren(cn: UiElement*)          = copy(children = cn)
   override def withStyle(v: Map[String, Any])        = copy(style = v)
   def withKey(v: String)                             = copy(key = v)
@@ -1949,7 +1958,8 @@ case class BreadcrumbLink(
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[BreadcrumbLink]
     with HasChildren[BreadcrumbLink]
-    with OnClickEventHandler.CanHandleOnClickEvent[BreadcrumbLink]:
+    with OnClickEventHandler.CanHandleOnClickEvent:
+  type This = BreadcrumbLink
   def withKey(v: String)                                   = copy(key = v)
   override def withChildren(cn: UiElement*)                = copy(children = cn)
   override def withStyle(v: Map[String, Any])              = copy(style = v)
@@ -1968,7 +1978,8 @@ case class Link(
     dataStore: TypedMap = TypedMap.empty
 ) extends ChakraElement[Link]
     with HasChildren[Link]
-    with OnClickEventHandler.CanHandleOnClickEvent[Link]:
+    with OnClickEventHandler.CanHandleOnClickEvent:
+  type This = Link
   def withKey(v: String)                         = copy(key = v)
   override def withChildren(cn: UiElement*)      = copy(children = cn)
   override def withStyle(v: Map[String, Any])    = copy(style = v)

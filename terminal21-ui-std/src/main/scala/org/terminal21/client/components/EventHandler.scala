@@ -6,22 +6,25 @@ import org.terminal21.client.{Model, OnChangeBooleanEventHandlerFunction, OnChan
 trait EventHandler
 
 object OnClickEventHandler:
-  trait CanHandleOnClickEvent[A <: UiElement] extends HasDataStore[A]:
-    this: A =>
-    def onClick[M](using model: Model[M])(h: OnClickEventHandlerFunction[M]): A =
+  trait CanHandleOnClickEvent extends HasDataStore:
+    this: UiElement =>
+    type This <: UiElement
+    def onClick[M](using model: Model[M])(h: OnClickEventHandlerFunction[M]): This =
       val handlers = dataStore.getOrElse(model.ClickKey, Nil)
       store(model.ClickKey, handlers :+ h)
 
 object OnChangeEventHandler:
-  trait CanHandleOnChangeEvent[A <: UiElement] extends HasDataStore[A] with HasEventHandler[A]:
-    this: A =>
-    def onChange[M](using model: Model[M])(h: OnChangeEventHandlerFunction[M]): A =
+  trait CanHandleOnChangeEvent extends HasDataStore with HasEventHandler:
+    this: UiElement =>
+    type This <: UiElement
+    def onChange[M](using model: Model[M])(h: OnChangeEventHandlerFunction[M]): This =
       val handlers = dataStore.getOrElse(model.ChangeKey, Nil)
       store(model.ChangeKey, handlers :+ h)
 
 object OnChangeBooleanEventHandler:
-  trait CanHandleOnChangeEvent[A <: UiElement] extends HasDataStore[A] with HasEventHandler[A]:
-    this: A =>
-    def onChange[M](using model: Model[M])(h: OnChangeBooleanEventHandlerFunction[M]): A =
+  trait CanHandleOnChangeEvent extends HasDataStore with HasEventHandler:
+    this: UiElement =>
+    type This <: UiElement
+    def onChange[M](using model: Model[M])(h: OnChangeBooleanEventHandlerFunction[M]): This =
       val handlers = dataStore.getOrElse(model.ChangeBooleanKey, Nil)
       store(model.ChangeBooleanKey, handlers :+ h)
