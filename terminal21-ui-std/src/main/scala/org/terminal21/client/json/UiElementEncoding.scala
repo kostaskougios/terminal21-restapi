@@ -38,7 +38,7 @@ object StdElementEncoding extends ComponentLib:
     case std: StdEJson       => std.asJson.mapObject(o => o.add("type", "Std".asJson))
     case c: CEJson           => c.asJson.mapObject(o => o.add("type", "Chakra".asJson))
     case c: UiComponent      =>
-      val b: ChakraElement[Box] = Box(key = c.key, text = "")
+      val b: ChakraElement = Box(key = c.key, text = "")
       b.asJson.mapObject(o => o.add("type", "Chakra".asJson))
     case std: StdHttp        => std.asJson.mapObject(o => o.add("type", "Std".asJson))
     case fe: FrontEndElement => fe.asJson.mapObject(o => o.add("type", "FrontEnd".asJson))
