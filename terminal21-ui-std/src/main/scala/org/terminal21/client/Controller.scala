@@ -69,8 +69,8 @@ class Controller[M](
               case _                    => handled
           case _                                 => handled
 
-  private def invokeEventHandlers(handled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
-    eventHandlers.foldLeft(handled.copy(renderChanges = Nil, timedRenderChanges = Nil)): (h, f) =>
+  private def invokeEventHandlers(initHandled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
+    eventHandlers.foldLeft(initHandled.copy(renderChanges = Nil, timedRenderChanges = Nil)): (h, f) =>
       event match
         case OnClick(key)         =>
           val e = ControllerClickEvent(h.componentsByKey(key), h)
@@ -82,7 +82,7 @@ class Controller[M](
             case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean)
           if f.isDefinedAt(e) then f(e) else h
         case ce: ClientEvent      =>
-          val e = ControllerClientEvent(handled, ce)
+          val e = ControllerClientEvent(h, ce)
           if f.isDefinedAt(e) then f(e) else h
         case x                    => throw new IllegalStateException(s"Unexpected state $x")
 

@@ -1,6 +1,5 @@
 package org.terminal21.client
 
-import io.circe.*
 import org.terminal21.client.components.UiElement.HasChildren
 import org.terminal21.client.components.{UiComponent, UiElement}
 import org.terminal21.client.json.UiElementEncoding
