@@ -1,6 +1,5 @@
 package org.terminal21.client.components
 
-import org.terminal21.client.HandledEvent
 import org.terminal21.collections.{TypedMap, TypedMapKey}
 
 trait UiElement extends AnyElement:
