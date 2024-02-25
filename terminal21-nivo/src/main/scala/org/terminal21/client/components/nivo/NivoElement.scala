@@ -3,8 +3,8 @@ package org.terminal21.client.components.nivo
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.{Keys, UiElement}
 
-sealed trait NEJson                      extends UiElement
-sealed trait NivoElement[A <: UiElement] extends NEJson with HasStyle[A]
+sealed trait NEJson      extends UiElement
+sealed trait NivoElement extends NEJson with HasStyle
 
 /** https://nivo.rocks/line/
   */
@@ -29,7 +29,8 @@ case class ResponsiveLine(
     pointLabelYOffset: Int = -12,
     useMesh: Boolean = true,
     legends: Seq[Legend] = Nil
-) extends NivoElement[ResponsiveLine]:
+) extends NivoElement:
+  type This = ResponsiveLine
   override def withStyle(v: Map[String, Any]): ResponsiveLine = copy(style = v)
   def withKey(v: String)                                      = copy(key = v)
   def withData(data: Seq[Serie])                              = copy(data = data)
@@ -57,7 +58,8 @@ case class ResponsiveBar(
     axisLeft: Option[Axis] = Some(Axis(legend = "x", legendOffset = -40)),
     legends: Seq[Legend] = Nil,
     ariaLabel: String = "Chart Label"
-) extends NivoElement[ResponsiveBar]:
+) extends NivoElement:
+  type This = ResponsiveBar
   override def withStyle(v: Map[String, Any]): ResponsiveBar = copy(style = v)
   def withKey(v: String)                                     = copy(key = v)
   def withData(data: Seq[Seq[BarDatum]])                     = copy(data = data)

@@ -25,14 +25,14 @@ object UiElement:
     this: UiElement =>
     def defaultEventHandler: String => This
 
-  trait HasStyle[A <: UiElement]:
+  trait HasStyle:
+    this: UiElement =>
     def style: Map[String, Any]
-    def withStyle(v: Map[String, Any]): A
-    def withStyle(vs: (String, Any)*): A = withStyle(vs.toMap)
+    def withStyle(v: Map[String, Any]): This
+    def withStyle(vs: (String, Any)*): This = withStyle(vs.toMap)
 
   trait HasDataStore:
     this: UiElement =>
-    type This <: UiElement
     def dataStore: TypedMap
     def withDataStore(ds: TypedMap): This
     def store[V](key: TypedMapKey[V], value: V): This = withDataStore(dataStore + (key -> value))

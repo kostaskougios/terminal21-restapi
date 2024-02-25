@@ -13,7 +13,8 @@ case class QuickTable(
     headers: Seq[UiElement] = Nil,
     rows: Seq[Seq[UiElement]] = Nil
 ) extends UiComponent
-    with HasStyle[QuickTable]:
+    with HasStyle:
+  type This = QuickTable
   def withKey(v: String)             = copy(key = v)
   def withVariant(v: String)         = copy(variant = v)
   def withColorScheme(v: String)     = copy(colorScheme = v)

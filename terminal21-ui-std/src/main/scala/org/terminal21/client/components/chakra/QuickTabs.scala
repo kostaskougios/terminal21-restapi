@@ -9,7 +9,8 @@ case class QuickTabs(
     tabs: Seq[String | Seq[UiElement]] = Nil,
     tabPanels: Seq[Seq[UiElement]] = Nil
 ) extends UiComponent
-    with HasStyle[QuickTabs]:
+    with HasStyle:
+  type This = QuickTabs
 
   def withTabs(tabs: String | Seq[UiElement]*): QuickTabs  = copy(tabs = tabs)
   def withTabPanels(tabPanels: Seq[UiElement]*): QuickTabs = copy(tabPanels = tabPanels)

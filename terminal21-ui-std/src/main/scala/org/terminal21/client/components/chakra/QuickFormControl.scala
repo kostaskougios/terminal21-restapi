@@ -10,7 +10,8 @@ case class QuickFormControl(
     inputGroup: Seq[UiElement] = Nil,
     helperText: Option[String] = None
 ) extends UiComponent
-    with HasStyle[QuickFormControl]:
+    with HasStyle:
+  type This = QuickFormControl
   lazy val rendered: Seq[UiElement] =
     val ch: Seq[UiElement] =
       label.map(l => FormLabel(key = key + "-label", text = l)).toSeq ++

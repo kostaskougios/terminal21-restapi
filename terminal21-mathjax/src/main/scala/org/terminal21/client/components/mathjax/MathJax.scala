@@ -13,7 +13,8 @@ case class MathJax(
     expression: String = """fill in the expression as per https://asciimath.org/""",
     style: Map[String, Any] = Map.empty // Note: some of the styles are ignored by mathjax lib
 ) extends MathJaxElement
-    with HasStyle[MathJax]:
+    with HasStyle:
+  type This = MathJax
   override def withStyle(v: Map[String, Any]): MathJax = copy(style = v)
   def withKey(k: String)                               = copy(key = k)
   def withExpression(e: String)                        = copy(expression = e)
