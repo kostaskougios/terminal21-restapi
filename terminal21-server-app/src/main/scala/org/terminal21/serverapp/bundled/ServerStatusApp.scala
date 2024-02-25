@@ -31,7 +31,7 @@ class ServerStatusPage(
   private val xs            = Some("2xs")
 
   def controller(runtime: Runtime, sessions: Seq[Session]): Controller[Unit] =
-    Controller(components(runtime, sessions))
+    Controller(components(runtime, sessions)) // .onEvent()
 
   def components(runtime: Runtime, sessions: Seq[Session]): Seq[UiElement] =
     Seq(jvmTable(runtime), sessionsTable(sessions))

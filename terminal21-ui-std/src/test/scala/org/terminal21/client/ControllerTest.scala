@@ -45,6 +45,16 @@ class ControllerTest extends AnyFunSuiteLike:
       .eventsIterator
       .toList should be(List(0, 1))
 
+  test("onEvent not matched for change"):
+    val model = Model(0)
+    newController(model, Seq(inputChange), Seq(input))
+      .onEvent:
+        case event: ControllerClickEvent[_] =>
+          import event.*
+          handled.withModel(5)
+      .eventsIterator
+      .toList should be(List(0, 0))
+
   test("onEvent is called for change/boolean"):
     val model = Model(0)
     newController(model, Seq(checkBoxChange), Seq(checkbox))
@@ -53,6 +63,16 @@ class ControllerTest extends AnyFunSuiteLike:
         if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
       .eventsIterator
       .toList should be(List(0, 1))
+
+  test("onEvent not matches for change/boolean"):
+    val model = Model(0)
+    newController(model, Seq(checkBoxChange), Seq(checkbox))
+      .onEvent:
+        case event: ControllerClickEvent[_] =>
+          import event.*
+          handled.withModel(5)
+      .eventsIterator
+      .toList should be(List(0, 0))
 
   case class TestClientEvent(i: Int) extends ClientEvent
 
@@ -63,9 +83,17 @@ class ControllerTest extends AnyFunSuiteLike:
         case ControllerClientEvent(handled, event: TestClientEvent) =>
           import event.*
           handled.withModel(event.i).terminate
-        case event                                                  => event.handled
       .eventsIterator
       .toList should be(List(0, 5))
+
+  test("onEvent when no partial function matches ClientEvent"):
+    val model = Model(0)
+    newController(model, Seq(TestClientEvent(5)), Seq(button))
+      .onEvent:
+        case ControllerClickEvent(`checkbox`, handled) =>
+          handled.withModel(5).terminate
+      .eventsIterator
+      .toList should be(List(0, 0))
 
   test("onClick is called"):
     given model: Model[Int] = Model(0)

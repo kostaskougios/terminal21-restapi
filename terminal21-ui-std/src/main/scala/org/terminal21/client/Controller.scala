@@ -14,13 +14,13 @@ class Controller[M](
     renderChanges: Seq[UiElement] => Unit,
     initialComponents: Seq[UiElement],
     initialModel: Model[M],
-    eventHandlers: Seq[ControllerEvent[M] => HandledEvent[M]]
+    eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
 ):
   def render()(using session: ConnectedSession): this.type =
     session.render(initialComponents)
     this
 
-  def onEvent(handler: ControllerEvent[M] => HandledEvent[M]) =
+  def onEvent(handler: PartialFunction[ControllerEvent[M], HandledEvent[M]]) =
     new Controller(
       eventIteratorFactory,
       fireEvent,
@@ -73,15 +73,17 @@ class Controller[M](
     eventHandlers.foldLeft(handled.copy(renderChanges = Nil, timedRenderChanges = Nil)): (h, f) =>
       event match
         case OnClick(key)         =>
-          f(ControllerClickEvent(h.componentsByKey(key), h))
+          val e = ControllerClickEvent(h.componentsByKey(key), h)
+          if f.isDefinedAt(e) then f(e) else h
         case OnChange(key, value) =>
           val receivedBy = h.componentsByKey(key)
           val e          = receivedBy match
             case _: OnChangeEventHandler.CanHandleOnChangeEvent        => ControllerChangeEvent(receivedBy, h, value)
             case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean)
-          f(e)
+          if f.isDefinedAt(e) then f(e) else h
         case ce: ClientEvent      =>
-          f(ControllerClientEvent(handled, ce))
+          val e = ControllerClientEvent(handled, ce)
+          if f.isDefinedAt(e) then f(e) else h
         case x                    => throw new IllegalStateException(s"Unexpected state $x")
 
   private def invokeComponentEventHandlers(h: HandledEvent[M], event: CommandEvent) =
