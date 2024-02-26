@@ -52,7 +52,9 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     */
   def isClosed: Boolean = exitLatch.getCount == 0
 
-  def click(e: UiElement): Unit = fireEvent(OnClick(e.key))
+  def fireClickEvent(e: UiElement): Unit                    = fireEvent(CommandEvent.onClick(e))
+  def fireChangeEvent(e: UiElement, newValue: String): Unit = fireEvent(CommandEvent.onChange(e, newValue))
+  def fireSessionClosedEvent(): Unit                        = fireEvent(CommandEvent.sessionClosed)
 
   def eventIterator: Iterator[CommandEvent] = events.iterator
 

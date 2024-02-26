@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.time.{Millis, Span}
 import org.terminal21.client.components.Keys
 import org.terminal21.client.components.chakra.*
-import org.terminal21.client.{ConnectedSession, ConnectedSessionMock, Model, given}
+import org.terminal21.client.{ConnectedSession, ConnectedSessionMock, Controller, Model, given}
 import org.terminal21.sparklib.SparkSessions
 
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
@@ -85,7 +85,10 @@ class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
       given SparkSession              = spark
       val calc                        = new TestingCalculation
       calc.run().get().collect().toList should be(List(2))
-      session.click(calc.recalc)
+      val it                          = Controller(Seq(calc)).eventsIterator
+      session.fireClickEvent(calc.recalc)
+      session.fireSessionClosedEvent()
+      it.lastOption
       eventually:
         calc.calcCalledTimes.get() should be(2)
 
