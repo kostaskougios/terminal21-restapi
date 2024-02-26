@@ -11,7 +11,7 @@ import org.terminal21.client.components.mathjax.*
     .andLibraries(MathJaxLib)
     .connect: session =>
       given ConnectedSession = session
-      import Model.unitModel
+      import Model.Standard.unitModel
 
       val components = Seq(
         HStack().withChildren(

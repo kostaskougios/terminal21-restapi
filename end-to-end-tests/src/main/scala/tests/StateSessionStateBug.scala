@@ -12,7 +12,7 @@ import java.util.Date
     .withNewSession("state-session", "Stale Session")
     .connect: session =>
       given ConnectedSession = session
-      import Model.unitModel
+      import Model.Standard.unitModel
 
       val date       = new Date()
       val components = Seq(

@@ -9,7 +9,7 @@ import org.terminal21.client.components.std.*
     .withNewSession("std-components", "Std Components")
     .connect: session =>
       given ConnectedSession = session
-      import Model.unitModel
+      import Model.Standard.unitModel
 
       val output      = Paragraph(text = "This will reflect what you type in the input")
       val cookieValue = Paragraph(text = "This will display the value of the cookie")

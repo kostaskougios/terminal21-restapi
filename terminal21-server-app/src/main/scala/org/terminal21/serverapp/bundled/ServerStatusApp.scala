@@ -24,7 +24,7 @@ class ServerStatusPage(
     serverSideSessions: ServerSideSessions,
     sessionsService: ServerSessionsService
 )(using appSession: ConnectedSession, fiberExecutor: FiberExecutor):
-  import Model.unitModel
+  import Model.Standard.unitModel
 
   case object Ticker extends ClientEvent
 

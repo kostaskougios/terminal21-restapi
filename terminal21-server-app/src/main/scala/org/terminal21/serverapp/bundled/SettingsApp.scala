@@ -19,7 +19,7 @@ class SettingsApp extends ServerSideApp:
         new SettingsPage().run()
 
 class SettingsPage(using session: ConnectedSession):
-  import Model.unitModel
+  import Model.Standard.unitModel
   val themeToggle = ThemeToggle()
   def run()       =
     controller.render().eventsIterator.lastOption
