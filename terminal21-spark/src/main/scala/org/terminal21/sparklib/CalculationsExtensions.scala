@@ -8,7 +8,7 @@ import org.terminal21.client.components.{Keys, UiElement}
 import org.terminal21.sparklib.calculations.{ReadWriter, StdUiSparkCalculation}
 
 extension [OUT: ReadWriter](ds: OUT)
-  def visualize(name: String, dataUi: UiElement with HasStyle)(
+  def visualize(name: String, dataUi: UiElement & HasStyle)(
       toUi: OUT => UiElement & HasStyle
   )(using
       ConnectedSession,
