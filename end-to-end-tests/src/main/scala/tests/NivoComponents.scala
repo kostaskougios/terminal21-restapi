@@ -1,6 +1,5 @@
 package tests
 
-import org.terminal21.client.components.nivo.*
 import org.terminal21.client.*
 import org.terminal21.client.components.*
 import tests.nivo.{ResponsiveBarChart, ResponsiveLineChart}
@@ -13,4 +12,5 @@ import tests.nivo.{ResponsiveBarChart, ResponsiveLineChart}
       given ConnectedSession = session
       import Model.Standard.unitModel
       val components         = ResponsiveBarChart() ++ ResponsiveLineChart()
-      Controller(components).render().eventsIterator.lastOption
+      Controller(components).render()
+      session.leaveSessionOpenAfterExiting()

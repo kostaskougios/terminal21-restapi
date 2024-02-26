@@ -24,4 +24,5 @@ import org.terminal21.client.components.mathjax.*
           style = Map("backgroundColor" -> "gray")
         )
       )
-      Controller(components).render().eventsIterator.lastOption
+      Controller(components).render()
+      session.leaveSessionOpenAfterExiting()
