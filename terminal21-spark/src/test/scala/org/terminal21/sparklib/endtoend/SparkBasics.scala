@@ -71,7 +71,7 @@ import scala.util.Using
             sortedCalcAsDF,
             sourceFileChart
           )
-        ).render().lastEventOption
+        ).render().lastEventOptionOrNoneIfSessionIsClosed
 
 def sourceFiles()(using spark: SparkSession) =
   import scala3encoders.given
