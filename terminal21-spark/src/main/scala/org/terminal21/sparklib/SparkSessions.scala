@@ -1,10 +1,6 @@
 package org.terminal21.sparklib
 
 import org.apache.spark.sql.SparkSession
-import org.terminal21.client.components.ComponentLib
-import org.terminal21.client.{ConnectedSession, Sessions}
-
-import scala.util.Using
 
 object SparkSessions:
   def newSparkSession(

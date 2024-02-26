@@ -50,21 +50,19 @@ import scala.util.Using
           data = Seq(
             Serie(
               "Scala",
-              data = Seq(
-                Datum("plane", 262),
-                Datum("helicopter", 26),
-                Datum("boat", 43)
-              )
+              data = Nil
             )
           ),
           axisBottom = Some(Axis(legend = "Class", legendOffset = 36)),
-          axisLeft = Some(Axis(legend = "Count", legendOffset = -40)),
+          axisLeft = Some(Axis(legend = "Number of Lines", legendOffset = -40)),
           legends = Seq(Legend())
         )
 
-        val sourceFileChart = sortedSourceFilesDS.visualize("Biggest Code Files", chart): results =>
-          val data = results.take(10).map(cf => Datum(StringUtils.substringBeforeLast(cf.name, ".scala"), cf.numOfLines)).toList
-          chart.withData(Seq(Serie("Scala", data = data)))
+        val sourceFileChart = sourceFiles()
+          .sort($"numOfLines".desc)
+          .visualize("Biggest Code Files", chart): results =>
+            val data = results.take(10).map(cf => Datum(StringUtils.substringBeforeLast(cf.name, ".scala"), cf.numOfLines)).toList
+            chart.withData(Seq(Serie("Scala", data = data)))
 
         Controller(
           Seq(
