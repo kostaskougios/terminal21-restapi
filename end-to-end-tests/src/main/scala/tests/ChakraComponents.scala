@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean
           )
         Controller(components).render().eventsIterator.lastOption match
           case Some(true) =>
-            session.render(Seq(Paragraph(text = "resetting state")))
+            session.render(Seq(Paragraph(text = "chakra-session-reset")))
             Thread.sleep(500)
             loop()
           case _          =>
