@@ -6,8 +6,6 @@ import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.std.Paragraph
 import tests.chakra.*
 
-import java.util.concurrent.atomic.AtomicBoolean
-
 @main def chakraComponents(): Unit =
   def loop(): Unit =
     println("Starting new session")
