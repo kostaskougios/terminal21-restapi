@@ -75,6 +75,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
       case _                =>
 
   def render(es: Seq[UiElement]): Unit =
+    clear()
     val j = toJson(es)
     sessionsService.setSessionJsonState(session, j)
 

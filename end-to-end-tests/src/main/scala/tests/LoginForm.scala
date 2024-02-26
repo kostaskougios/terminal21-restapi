@@ -45,7 +45,7 @@ class LoginForm(using session: ConnectedSession):
   val errorMsgInvalidEmail = Paragraph(text = "Invalid Email", style = Map("color" -> "red"))
 
   def run(): Option[Login] =
-    controller.eventsIterator.lastOptionOrNoneIfSessionClosed
+    controller.render().eventsIterator.lastOptionOrNoneIfSessionClosed
 
   def components: Seq[UiElement] =
     Seq(
@@ -91,7 +91,7 @@ class LoggedIn(login: Login)(using session: ConnectedSession):
   val passwordDetails = Text(text = s"password : ${login.pwd}")
 
   def run(): Option[Boolean] =
-    controller.eventsIterator.lastOption
+    controller.render().eventsIterator.lastOption
 
   def components =
     Seq(
