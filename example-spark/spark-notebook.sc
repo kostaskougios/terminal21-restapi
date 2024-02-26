@@ -28,6 +28,7 @@ Using.resource(SparkSessions.newSparkSession( /* configure your spark session he
     .connect: session =>
       given ConnectedSession = session
       given SparkSession     = spark
+      given Model[Unit]      = Model.Standard.unitModel
       import scala3encoders.given
       import spark.implicits.*
 
@@ -36,12 +37,12 @@ Using.resource(SparkSessions.newSparkSession( /* configure your spark session he
       val peopleDS = createPeople
 
       // We will display the data in a table
-      val peopleTable = QuickTable().headers("Id", "Name", "Age").caption("People")
+      val peopleTable = QuickTable().withHeaders("Id", "Name", "Age").withCaption("People")
 
       val peopleTableCalc = peopleDS
         .sort($"id")
         .visualize("People sample", peopleTable): data =>
-          peopleTable.rows(data.take(5).map(p => Seq(p.id, p.name, p.age)))
+          peopleTable.withRows(data.take(5).map(p => Seq(p.id, p.name, p.age)))
 
       /** The calculation above uses a directory to store the dataset results. This way we can restart this script without loosing datasets that may take long
         * to calculate, making our script behave more like a notebook. When we click "Recalculate" in the UI, the cache directory is deleted and the dataset is
@@ -69,7 +70,7 @@ Using.resource(SparkSessions.newSparkSession( /* configure your spark session he
             )
           )
 
-      Seq(
+      val components = Seq(
         Paragraph(
           text = """
           |The spark notebooks can use the `visualise` extension method over a dataframe/dataset. It will cache the dataset by
@@ -95,9 +96,8 @@ Using.resource(SparkSessions.newSparkSession( /* configure your spark session he
         ),
         peopleTableCalc,
         oldestPeopleChartCalc
-      ).render()
-
-      session.waitTillUserClosesSession()
+      )
+      Controller(components).render().eventsIterator.lastOption
 
 object SparkNotebook:
   private val names                 = Array("Andy", "Kostas", "Alex", "Andreas", "George", "Jack")
