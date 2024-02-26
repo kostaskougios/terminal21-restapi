@@ -1,21 +1,27 @@
 package tests
 
+import functions.fibers.Fiber
 import org.terminal21.client.given
 
 @main def runAll(): Unit =
   Seq(
-    fiberExecutor.submit:
+    submit:
       chakraComponents()
     ,
-    fiberExecutor.submit:
+    submit:
       stdComponents()
     ,
-    fiberExecutor.submit:
+    submit:
       loginFormApp()
     ,
-    fiberExecutor.submit:
+    submit:
       mathJaxComponents()
     ,
-    fiberExecutor.submit:
+    submit:
       nivoComponents()
   ).foreach(_.get())
+
+private def submit(f: => Unit): Fiber[Unit] =
+  fiberExecutor.submit:
+    try f
+    catch case t: Throwable => t.printStackTrace()
