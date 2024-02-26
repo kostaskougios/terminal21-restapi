@@ -12,4 +12,10 @@ import org.terminal21.client.given
     ,
     fiberExecutor.submit:
       loginFormApp()
+    ,
+    fiberExecutor.submit:
+      mathJaxComponents()
+    ,
+    fiberExecutor.submit:
+      nivoComponents()
   ).foreach(_.get())

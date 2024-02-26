@@ -31,9 +31,7 @@ import org.terminal21.client.components.std.*
           NewLine(),
           Span(text = "And the last line")
         ),
-        Paragraph(text = "A Form").withChildren(
-          input
-        ),
+        Paragraph(text = "A Form").withChildren(input),
         output,
         Cookie(name = "std-components-test-cookie", value = "test-cookie-value"),
         CookieReader(name = "std-components-test-cookie").onChange: event =>
@@ -43,4 +41,4 @@ import org.terminal21.client.components.std.*
         cookieValue
       )
 
-      Controller(components).eventsIterator.lastOption
+      Controller(components).render().eventsIterator.lastOption

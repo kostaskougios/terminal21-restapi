@@ -3,10 +3,8 @@ package tests
 import org.terminal21.client.*
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
-import org.terminal21.client.components.std.Paragraph
 import tests.chakra.*
 
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 
 @main def chakraComponents(): Unit =
@@ -30,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean
           Overlay.components ++ Forms.components ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Feedback.components ++ Disclosure.components ++ Navigation.components ++ Seq(
             krButton
           )
-        Controller(components).eventsIterator.lastOption match
+        Controller(components).render().eventsIterator.lastOption match
           case Some(true) => loop()
           case _          =>
 

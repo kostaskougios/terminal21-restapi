@@ -9,7 +9,7 @@ import java.util.Date
 
 @main def stateSessionStateBug(): Unit =
   Sessions
-    .withNewSession("state-session", "Stale Session")
+    .withNewSession("stale-session", "Stale Session")
     .connect: session =>
       given ConnectedSession = session
       import Model.Standard.unitModel
@@ -42,4 +42,4 @@ import java.util.Date
         Button(text = "Close").onClick: event =>
           event.handled.terminate
       )
-      Controller(components).eventsIterator.lastOption
+      Controller(components).render().eventsIterator.lastOption

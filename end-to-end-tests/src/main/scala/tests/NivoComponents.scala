@@ -13,4 +13,4 @@ import tests.nivo.{ResponsiveBarChart, ResponsiveLineChart}
       given ConnectedSession = session
       import Model.Standard.unitModel
       val components         = ResponsiveBarChart() ++ ResponsiveLineChart()
-      Controller(components).eventsIterator.lastOption
+      Controller(components).render().eventsIterator.lastOption
