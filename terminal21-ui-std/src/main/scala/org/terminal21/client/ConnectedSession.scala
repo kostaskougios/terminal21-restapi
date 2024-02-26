@@ -11,12 +11,25 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 import scala.annotation.tailrec
 
+/** A session connected to the terminal21 server.
+  *
+  * @param session
+  *   the session
+  * @param encoding
+  *   json encoder for UiElements
+  * @param serverUrl
+  *   the url of the server
+  * @param sessionsService
+  *   the service to talk to the server
+  * @param onCloseHandler
+  *   gets notified when the user closes the session
+  */
 class ConnectedSession(val session: Session, encoding: UiElementEncoding, val serverUrl: String, sessionsService: SessionsService, onCloseHandler: () => Unit):
   @volatile private var events = SEList[CommandEvent]()
 
   def uiUrl: String = serverUrl + "/ui"
 
-  /** Clears all UI elements and event handlers. Renders a blank UI
+  /** Clears all UI elements and event handlers.
     */
   def clear(): Unit =
     events.poisonPill()
@@ -32,7 +45,8 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   private val leaveSessionOpen = new AtomicBoolean(false)
 
-  /** Doesn't close the session upon exiting. In the UI the session seems active but events are not working because the event handlers are not available.
+  /** Doesn't close the session upon exiting. In the UI the session seems active but events are not working because the event handlers are not available. Useful
+    * when we need to let the user read through some data. But no interaction is possible anymore between the user and the code.
     */
   def leaveSessionOpenAfterExiting(): Unit =
     leaveSessionOpen.set(true)
@@ -74,11 +88,19 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
         onCloseHandler()
       case _                =>
 
+  /** Normally this method shouldn't be called directly. Terminates any previous event iterators, clears the UI and renders the UiElements.
+    * @param es
+    *   the UiElements to be rendered.
+    */
   def render(es: Seq[UiElement]): Unit =
     clear()
     val j = toJson(es)
     sessionsService.setSessionJsonState(session, j)
 
+  /** Normally this method shouldn't be called directly. Renders updates to existing elements
+    * @param es
+    *   a seq of updated elements, all these should already have been rendered before (but not necessarily their children)
+    */
   def renderChanges(es: Seq[UiElement]): Unit =
     if !isClosed && es.nonEmpty then
       val j = toJson(es)
