@@ -39,7 +39,7 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
       Text(text = app.description)
     )
 
-  def components =
+  def components(m: ManagerModel): Seq[UiElement] =
     val appsTable = QuickTable(
       caption = Some("Apps installed on the server, click one to run it."),
       rows = appRows
@@ -63,15 +63,12 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
       )
     )
 
-  def controller(components: Seq[UiElement]): Controller[ManagerModel] =
+  def controller: Controller[ManagerModel] =
     Controller(components)
       .onEvent: event =>
         import event.*
         // for every event, reset the startApp so that it doesn't start the same app on each event
         handled.withModel(model.copy(startApp = None))
-
-  def controller: Controller[ManagerModel] =
-    controller(components)
 
   def eventsIterator: Iterator[ManagerModel] =
     controller

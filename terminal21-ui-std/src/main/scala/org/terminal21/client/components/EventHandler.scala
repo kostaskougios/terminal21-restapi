@@ -1,6 +1,6 @@
 package org.terminal21.client.components
 
-import org.terminal21.client.components.UiElement.{HasDataStore, HasEventHandler}
+import org.terminal21.client.components.UiElement.HasDataStore
 import org.terminal21.client.{Model, OnChangeBooleanEventHandlerFunction, OnChangeEventHandlerFunction, OnClickEventHandlerFunction}
 
 trait EventHandler
@@ -13,14 +13,14 @@ object OnClickEventHandler:
       store(model.ClickKey, handlers :+ h)
 
 object OnChangeEventHandler:
-  trait CanHandleOnChangeEvent extends HasDataStore with HasEventHandler:
+  trait CanHandleOnChangeEvent extends HasDataStore:
     this: UiElement =>
     def onChange[M](using model: Model[M])(h: OnChangeEventHandlerFunction[M]): This =
       val handlers = dataStore.getOrElse(model.ChangeKey, Nil)
       store(model.ChangeKey, handlers :+ h)
 
 object OnChangeBooleanEventHandler:
-  trait CanHandleOnChangeEvent extends HasDataStore with HasEventHandler:
+  trait CanHandleOnChangeEvent extends HasDataStore:
     this: UiElement =>
     def onChange[M](using model: Model[M])(h: OnChangeBooleanEventHandlerFunction[M]): This =
       val handlers = dataStore.getOrElse(model.ChangeBooleanKey, Nil)

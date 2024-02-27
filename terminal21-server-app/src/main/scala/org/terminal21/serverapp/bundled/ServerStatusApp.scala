@@ -24,7 +24,9 @@ class ServerStatusPage(
     serverSideSessions: ServerSideSessions,
     sessionsService: ServerSessionsService
 )(using appSession: ConnectedSession, fiberExecutor: FiberExecutor):
-  import Model.Standard.unitModel
+  case class StatusModel(runtime: Runtime, sessions: Seq[Session])
+  val initModel            = StatusModel(Runtime.getRuntime, sessionsService.allSessions)
+  given Model[StatusModel] = Model(initModel)
 
   case object Ticker extends ClientEvent
 
@@ -33,48 +35,53 @@ class ServerStatusPage(
       while !appSession.isClosed do
         Thread.sleep(2000)
         appSession.fireEvents(Ticker)
-    controller(Runtime.getRuntime, sessionsService.allSessions).render().handledEventsIterator.lastOption
+
+    try controller.render().handledEventsIterator.lastOption
+    catch case t: Throwable => t.printStackTrace()
 
   private def toMb(v: Long) = s"${v / (1024 * 1024)} MB"
   private val xs            = Some("2xs")
 
-  def controller(runtime: Runtime, sessions: => Seq[Session]): Controller[Unit] =
-    Controller(components(runtime, sessions)).onEvent:
+  def controller: Controller[StatusModel] =
+    Controller(components).onEvent:
       case ControllerClientEvent(handled, Ticker) =>
-        handled.withRenderChanges(sessionsTable(sessions))
+        handled.withModel(handled.model.copy(sessions = sessionsService.allSessions))
 
-  def components(runtime: Runtime, sessions: Seq[Session]): Seq[UiElement] =
-    Seq(jvmTable(runtime), sessionsTable(sessions))
+  def components(m: StatusModel): Seq[UiElement] =
+    Seq(jvmTable(m.runtime), sessionsTable(m.sessions))
 
-  def jvmTable(runtime: Runtime) = QuickTable(key = "jvmTable", caption = Some("JVM"))
+  private val jvmTableE = QuickTable(key = "jvmTable", caption = Some("JVM"))
     .withHeaders("Property", "Value", "Actions")
-    .withRows(
+  private val gcButton  = Button(size = xs, text = "Run GC")
+    .onClick: event =>
+      System.gc()
+      event.handled
+
+  def jvmTable(runtime: Runtime) =
+    jvmTableE.withRows(
       Seq(
         Seq("Free Memory", toMb(runtime.freeMemory()), ""),
         Seq("Max Memory", toMb(runtime.maxMemory()), ""),
-        Seq(
-          "Total Memory",
-          toMb(runtime.totalMemory()),
-          Button(size = xs, text = "Run GC").onClick: event =>
-            System.gc()
-            event.handled
-        ),
+        Seq("Total Memory", toMb(runtime.totalMemory()), gcButton),
         Seq("Available processors", runtime.availableProcessors(), "")
       )
     )
 
-  def sessionsTable(sessions: Seq[Session]) = QuickTable(
-    key = "sessions-table",
-    caption = Some("All sessions"),
-    rows = sessions.map: session =>
+  private val sessionsTableE =
+    QuickTable(
+      key = "sessions-table",
+      caption = Some("All sessions")
+    ).withHeaders("Id", "Name", "Is Open", "Actions")
+
+  def sessionsTable(sessions: Seq[Session]) = sessionsTableE.withRows(
+    sessions.map: session =>
       Seq(Text(text = session.id), Text(text = session.name), if session.isOpen then CheckIcon() else NotAllowedIcon(), actionsFor(session))
   )
-    .withHeaders("Id", "Name", "Is Open", "Actions")
 
   private def actionsFor(session: Session): UiElement =
     if session.isOpen then
       Box().withChildren(
-        Button(text = "Close", size = xs)
+        Button(key = s"close-${session.id}", text = "Close", size = xs)
           .withLeftIcon(SmallCloseIcon())
           .onClick: event =>
             import event.*
@@ -82,7 +89,7 @@ class ServerStatusPage(
             handled
         ,
         Text(text = " "),
-        Button(text = "View State", size = xs)
+        Button(key = s"view-${session.id}", text = "View State", size = xs)
           .withLeftIcon(ChatIcon())
           .onClick: event =>
             serverSideSessions

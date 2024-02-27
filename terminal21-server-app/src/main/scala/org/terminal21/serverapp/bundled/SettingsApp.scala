@@ -24,6 +24,6 @@ class SettingsPage(using session: ConnectedSession):
   def run()       =
     controller.render().handledEventsIterator.lastOption
 
-  def components = Seq(themeToggle)
+  def components(u: Unit) = Seq(themeToggle)
 
   def controller = Controller(components)

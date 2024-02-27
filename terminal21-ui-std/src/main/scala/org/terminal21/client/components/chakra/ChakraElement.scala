@@ -165,8 +165,6 @@ case class Editable(
     with HasChildren
     with OnChangeEventHandler.CanHandleOnChangeEvent:
   type This = Editable
-  override def defaultEventHandler                   =
-    newValue => copy(valueReceived = Some(newValue))
   override def withChildren(cn: UiElement*)          = copy(children = cn)
   override def withStyle(v: Map[String, Any])        = copy(style = v)
   def withKey(v: String)                             = copy(key = v)
@@ -249,7 +247,6 @@ case class Input(
 ) extends ChakraElement
     with OnChangeEventHandler.CanHandleOnChangeEvent:
   type This = Input
-  override def defaultEventHandler                   = newValue => copy(valueReceived = Some(newValue))
   override def withStyle(v: Map[String, Any]): Input = copy(style = v)
   def withKey(v: String): Input                      = copy(key = v)
   def withType(v: String): Input                     = copy(`type` = v)
@@ -313,7 +310,6 @@ case class Checkbox(
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent:
   type This = Checkbox
   def checked: Boolean                               = checkedV.getOrElse(defaultChecked)
-  override def defaultEventHandler                   = newValue => copy(checkedV = Some(newValue.toBoolean))
   override def withStyle(v: Map[String, Any])        = copy(style = v)
   def withKey(v: String)                             = copy(key = v)
   def withText(v: String)                            = copy(text = v)
@@ -348,7 +344,6 @@ case class RadioGroup(
     with HasChildren
     with OnChangeEventHandler.CanHandleOnChangeEvent:
   type This = RadioGroup
-  override def defaultEventHandler                     = newValue => copy(valueReceived = Some(newValue))
   override def withChildren(cn: UiElement*)            = copy(children = cn)
   override def withStyle(v: Map[String, Any])          = copy(style = v)
   def value: String                                    = valueReceived.getOrElse(defaultValue)
@@ -1480,7 +1475,6 @@ case class Textarea(
 ) extends ChakraElement
     with OnChangeEventHandler.CanHandleOnChangeEvent:
   type This = Textarea
-  override def defaultEventHandler                   = newValue => copy(valueReceived = Some(newValue))
   override def withStyle(v: Map[String, Any])        = copy(style = v)
   def withKey(v: String)                             = copy(key = v)
   def withType(v: String)                            = copy(`type` = v)
@@ -1505,7 +1499,6 @@ case class Switch(
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent:
   type This = Switch
   def checked: Boolean                             = checkedV.getOrElse(defaultChecked)
-  override def defaultEventHandler                 = newValue => copy(checkedV = Some(newValue.toBoolean))
   override def withStyle(v: Map[String, Any])      = copy(style = v)
   def withKey(v: String)                           = copy(key = v)
   def withText(v: String)                          = copy(text = v)
@@ -1530,7 +1523,6 @@ case class Select(
     with HasChildren
     with OnChangeEventHandler.CanHandleOnChangeEvent:
   type This = Select
-  override def defaultEventHandler                 = newValue => copy(valueReceived = Some(newValue))
   override def withStyle(v: Map[String, Any])      = copy(style = v)
   override def withChildren(cn: UiElement*)        = copy(children = cn)
   def withKey(v: String)                           = copy(key = v)

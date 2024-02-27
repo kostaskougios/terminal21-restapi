@@ -12,6 +12,8 @@ trait UiElement extends AnyElement:
     */
   def flat: Seq[UiElement] = Seq(this)
 
+  def toSimpleString: String = s"${getClass.getSimpleName}($key)"
+
 object UiElement:
   trait HasChildren:
     this: UiElement =>
@@ -20,10 +22,6 @@ object UiElement:
     def withChildren(cn: UiElement*): This
     def noChildren: This                  = withChildren()
     def addChildren(cn: UiElement*): This = withChildren(children ++ cn: _*)
-
-  trait HasEventHandler:
-    this: UiElement =>
-    def defaultEventHandler: String => This
 
   trait HasStyle:
     this: UiElement =>

@@ -84,7 +84,6 @@ case class Input(
 ) extends StdElement
     with CanHandleOnChangeEvent:
   type This = Input
-  override def defaultEventHandler                = newValue => copy(valueReceived = Some(newValue))
   override def withStyle(v: Map[String, Any])     = copy(style = v)
   def withKey(v: String)                          = copy(key = v)
   def withType(v: String)                         = copy(`type` = v)

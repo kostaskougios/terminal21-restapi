@@ -2,7 +2,6 @@ package org.terminal21.client.components.std
 
 import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.ConnectedSession
-import org.terminal21.client.components.UiElement.HasEventHandler
 import org.terminal21.client.components.{EventHandler, Keys, OnChangeEventHandler, TransientRequest, UiElement}
 import org.terminal21.collections.TypedMap
 import org.terminal21.model.OnChange
@@ -45,5 +44,4 @@ case class CookieReader(
 ) extends StdHttp
     with CanHandleOnChangeEvent:
   type This = CookieReader
-  override def defaultEventHandler                       = newValue => copy(value = Some(newValue))
   override def withDataStore(ds: TypedMap): CookieReader = copy(dataStore = ds)
