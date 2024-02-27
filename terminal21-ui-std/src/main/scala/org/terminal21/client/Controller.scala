@@ -146,6 +146,8 @@ object Controller:
     new Controller(session.eventIterator, session.fireEvent, session.renderChanges, components, initialModel)
   def apply[M](components: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
     new Controller(session.eventIterator, session.fireEvent, session.renderChanges, components, initialModel)
+  def apply[M](component: UiElement)(using initialModel: Model[M], session: ConnectedSession): Controller[M]       =
+    apply(Seq(component))
 
 sealed trait ControllerEvent[M]:
   def model: M                                    = handled.model
