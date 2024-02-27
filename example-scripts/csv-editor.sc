@@ -37,12 +37,17 @@ Sessions
     editor.run()
 
 class CsvEditor(csv: Seq[Seq[String]])(using session: ConnectedSession):
-  case class CsvModel(save: Boolean, exitWithoutSave: Boolean)
-  private given Model[CsvModel] = Model(CsvModel(false, false))
+  case class CsvModel(save: Boolean, exitWithoutSave: Boolean, csv: Seq[Seq[String]])
+  private given Model[CsvModel] = Model(CsvModel(false, false, Nil))
   val saveAndExit = Button(text = "Save & Exit").onClick: event =>
-    event.handled.withModel(true).terminate
+    import event.*
+    val csv = tableCells.map: row =>
+      row.map: editable =>
+        editable.current.value
+    handled.withModel(CsvModel(true, false, csv)).terminate
   val exit = Button(text = "Exit Without Saving").onClick: event =>
-    event.handled.withModel(false).terminate
+    import event.*
+    handled.withModel(model.copy(exitWithoutSave = true)).terminate
   val status = Box()
 
   val tableCells =
@@ -51,15 +56,8 @@ class CsvEditor(csv: Seq[Seq[String]])(using session: ConnectedSession):
         newEditable(column)
 
   def run(): Unit =
-    if controller.handledEventsIterator
-        .map: handled =>
-          if handled.model then
-            handled.withRenderChanges(status.withText("Csv file saved, exiting."))
-            Thread.sleep(500)
-          else handled
-        .toList
-        .lastOption
-    then save()
+    for handled <- controller.render().handledEventsIterator.lastOption.filter(_.model.save)
+    do save(handled.model.csv)
 
   def components: Seq[UiElement] =
     Seq(
@@ -76,16 +74,14 @@ class CsvEditor(csv: Seq[Seq[String]])(using session: ConnectedSession):
   /** @return
     *   true if the user clicked "Save", false if the user clicked "Exit" or closed the session
     */
-  def controller: Controller[Boolean] =
+  def controller: Controller[CsvModel] =
     Controller(components)
 
-  def save(): Unit =
-    val data = currentCsvValue
-    FileUtils.writeStringToFile(file, data, "UTF-8")
+  def save(data: Seq[Seq[String]]): Unit =
+    FileUtils.writeStringToFile(file, data.map(_.mkString(",")).mkString("\n"), "UTF-8")
+    println(s"Csv file saved to $file")
 
-  def currentCsvValue: String = tableCells.map(_.map(_.current.value).mkString(",")).mkString("\n")
-
-  private def newEditable(value: String) =
+  private def newEditable(value: String): Editable =
     Editable(defaultValue = value)
       .withChildren(
         EditablePreview(),
