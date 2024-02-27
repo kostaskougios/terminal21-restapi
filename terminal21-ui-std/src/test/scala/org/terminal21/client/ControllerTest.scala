@@ -9,12 +9,13 @@ import org.terminal21.collections.SEList
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
 class ControllerTest extends AnyFunSuiteLike:
-  val button         = Button()
-  val buttonClick    = OnClick(button.key)
-  val input          = Input()
-  val inputChange    = OnChange(input.key, "new-value")
-  val checkbox       = Checkbox()
-  val checkBoxChange = OnChange(checkbox.key, "true")
+  val button             = Button()
+  val buttonClick        = OnClick(button.key)
+  val input              = Input()
+  val inputChange        = OnChange(input.key, "new-value")
+  val checkbox           = Checkbox()
+  val checkBoxChange     = OnChange(checkbox.key, "true")
+  given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
 
   def newController[M](
       initialModel: Model[M],
@@ -33,6 +34,7 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(model, Seq(buttonClick), Seq(button))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
+      .render()
       .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 1))
@@ -43,6 +45,7 @@ class ControllerTest extends AnyFunSuiteLike:
       .onEvent: event =>
         import event.*
         if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
+      .render()
       .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 1))
@@ -54,6 +57,7 @@ class ControllerTest extends AnyFunSuiteLike:
         case event: ControllerClickEvent[_] =>
           import event.*
           handled.withModel(5)
+      .render()
       .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 0))
@@ -64,6 +68,7 @@ class ControllerTest extends AnyFunSuiteLike:
       .onEvent: event =>
         import event.*
         if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
+      .render()
       .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 1))
@@ -75,6 +80,7 @@ class ControllerTest extends AnyFunSuiteLike:
         case event: ControllerClickEvent[_] =>
           import event.*
           handled.withModel(5)
+      .render()
       .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 0))
@@ -88,6 +94,7 @@ class ControllerTest extends AnyFunSuiteLike:
         case ControllerClientEvent(handled, event: TestClientEvent) =>
           import event.*
           handled.withModel(event.i).terminate
+      .render()
       .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 5))
@@ -98,6 +105,7 @@ class ControllerTest extends AnyFunSuiteLike:
       .onEvent:
         case ControllerClickEvent(`checkbox`, handled) =>
           handled.withModel(5).terminate
+      .render()
       .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 0))
@@ -111,7 +119,8 @@ class ControllerTest extends AnyFunSuiteLike:
         button.onClick: event =>
           event.handled.withModel(100).terminate
       )
-    ).handledEventsIterator
+    ).render()
+      .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 100))
 
@@ -124,7 +133,8 @@ class ControllerTest extends AnyFunSuiteLike:
         input.onChange: event =>
           event.handled.withModel(100).terminate
       )
-    ).handledEventsIterator
+    ).render()
+      .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 100))
 
@@ -137,7 +147,8 @@ class ControllerTest extends AnyFunSuiteLike:
         checkbox.onChange: event =>
           event.handled.withModel(100).terminate
       )
-    ).handledEventsIterator
+    ).render()
+      .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 100))
 
@@ -146,6 +157,7 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(model, Seq(buttonClick, buttonClick, buttonClick), Seq(button))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate.withModel(100) else event.handled.withModel(event.model + 1)
+      .render()
       .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 1, 2, 100))
@@ -157,6 +169,7 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(Model(0), Seq(buttonClick), Seq(button), renderer)
       .onEvent: event =>
         event.handled.withModel(event.model + 1).withRenderChanges(button.withText("changed")).terminate
+      .render()
       .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 1))
@@ -177,7 +190,7 @@ class ControllerTest extends AnyFunSuiteLike:
         checkbox
       ),
       renderer
-    ).handledEventsIterator.toList
+    ).render().handledEventsIterator.toList
 
     handled(1).renderChanges should be(List(button.withText("changed")))
     handled(2).renderChanges should be(Nil)
@@ -188,6 +201,7 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(Model(0), Seq(buttonClick), Seq(button), renderer)
       .onEvent: event =>
         event.handled.withModel(1).withTimedRenderChanges(TimedRenderChanges(10, button.withText("changed"))).terminate
+      .render()
       .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 1))
@@ -203,7 +217,7 @@ class ControllerTest extends AnyFunSuiteLike:
         button.onClick(using model): event =>
           event.handled.withTimedRenderChanges(TimedRenderChanges(10, button.withText("changed"))).terminate
       )
-    ).handledEventsIterator.toList(1).current(button) should be(button.withText("changed"))
+    ).render().handledEventsIterator.toList(1).current(button) should be(button.withText("changed"))
 
   test("timed changes event handlers are called"):
     val model = Model(0)
@@ -216,7 +230,8 @@ class ControllerTest extends AnyFunSuiteLike:
         button.onClick(using model): event =>
           event.handled.withTimedRenderChanges(TimedRenderChanges(10, c))
       )
-    ).handledEventsIterator
+    ).render()
+      .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 0, 2))
 
@@ -230,7 +245,8 @@ class ControllerTest extends AnyFunSuiteLike:
           import event.*
           handled.withModel(if input.current.value == "new-value" then 100 else -1).terminate
       )
-    ).handledEventsIterator
+    ).render()
+      .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 100))
 
@@ -244,7 +260,8 @@ class ControllerTest extends AnyFunSuiteLike:
           import event.*
           handled.withModel(if checkbox.current.checked then 100 else -1).terminate
       )
-    ).handledEventsIterator
+    ).render()
+      .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 100))
 
@@ -255,7 +272,7 @@ class ControllerTest extends AnyFunSuiteLike:
         event.handled.withRenderChanges(box.withChildren(button, checkbox))
     )
 
-    val handledEvents = newController(model, Seq(buttonClick), Seq(box)).handledEventsIterator.toList
+    val handledEvents = newController(model, Seq(buttonClick), Seq(box)).render().handledEventsIterator.toList
     handledEvents(1).componentsByKey(checkbox.key) should be(checkbox)
 
   test("newly rendered elements event handlers are invoked"):
@@ -273,7 +290,9 @@ class ControllerTest extends AnyFunSuiteLike:
 
     lazy val box: Box = Box().withChildren(b)
 
-    newController(model, Seq(buttonClick, checkBoxChange), Seq(box)).handledEventsIterator
+    newController(model, Seq(buttonClick, checkBoxChange), Seq(box))
+      .render()
+      .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 1, 2))
 
@@ -281,7 +300,9 @@ class ControllerTest extends AnyFunSuiteLike:
     var rendered                          = Seq.empty[UiElement]
     def renderer(s: Seq[UiElement]): Unit = rendered = s
 
-    newController(Model(0), Seq(RenderChangesEvent(Seq(button.withText("changed")))), Seq(button), renderer).handledEventsIterator
+    newController(Model(0), Seq(RenderChangesEvent(Seq(button.withText("changed")))), Seq(button), renderer)
+      .render()
+      .handledEventsIterator
       .map(_.model)
       .toList should be(List(0, 0))
     rendered should be(Seq(button.withText("changed")))

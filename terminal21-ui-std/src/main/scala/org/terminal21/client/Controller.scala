@@ -17,9 +17,9 @@ class Controller[M](
     initialModel: Model[M],
     eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]] = defaultEventHandlers[M]
 ):
-  def render()(using session: ConnectedSession): this.type =
+  def render()(using session: ConnectedSession): RenderedController[M] =
     session.render(initialComponents)
-    this
+    new RenderedController(eventIteratorFactory, initialModel, initialComponents, renderChanges, eventHandlers)
 
   def onEvent(handler: PartialFunction[ControllerEvent[M], HandledEvent[M]]) =
     new Controller(
@@ -31,6 +31,13 @@ class Controller[M](
       eventHandlers :+ handler
     )
 
+class RenderedController[M](
+    eventIteratorFactory: => Iterator[CommandEvent],
+    initialModel: Model[M],
+    initialComponents: Seq[UiElement],
+    renderChanges: Seq[UiElement] => Unit,
+    eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
+):
   private def clickHandlersMap(h: HandledEvent[M]): Map[String, Seq[OnClickEventHandlerFunction[M]]]                 =
     h.componentsByKey.values
       .collect:
@@ -47,13 +54,6 @@ class Controller[M](
         case e: OnChangeBooleanEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(initialModel.ChangeBooleanKey) =>
           (e.key, e.dataStore(initialModel.ChangeBooleanKey))
       .toMap
-
-  private def initialComponentsByKeyMap: Map[String, UiElement] =
-    initialComponents
-      .flatMap(_.flat)
-      .map(c => (c.key, c))
-      .toMap
-      .withDefault(key => throw new IllegalArgumentException(s"Component with key=$key is not available"))
 
   private def updateComponentsFromEvent(handled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
     event match
@@ -113,6 +113,13 @@ class Controller[M](
     val newComponentsByKey =
       (handled.renderChanges.flatMap(_.flat) ++ handled.timedRenderChanges.flatMap(_.renderChanges).flatMap(_.flat)).map(e => (e.key, e)).toMap
     handled.copy(componentsByKey = handled.componentsByKey ++ newComponentsByKey)
+
+  private def initialComponentsByKeyMap: Map[String, UiElement] =
+    initialComponents
+      .flatMap(_.flat)
+      .map(c => (c.key, c))
+      .toMap
+      .withDefault(key => throw new IllegalArgumentException(s"Component with key=$key is not available"))
 
   def handledEventsIterator: EventIterator[HandledEvent[M]] =
     new EventIterator(

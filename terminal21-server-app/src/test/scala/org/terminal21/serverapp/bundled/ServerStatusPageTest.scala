@@ -63,7 +63,7 @@ class ServerStatusPageTest extends AnyFunSuiteLike:
           case 1 => Seq(session(id = "s1", name = "session 1")) // this is initially rendered
           case 2 => Seq(session(id = "s2", name = "session 2")) // this is a change
           case 3 => Seq(session(id = "s3", name = "session 3")) // this is also a change
-      val it            = page.controller(Runtime.getRuntime, sessions).handledEventsIterator
+      val it            = page.controller(Runtime.getRuntime, sessions).render().handledEventsIterator
       connectedSession.fireEvents(page.Ticker, page.Ticker, CommandEvent.sessionClosed)
       val handledEvents = it.toList
       handledEvents.head.renderChanges should be(Nil)

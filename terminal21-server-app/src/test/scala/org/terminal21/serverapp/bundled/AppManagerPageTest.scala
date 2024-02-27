@@ -57,6 +57,6 @@ class AppManagerPageTest extends AnyFunSuiteLike:
     val app = mockApp("app1", "the-app1-desc")
     new App(app):
       val other    = Link()
-      val eventsIt = page.controller(page.components :+ other).handledEventsIterator
+      val eventsIt = page.controller(page.components :+ other).render().handledEventsIterator
       session.fireEvents(CommandEvent.onClick(page.appRows.head.head), CommandEvent.onClick(other), CommandEvent.sessionClosed)
       eventsIt.toList.map(_.model).last.startApp should be(None)
