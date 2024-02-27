@@ -85,7 +85,7 @@ class StdUiSparkCalculationTest extends AnyFunSuiteLike with Eventually:
       given SparkSession              = spark
       val calc                        = new TestingCalculation
       calc.run().get().collect().toList should be(List(2))
-      val it                          = Controller(Seq(calc)).eventsIterator
+      val it                          = Controller(Seq(calc)).handledEventsIterator
       session.fireClickEvent(calc.recalc)
       session.fireSessionClosedEvent()
       it.lastOption

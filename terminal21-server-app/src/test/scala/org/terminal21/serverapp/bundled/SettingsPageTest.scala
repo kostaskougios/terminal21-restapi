@@ -1,9 +1,8 @@
 package org.terminal21.serverapp.bundled
 
 import org.scalatest.funsuite.AnyFunSuiteLike
-import org.terminal21.client.{*, given}
 import org.scalatest.matchers.should.Matchers.*
-import org.terminal21.model.CommandEvent
+import org.terminal21.client.{*, given}
 
 class SettingsPageTest extends AnyFunSuiteLike:
   class App:
