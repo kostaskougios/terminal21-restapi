@@ -35,10 +35,10 @@ class LoginForm(using session: ConnectedSession):
     .onClick: clickEvent =>
       import clickEvent.*
       // if the email is invalid, we will not terminate. We also will render an error that will be visible for 2 seconds
-      val isValidEmail = clickEvent.model.isValidEmail
+      val isValidEmail = model.isValidEmail
       val messageBox   =
         if isValidEmail then errorsBox.current else errorsBox.current.addChildren(errorMsgInvalidEmail)
-      clickEvent.handled.withShouldTerminate(isValidEmail).withRenderChanges(messageBox).addTimedRenderChange(2000, errorsBox)
+      handled.withShouldTerminate(isValidEmail).withRenderChanges(messageBox).addTimedRenderChange(2000, errorsBox)
 
   val passwordInput        = Input(`type` = "password", defaultValue = initialModel.value.pwd)
   val errorsBox            = Box()
