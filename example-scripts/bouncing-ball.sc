@@ -19,15 +19,16 @@ Sessions
   .withNewSession("bouncing-ball", "C64 bouncing ball")
   .connect: session =>
     given ConnectedSession = session
+    given Model[Unit] = Model.Standard.unitModel
 
     println(
       "Files under ~/.terminal21/web will be served under /web . Please place a ball.png file under ~/.terminal21/web/images on the box where the server runs."
     )
     val ball = Image(src = "/web/images/ball.png")
-    ball.render()
+    session.render(Seq(ball))
 
     @tailrec def animateBall(x: Int, y: Int, dx: Int, dy: Int): Unit =
-      ball.withStyle("position" -> "fixed", "left" -> (x + "px"), "top" -> (y + "px")).renderChanges()
+      session.renderChanges(Seq(ball.withStyle("position" -> "fixed", "left" -> (x + "px"), "top" -> (y + "px"))))
       Thread.sleep(1000 / 120)
       val newDx = if x < 0 || x > 600 then -dx else dx
       val newDy = if y < 0 || y > 500 then -dy else dy

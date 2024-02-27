@@ -6,9 +6,7 @@
 
 // always import these
 import org.terminal21.client.*
-
 import org.terminal21.client.components.*
-import org.terminal21.client.model.*
 import org.terminal21.model.*
 // use the chakra components for menus, forms etc, https://chakra-ui.com/docs/components
 // The scala case classes : https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/chakra/ChakraElement.scala
@@ -39,8 +37,12 @@ Sessions
     editor.run()
 
 class CsvEditor(csv: Seq[Seq[String]])(using session: ConnectedSession):
-  val saveAndExit = Button(text = "Save & Exit")
-  val exit = Button(text = "Exit Without Saving")
+  case class CsvModel(save: Boolean, exitWithoutSave: Boolean)
+  private given Model[CsvModel] = Model(CsvModel(false, false))
+  val saveAndExit = Button(text = "Save & Exit").onClick: event =>
+    event.handled.withModel(true).terminate
+  val exit = Button(text = "Exit Without Saving").onClick: event =>
+    event.handled.withModel(false).terminate
   val status = Box()
 
   val tableCells =
@@ -49,11 +51,15 @@ class CsvEditor(csv: Seq[Seq[String]])(using session: ConnectedSession):
         newEditable(column)
 
   def run(): Unit =
-    components.render()
-    if processEvents then
-      save()
-      status.withText("Csv file saved, exiting.").renderChanges()
-      Thread.sleep(1000)
+    if controller.handledEventsIterator
+        .map: handled =>
+          if handled.model then
+            handled.withRenderChanges(status.withText("Csv file saved, exiting."))
+            Thread.sleep(500)
+          else handled
+        .toList
+        .lastOption
+    then save()
 
   def components: Seq[UiElement] =
     Seq(
@@ -70,8 +76,8 @@ class CsvEditor(csv: Seq[Seq[String]])(using session: ConnectedSession):
   /** @return
     *   true if the user clicked "Save", false if the user clicked "Exit" or closed the session
     */
-  def processEvents: Boolean =
-    registerCsvEditorEventHandlers(Controller(false)).lastModelOption.getOrElse(false)
+  def controller: Controller[Boolean] =
+    Controller(components)
 
   def save(): Unit =
     val data = currentCsvValue
@@ -85,12 +91,5 @@ class CsvEditor(csv: Seq[Seq[String]])(using session: ConnectedSession):
         EditablePreview(),
         EditableInput()
       )
-
-  def registerCsvEditorEventHandlers(controller: Controller[Boolean]) =
-    controller
-      .onClick(saveAndExit): event =>
-        event.handled.withModel(true).terminate
-      .onClick(exit): click =>
-        click.handled.withModel(false).terminate
-      .onChanged(tableCells.flatten*): event =>
+      .onChange: event =>
         event.handled.withRenderChanges(status.withText(s"Changed a cell value to ${event.newValue}"))

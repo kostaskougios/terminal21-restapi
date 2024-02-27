@@ -13,6 +13,7 @@ Sessions
   .withNewSession("hello-world", "Hello World Example")
   .connect: session =>
     given ConnectedSession = session
+    given Model[Unit] = Model.Standard.unitModel // We don't have a model in this simple example
 
-    Paragraph(text = "Hello World!").render()
+    Controller(Seq(Paragraph(text = "Hello World!"))).render()
     session.leaveSessionOpenAfterExiting()
