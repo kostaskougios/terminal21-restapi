@@ -8,6 +8,10 @@ import org.terminal21.client.components.nivo.*
 
 import scala.util.Random
 import NivoLineChart.*
+import org.terminal21.model.ClientEvent
+// We don't have a model in this simple example, so we will import the standard Unit model
+// for our controller to use.
+import org.terminal21.client.Model.Standard.unitModel
 
 Sessions
   .withNewSession("nivo-line-chart", "Nivo Line Chart")
@@ -23,17 +27,24 @@ Sessions
       legends = Seq(Legend())
     )
 
-    Seq(
-      Paragraph(text = "Means of transportation for various countries", style = Map("margin" -> 20)),
-      chart
-    ).render()
-
+    // we'll send new data to our controller every 2 seconds via a custom event
+    case class NewData(data: Seq[Serie]) extends ClientEvent
     fiberExecutor.submit:
       while !session.isClosed do
         Thread.sleep(2000)
-        chart.withData(createRandomData).renderChanges()
+        session.fireEvent(NewData(createRandomData))
 
-    session.waitTillUserClosesSession()
+    Controller(
+      Seq(
+        Paragraph(text = "Means of transportation for various countries", style = Map("margin" -> 20)),
+        chart
+      )
+    ).render()
+      .onEvent: // receive the new data and render them
+        case ControllerClientEvent(handled, NewData(data)) =>
+          handled.withRenderChanges(chart.withData(data))
+      .handledEventsIterator
+      .lastOption
 
 object NivoLineChart:
   def createRandomData: Seq[Serie] =

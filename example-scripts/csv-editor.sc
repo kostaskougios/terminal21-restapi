@@ -26,7 +26,7 @@ val contents =
   if file.exists() then FileUtils.readFileToString(file, "UTF-8")
   else "type,damage points,hit points\nmage,10dp,20hp\nwarrior,20dp,30hp"
 
-val csv = contents.split("\n").map(_.split(",").toSeq).toSeq
+val csv: Seq[Seq[String]] = contents.split("\n").map(_.split(",").toSeq).toSeq
 
 Sessions
   .withNewSession(s"csv-editor-$fileName", s"CsvEdit: $fileName")
@@ -37,14 +37,18 @@ Sessions
     editor.run()
 
 class CsvEditor(csv: Seq[Seq[String]])(using session: ConnectedSession):
+  /** Our model. If the user clicks "Save", we'll set `save` to true and store the csv data into `csv`
+    */
   case class CsvModel(save: Boolean, exitWithoutSave: Boolean, csv: Seq[Seq[String]])
+
   private given Model[CsvModel] = Model(CsvModel(false, false, Nil))
+
   val saveAndExit = Button(text = "Save & Exit").onClick: event =>
     import event.*
     val csv = tableCells.map: row =>
       row.map: editable =>
         editable.current.value
-    handled.withModel(CsvModel(true, false, csv)).terminate
+    handled.withModel(CsvModel(true, false, csv)).terminate // terminate the event iteration after storing the data into the model
   val exit = Button(text = "Exit Without Saving").onClick: event =>
     import event.*
     handled.withModel(model.copy(exitWithoutSave = true)).terminate
@@ -56,7 +60,7 @@ class CsvEditor(csv: Seq[Seq[String]])(using session: ConnectedSession):
         newEditable(column)
 
   def run(): Unit =
-    for handled <- controller.render().handledEventsIterator.lastOption.filter(_.model.save)
+    for handled <- controller.render().handledEventsIterator.lastOption.filter(_.model.save) // only save if model.save is true
     do save(handled.model.csv)
 
   def components: Seq[UiElement] =
