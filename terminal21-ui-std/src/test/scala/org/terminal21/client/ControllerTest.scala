@@ -33,7 +33,8 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(model, Seq(buttonClick), Seq(button))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
-      .eventsIterator
+      .handledEventsIterator
+      .map(_.model)
       .toList should be(List(0, 1))
 
   test("onEvent is called for change"):
@@ -42,7 +43,8 @@ class ControllerTest extends AnyFunSuiteLike:
       .onEvent: event =>
         import event.*
         if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
-      .eventsIterator
+      .handledEventsIterator
+      .map(_.model)
       .toList should be(List(0, 1))
 
   test("onEvent not matched for change"):
@@ -52,7 +54,8 @@ class ControllerTest extends AnyFunSuiteLike:
         case event: ControllerClickEvent[_] =>
           import event.*
           handled.withModel(5)
-      .eventsIterator
+      .handledEventsIterator
+      .map(_.model)
       .toList should be(List(0, 0))
 
   test("onEvent is called for change/boolean"):
@@ -61,7 +64,8 @@ class ControllerTest extends AnyFunSuiteLike:
       .onEvent: event =>
         import event.*
         if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
-      .eventsIterator
+      .handledEventsIterator
+      .map(_.model)
       .toList should be(List(0, 1))
 
   test("onEvent not matches for change/boolean"):
@@ -71,7 +75,8 @@ class ControllerTest extends AnyFunSuiteLike:
         case event: ControllerClickEvent[_] =>
           import event.*
           handled.withModel(5)
-      .eventsIterator
+      .handledEventsIterator
+      .map(_.model)
       .toList should be(List(0, 0))
 
   case class TestClientEvent(i: Int) extends ClientEvent
@@ -83,7 +88,8 @@ class ControllerTest extends AnyFunSuiteLike:
         case ControllerClientEvent(handled, event: TestClientEvent) =>
           import event.*
           handled.withModel(event.i).terminate
-      .eventsIterator
+      .handledEventsIterator
+      .map(_.model)
       .toList should be(List(0, 5))
 
   test("onEvent when no partial function matches ClientEvent"):
@@ -92,7 +98,8 @@ class ControllerTest extends AnyFunSuiteLike:
       .onEvent:
         case ControllerClickEvent(`checkbox`, handled) =>
           handled.withModel(5).terminate
-      .eventsIterator
+      .handledEventsIterator
+      .map(_.model)
       .toList should be(List(0, 0))
 
   test("onClick is called"):
@@ -104,7 +111,9 @@ class ControllerTest extends AnyFunSuiteLike:
         button.onClick: event =>
           event.handled.withModel(100).terminate
       )
-    ).eventsIterator.toList should be(List(0, 100))
+    ).handledEventsIterator
+      .map(_.model)
+      .toList should be(List(0, 100))
 
   test("onChange is called"):
     given model: Model[Int] = Model(0)
@@ -115,7 +124,9 @@ class ControllerTest extends AnyFunSuiteLike:
         input.onChange: event =>
           event.handled.withModel(100).terminate
       )
-    ).eventsIterator.toList should be(List(0, 100))
+    ).handledEventsIterator
+      .map(_.model)
+      .toList should be(List(0, 100))
 
   test("onChange/boolean is called"):
     given model: Model[Int] = Model(0)
@@ -126,14 +137,17 @@ class ControllerTest extends AnyFunSuiteLike:
         checkbox.onChange: event =>
           event.handled.withModel(100).terminate
       )
-    ).eventsIterator.toList should be(List(0, 100))
+    ).handledEventsIterator
+      .map(_.model)
+      .toList should be(List(0, 100))
 
   test("terminate is obeyed and latest model state is iterated"):
     val model = Model(0)
     newController(model, Seq(buttonClick, buttonClick, buttonClick), Seq(button))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate.withModel(100) else event.handled.withModel(event.model + 1)
-      .eventsIterator
+      .handledEventsIterator
+      .map(_.model)
       .toList should be(List(0, 1, 2, 100))
 
   test("changes are rendered"):
@@ -143,7 +157,8 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(Model(0), Seq(buttonClick), Seq(button), renderer)
       .onEvent: event =>
         event.handled.withModel(event.model + 1).withRenderChanges(button.withText("changed")).terminate
-      .eventsIterator
+      .handledEventsIterator
+      .map(_.model)
       .toList should be(List(0, 1))
 
     rendered should be(Seq(button.withText("changed")))
@@ -173,7 +188,8 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(Model(0), Seq(buttonClick), Seq(button), renderer)
       .onEvent: event =>
         event.handled.withModel(1).withTimedRenderChanges(TimedRenderChanges(10, button.withText("changed"))).terminate
-      .eventsIterator
+      .handledEventsIterator
+      .map(_.model)
       .toList should be(List(0, 1))
     Thread.sleep(15)
     rendered should be(Seq(button.withText("changed")))
@@ -200,7 +216,9 @@ class ControllerTest extends AnyFunSuiteLike:
         button.onClick(using model): event =>
           event.handled.withTimedRenderChanges(TimedRenderChanges(10, c))
       )
-    ).eventsIterator.toList should be(List(0, 0, 2))
+    ).handledEventsIterator
+      .map(_.model)
+      .toList should be(List(0, 0, 2))
 
   test("current value for OnChange"):
     val model = Model(0)
@@ -212,7 +230,9 @@ class ControllerTest extends AnyFunSuiteLike:
           import event.*
           handled.withModel(if input.current.value == "new-value" then 100 else -1).terminate
       )
-    ).eventsIterator.toList should be(List(0, 100))
+    ).handledEventsIterator
+      .map(_.model)
+      .toList should be(List(0, 100))
 
   test("current value for OnChange/boolean"):
     val model = Model(0)
@@ -224,7 +244,9 @@ class ControllerTest extends AnyFunSuiteLike:
           import event.*
           handled.withModel(if checkbox.current.checked then 100 else -1).terminate
       )
-    ).eventsIterator.toList should be(List(0, 100))
+    ).handledEventsIterator
+      .map(_.model)
+      .toList should be(List(0, 100))
 
   test("newly rendered elements are visible"):
     val model         = Model(0)
@@ -251,11 +273,15 @@ class ControllerTest extends AnyFunSuiteLike:
 
     lazy val box: Box = Box().withChildren(b)
 
-    newController(model, Seq(buttonClick, checkBoxChange), Seq(box)).eventsIterator.toList should be(List(0, 1, 2))
+    newController(model, Seq(buttonClick, checkBoxChange), Seq(box)).handledEventsIterator
+      .map(_.model)
+      .toList should be(List(0, 1, 2))
 
   test("RenderChangesEvent renders changes"):
     var rendered                          = Seq.empty[UiElement]
     def renderer(s: Seq[UiElement]): Unit = rendered = s
 
-    newController(Model(0), Seq(RenderChangesEvent(Seq(button.withText("changed")))), Seq(button), renderer).eventsIterator.toList should be(List(0, 0))
+    newController(Model(0), Seq(RenderChangesEvent(Seq(button.withText("changed")))), Seq(button), renderer).handledEventsIterator
+      .map(_.model)
+      .toList should be(List(0, 0))
     rendered should be(Seq(button.withText("changed")))

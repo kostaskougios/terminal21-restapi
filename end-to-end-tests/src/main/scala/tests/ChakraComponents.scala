@@ -23,7 +23,7 @@ import tests.chakra.*
           Overlay.components ++ Forms.components ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Feedback.components ++ Disclosure.components ++ Navigation.components ++ Seq(
             krButton
           )
-        Controller(components).render().eventsIterator.lastOption match
+        Controller(components).render().handledEventsIterator.lastOption.map(_.model) match
           case Some(true) =>
             session.render(Seq(Paragraph(text = "chakra-session-reset")))
             Thread.sleep(500)

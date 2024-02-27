@@ -22,7 +22,7 @@ class SettingsPage(using session: ConnectedSession):
   import Model.Standard.unitModel
   val themeToggle = ThemeToggle()
   def run()       =
-    controller.render().eventsIterator.lastOption
+    controller.render().handledEventsIterator.lastOption
 
   def components = Seq(themeToggle)
 

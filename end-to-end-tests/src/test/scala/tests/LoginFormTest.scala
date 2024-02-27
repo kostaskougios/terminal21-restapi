@@ -27,7 +27,7 @@ class LoginFormTest extends AnyFunSuiteLike:
 
   test("user submits validated data"):
     new App:
-      val eventsIt = form.controller.eventsIterator // get the iterator before we fire the events, otherwise the iterator will be empty
+      val eventsIt = form.controller.handledEventsIterator // get the iterator before we fire the events, otherwise the iterator will be empty
       session.fireEvents(
         CommandEvent.onChange(form.emailInput, "an@email.com"),
         CommandEvent.onChange(form.passwordInput, "secret"),
@@ -35,7 +35,7 @@ class LoginFormTest extends AnyFunSuiteLike:
         CommandEvent.sessionClosed // every test should close the session so that the iterator doesn't block if converted to a list.
       )
 
-      eventsIt.lastOption should be(Some(Login("an@email.com", "secret")))
+      eventsIt.lastOption.map(_.model) should be(Some(Login("an@email.com", "secret")))
 
   test("user submits invalid email"):
     new App:

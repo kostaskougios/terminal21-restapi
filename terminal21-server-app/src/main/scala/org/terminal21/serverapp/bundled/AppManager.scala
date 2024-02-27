@@ -76,7 +76,8 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
   def eventsIterator: Iterator[ManagerModel] =
     controller
       .render()
-      .eventsIterator
+      .handledEventsIterator
+      .map(_.model)
       .tapEach: m =>
         for app <- m.startApp do startApp(app)
 

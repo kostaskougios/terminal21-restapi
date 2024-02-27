@@ -1,9 +1,8 @@
 package tests
 
 import org.scalatest.funsuite.AnyFunSuiteLike
-import org.terminal21.client.{ConnectedSession, ConnectedSessionMock}
 import org.scalatest.matchers.should.Matchers.*
-import org.terminal21.client.components.*
+import org.terminal21.client.{ConnectedSession, ConnectedSessionMock}
 import org.terminal21.model.CommandEvent
 
 class LoggedInTest extends AnyFunSuiteLike:
@@ -23,12 +22,12 @@ class LoggedInTest extends AnyFunSuiteLike:
 
   test("yes clicked"):
     new App:
-      val eventsIt = form.controller.eventsIterator
+      val eventsIt = form.controller.handledEventsIterator
       session.fireEvents(CommandEvent.onClick(form.yesButton), CommandEvent.sessionClosed)
-      eventsIt.lastOption should be(Some(true))
+      eventsIt.lastOption.map(_.model) should be(Some(true))
 
   test("no clicked"):
     new App:
-      val eventsIt = form.controller.eventsIterator
+      val eventsIt = form.controller.handledEventsIterator
       session.fireEvents(CommandEvent.onClick(form.noButton), CommandEvent.sessionClosed)
-      eventsIt.lastOption should be(Some(false))
+      eventsIt.lastOption.map(_.model) should be(Some(false))

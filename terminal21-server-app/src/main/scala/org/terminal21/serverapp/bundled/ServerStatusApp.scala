@@ -33,7 +33,7 @@ class ServerStatusPage(
       while !appSession.isClosed do
         Thread.sleep(2000)
         appSession.fireEvents(Ticker)
-    controller(Runtime.getRuntime, sessionsService.allSessions).render().eventsIterator.lastOption
+    controller(Runtime.getRuntime, sessionsService.allSessions).render().handledEventsIterator.lastOption
 
   private def toMb(v: Long) = s"${v / (1024 * 1024)} MB"
   private val xs            = Some("2xs")

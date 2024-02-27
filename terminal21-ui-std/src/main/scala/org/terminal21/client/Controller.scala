@@ -31,8 +31,6 @@ class Controller[M](
       eventHandlers :+ handler
     )
 
-  def eventsIterator: EventIterator[M] = new EventIterator(handledEventsIterator.takeWhile(!_.shouldTerminate).map(_.model))
-
   private def clickHandlersMap(h: HandledEvent[M]): Map[String, Seq[OnClickEventHandlerFunction[M]]]                 =
     h.componentsByKey.values
       .collect:
@@ -134,6 +132,7 @@ class Controller[M](
         .flatMap: h =>
           // trick to make sure we take the last state of the model when shouldTerminate=true
           if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
+        .takeWhile(!_.shouldTerminate)
     )
 
 object Controller:

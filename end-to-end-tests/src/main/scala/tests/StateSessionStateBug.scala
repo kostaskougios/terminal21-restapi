@@ -42,4 +42,4 @@ import java.util.Date
         Button(text = "Close").onClick: event =>
           event.handled.terminate
       )
-      Controller(components).render().eventsIterator.lastOption
+      Controller(components).render().handledEventsIterator.lastOption
