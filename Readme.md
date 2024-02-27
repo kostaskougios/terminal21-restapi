@@ -170,7 +170,7 @@ Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi
 - apps can now run on the server + server management bundled apps
 - Cookie setter and reader.
 - session builders refactoring for more flexible creation of sessions
-- QuickTabs
+- QuickTabs, QuickFormControl
 - bug fix for old react state re-rendering on new session
 - event iterators allows idiomatic handling of events and overhaul of the event handling for easier testing
 
