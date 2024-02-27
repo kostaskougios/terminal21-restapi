@@ -28,13 +28,13 @@ class ServerStatusPage(
   val initModel            = StatusModel(Runtime.getRuntime, sessionsService.allSessions)
   given Model[StatusModel] = Model(initModel)
 
-  case object Ticker extends ClientEvent
+  case class Ticker(sessions: Seq[Session]) extends ClientEvent
 
   def run(): Unit =
     fiberExecutor.submit:
       while !appSession.isClosed do
         Thread.sleep(2000)
-        appSession.fireEvents(Ticker)
+        appSession.fireEvents(Ticker(sessionsService.allSessions))
 
     try controller.render().handledEventsIterator.lastOption
     catch case t: Throwable => t.printStackTrace()
@@ -44,8 +44,8 @@ class ServerStatusPage(
 
   def controller: Controller[StatusModel] =
     Controller(components).onEvent:
-      case ControllerClientEvent(handled, Ticker) =>
-        handled.withModel(handled.model.copy(sessions = sessionsService.allSessions))
+      case ControllerClientEvent(handled, Ticker(sessions)) =>
+        handled.withModel(handled.model.copy(sessions = sessions))
 
   def components(m: StatusModel): Seq[UiElement] =
     Seq(jvmTable(m.runtime), sessionsTable(m.sessions))
@@ -80,7 +80,7 @@ class ServerStatusPage(
 
   private def actionsFor(session: Session): UiElement =
     if session.isOpen then
-      Box().withChildren(
+      Box(key = s"session-${session.id}-actions").withChildren(
         Button(key = s"close-${session.id}", text = "Close", size = xs)
           .withLeftIcon(SmallCloseIcon())
           .onClick: event =>
