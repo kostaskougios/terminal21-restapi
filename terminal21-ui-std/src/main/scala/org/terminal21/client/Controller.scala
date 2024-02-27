@@ -11,7 +11,6 @@ import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
 class Controller[M](
     eventIteratorFactory: => Iterator[CommandEvent],
-    fireEvent: CommandEvent => Unit,
     renderChanges: Seq[UiElement] => Unit,
     initialComponents: Seq[UiElement],
     initialModel: Model[M],
@@ -24,7 +23,6 @@ class Controller[M](
   def onEvent(handler: PartialFunction[ControllerEvent[M], HandledEvent[M]]) =
     new Controller(
       eventIteratorFactory,
-      fireEvent,
       renderChanges,
       initialComponents,
       initialModel,
@@ -150,9 +148,9 @@ object Controller:
   private def defaultEventHandlers[M] = Seq(renderChangesEventHandler[M])
 
   def apply[M](initialModel: Model[M], components: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
-    new Controller(session.eventIterator, session.fireEvent, session.renderChanges, components, initialModel)
+    new Controller(session.eventIterator, session.renderChanges, components, initialModel)
   def apply[M](components: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
-    new Controller(session.eventIterator, session.fireEvent, session.renderChanges, components, initialModel)
+    new Controller(session.eventIterator, session.renderChanges, components, initialModel)
   def apply[M](component: UiElement)(using initialModel: Model[M], session: ConnectedSession): Controller[M]       =
     apply(Seq(component))
 

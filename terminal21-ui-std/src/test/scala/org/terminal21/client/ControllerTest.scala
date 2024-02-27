@@ -27,7 +27,7 @@ class ControllerTest extends AnyFunSuiteLike:
     val it     = seList.iterator
     events.foreach(e => seList.add(e))
     seList.add(CommandEvent.sessionClosed)
-    new Controller(it, _ => (), renderChanges, components, initialModel)
+    new Controller(it, renderChanges, components, initialModel)
 
   test("onEvent is called"):
     val model = Model(0)
