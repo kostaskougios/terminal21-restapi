@@ -7,6 +7,7 @@ trait UiElement extends AnyElement:
 
   def key: String
   def withKey(key: String): This
+  def findKey(key: String): UiElement = flat.find(_.key == key).get
 
   /** @return
     *   this element along all it's children flattened

@@ -1,6 +1,6 @@
 package org.terminal21.serverapp.bundled
 
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.terminal21.client.components.chakra.{Button, CheckIcon, NotAllowedIcon, Text}
@@ -17,7 +17,8 @@ class ServerStatusPageTest extends AnyFunSuiteLike:
     given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
     val sessionsService                      = mock[ServerSessionsService]
     val serverSideSessions                   = mock[ServerSideSessions]
-    when(sessionsService.allSessions).thenReturn(Seq(session(id = "session1")))
+    val session1                             = session(id = "session1")
+    when(sessionsService.allSessions).thenReturn(Seq(session1))
     val page                                 = new ServerStatusPage(serverSideSessions, sessionsService)
 
   test("Close button for a session"):
@@ -70,3 +71,11 @@ class ServerStatusPageTest extends AnyFunSuiteLike:
       handledEvents.head.model.sessions should be(Seq(session(id = "session1")))
       handledEvents(1).model.sessions should be(sessions2)
       handledEvents(2).model.sessions should be(sessions3)
+
+  test("closes session when close button is clicked"):
+    new App:
+      val it = page.controller.render().handledEventsIterator
+      connectedSession.fireClickEvent(page.sessionsTable(Seq(session1)).findKey("close-session1"))
+      connectedSession.fireSessionClosedEvent()
+      it.toList
+      verify(sessionsService).terminateAndRemove(session1)
