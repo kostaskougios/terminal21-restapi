@@ -17,17 +17,17 @@ object Navigation:
       commonBox(text = "Breadcrumbs"),
       Breadcrumb().withChildren(
         BreadcrumbItem().withChildren(
-          BreadcrumbLink(text = "breadcrumb-home").onClick: event =>
+          BreadcrumbLink("breadcrumb-home", text = "breadcrumb-home").onClick: event =>
             import event.*
             handled.withModel(breadcrumbClicked(model, "breadcrumb-home"))
         ),
         BreadcrumbItem().withChildren(
-          BreadcrumbLink(text = "breadcrumb-link1").onClick: event =>
+          BreadcrumbLink("breadcrumb-link1", text = "breadcrumb-link1").onClick: event =>
             import event.*
             handled.withModel(breadcrumbClicked(model, "breadcrumb-link1"))
         ),
         BreadcrumbItem(isCurrentPage = Some(true)).withChildren(
-          BreadcrumbLink(text = "breadcrumb-link2").onClick: event =>
+          BreadcrumbLink("breadcrumb-link2", text = "breadcrumb-link2").onClick: event =>
             import event.*
             handled.withModel(breadcrumbClicked(model, "breadcrumb-link2"))
         )

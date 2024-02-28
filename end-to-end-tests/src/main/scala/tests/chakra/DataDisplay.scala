@@ -30,7 +30,7 @@ object DataDisplay:
         Badge(text = "badge 3", size = "lg", colorScheme = Some("green")),
         Badge(text = "badge 4", variant = Some("outline"), colorScheme = Some("tomato")),
         Badge(text = "badge 4").withChildren(
-          Button(text = "test")
+          Button("test", text = "test")
         )
       ),
       commonBox(text = "Quick Tables"),

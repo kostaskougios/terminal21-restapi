@@ -1,6 +1,5 @@
 package tests
 
-import cats.conversions.all.autoConvertProfunctorVariance
 import org.terminal21.client.*
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
@@ -17,7 +16,7 @@ import tests.chakra.*
         given model: Model[ChakraModel] = Model(ChakraModel())
 
         // react tests reset the session to clear state
-        val krButton = Button(text = "Reset state").onClick: event =>
+        val krButton = Button("reset", text = "Reset state").onClick: event =>
           event.handled.withModel(_.copy(rerun = true)).terminate
 
         def components(m: ChakraModel): Seq[UiElement] =
