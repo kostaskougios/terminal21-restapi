@@ -1,5 +1,6 @@
 package org.terminal21.client.components.chakra
 
+import org.terminal21.client.components.Keys.linearKeys
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.{Keys, UiComponent, UiElement}
 
@@ -37,7 +38,7 @@ case class QuickTable(
       children = caption.map(text => TableCaption(text = text)).toSeq ++ Seq(head, body)
     )
     val tableContainer = TableContainer(key = key + "-tc", style = style, children = Seq(table))
-    Seq(tableContainer)
+    linearKeys(key, tableContainer)
 
   def withHeaders(headers: String*): QuickTable            = copy(headers = headers.map(h => Text(text = h)))
   def withHeadersElements(headers: UiElement*): QuickTable = copy(headers = headers)

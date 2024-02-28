@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import org.terminal21.client.collections.EventIterator
 import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
-import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
+import org.terminal21.client.components.{Keys, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
 import org.terminal21.collections.TypedMapKey
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
@@ -16,7 +16,7 @@ class Controller[M](
     eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
 ):
   def render()(using session: ConnectedSession): RenderedController[M] =
-    val initComponents = modelComponents(initialModel.value)
+    val initComponents = Keys.linearKeys(modelComponents(initialModel.value))
     session.render(initComponents)
     new RenderedController(eventIteratorFactory, initialModel, initComponents, modelComponents, renderChanges, eventHandlers)
 
@@ -97,9 +97,15 @@ class RenderedController[M](
         handled
       case _                                                           => h
 
+  private def checkForDuplicatesAndThrow(seq: Seq[String]): Unit =
+    val duplicates = seq.groupBy(identity).filter(_._2.size > 1).keys.toList
+    if duplicates.nonEmpty then throw new IllegalArgumentException(s"Duplicate(s) found: ${duplicates.mkString(", ")}")
+
   private def calcComponentsByKeyMap(components: Seq[UiElement]): Map[String, UiElement] =
-    val all = components
+    val flattened = components
       .flatMap(_.flat)
+    checkForDuplicatesAndThrow(flattened.map(_.key))
+    val all       = flattened
       .map(c => (c.key, c))
       .toMap
     all.withDefault(key =>
@@ -110,7 +116,7 @@ class RenderedController[M](
 
   private def doRenderChanges(oldHandled: HandledEvent[M], newHandled: HandledEvent[M]): HandledEvent[M] =
     // TODO: optimise what elements are rendered
-    val all = modelComponents(newHandled.model)
+    val all = Keys.linearKeys(modelComponents(newHandled.model))
     renderChanges(all)
     newHandled.copy(componentsByKey = calcComponentsByKeyMap(all))
 

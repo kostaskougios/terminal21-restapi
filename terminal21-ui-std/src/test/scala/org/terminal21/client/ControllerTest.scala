@@ -3,17 +3,17 @@ package org.terminal21.client
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.components.UiElement
-import org.terminal21.client.components.chakra.{Box, Button, ChakraElement, Checkbox}
+import org.terminal21.client.components.chakra.{Button, Checkbox}
 import org.terminal21.client.components.std.Input
 import org.terminal21.collections.SEList
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
 class ControllerTest extends AnyFunSuiteLike:
-  val button             = Button()
+  val button             = Button(key = "b1")
   val buttonClick        = OnClick(button.key)
-  val input              = Input()
+  val input              = Input(key = "i1")
   val inputChange        = OnChange(input.key, "new-value")
-  val checkbox           = Checkbox()
+  val checkbox           = Checkbox(key = "c1")
   val checkBoxChange     = OnChange(checkbox.key, "true")
   given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
 
@@ -28,6 +28,10 @@ class ControllerTest extends AnyFunSuiteLike:
     events.foreach(e => seList.add(e))
     seList.add(CommandEvent.sessionClosed)
     new Controller(it, renderChanges, modelComponents, initialModel, Nil)
+
+  test("will throw an exception if there is a duplicate key"):
+    an[IllegalArgumentException] should be thrownBy
+      newController(Model(0), Seq(buttonClick), _ => Seq(button, button)).render().handledEventsIterator
 
   test("onEvent is called"):
     val model = Model(0)

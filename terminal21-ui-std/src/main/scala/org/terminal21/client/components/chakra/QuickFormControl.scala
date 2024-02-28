@@ -1,5 +1,6 @@
 package org.terminal21.client.components.chakra
 
+import org.terminal21.client.components.Keys.linearKeys
 import org.terminal21.client.components.{Keys, UiComponent, UiElement}
 import org.terminal21.client.components.UiElement.HasStyle
 
@@ -17,9 +18,7 @@ case class QuickFormControl(
       label.map(l => FormLabel(key = key + "-label", text = l)).toSeq ++
         Seq(InputGroup(key = key + "-ig").withChildren(inputGroup: _*)) ++
         helperText.map(h => FormHelperText(key = key + "-helper", text = h))
-    Seq(
-      FormControl(key = key + "-fc", style = style).withChildren(ch: _*)
-    )
+    linearKeys(key, FormControl(key = key + "-fc", style = style).withChildren(ch: _*))
 
   def withLabel(label: String): QuickFormControl       = copy(label = Some(label))
   def withInputGroup(ig: UiElement*): QuickFormControl = copy(inputGroup = ig)
