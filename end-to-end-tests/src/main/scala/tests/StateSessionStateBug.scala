@@ -14,8 +14,8 @@ import java.util.Date
       given ConnectedSession = session
       import Model.Standard.unitModel
 
-      val date       = new Date()
-      val components = Seq(
+      val date                = new Date()
+      def components(m: Unit) = Seq(
         Paragraph(text = s"Now: $date"),
         QuickTable()
           .withHeaders("Title", "Value")

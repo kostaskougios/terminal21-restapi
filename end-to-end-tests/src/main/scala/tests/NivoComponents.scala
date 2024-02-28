@@ -10,7 +10,7 @@ import tests.nivo.{ResponsiveBarChart, ResponsiveLineChart}
     .andLibraries(NivoLib)
     .connect: session =>
       given ConnectedSession = session
-      import Model.Standard.unitModel
-      val components         = ResponsiveBarChart() ++ ResponsiveLineChart()
-      Controller(components).render()
+
+      val components = ResponsiveBarChart() ++ ResponsiveLineChart()
+      Controller.noModel(components).render()
       session.leaveSessionOpenAfterExiting()

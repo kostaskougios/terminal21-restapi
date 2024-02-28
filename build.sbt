@@ -1,5 +1,3 @@
-import sbt.librarymanagement.ModuleFilter
-
 /** This build has different sections for each integration. I.e. an http4s section and a kafka section. These sections are not related to each other, please
   * examine the section you're interested in.
   */

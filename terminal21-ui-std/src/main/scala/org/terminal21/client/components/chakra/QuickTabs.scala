@@ -1,6 +1,5 @@
 package org.terminal21.client.components.chakra
 
-import org.terminal21.client.components.Keys.linearKeys
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.{Keys, UiComponent, UiElement}
 
@@ -16,8 +15,7 @@ case class QuickTabs(
   def withTabs(tabs: String | Seq[UiElement]*): QuickTabs  = copy(tabs = tabs)
   def withTabPanels(tabPanels: Seq[UiElement]*): QuickTabs = copy(tabPanels = tabPanels)
 
-  override lazy val rendered = linearKeys(
-    key,
+  override lazy val rendered =
     Seq(
       Tabs(key = subKey("-tabs"), style = style).withChildren(
         TabList(
@@ -33,7 +31,6 @@ case class QuickTabs(
         )
       )
     )
-  )
 
   override def withStyle(v: Map[String, Any]): QuickTabs = copy(style = v)
   override def withKey(key: String): QuickTabs           = copy(key = key)

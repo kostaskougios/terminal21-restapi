@@ -84,12 +84,12 @@ class LoginPage(using session: ConnectedSession):
       handled.withModel(newModel)
 
 class LoggedIn(login: LoginForm)(using session: ConnectedSession):
-  private given Model[Boolean] = Model(false)
-  val yesButton                = Button(text = "Yes")
+  import Model.Standard.booleanFalseModel
+  val yesButton = Button(key = "yes-button", text = "Yes")
     .onClick: e =>
       e.handled.withModel(true).terminate
 
-  val noButton = Button(text = "No")
+  val noButton = Button(key = "no-button", text = "No")
     .onClick: e =>
       e.handled.withModel(false).terminate
 
@@ -99,7 +99,7 @@ class LoggedIn(login: LoginForm)(using session: ConnectedSession):
   def run(): Option[Boolean] =
     controller.render().handledEventsIterator.lastOption.map(_.model)
 
-  def components: Seq[UiElement] =
+  def components(m: Boolean): Seq[UiElement] =
     Seq(
       Paragraph().withChildren(
         Text(text = "Are your details correct?"),
@@ -114,4 +114,4 @@ class LoggedIn(login: LoginForm)(using session: ConnectedSession):
   /** @return
     *   A controller with a boolean value, true if user clicked "Yes", false for "No"
     */
-  def controller = Controller(components)
+  def controller: Controller[Boolean] = Controller(components)

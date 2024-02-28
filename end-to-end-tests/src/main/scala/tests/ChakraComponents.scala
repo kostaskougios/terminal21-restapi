@@ -1,5 +1,6 @@
 package tests
 
+import cats.conversions.all.autoConvertProfunctorVariance
 import org.terminal21.client.*
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
@@ -32,7 +33,7 @@ import tests.chakra.*
             )
         Controller(components).render().handledEventsIterator.lastOption.map(_.model) match
           case Some(m) if m.rerun =>
-            session.render(Seq(Paragraph(text = "chakra-session-reset")))
+            Controller.noModel(Seq(Paragraph(text = "chakra-session-reset"))).render()
             Thread.sleep(500)
             loop()
           case _                  =>

@@ -1,8 +1,10 @@
 package org.terminal21.client.components
 
+import org.terminal21.client.components.UiElement.HasChildren
+import org.terminal21.client.components.chakra.Box
 import org.terminal21.collections.{TypedMap, TypedMapKey}
 
-trait UiElement extends AnyElement:
+abstract class UiElement extends AnyElement:
   type This <: UiElement
 
   def key: String
@@ -13,6 +15,12 @@ trait UiElement extends AnyElement:
     *   this element along all it's children flattened
     */
   def flat: Seq[UiElement] = Seq(this)
+
+  def substituteComponents: UiElement =
+    this match
+      case c: UiComponent  => Box(key = c.key, text = "", children = c.rendered.map(_.substituteComponents))
+      case ch: HasChildren => ch.withChildren(ch.children.map(_.substituteComponents)*)
+      case _               => this
 
   def toSimpleString: String = s"${getClass.getSimpleName}($key)"
 

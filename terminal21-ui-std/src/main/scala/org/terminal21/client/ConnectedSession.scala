@@ -93,7 +93,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     * @param es
     *   the UiElements to be rendered.
     */
-  def render(es: Seq[UiElement]): Unit =
+  private[client] def render(es: Seq[UiElement]): Unit =
     clear()
     val j = toJson(es)
     sessionsService.setSessionJsonState(session, j)
@@ -102,7 +102,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
     * @param es
     *   a seq of updated elements, all these should already have been rendered before (but not necessarily their children)
     */
-  def renderChanges(es: Seq[UiElement]): Unit =
+  private[client] def renderChanges(es: Seq[UiElement]): Unit =
     if !isClosed && es.nonEmpty then
       val j = toJson(es)
       sessionsService.changeSessionJsonState(session, j)

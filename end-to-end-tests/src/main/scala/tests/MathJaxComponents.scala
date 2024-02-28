@@ -11,7 +11,6 @@ import org.terminal21.client.components.mathjax.*
     .andLibraries(MathJaxLib)
     .connect: session =>
       given ConnectedSession = session
-      import Model.Standard.unitModel
 
       val components = Seq(
         HStack().withChildren(
@@ -24,5 +23,5 @@ import org.terminal21.client.components.mathjax.*
           style = Map("backgroundColor" -> "gray")
         )
       )
-      Controller(components).render()
+      Controller.noModel(components).render()
       session.leaveSessionOpenAfterExiting()

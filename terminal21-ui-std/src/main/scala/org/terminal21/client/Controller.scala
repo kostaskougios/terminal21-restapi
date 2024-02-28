@@ -15,10 +15,13 @@ class Controller[M](
     initialModel: Model[M],
     eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
 ):
+  private def prepareComponents(m: M): Seq[UiElement] =
+    Keys.linearKeys(modelComponents(m).map(_.substituteComponents))
+
   def render()(using session: ConnectedSession): RenderedController[M] =
-    val initComponents = Keys.linearKeys(modelComponents(initialModel.value))
+    val initComponents = prepareComponents(initialModel.value)
     session.render(initComponents)
-    new RenderedController(eventIteratorFactory, initialModel, initComponents, modelComponents, renderChanges, eventHandlers)
+    new RenderedController(eventIteratorFactory, initialModel, initComponents, prepareComponents, renderChanges, eventHandlers)
 
   def onEvent(handler: PartialFunction[ControllerEvent[M], HandledEvent[M]]) =
     new Controller(
@@ -116,7 +119,7 @@ class RenderedController[M](
 
   private def doRenderChanges(oldHandled: HandledEvent[M], newHandled: HandledEvent[M]): HandledEvent[M] =
     // TODO: optimise what elements are rendered
-    val all = Keys.linearKeys(modelComponents(newHandled.model))
+    val all = modelComponents(newHandled.model)
     renderChanges(all)
     newHandled.copy(componentsByKey = calcComponentsByKeyMap(all))
 
@@ -148,8 +151,8 @@ object Controller:
     new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
   def apply[M](modelComponents: M => Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
     new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
-  def apply[M](modelComponents: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M]      =
-    new Controller(session.eventIterator, session.renderChanges, _ => modelComponents, initialModel, Nil)
+  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[Unit]                            =
+    new Controller(session.eventIterator, session.renderChanges, _ => modelComponents, Model.Standard.unitModel, Nil)
 
 sealed trait ControllerEvent[M]:
   def model: M = handled.model
