@@ -32,7 +32,7 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
 
   val appRows: Seq[Seq[UiElement]] = apps.map: app =>
     Seq(
-      Link(text = app.name).onClick: event =>
+      Link(key = s"app-${app.name}", text = app.name).onClick: event =>
         import event.*
         handled.withModel(model.copy(startApp = Some(app)))
       ,
@@ -56,6 +56,7 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
       Paragraph().withChildren(
         Span(text = "Have a question? Please ask at "),
         Link(
+          key = "discussion-board-link",
           text = "terminal21's discussion board ",
           href = "https://github.com/kostaskougios/terminal21-restapi/discussions",
           color = Some("teal.500"),
