@@ -7,7 +7,7 @@ import org.terminal21.model.CommandEvent
 
 class LoggedInTest extends AnyFunSuiteLike:
   class App:
-    val login                       = Login("my@email.com", "secret")
+    val login                       = LoginForm()
     given session: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
     val form                        = new LoggedIn(login)
     def allComponents               = form.components.flatMap(_.flat)

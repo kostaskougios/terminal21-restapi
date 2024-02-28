@@ -6,7 +6,7 @@ import org.terminal21.client.components.chakra.{Box, SimpleGrid}
 import tests.chakra.Common.*
 
 object Grids:
-  def components(using session: ConnectedSession): Seq[UiElement] =
+  def components: Seq[UiElement] =
     val box1 = commonBox(text = "Simple grid")
     Seq(
       box1,

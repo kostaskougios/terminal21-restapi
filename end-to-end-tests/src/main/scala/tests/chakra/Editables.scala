@@ -6,25 +6,26 @@ import org.terminal21.client.components.chakra.*
 import tests.chakra.Common.*
 
 object Editables:
-  def components(using ConnectedSession, Model[Boolean]): Seq[UiElement] =
-    val status = Box(text = "This will reflect any changes in the form.")
+  def components(model: ChakraModel)(using Model[ChakraModel]): Seq[UiElement] =
+    val status = Box(text = model.editableStatus)
 
-    val editable1I = Editable(defaultValue = "Please type here").withChildren(
-      EditablePreview(),
-      EditableInput()
-    )
+    val editable1 = Editable(key = "editable1", defaultValue = "Please type here")
+      .withChildren(
+        EditablePreview(),
+        EditableInput()
+      )
+      .onChange: event =>
+        import event.*
+        handled.withModel(_.copy(editableStatus = s"editable1 newValue = $newValue"))
 
-    val editable1 = editable1I.onChange: event =>
-      import event.*
-      handled.withRenderChanges(status.withText(s"editable1 newValue = $newValue, verify editable1.value = ${editable1I.current.value}"))
-
-    val editable2I = Editable(defaultValue = "For longer maybe-editable texts\nUse an EditableTextarea\nIt uses a textarea control.").withChildren(
-      EditablePreview(),
-      EditableTextarea()
-    )
-    val editable2  = editable2I.onChange: event =>
-      import event.*
-      handled.withRenderChanges(status.withText(s"editable2 newValue = $newValue, verify editable2.value = ${editable2I.current.value}"))
+    val editable2 = Editable(key = "editable2", defaultValue = "For longer maybe-editable texts\nUse an EditableTextarea\nIt uses a textarea control.")
+      .withChildren(
+        EditablePreview(),
+        EditableTextarea()
+      )
+      .onChange: event =>
+        import event.*
+        handled.withModel(_.copy(editableStatus = s"editable2 newValue = $newValue"))
 
     Seq(
       commonBox(text = "Editables"),

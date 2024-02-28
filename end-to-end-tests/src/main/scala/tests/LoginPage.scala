@@ -11,43 +11,52 @@ import org.terminal21.client.*
     .connect: session =>
       given ConnectedSession = session
       val confirmed          = for
-        login <- new LoginForm().run()
+        login <- new LoginPage().run()
         isYes <- new LoggedIn(login).run()
       yield isYes
 
       if confirmed.getOrElse(false) then println("User confirmed the details") else println("Not confirmed")
 
-case class Login(email: String, pwd: String):
+case class LoginForm(email: String = "my@email.com", pwd: String = "mysecret", submitted: Boolean = false, submittedInvalidEmail: Boolean = false):
   def isValidEmail: Boolean = email.contains("@")
 
 /** The login form. Displays an email and password input and a submit button. When run() it will fill in the Login(email,pwd) model.
   */
-class LoginForm(using session: ConnectedSession):
-  private given initialModel: Model[Login] = Model(Login("my@email.com", "mysecret"))
-  val okIcon                               = CheckCircleIcon(color = Some("green"))
-  val notOkIcon                            = WarningTwoIcon(color = Some("red"))
-  val emailRightAddon                      = InputRightAddon().withChildren(okIcon)
-  val emailInput                           = Input(`type` = "email", defaultValue = initialModel.value.email)
+class LoginPage(using session: ConnectedSession):
+  private given initialModel: Model[LoginForm] = Model(LoginForm())
+  val okIcon                                   = CheckCircleIcon(color = Some("green"))
+  val notOkIcon                                = WarningTwoIcon(color = Some("red"))
+  val emailInput                               = Input(key = "email", `type` = "email", defaultValue = initialModel.value.email)
     .onChange: changeEvent =>
-      changeEvent.handled.withRenderChanges(validate(changeEvent.model))
+      import changeEvent.*
+      handled.withModel(model.copy(email = newValue))
 
-  val submitButton = Button(text = "Submit")
+  val submitButton = Button(key = "submit", text = "Submit")
     .onClick: clickEvent =>
       import clickEvent.*
       // if the email is invalid, we will not terminate. We also will render an error that will be visible for 2 seconds
       val isValidEmail = model.isValidEmail
-      val messageBox   =
-        if isValidEmail then errorsBox.current else errorsBox.current.addChildren(errorMsgInvalidEmail)
-      handled.withShouldTerminate(isValidEmail).withRenderChanges(messageBox).addTimedRenderChange(2000, errorsBox)
+      handled.withModel(_.copy(submitted = isValidEmail, submittedInvalidEmail = !isValidEmail))
 
-  val passwordInput        = Input(`type` = "password", defaultValue = initialModel.value.pwd)
+  val passwordInput = Input(key = "password", `type` = "password", defaultValue = initialModel.value.pwd)
+    .onChange: changeEvent =>
+      import changeEvent.*
+      handled.withModel(model.copy(pwd = newValue))
+
   val errorsBox            = Box()
   val errorMsgInvalidEmail = Paragraph(text = "Invalid Email", style = Map("color" -> "red"))
 
-  def run(): Option[Login] =
-    controller.render().handledEventsIterator.lastOptionOrNoneIfSessionClosed.map(_.model)
+  def run(): Option[LoginForm] =
+    controller
+      .render()
+      .handledEventsIterator
+      .map(_.model)
+      .tapEach: form =>
+        println(form)
+      .dropWhile(!_.submitted)
+      .nextOption()
 
-  def components: Seq[UiElement] =
+  def components(loginForm: LoginForm): Seq[UiElement] =
     Seq(
       QuickFormControl()
         .withLabel("Email address")
@@ -55,7 +64,7 @@ class LoginForm(using session: ConnectedSession):
         .withInputGroup(
           InputLeftAddon().withChildren(EmailIcon()),
           emailInput,
-          emailRightAddon
+          InputRightAddon().withChildren(if loginForm.isValidEmail then okIcon else notOkIcon)
         ),
       QuickFormControl()
         .withLabel("Password")
@@ -65,19 +74,16 @@ class LoginForm(using session: ConnectedSession):
           passwordInput
         ),
       submitButton,
-      errorsBox
+      if loginForm.submittedInvalidEmail then errorsBox.withChildren(errorMsgInvalidEmail) else errorsBox
     )
 
-  def controller: Controller[Login] = Controller(components)
+  def controller: Controller[LoginForm] = Controller(components)
     .onEvent: event =>
       import event.*
-      val newModel = event.model.copy(email = emailInput.current.value, pwd = passwordInput.current.value)
-      event.handled.withModel(newModel)
+      val newModel = model.copy(submittedInvalidEmail = false)
+      handled.withModel(newModel)
 
-  private def validate(login: Login): InputRightAddon =
-    if login.isValidEmail then emailRightAddon.withChildren(okIcon) else emailRightAddon.withChildren(notOkIcon)
-
-class LoggedIn(login: Login)(using session: ConnectedSession):
+class LoggedIn(login: LoginForm)(using session: ConnectedSession):
   private given Model[Boolean] = Model(false)
   val yesButton                = Button(text = "Yes")
     .onClick: e =>
@@ -93,7 +99,7 @@ class LoggedIn(login: Login)(using session: ConnectedSession):
   def run(): Option[Boolean] =
     controller.render().handledEventsIterator.lastOption.map(_.model)
 
-  def components =
+  def components: Seq[UiElement] =
     Seq(
       Paragraph().withChildren(
         Text(text = "Are your details correct?"),

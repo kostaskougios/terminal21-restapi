@@ -148,6 +148,8 @@ object Controller:
     new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
   def apply[M](modelComponents: M => Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
     new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
+  def apply[M](modelComponents: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M]      =
+    new Controller(session.eventIterator, session.renderChanges, _ => modelComponents, initialModel, Nil)
 
 sealed trait ControllerEvent[M]:
   def model: M = handled.model
@@ -166,6 +168,7 @@ case class HandledEvent[M](
   def terminate: HandledEvent[M]                       = copy(shouldTerminate = true)
   def withShouldTerminate(t: Boolean): HandledEvent[M] = copy(shouldTerminate = t)
   def withModel(m: M): HandledEvent[M]                 = copy(model = m)
+  def withModel(f: M => M): HandledEvent[M]            = copy(model = f(model))
 
 type OnClickEventHandlerFunction[M]         = ControllerClickEvent[M] => HandledEvent[M]
 type OnChangeEventHandlerFunction[M]        = ControllerChangeEvent[M] => HandledEvent[M]

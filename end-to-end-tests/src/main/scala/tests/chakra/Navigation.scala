@@ -7,11 +7,11 @@ import org.terminal21.client.components.std.Paragraph
 import tests.chakra.Common.commonBox
 
 object Navigation:
-  def components(using Model[Boolean]): Seq[UiElement] =
-    val clickedBreadcrumb            = Paragraph(text = "no-breadcrumb-clicked")
-    def breadcrumbClicked(t: String) = clickedBreadcrumb.withText(s"breadcrumb-click: $t")
+  def components(m: ChakraModel)(using Model[ChakraModel]): Seq[UiElement] =
+    val clickedBreadcrumb                            = Paragraph(text = m.breadcrumbStatus)
+    def breadcrumbClicked(m: ChakraModel, t: String) = m.copy(breadcrumbStatus = s"breadcrumb-click: $t")
 
-    val clickedLink = Paragraph(text = "no-link-clicked")
+    val clickedLink = Paragraph(text = m.linkStatus)
 
     Seq(
       commonBox(text = "Breadcrumbs"),
@@ -19,25 +19,25 @@ object Navigation:
         BreadcrumbItem().withChildren(
           BreadcrumbLink(text = "breadcrumb-home").onClick: event =>
             import event.*
-            handled.withRenderChanges(breadcrumbClicked("breadcrumb-home"))
+            handled.withModel(breadcrumbClicked(model, "breadcrumb-home"))
         ),
         BreadcrumbItem().withChildren(
           BreadcrumbLink(text = "breadcrumb-link1").onClick: event =>
             import event.*
-            handled.withRenderChanges(breadcrumbClicked("breadcrumb-link1"))
+            handled.withModel(breadcrumbClicked(model, "breadcrumb-link1"))
         ),
         BreadcrumbItem(isCurrentPage = Some(true)).withChildren(
           BreadcrumbLink(text = "breadcrumb-link2").onClick: event =>
             import event.*
-            handled.withRenderChanges(breadcrumbClicked("breadcrumb-link2"))
+            handled.withModel(breadcrumbClicked(model, "breadcrumb-link2"))
         )
       ),
       clickedBreadcrumb,
       commonBox(text = "Link"),
-      Link(text = "link-external-google", href = "https://www.google.com/", isExternal = Some(true))
+      Link(key = "google-link", text = "link-external-google", href = "https://www.google.com/", isExternal = Some(true))
         .onClick: event =>
           import event.*
-          handled.withRenderChanges(clickedLink.withText("link-clicked"))
+          handled.withModel(_.copy(linkStatus = "link-clicked"))
       ,
       clickedLink
     )

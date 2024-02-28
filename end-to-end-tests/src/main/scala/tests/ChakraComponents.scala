@@ -12,22 +12,29 @@ import tests.chakra.*
     Sessions
       .withNewSession("chakra-components", "Chakra Components")
       .connect: session =>
-        given ConnectedSession      = session
-        given model: Model[Boolean] = Model(false)
+        given ConnectedSession          = session
+        given model: Model[ChakraModel] = Model(ChakraModel())
 
         // react tests reset the session to clear state
         val krButton = Button(text = "Reset state").onClick: event =>
-          event.handled.withModel(true).terminate
+          event.handled.withModel(_.copy(rerun = true)).terminate
 
-        val components: Seq[UiElement] =
-          Overlay.components ++ Forms.components ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Feedback.components ++ Disclosure.components ++ Navigation.components ++ Seq(
-            krButton
-          )
+        def components(m: ChakraModel): Seq[UiElement] =
+          Overlay.components(
+            m
+          ) ++ Forms.components(
+            m
+          ) ++ Editables.components(
+            m
+          ) ++ Stacks.components ++ Grids.components ++ Buttons.components ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Feedback.components ++ Disclosure.components ++
+            Navigation.components(m) ++ Seq(
+              krButton
+            )
         Controller(components).render().handledEventsIterator.lastOption.map(_.model) match
-          case Some(true) =>
+          case Some(m) if m.rerun =>
             session.render(Seq(Paragraph(text = "chakra-session-reset")))
             Thread.sleep(500)
             loop()
-          case _          =>
+          case _                  =>
 
   loop()

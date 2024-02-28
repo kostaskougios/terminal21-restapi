@@ -9,36 +9,39 @@ import org.terminal21.client.components.std.*
     .withNewSession("std-components", "Std Components")
     .connect: session =>
       given ConnectedSession = session
-      import Model.Standard.unitModel
 
-      val output      = Paragraph(text = "This will reflect what you type in the input")
-      val cookieValue = Paragraph(text = "This will display the value of the cookie")
-      val input       = Input(defaultValue = "Please enter your name").onChange: event =>
-        import event.*
-        handled.withRenderChanges(output.withText(newValue))
+      case class Form(output: String, cookie: String)
+      given Model[Form] = Model(Form("This will reflect what you type in the input", "This will display the value of the cookie"))
 
-      val components = Seq(
-        Header1(text = "header1 test"),
-        Header2(text = "header2 test"),
-        Header3(text = "header3 test"),
-        Header4(text = "header4 test"),
-        Header5(text = "header5 test"),
-        Header6(text = "header6 test"),
-        Paragraph(text = "Hello World!").withChildren(
-          NewLine(),
-          Span(text = "Some more text"),
-          Em(text = " emphasized!"),
-          NewLine(),
-          Span(text = "And the last line")
-        ),
-        Paragraph(text = "A Form").withChildren(input),
-        output,
-        Cookie(name = "std-components-test-cookie", value = "test-cookie-value"),
-        CookieReader(name = "std-components-test-cookie").onChange: event =>
+      def components(form: Form) =
+        val output      = Paragraph(text = form.output)
+        val cookieValue = Paragraph(text = form.cookie)
+        val input       = Input(defaultValue = "Please enter your name").onChange: event =>
           import event.*
-          handled.withRenderChanges(cookieValue.withText(s"Cookie value $newValue"))
-        ,
-        cookieValue
-      )
+          handled.withModel(form.copy(output = newValue))
+
+        Seq(
+          Header1(text = "header1 test"),
+          Header2(text = "header2 test"),
+          Header3(text = "header3 test"),
+          Header4(text = "header4 test"),
+          Header5(text = "header5 test"),
+          Header6(text = "header6 test"),
+          Paragraph(text = "Hello World!").withChildren(
+            NewLine(),
+            Span(text = "Some more text"),
+            Em(text = " emphasized!"),
+            NewLine(),
+            Span(text = "And the last line")
+          ),
+          Paragraph(text = "A Form").withChildren(input),
+          output,
+          Cookie(name = "std-components-test-cookie", value = "test-cookie-value"),
+          CookieReader(name = "std-components-test-cookie").onChange: event =>
+            import event.*
+            handled.withModel(_.copy(cookie = s"Cookie value $newValue"))
+          ,
+          cookieValue
+        )
 
       Controller(components).render().handledEventsIterator.lastOption

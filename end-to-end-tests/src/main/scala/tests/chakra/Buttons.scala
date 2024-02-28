@@ -8,16 +8,11 @@ import tests.chakra.Common.*
 import java.util.concurrent.CountDownLatch
 
 object Buttons:
-  def components(using Model[Boolean]): Seq[UiElement] =
+  def components(using Model[ChakraModel]): Seq[UiElement] =
     val box1       = commonBox(text = "Buttons")
-    val exitButton = Button(text = "Click to exit program", colorScheme = Some("red"))
+    val exitButton = Button(key = "exit-button", text = "Click to exit program", colorScheme = Some("red")).onClick: event =>
+      event.handled.terminate
     Seq(
       box1,
-      exitButton.onClick: event =>
-        event.handled
-          .withRenderChanges(
-            box1.withText("Exit Clicked!"),
-            exitButton.withText("Stopping...").withColorScheme(Some("green"))
-          )
-          .terminate
+      exitButton
     )
