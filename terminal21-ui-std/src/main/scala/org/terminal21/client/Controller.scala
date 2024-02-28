@@ -16,8 +16,9 @@ class Controller[M](
     eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
 ):
   def render()(using session: ConnectedSession): RenderedController[M] =
-    session.render(modelComponents(initialModel.value))
-    new RenderedController(eventIteratorFactory, initialModel, modelComponents, renderChanges, eventHandlers)
+    val initComponents = modelComponents(initialModel.value)
+    session.render(initComponents)
+    new RenderedController(eventIteratorFactory, initialModel, initComponents, modelComponents, renderChanges, eventHandlers)
 
   def onEvent(handler: PartialFunction[ControllerEvent[M], HandledEvent[M]]) =
     new Controller(
@@ -31,6 +32,7 @@ class Controller[M](
 class RenderedController[M](
     eventIteratorFactory: => Iterator[CommandEvent],
     initialModel: Model[M],
+    initialComponents: Seq[UiElement],
     modelComponents: M => Seq[UiElement],
     renderChanges: Seq[UiElement] => Unit,
     eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
@@ -70,7 +72,7 @@ class RenderedController[M](
           if f.isDefinedAt(e) then f(e) else h
         case x                    => throw new IllegalStateException(s"Unexpected state $x")
 
-  private def invokeComponentEventHandlers(h: HandledEvent[M], event: CommandEvent) =
+  private def invokeComponentEventHandlers(h: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
     lazy val clickHandlers         = clickHandlersMap(h)
     lazy val changeHandlers        = changeHandlersMap(h)
     lazy val changeBooleanHandlers = changeBooleanHandlersMap(h)
@@ -95,8 +97,8 @@ class RenderedController[M](
         handled
       case _                                                           => h
 
-  private def initialComponentsByKeyMap: Map[String, UiElement] =
-    val all = modelComponents(initialModel.value)
+  private def calcComponentsByKeyMap(components: Seq[UiElement]): Map[String, UiElement] =
+    val all = components
       .flatMap(_.flat)
       .map(c => (c.key, c))
       .toMap
@@ -106,19 +108,29 @@ class RenderedController[M](
       )
     )
 
+  private def doRenderChanges(oldHandled: HandledEvent[M], newHandled: HandledEvent[M]): HandledEvent[M] =
+    // TODO: optimise what elements are rendered
+    val all = modelComponents(newHandled.model)
+    renderChanges(all)
+    newHandled.copy(componentsByKey = calcComponentsByKeyMap(all))
+
   def handledEventsIterator: EventIterator[HandledEvent[M]] =
+    val initHandled = HandledEvent(initialModel.value, calcComponentsByKeyMap(initialComponents), false)
     new EventIterator(
       eventIteratorFactory
         .takeWhile(!_.isSessionClosed)
-        .scanLeft(HandledEvent(initialModel.value, initialComponentsByKeyMap, false)): (oldHandled, event) =>
-          try
-            val handled2 = invokeEventHandlers(oldHandled, event)
-            val handled3 = invokeComponentEventHandlers(handled2, event)
-            handled3
-          catch
-            case t: Throwable =>
-              logger.error("an error occurred while iterating events", t)
-              oldHandled
+        .scanLeft((initHandled, initHandled)):
+          case ((_, oldHandled), event) =>
+            try
+              val handled2 = invokeEventHandlers(oldHandled, event)
+              val handled3 = invokeComponentEventHandlers(handled2, event)
+              (oldHandled, handled3)
+            catch
+              case t: Throwable =>
+                logger.error("an error occurred while iterating events", t)
+                (oldHandled, oldHandled)
+        .map: (oldHandled, newHandled) =>
+          if oldHandled.model != newHandled.model then doRenderChanges(oldHandled, newHandled) else newHandled
         .flatMap: h =>
           // trick to make sure we take the last state of the model when shouldTerminate=true
           if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)

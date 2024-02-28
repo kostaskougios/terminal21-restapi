@@ -6,6 +6,7 @@ trait UiElement extends AnyElement:
   type This <: UiElement
 
   def key: String
+  def withKey(key: String): This
 
   /** @return
     *   this element along all it's children flattened

@@ -172,7 +172,7 @@ Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi
 - session builders refactoring for more flexible creation of sessions
 - QuickTabs, QuickFormControl
 - bug fix for old react state re-rendering on new session
-- event iterators allows idiomatic handling of events and overhaul of the event handling for easier testing
+- event iterators allows idiomatic handling of events and overhaul of the event handling for easier testing and easier development of larger apps
 
 ## Version 0.21
 

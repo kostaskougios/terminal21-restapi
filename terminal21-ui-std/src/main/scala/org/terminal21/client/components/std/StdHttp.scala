@@ -30,7 +30,9 @@ case class Cookie(
     path: Option[String] = None,
     expireDays: Option[Int] = None,
     requestId: String = TransientRequest.newRequestId()
-) extends StdHttp
+) extends StdHttp:
+  override type This = Cookie
+  override def withKey(key: String): Cookie = copy(key = key)
 
 /** Read a cookie value. The value, when read from the ui, it will reflect in `value` assuming the UI had the time to send the value back. Also the onChange
   * handler will be called once with the value.
@@ -45,3 +47,5 @@ case class CookieReader(
     with CanHandleOnChangeEvent:
   type This = CookieReader
   override def withDataStore(ds: TypedMap): CookieReader = copy(dataStore = ds)
+
+  override def withKey(key: String): CookieReader = copy(key = key)

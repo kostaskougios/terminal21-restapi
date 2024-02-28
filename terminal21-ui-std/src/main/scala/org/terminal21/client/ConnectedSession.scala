@@ -1,6 +1,7 @@
 package org.terminal21.client
 
 import org.terminal21.client.components.UiElement.HasChildren
+import org.terminal21.client.components.chakra.Box
 import org.terminal21.client.components.{UiComponent, UiElement}
 import org.terminal21.client.json.UiElementEncoding
 import org.terminal21.collections.SEList
@@ -107,9 +108,10 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
       sessionsService.changeSessionJsonState(session, j)
 
   private def toJson(elements: Seq[UiElement]): ServerJson =
-    val flat = elements.flatMap(_.flat)
+    val root = Box(key = "root", children = elements) // keep the root element with a steady key
+    val flat = root.flat
     val sj   = ServerJson(
-      elements.map(_.key),
+      Seq(root.key),
       flat
         .map: el =>
           (

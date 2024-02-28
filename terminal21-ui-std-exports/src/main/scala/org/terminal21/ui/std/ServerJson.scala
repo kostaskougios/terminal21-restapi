@@ -32,7 +32,8 @@ case class ServerJson(
              |${toHumanReadableString}
              |The received:
              |${j.toHumanReadableString}
-             |""".stripMargin
+             |""".stripMargin,
+            t
           )
         throw t
 

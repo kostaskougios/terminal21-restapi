@@ -32,3 +32,4 @@ case class QuickTabs(
   )
 
   override def withStyle(v: Map[String, Any]): QuickTabs = copy(style = v)
+  override def withKey(key: String): QuickTabs           = copy(key = key)

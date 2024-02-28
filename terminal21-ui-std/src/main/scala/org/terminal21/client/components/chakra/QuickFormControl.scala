@@ -26,3 +26,4 @@ case class QuickFormControl(
   def withHelperText(text: String): QuickFormControl   = copy(helperText = Some(text))
 
   override def withStyle(v: Map[String, Any]): QuickFormControl = copy(style = v)
+  override def withKey(key: String): QuickFormControl           = copy(key = key)
