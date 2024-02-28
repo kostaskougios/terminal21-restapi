@@ -14,10 +14,10 @@ case class QuickFormControl(
   type This = QuickFormControl
   lazy val rendered: Seq[UiElement] =
     val ch: Seq[UiElement] =
-      label.map(l => FormLabel(key = subKey("-label"), text = l)).toSeq ++
-        Seq(InputGroup(key = subKey("-ig")).withChildren(inputGroup*)) ++
-        helperText.map(h => FormHelperText(key = subKey("-helper"), text = h))
-    Seq(FormControl(key = subKey("-fc"), style = style).withChildren(ch: _*))
+      label.map(l => FormLabel(key = subKey("label"), text = l)).toSeq ++
+        Seq(InputGroup(key = subKey("ig")).withChildren(inputGroup*)) ++
+        helperText.map(h => FormHelperText(key = subKey("helper"), text = h))
+    Seq(FormControl(key = subKey("fc"), style = style).withChildren(ch: _*))
 
   def withLabel(label: String): QuickFormControl       = copy(label = Some(label))
   def withInputGroup(ig: UiElement*): QuickFormControl = copy(inputGroup = ig)

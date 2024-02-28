@@ -23,20 +23,20 @@ case class QuickTable(
   def withCaption(v: String)         = copy(caption = Some(v))
 
   override lazy val rendered: Seq[UiElement] =
-    val head           = Thead(key = subKey("-th"), children = Seq(Tr(children = headers.map(h => Th(children = Seq(h))))))
+    val head           = Thead(key = subKey("th"), children = Seq(Tr(children = headers.map(h => Th(children = Seq(h))))))
     val body           = Tbody(
-      key = subKey("-tb"),
+      key = subKey("tb"),
       children = rows.map: row =>
         Tr(children = row.map(c => Td(children = Seq(c))))
     )
     val table          = Table(
-      key = subKey("-t"),
+      key = subKey("t"),
       variant = variant,
       colorScheme = Some(colorScheme),
       size = size,
       children = caption.map(text => TableCaption(text = text)).toSeq ++ Seq(head, body)
     )
-    val tableContainer = TableContainer(key = subKey("-tc"), style = style, children = Seq(table))
+    val tableContainer = TableContainer(key = subKey("tc"), style = style, children = Seq(table))
     Seq(tableContainer)
 
   def withHeaders(headers: String*): QuickTable            = copy(headers = headers.map(h => Text(text = h)))
