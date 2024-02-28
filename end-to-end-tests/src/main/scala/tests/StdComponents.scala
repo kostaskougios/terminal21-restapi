@@ -16,7 +16,7 @@ import org.terminal21.client.components.std.*
       def components(form: Form) =
         val output      = Paragraph(text = form.output)
         val cookieValue = Paragraph(text = form.cookie)
-        val input       = Input(defaultValue = "Please enter your name").onChange: event =>
+        val input       = Input(key = "name", defaultValue = "Please enter your name").onChange: event =>
           import event.*
           handled.withModel(form.copy(output = newValue))
 
@@ -37,7 +37,7 @@ import org.terminal21.client.components.std.*
           Paragraph(text = "A Form").withChildren(input),
           output,
           Cookie(name = "std-components-test-cookie", value = "test-cookie-value"),
-          CookieReader(name = "std-components-test-cookie").onChange: event =>
+          CookieReader(key = "cookie-reader", name = "std-components-test-cookie").onChange: event =>
             import event.*
             handled.withModel(_.copy(cookie = s"Cookie value $newValue"))
           ,

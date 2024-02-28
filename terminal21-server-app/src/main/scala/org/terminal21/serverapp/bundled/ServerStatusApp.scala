@@ -89,7 +89,7 @@ class ServerStatusPage(
             handled
         ,
         Text(text = " "),
-        Button(text = "View State", size = xs)
+        Button(key = s"view-${session.id}", text = "View State", size = xs)
           .withLeftIcon(ChatIcon())
           .onClick: event =>
             serverSideSessions
