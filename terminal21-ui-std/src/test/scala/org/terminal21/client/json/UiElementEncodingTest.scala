@@ -7,6 +7,6 @@ import org.scalatest.matchers.should.Matchers.*
 class UiElementEncodingTest extends AnyFunSuiteLike:
   val encoding = new UiElementEncoding(Seq(StdElementEncoding))
   test("dataStore"):
-    val b = Button()
+    val b = Button(key = "b")
     val j = encoding.uiElementEncoder(b).deepDropNullValues
     j.hcursor.downField("Button").downField("dataStore").failed should be(true)
