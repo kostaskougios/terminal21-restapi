@@ -131,5 +131,5 @@ class ViewServerStatePage(using session: ConnectedSession):
           keyTreePanel
         )
     )
-    session.render(components)
+    Controller.noModel(components).render()
     session.leaveSessionOpenAfterExiting()
