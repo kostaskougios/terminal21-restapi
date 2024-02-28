@@ -52,7 +52,7 @@ class ServerStatusPage(
 
   private val jvmTableE = QuickTable(key = "jvmTable", caption = Some("JVM"))
     .withHeaders("Property", "Value", "Actions")
-  private val gcButton  = Button(size = xs, text = "Run GC")
+  private val gcButton  = Button(key = "gc-button", size = xs, text = "Run GC")
     .onClick: event =>
       System.gc()
       event.handled
@@ -80,7 +80,7 @@ class ServerStatusPage(
 
   private def actionsFor(session: Session): UiElement =
     if session.isOpen then
-      Box(key = s"session-${session.id}-actions").withChildren(
+      Box().withChildren(
         Button(key = s"close-${session.id}", text = "Close", size = xs)
           .withLeftIcon(SmallCloseIcon())
           .onClick: event =>
@@ -89,7 +89,7 @@ class ServerStatusPage(
             handled
         ,
         Text(text = " "),
-        Button(key = s"view-${session.id}", text = "View State", size = xs)
+        Button(text = "View State", size = xs)
           .withLeftIcon(ChatIcon())
           .onClick: event =>
             serverSideSessions
