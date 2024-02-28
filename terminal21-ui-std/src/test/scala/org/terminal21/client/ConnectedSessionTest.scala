@@ -5,7 +5,7 @@ import org.mockito.Mockito.verify
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.ConnectedSessionMock.encoder
-import org.terminal21.client.components.chakra.{Button, Checkbox, Editable, Input}
+import org.terminal21.client.components.chakra.{Box, Button, Checkbox, Editable, Input}
 import org.terminal21.client.components.std.{Paragraph, Span}
 import org.terminal21.model.{CommandEvent, OnChange}
 import org.terminal21.ui.std.ServerJson
@@ -31,16 +31,20 @@ class ConnectedSessionTest extends AnyFunSuiteLike:
   test("to server json"):
     val (sessionService, connectedSession) = ConnectedSessionMock.newConnectedSessionAndSessionServiceMock
 
-    val p1    = Paragraph(text = "p1")
-    val span1 = Span(text = "span1")
+    val p1    = Paragraph(key = "pk", text = "p1")
+    val span1 = Span(key = "sk", text = "span1")
     connectedSession.render(Seq(p1.withChildren(span1)))
     connectedSession.render(Nil)
     verify(sessionService).setSessionJsonState(
       connectedSession.session,
       ServerJson(
-        Seq(p1.key),
-        Map(p1.key -> encoder(p1.withChildren()), span1.key -> encoder(span1)),
-        Map(p1.key -> Seq(span1.key), span1.key             -> Nil)
+        Seq("root"),
+        Map(
+          "root"    -> encoder(Box("root")).deepDropNullValues,
+          p1.key    -> encoder(p1.withChildren()).deepDropNullValues,
+          span1.key -> encoder(span1).deepDropNullValues
+        ),
+        Map("root"  -> List(p1.key), p1.key -> Seq(span1.key), span1.key -> Nil)
       )
     )
 
