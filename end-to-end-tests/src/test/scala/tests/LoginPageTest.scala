@@ -37,7 +37,7 @@ class LoginPageTest extends AnyFunSuiteLike:
         CommandEvent.sessionClosed // every test should close the session so that the iterator doesn't block if converted to a list.
       )
 
-      eventsIt.lastOption.map(_.model) should be(Some(LoginForm("an@email.com", "secret")))
+      eventsIt.lastOption.map(_.model) should be(Some(LoginForm("an@email.com", "secret", true)))
 
   test("user submits invalid email"):
     new App:

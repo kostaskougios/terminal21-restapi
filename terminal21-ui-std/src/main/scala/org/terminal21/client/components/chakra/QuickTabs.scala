@@ -19,15 +19,15 @@ case class QuickTabs(
   override lazy val rendered = linearKeys(
     key,
     Seq(
-      Tabs(key = key + "-tabs", style = style).withChildren(
+      Tabs(key = subKey("-tabs"), style = style).withChildren(
         TabList(
-          key = key + "-tab-list",
+          key = subKey("-tab-list"),
           children = tabs.zipWithIndex.map:
             case (name: String, idx)             => Tab(key = s"$key-tab-$idx", text = name)
             case (elements: Seq[UiElement], idx) => Tab(key = s"$key-tab-$idx", children = elements)
         ),
         TabPanels(
-          key = key + "-panels",
+          key = subKey("-panels"),
           children = tabPanels.zipWithIndex.map: (elements, idx) =>
             TabPanel(key = s"$key-panel-$idx", children = elements)
         )
