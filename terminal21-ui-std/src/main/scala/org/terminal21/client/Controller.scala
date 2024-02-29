@@ -17,9 +17,8 @@ class Controller[M](
 ):
 
   def render()(using session: ConnectedSession): RenderedController[M] =
-    val initComponents = modelComponents.map(_.substituteComponents)
-    session.render(initComponents)
-    new RenderedController(eventIteratorFactory, initialModel, initComponents, renderChanges, eventHandlers)
+    session.render(modelComponents)
+    new RenderedController(eventIteratorFactory, initialModel, modelComponents, renderChanges, eventHandlers)
 
   def onEvent(handler: PartialFunction[ControllerEvent[M], HandledEvent[M]]) =
     new Controller(
@@ -128,7 +127,6 @@ class RenderedController[M](
       .filter: (e, ne) =>
         e.withDataStore(dsEmpty) != ne.withDataStore(dsEmpty)
       .map(_._2)
-      .map(_.substituteComponents)
       .toList
     renderChanges(changed)
     newHandled.copy(componentsByKey = calcComponentsByKeyMap(changed), renderedChanges = changed)

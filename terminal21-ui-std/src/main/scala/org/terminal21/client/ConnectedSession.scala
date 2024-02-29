@@ -107,10 +107,11 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
       val j = toJson(es)
       sessionsService.changeSessionJsonState(session, j)
 
-  private def toJson(elements: Seq[UiElement]): ServerJson =
-    val root = Box(key = "root", children = elements) // keep the root element with a steady key
-    val flat = root.flat
-    val sj   = ServerJson(
+  private def toJson(elementsUn: Seq[UiElement]): ServerJson =
+    val elements = elementsUn.map(_.substituteComponents)
+    val root     = Box(key = "root", children = elements) // keep the root element with a steady key
+    val flat     = root.flat
+    val sj       = ServerJson(
       Seq(root.key),
       flat
         .map: el =>

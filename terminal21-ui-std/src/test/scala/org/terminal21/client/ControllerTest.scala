@@ -3,10 +3,12 @@ package org.terminal21.client
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.components.UiElement
-import org.terminal21.client.components.chakra.{Button, Checkbox}
+import org.terminal21.client.components.chakra.{Button, Checkbox, QuickTable}
 import org.terminal21.client.components.std.Input
 import org.terminal21.collections.SEList
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
+
+import java.util.concurrent.atomic.AtomicBoolean
 
 class ControllerTest extends AnyFunSuiteLike:
   val button             = Button()
@@ -204,3 +206,44 @@ class ControllerTest extends AnyFunSuiteLike:
     rendered.head should be(Nil)
     rendered(1) should be(Seq(but.withText("changed 1")))
     rendered(2) should be(Nil)
+
+  test("components handle events"):
+    given m: Model[Int] = Model(0)
+    val table           = QuickTable().withRows(
+      Seq(
+        Seq(
+          button.onClick: event =>
+            import event.*
+            handled.withModel(model + 1).terminate
+        )
+      )
+    )
+    val handledEvents   = newController(m, Seq(buttonClick), Seq(table))
+      .render()
+      .handledEventsIterator
+      .toList
+
+    handledEvents.map(_.model) should be(List(0, 1))
+
+  test("components receive onModelChange"):
+    given m: Model[Int] = Model(0)
+    val called          = new AtomicBoolean(false)
+    val table           = QuickTable()
+      .withRows(
+        Seq(
+          Seq(
+            button.onClick: event =>
+              import event.*
+              handled.withModel(model + 1).terminate
+          )
+        )
+      )
+      .onModelChange: (table, m) =>
+        called.set(true)
+        table
+    val handledEvents   = newController(m, Seq(buttonClick), Seq(table))
+      .render()
+      .handledEventsIterator
+      .toList
+
+    called.get() should be(true)
