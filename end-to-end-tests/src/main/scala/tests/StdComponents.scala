@@ -11,7 +11,7 @@ import org.terminal21.client.components.std.*
       given ConnectedSession = session
 
       case class Form(output: String, cookie: String)
-      given Model[Form] = Model(Form("This will reflect what you type in the input", "This will display the value of the cookie"))
+      given model: Model[Form] = Model(Form("This will reflect what you type in the input", "This will display the value of the cookie"))
 
       def components(form: Form) =
         val output      = Paragraph(text = form.output)
@@ -44,4 +44,4 @@ import org.terminal21.client.components.std.*
           cookieValue
         )
 
-      Controller(components).render().handledEventsIterator.lastOption
+      Controller(components(model.value)).render().handledEventsIterator.lastOption

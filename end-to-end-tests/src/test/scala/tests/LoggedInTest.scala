@@ -10,7 +10,7 @@ class LoggedInTest extends AnyFunSuiteLike:
     val login                       = LoginForm()
     given session: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
     val form                        = new LoggedIn(login)
-    def allComponents               = form.components(false).flatMap(_.flat)
+    def allComponents               = form.components.flatMap(_.flat)
 
   test("renders email details"):
     new App:

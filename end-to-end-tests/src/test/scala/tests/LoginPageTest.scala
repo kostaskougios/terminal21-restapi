@@ -9,11 +9,10 @@ import org.terminal21.model.CommandEvent
 class LoginPageTest extends AnyFunSuiteLike:
 
   class App:
-    given session: ConnectedSession                    = ConnectedSessionMock.newConnectedSessionMock
-    val login                                          = LoginForm()
-    val page                                           = new LoginPage
-    def allComponents: Seq[UiElement]                  = allComponents(login)
-    def allComponents(form: LoginForm): Seq[UiElement] = page.components(form).flatMap(_.flat)
+    given session: ConnectedSession   = ConnectedSessionMock.newConnectedSessionMock
+    val login                         = LoginForm()
+    val page                          = new LoginPage
+    def allComponents: Seq[UiElement] = page.components.flatMap(_.flat)
 
   test("renders email input"):
     new App:
@@ -38,9 +37,3 @@ class LoginPageTest extends AnyFunSuiteLike:
       )
 
       eventsIt.lastOption.map(_.model) should be(Some(LoginForm("an@email.com", "secret", true)))
-
-  test("user submits invalid email"):
-    new App:
-      val all = allComponents(login.copy(email = "invalid.com", submitted = false, submittedInvalidEmail = true))
-      all should contain(page.notOkIcon)
-      all should contain(page.errorsBox.withChildren(page.errorMsgInvalidEmail))

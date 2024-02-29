@@ -30,7 +30,7 @@ import tests.chakra.*
             Navigation.components(m) ++ Seq(
               krButton
             )
-        Controller(components).render().handledEventsIterator.lastOption.map(_.model) match
+        Controller(components(model.value)).render().handledEventsIterator.lastOption.map(_.model) match
           case Some(m) if m.rerun =>
             Controller.noModel(Seq(Paragraph(text = "chakra-session-reset"))).render()
             Thread.sleep(500)

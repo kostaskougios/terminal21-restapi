@@ -56,7 +56,7 @@ class LoginPage(using session: ConnectedSession):
       .dropWhile(!_.submitted)
       .nextOption()
 
-  def components(loginForm: LoginForm): Seq[UiElement] =
+  def components: Seq[UiElement] =
     Seq(
       QuickFormControl()
         .withLabel("Email address")
@@ -64,7 +64,8 @@ class LoginPage(using session: ConnectedSession):
         .withInputGroup(
           InputLeftAddon().withChildren(EmailIcon()),
           emailInput,
-          InputRightAddon().withChildren(if loginForm.isValidEmail then okIcon else notOkIcon)
+          InputRightAddon().onModelChange: (i, m) =>
+            i.withChildren(if m.isValidEmail then okIcon else notOkIcon)
         ),
       QuickFormControl()
         .withLabel("Password")
@@ -74,7 +75,8 @@ class LoginPage(using session: ConnectedSession):
           passwordInput
         ),
       submitButton,
-      if loginForm.submittedInvalidEmail then errorsBox.withChildren(errorMsgInvalidEmail) else errorsBox
+      errorsBox.onModelChange: (eb, m) =>
+        if m.submittedInvalidEmail then eb.withChildren(errorMsgInvalidEmail) else errorsBox
     )
 
   def controller: Controller[LoginForm] = Controller(components)
@@ -99,7 +101,7 @@ class LoggedIn(login: LoginForm)(using session: ConnectedSession):
   def run(): Option[Boolean] =
     controller.render().handledEventsIterator.lastOption.map(_.model)
 
-  def components(m: Boolean): Seq[UiElement] =
+  def components: Seq[UiElement] =
     Seq(
       Paragraph().withChildren(
         Text(text = "Are your details correct?"),
