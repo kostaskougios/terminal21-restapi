@@ -12,6 +12,7 @@ class TypedMap(val m: Map[TypedMapKey[_], Any]):
     case _            => false
 
   def contains[A](k: TypedMapKey[A]) = m.contains(k)
+  override def toString              = s"TypedMap(${m.keys.mkString(", ")})"
 
 object TypedMap:
   def empty = new TypedMap(Map.empty)

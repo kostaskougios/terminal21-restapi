@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import org.terminal21.client.collections.EventIterator
 import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
-import org.terminal21.client.components.{Keys, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
+import org.terminal21.client.components.{Keys, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiComponent, UiElement}
 import org.terminal21.collections.{TypedMap, TypedMapKey}
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
@@ -96,14 +96,16 @@ class RenderedController[M](
         handled
       case _                                                           => h
 
-  private def checkForDuplicatesAndThrow(seq: Seq[String]): Unit =
-    val duplicates = seq.groupBy(identity).filter(_._2.size > 1).keys.toList
-    if duplicates.nonEmpty then throw new IllegalArgumentException(s"Duplicate(s) found: ${duplicates.mkString(", ")}")
+  private def checkForDuplicatesAndThrow(components: Seq[UiElement]): Unit =
+    val duplicates = components.map(_.key).groupBy(identity).filter(_._2.size > 1).keys.toSet
+    if duplicates.nonEmpty then
+      val duplicateComponents = components.filter(e => duplicates.contains(e.key))
+      throw new IllegalArgumentException(s"Duplicate(s) found: ${duplicates.mkString(", ")}\nDuplicate components:\n${duplicateComponents.mkString("\n")}")
 
   private def calcComponentsByKeyMap(components: Seq[UiElement]): Map[String, UiElement] =
     val flattened = components
       .flatMap(_.flat)
-    checkForDuplicatesAndThrow(flattened.map(_.key))
+    checkForDuplicatesAndThrow(flattened)
     val all       = flattened
       .map(c => (c.key, c))
       .toMap

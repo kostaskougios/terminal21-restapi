@@ -1,14 +1,13 @@
 package tests.chakra
 
-import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.std.NewLine
 import tests.chakra.Common.*
 
 object DataDisplay:
-  def components(using session: ConnectedSession): Seq[UiElement] =
-    val headAndFoot = Tr().withChildren(
+  def components: Seq[UiElement] =
+    def headAndFoot = Tr().withChildren(
       Th(text = "To convert"),
       Th(text = "into"),
       Th(text = "multiply by", isNumeric = true)
