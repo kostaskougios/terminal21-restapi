@@ -109,10 +109,9 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   private def toJson(elementsUn: Seq[UiElement]): ServerJson =
     val elements = elementsUn.map(_.substituteComponents)
-    val root     = Box(key = "root", children = elements) // keep the root element with a steady key
-    val flat     = root.flat
+    val flat     = elements.flatMap(_.flat)
     val sj       = ServerJson(
-      Seq(root.key),
+      elements.map(_.key),
       flat
         .map: el =>
           (

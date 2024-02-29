@@ -4,6 +4,7 @@ import functions.fibers.FiberExecutor
 import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.client.components.std.Paragraph
 import org.terminal21.model.{ClientEvent, Session}
 import org.terminal21.server.Dependencies
 import org.terminal21.server.model.SessionState
