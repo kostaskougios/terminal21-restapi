@@ -132,7 +132,7 @@ class RenderedController[M](
       )
     )
 
-  private def doRenderChanges(newHandled: HandledEvent[M]): HandledEvent[M] =
+  private def renderChangesWhenModelChanges(newHandled: HandledEvent[M]): HandledEvent[M] =
     val changeFunctions =
       for
         e <- newHandled.componentsByKey.values
@@ -147,7 +147,6 @@ class RenderedController[M](
         e.withDataStore(dsEmpty) != ne.withDataStore(dsEmpty)
       .map(_._2)
       .toList
-    renderChanges(changed)
     newHandled.copy(componentsByKey = newHandled.componentsByKey ++ calcComponentsByKeyMap(changed), renderedChanges = changed)
 
   def handledEventsIterator: EventIterator[HandledEvent[M]] =
@@ -158,9 +157,10 @@ class RenderedController[M](
         .scanLeft(initHandled):
           case (oldHandled, event) =>
             try
-              val handled2   = invokeEventHandlers(oldHandled, event)
+              val handled2   = invokeEventHandlers(oldHandled.copy(renderedChanges = Nil), event)
               val handled3   = invokeComponentEventHandlers(handled2, event)
-              val newHandled = if oldHandled.model != handled3.model then doRenderChanges(handled3) else handled3.copy(renderedChanges = Nil)
+              val newHandled = if oldHandled.model != handled3.model then renderChangesWhenModelChanges(handled3) else handled3
+              if newHandled.renderedChanges.nonEmpty then renderChanges(newHandled.renderedChanges)
               newHandled
             catch
               case t: Throwable =>
@@ -208,3 +208,5 @@ object Model:
     given unitModel: Model[Unit]            = Model(())
     given booleanFalseModel: Model[Boolean] = Model(false)
     given booleanTrueModel: Model[Boolean]  = Model(true)
+
+case class RenderChangesEvent(changes: Seq[UiElement]) extends ClientEvent

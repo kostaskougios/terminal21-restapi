@@ -190,13 +190,11 @@ class ControllerTest extends AnyFunSuiteLike:
     handled.map(_.renderedChanges)(1) should be(expected)
 
   test("rendered are cleared"):
-    given model: Model[Int]               = Model(0)
-    var lastRendered                      = Seq.empty[UiElement]
-    def renderer(s: Seq[UiElement]): Unit = lastRendered = s
-    val but                               = button.onModelChange: (b, m) =>
+    given model: Model[Int] = Model(0)
+    val but                 = button.onModelChange: (b, m) =>
       if m == 1 then b.withText(s"changed $m") else b
 
-    val handled = newController(model, Seq(buttonClick, checkBoxChange), Seq(but, checkbox), renderer)
+    val handled = newController(model, Seq(buttonClick, checkBoxChange), Seq(but, checkbox))
       .onEvent: event =>
         val h = event.handled.withModel(event.model + 1)
         if h.model > 1 then h.terminate else h
@@ -204,7 +202,6 @@ class ControllerTest extends AnyFunSuiteLike:
       .handledEventsIterator
       .toList
 
-    lastRendered should be(Nil)
     val rendered = handled.map(_.renderedChanges)
     rendered.head should be(Nil)
     rendered(1) should be(Seq(but.withText("changed 1")))
