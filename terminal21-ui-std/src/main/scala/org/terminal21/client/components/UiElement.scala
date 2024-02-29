@@ -18,8 +18,8 @@ abstract class UiElement extends AnyElement:
 
   def onModelChange[M](using model: Model[M])(f: (This, M) => This): This =
     store(model.OnModelChangeKey, f.asInstanceOf[model.OnModelChangeFunction])
-
-  def fireModelChange[M](using model: Model[M])(m: M) =
+  def hasModelChangeHandler[M](using model: Model[M]): Boolean            = dataStore.contains(model.OnModelChangeKey)
+  def fireModelChange[M](using model: Model[M])(m: M)                     =
     dataStore(model.OnModelChangeKey).apply(this, m)
 
   /** @return

@@ -4,7 +4,6 @@ import functions.fibers.FiberExecutor
 import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
-import org.terminal21.client.components.std.Paragraph
 import org.terminal21.model.{ClientEvent, Session}
 import org.terminal21.server.Dependencies
 import org.terminal21.server.model.SessionState
@@ -26,7 +25,7 @@ class ServerStatusPage(
     sessionsService: ServerSessionsService
 )(using appSession: ConnectedSession, fiberExecutor: FiberExecutor):
   case class StatusModel(runtime: Runtime, sessions: Seq[Session])
-  val initModel            = StatusModel(Runtime.getRuntime, Nil)
+  val initModel            = StatusModel(Runtime.getRuntime, sessionsService.allSessions)
   given Model[StatusModel] = Model(initModel)
 
   case class Ticker(sessions: Seq[Session]) extends ClientEvent

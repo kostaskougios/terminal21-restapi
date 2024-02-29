@@ -4,7 +4,8 @@ import org.slf4j.LoggerFactory
 import org.terminal21.client.collections.EventIterator
 import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
-import org.terminal21.client.components.{Keys, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiComponent, UiElement}
+import org.terminal21.client.components.UiElement.HasChildren
+import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
 import org.terminal21.collections.{TypedMap, TypedMapKey}
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
@@ -16,9 +17,17 @@ class Controller[M](
     eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
 ):
 
+  private def applyModelTo(components: Seq[UiElement]): Seq[UiElement] =
+    components.map: e =>
+      val ne = if e.hasModelChangeHandler(using initialModel) then e.fireModelChange(using initialModel)(initialModel.value) else e
+      ne match
+        case ch: HasChildren => ch.withChildren(applyModelTo(ch.children)*)
+        case x               => x
+
   def render()(using session: ConnectedSession): RenderedController[M] =
-    session.render(modelComponents)
-    new RenderedController(eventIteratorFactory, initialModel, modelComponents, renderChanges, eventHandlers)
+    val elements = applyModelTo(modelComponents)
+    session.render(elements)
+    new RenderedController(eventIteratorFactory, initialModel, elements, renderChanges, eventHandlers)
 
   def onEvent(handler: PartialFunction[ControllerEvent[M], HandledEvent[M]]) =
     new Controller(

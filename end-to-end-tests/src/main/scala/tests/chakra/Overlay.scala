@@ -7,7 +7,8 @@ import tests.chakra.Common.commonBox
 
 object Overlay:
   def components(m: ChakraModel)(using Model[ChakraModel]): Seq[UiElement] =
-    val box1 = Box(text = m.box1)
+    val box1 = Box(text = "initializing...").onModelChange: (b, m) =>
+      b.withText(m.box1)
     Seq(
       commonBox(text = "Menus box0001"),
       HStack().withChildren(
