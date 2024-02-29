@@ -38,6 +38,14 @@ class Controller[M](
       eventHandlers :+ handler
     )
 
+object Controller:
+  def apply[M](initialModel: Model[M], modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
+    new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
+  def apply[M](modelComponents: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
+    new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
+  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[Unit]                       =
+    new Controller(session.eventIterator, session.renderChanges, modelComponents, Model.Standard.unitModel, Nil)
+
 class RenderedController[M](
     eventIteratorFactory: => Iterator[CommandEvent],
     initialModel: Model[M],
@@ -163,14 +171,6 @@ class RenderedController[M](
           if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
         .takeWhile(!_.shouldTerminate)
     )
-
-object Controller:
-  def apply[M](initialModel: Model[M], modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
-    new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
-  def apply[M](modelComponents: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
-    new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
-  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[Unit]                       =
-    new Controller(session.eventIterator, session.renderChanges, modelComponents, Model.Standard.unitModel, Nil)
 
 sealed trait ControllerEvent[M]:
   def model: M = handled.model
