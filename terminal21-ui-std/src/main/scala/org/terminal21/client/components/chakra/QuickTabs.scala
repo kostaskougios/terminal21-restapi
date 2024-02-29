@@ -2,12 +2,14 @@ package org.terminal21.client.components.chakra
 
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.{Keys, UiComponent, UiElement}
+import org.terminal21.collections.TypedMap
 
 case class QuickTabs(
     key: String = Keys.nextKey,
     style: Map[String, Any] = Map.empty,
     tabs: Seq[String | Seq[UiElement]] = Nil,
-    tabPanels: Seq[Seq[UiElement]] = Nil
+    tabPanels: Seq[Seq[UiElement]] = Nil,
+    dataStore: TypedMap = TypedMap.empty
 ) extends UiComponent
     with HasStyle:
   type This = QuickTabs
@@ -34,3 +36,4 @@ case class QuickTabs(
 
   override def withStyle(v: Map[String, Any]): QuickTabs = copy(style = v)
   override def withKey(key: String): QuickTabs           = copy(key = key)
+  override def withDataStore(ds: TypedMap)               = copy(dataStore = ds)

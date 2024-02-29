@@ -1,5 +1,6 @@
 package org.terminal21.client.components
 
+import org.terminal21.client.Model
 import org.terminal21.client.components.UiElement.HasChildren
 import org.terminal21.client.components.chakra.Box
 import org.terminal21.collections.{TypedMap, TypedMapKey}
@@ -10,6 +11,13 @@ abstract class UiElement extends AnyElement:
   def key: String
   def withKey(key: String): This
   def findKey(key: String): UiElement = flat.find(_.key == key).get
+
+  def dataStore: TypedMap
+  def withDataStore(ds: TypedMap): This
+  def store[V](key: TypedMapKey[V], value: V): This = withDataStore(dataStore + (key -> value))
+
+  def onModelChange[M](using model: Model[M])(f: (This, M) => This): This =
+    store(model.OnModelChangeKey, f.asInstanceOf[model.OnModelChangeFunction])
 
   /** @return
     *   this element along all it's children flattened
@@ -38,9 +46,3 @@ object UiElement:
     def style: Map[String, Any]
     def withStyle(v: Map[String, Any]): This
     def withStyle(vs: (String, Any)*): This = withStyle(vs.toMap)
-
-  trait HasDataStore:
-    this: UiElement =>
-    def dataStore: TypedMap
-    def withDataStore(ds: TypedMap): This
-    def store[V](key: TypedMapKey[V], value: V): This = withDataStore(dataStore + (key -> value))

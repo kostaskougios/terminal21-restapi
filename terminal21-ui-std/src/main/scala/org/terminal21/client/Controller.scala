@@ -178,6 +178,8 @@ type OnChangeEventHandlerFunction[M]        = ControllerChangeEvent[M] => Handle
 type OnChangeBooleanEventHandlerFunction[M] = ControllerChangeBooleanEvent[M] => HandledEvent[M]
 
 case class Model[M](value: M):
+  type OnModelChangeFunction = (UiElement, M) => UiElement
+  object OnModelChangeKey extends TypedMapKey[OnModelChangeFunction]
   object ClickKey         extends TypedMapKey[Seq[OnClickEventHandlerFunction[M]]]
   object ChangeKey        extends TypedMapKey[Seq[OnChangeEventHandlerFunction[M]]]
   object ChangeBooleanKey extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]

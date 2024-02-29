@@ -2,13 +2,15 @@ package org.terminal21.client.components.chakra
 
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.{Keys, UiComponent, UiElement}
+import org.terminal21.collections.TypedMap
 
 case class QuickFormControl(
     key: String = Keys.nextKey,
     style: Map[String, Any] = Map.empty,
     label: Option[String] = None,
     inputGroup: Seq[UiElement] = Nil,
-    helperText: Option[String] = None
+    helperText: Option[String] = None,
+    dataStore: TypedMap = TypedMap.empty
 ) extends UiComponent
     with HasStyle:
   type This = QuickFormControl
@@ -25,3 +27,4 @@ case class QuickFormControl(
 
   override def withStyle(v: Map[String, Any]): QuickFormControl = copy(style = v)
   override def withKey(key: String): QuickFormControl           = copy(key = key)
+  override def withDataStore(ds: TypedMap)                      = copy(dataStore = ds)

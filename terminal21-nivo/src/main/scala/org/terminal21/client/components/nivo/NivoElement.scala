@@ -2,6 +2,7 @@ package org.terminal21.client.components.nivo
 
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.{Keys, UiElement}
+import org.terminal21.collections.TypedMap
 
 sealed trait NEJson      extends UiElement
 sealed trait NivoElement extends NEJson with HasStyle
@@ -28,12 +29,14 @@ case class ResponsiveLine(
     pointBorderColor: Map[String, String] = Map("from" -> "serieColor"),
     pointLabelYOffset: Int = -12,
     useMesh: Boolean = true,
-    legends: Seq[Legend] = Nil
+    legends: Seq[Legend] = Nil,
+    dataStore: TypedMap = TypedMap.empty
 ) extends NivoElement:
   type This = ResponsiveLine
   override def withStyle(v: Map[String, Any]): ResponsiveLine = copy(style = v)
   def withKey(v: String)                                      = copy(key = v)
   def withData(data: Seq[Serie])                              = copy(data = data)
+  override def withDataStore(ds: TypedMap)                    = copy(dataStore = ds)
 
 /** https://nivo.rocks/bar/
   */
@@ -57,9 +60,11 @@ case class ResponsiveBar(
     axisBottom: Option[Axis] = Some(Axis(legend = "y", legendOffset = 36)),
     axisLeft: Option[Axis] = Some(Axis(legend = "x", legendOffset = -40)),
     legends: Seq[Legend] = Nil,
-    ariaLabel: String = "Chart Label"
+    ariaLabel: String = "Chart Label",
+    dataStore: TypedMap = TypedMap.empty
 ) extends NivoElement:
   type This = ResponsiveBar
   override def withStyle(v: Map[String, Any]): ResponsiveBar = copy(style = v)
   def withKey(v: String)                                     = copy(key = v)
   def withData(data: Seq[Seq[BarDatum]])                     = copy(data = data)
+  override def withDataStore(ds: TypedMap)                   = copy(dataStore = ds)
