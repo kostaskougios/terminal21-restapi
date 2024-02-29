@@ -51,4 +51,4 @@ abstract class StdUiSparkCalculation[OUT: ReadWriter](
     dataUi: UiElement with HasStyle
 )(using ConnectedSession, Model[_], FiberExecutor, SparkSession)
     extends SparkCalculation[OUT](name)
-    with StdUiCalculation[OUT](name, dataUi)
+    with StdUiCalculation[OUT](key, name, dataUi)

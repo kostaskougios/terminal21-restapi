@@ -4,6 +4,7 @@ import functions.fibers.FiberExecutor
 import org.terminal21.client.{ConnectedSession, Model, RenderChangesEvent}
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.chakra.*
+import org.terminal21.collections.TypedMap
 
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
 
@@ -13,8 +14,10 @@ import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
   *   the return value of the calculation.
   */
 trait StdUiCalculation[OUT](
+    val key: String,
     name: String,
-    dataUi: UiElement with HasStyle
+    dataUi: UiElement with HasStyle,
+    val dataStore: TypedMap = TypedMap.empty
 )(using session: ConnectedSession, executor: FiberExecutor)
     extends Calculation[OUT]
     with UiComponent:
