@@ -79,7 +79,6 @@ class ServerStatusPage(
   def sessionsTable: UiElement =
     sessionsTableE.onModelChange: (table, m) =>
       val sessions = m.sessions
-      println("MODEL CHANGE")
       table.withRows(
         sessions.map: session =>
           Seq(Text(text = session.id), Text(text = session.name), if session.isOpen then CheckIcon() else NotAllowedIcon(), actionsFor(session))

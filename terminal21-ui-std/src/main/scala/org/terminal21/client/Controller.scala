@@ -113,7 +113,7 @@ class RenderedController[M](
       )
     )
 
-  private def doRenderChanges(oldHandled: HandledEvent[M], newHandled: HandledEvent[M]): HandledEvent[M] =
+  private def doRenderChanges(newHandled: HandledEvent[M]): HandledEvent[M] =
     val changeFunctions =
       for
         e <- newHandled.componentsByKey.values
@@ -129,25 +129,24 @@ class RenderedController[M](
       .map(_._2)
       .toList
     renderChanges(changed)
-    newHandled.copy(componentsByKey = calcComponentsByKeyMap(changed), renderedChanges = changed)
+    newHandled.copy(componentsByKey = newHandled.componentsByKey ++ calcComponentsByKeyMap(changed), renderedChanges = changed)
 
   def handledEventsIterator: EventIterator[HandledEvent[M]] =
     val initHandled = HandledEvent(initialModel.value, calcComponentsByKeyMap(initialComponents), false, Nil)
     new EventIterator(
       eventIteratorFactory
         .takeWhile(!_.isSessionClosed)
-        .scanLeft((initHandled, initHandled)):
-          case ((_, oldHandled), event) =>
+        .scanLeft(initHandled):
+          case (oldHandled, event) =>
             try
-              val handled2 = invokeEventHandlers(oldHandled, event)
-              val handled3 = invokeComponentEventHandlers(handled2, event)
-              (oldHandled, handled3)
+              val handled2   = invokeEventHandlers(oldHandled, event)
+              val handled3   = invokeComponentEventHandlers(handled2, event)
+              val newHandled = if oldHandled.model != handled3.model then doRenderChanges(handled3) else handled3.copy(renderedChanges = Nil)
+              newHandled
             catch
               case t: Throwable =>
                 logger.error("an error occurred while iterating events", t)
-                (oldHandled, oldHandled)
-        .map: (oldHandled, newHandled) =>
-          if oldHandled.model != newHandled.model then doRenderChanges(oldHandled, newHandled) else newHandled.copy(renderedChanges = Nil)
+                oldHandled
         .flatMap: h =>
           // trick to make sure we take the last state of the model when shouldTerminate=true
           if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
