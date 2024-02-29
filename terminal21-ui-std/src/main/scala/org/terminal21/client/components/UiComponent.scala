@@ -8,4 +8,4 @@ trait UiComponent extends UiElement:
   def rendered: Seq[UiElement]
   override def flat = Seq(this) ++ rendered.flatMap(_.flat)
 
-  protected def subKey(suffix: String): String = if key.isEmpty then "" else key + "-" + suffix
+  protected def subKey(suffix: String): String = key + "-" + suffix

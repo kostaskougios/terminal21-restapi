@@ -39,7 +39,7 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
       Text(text = app.description)
     )
 
-  def components(m: ManagerModel): Seq[UiElement] =
+  def components: Seq[UiElement] =
     val appsTable = QuickTable(
       key = "apps-table",
       caption = Some("Apps installed on the server, click one to run it."),

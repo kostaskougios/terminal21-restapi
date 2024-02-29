@@ -19,6 +19,9 @@ abstract class UiElement extends AnyElement:
   def onModelChange[M](using model: Model[M])(f: (This, M) => This): This =
     store(model.OnModelChangeKey, f.asInstanceOf[model.OnModelChangeFunction])
 
+  def fireModelChange[M](using model: Model[M])(m: M) =
+    dataStore(model.OnModelChangeKey).apply(this, m)
+
   /** @return
     *   this element along all it's children flattened
     */
@@ -26,7 +29,7 @@ abstract class UiElement extends AnyElement:
 
   def substituteComponents: UiElement =
     this match
-      case c: UiComponent  => Box(key = c.key, text = "", children = c.rendered.map(_.substituteComponents))
+      case c: UiComponent  => Box(key = c.key, text = "", children = c.rendered.map(_.substituteComponents), dataStore = c.dataStore)
       case ch: HasChildren => ch.withChildren(ch.children.map(_.substituteComponents)*)
       case _               => this
 

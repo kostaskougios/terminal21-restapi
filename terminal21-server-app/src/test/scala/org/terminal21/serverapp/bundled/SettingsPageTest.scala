@@ -11,4 +11,4 @@ class SettingsPageTest extends AnyFunSuiteLike:
 
   test("Should render the ThemeToggle component"):
     new App:
-      page.components(()) should contain(page.themeToggle)
+      page.components should contain(page.themeToggle)

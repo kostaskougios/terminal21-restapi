@@ -23,7 +23,7 @@ class AppManagerPageTest extends AnyFunSuiteLike:
     var startedApp: Option[ServerSideApp] = None
     val page                              = new AppManagerPage(apps, app => startedApp = Some(app))
     val model                             = page.ManagerModel()
-    def allComponents                     = page.components(model).flatMap(_.flat)
+    def allComponents                     = page.components.flatMap(_.flat)
 
   test("renders app links"):
     new App(mockApp("app1", "the-app1-desc")):

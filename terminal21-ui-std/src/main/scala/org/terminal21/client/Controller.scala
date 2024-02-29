@@ -115,7 +115,6 @@ class RenderedController[M](
     )
 
   private def doRenderChanges(oldHandled: HandledEvent[M], newHandled: HandledEvent[M]): HandledEvent[M] =
-    // TODO: optimise what elements are rendered
     val changeFunctions =
       for
         e <- newHandled.componentsByKey.values
@@ -129,6 +128,7 @@ class RenderedController[M](
       .filter: (e, ne) =>
         e.withDataStore(dsEmpty) != ne.withDataStore(dsEmpty)
       .map(_._2)
+      .map(_.substituteComponents)
       .toList
     renderChanges(changed)
     newHandled.copy(componentsByKey = calcComponentsByKeyMap(changed), renderedChanges = changed)
@@ -140,7 +140,6 @@ class RenderedController[M](
         .takeWhile(!_.isSessionClosed)
         .scanLeft((initHandled, initHandled)):
           case ((_, oldHandled), event) =>
-            println(event)
             try
               val handled2 = invokeEventHandlers(oldHandled, event)
               val handled3 = invokeComponentEventHandlers(handled2, event)
