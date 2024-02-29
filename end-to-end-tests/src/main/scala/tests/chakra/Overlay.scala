@@ -6,7 +6,7 @@ import org.terminal21.client.components.chakra.*
 import tests.chakra.Common.commonBox
 
 object Overlay:
-  def components(m: ChakraModel)(using Model[ChakraModel]): Seq[UiElement] =
+  def components(using Model[ChakraModel]): Seq[UiElement] =
     val box1 = Box().onModelChange: (b, m) =>
       b.withText(m.box1)
     Seq(

@@ -6,7 +6,7 @@ import org.terminal21.client.components.chakra.*
 import tests.chakra.Common.commonBox
 
 object MediaAndIcons:
-  def components(using session: ConnectedSession): Seq[UiElement] =
+  def components: Seq[UiElement] =
     Seq(
       commonBox(text = "Icons"),
       HStack().withChildren(

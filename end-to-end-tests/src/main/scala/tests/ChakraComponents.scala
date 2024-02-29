@@ -20,9 +20,7 @@ import tests.chakra.*
           event.handled.withModel(_.copy(rerun = true)).terminate
 
         def components(m: ChakraModel): Seq[UiElement] =
-          Overlay.components(
-            m
-          ) ++ Forms.components(
+          Overlay.components ++ Forms.components(
             m
           ) ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Feedback.components ++ Disclosure.components ++
             Navigation.components ++ Seq(
