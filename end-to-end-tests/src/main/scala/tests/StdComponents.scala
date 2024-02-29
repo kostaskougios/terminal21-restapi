@@ -13,12 +13,14 @@ import org.terminal21.client.components.std.*
       case class Form(output: String, cookie: String)
       given model: Model[Form] = Model(Form("This will reflect what you type in the input", "This will display the value of the cookie"))
 
-      def components(form: Form) =
-        val output      = Paragraph(text = form.output)
-        val cookieValue = Paragraph(text = form.cookie)
+      def components =
+        val output      = Paragraph().onModelChange: (p, m) =>
+          p.withText(m.output)
+        val cookieValue = Paragraph().onModelChange: (p, m) =>
+          p.withText(m.cookie)
         val input       = Input(key = "name", defaultValue = "Please enter your name").onChange: event =>
           import event.*
-          handled.withModel(form.copy(output = newValue))
+          handled.withModel(event.model.copy(output = newValue))
 
         Seq(
           Header1(text = "header1 test"),
@@ -44,4 +46,4 @@ import org.terminal21.client.components.std.*
           cookieValue
         )
 
-      Controller(components(model.value)).render().handledEventsIterator.lastOption
+      Controller(components).render().handledEventsIterator.lastOption

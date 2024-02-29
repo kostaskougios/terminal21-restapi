@@ -1,13 +1,14 @@
 package tests.chakra
 
-import org.terminal21.client.{ConnectedSession, Model}
+import org.terminal21.client.Model
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
 import tests.chakra.Common.*
 
 object Editables:
-  def components(model: ChakraModel)(using Model[ChakraModel]): Seq[UiElement] =
-    val status = Box(text = model.editableStatus)
+  def components(using Model[ChakraModel]): Seq[UiElement] =
+    val status = Box().onModelChange: (b, m) =>
+      b.withText(m.editableStatus)
 
     val editable1 = Editable(key = "editable1", defaultValue = "Please type here")
       .withChildren(

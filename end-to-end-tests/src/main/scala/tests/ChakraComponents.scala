@@ -24,10 +24,8 @@ import tests.chakra.*
             m
           ) ++ Forms.components(
             m
-          ) ++ Editables.components(
-            m
-          ) ++ Stacks.components ++ Grids.components ++ Buttons.components ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Feedback.components ++ Disclosure.components ++
-            Navigation.components(m) ++ Seq(
+          ) ++ Editables.components ++ Stacks.components ++ Grids.components ++ Buttons.components ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Feedback.components ++ Disclosure.components ++
+            Navigation.components ++ Seq(
               krButton
             )
         Controller(components(model.value)).render().handledEventsIterator.lastOption.map(_.model) match
