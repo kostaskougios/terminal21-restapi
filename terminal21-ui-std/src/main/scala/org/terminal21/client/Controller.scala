@@ -5,23 +5,21 @@ import org.terminal21.client.collections.EventIterator
 import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
 import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
 import org.terminal21.client.components.{Keys, OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
-import org.terminal21.collections.TypedMapKey
+import org.terminal21.collections.{TypedMap, TypedMapKey}
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
 class Controller[M](
     eventIteratorFactory: => Iterator[CommandEvent],
     renderChanges: Seq[UiElement] => Unit,
-    modelComponents: M => Seq[UiElement],
+    modelComponents: Seq[UiElement],
     initialModel: Model[M],
     eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
 ):
-  private def prepareComponents(m: M): Seq[UiElement] =
-    Keys.linearKeys(modelComponents(m).map(_.substituteComponents))
 
   def render()(using session: ConnectedSession): RenderedController[M] =
-    val initComponents = prepareComponents(initialModel.value)
+    val initComponents = modelComponents.map(_.substituteComponents)
     session.render(initComponents)
-    new RenderedController(eventIteratorFactory, initialModel, initComponents, prepareComponents, renderChanges, eventHandlers)
+    new RenderedController(eventIteratorFactory, initialModel, initComponents, renderChanges, eventHandlers)
 
   def onEvent(handler: PartialFunction[ControllerEvent[M], HandledEvent[M]]) =
     new Controller(
@@ -36,7 +34,6 @@ class RenderedController[M](
     eventIteratorFactory: => Iterator[CommandEvent],
     initialModel: Model[M],
     initialComponents: Seq[UiElement],
-    modelComponents: M => Seq[UiElement],
     renderChanges: Seq[UiElement] => Unit,
     eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
 ):
@@ -119,17 +116,31 @@ class RenderedController[M](
 
   private def doRenderChanges(oldHandled: HandledEvent[M], newHandled: HandledEvent[M]): HandledEvent[M] =
     // TODO: optimise what elements are rendered
-    val all = modelComponents(newHandled.model)
-    renderChanges(all)
-    newHandled.copy(componentsByKey = calcComponentsByKeyMap(all))
+    val changeFunctions =
+      for
+        e <- newHandled.componentsByKey.values
+        f <- e.dataStore.get(initialModel.OnModelChangeKey)
+      yield (e, f)
+
+    val dsEmpty = TypedMap.empty
+    val changed = changeFunctions
+      .map: (e, f) =>
+        (e, f(e, newHandled.model))
+      .filter: (e, ne) =>
+        e.withDataStore(dsEmpty) != ne.withDataStore(dsEmpty)
+      .map(_._2)
+      .toList
+    renderChanges(changed)
+    newHandled.copy(componentsByKey = calcComponentsByKeyMap(changed), renderedChanges = changed)
 
   def handledEventsIterator: EventIterator[HandledEvent[M]] =
-    val initHandled = HandledEvent(initialModel.value, calcComponentsByKeyMap(initialComponents), false)
+    val initHandled = HandledEvent(initialModel.value, calcComponentsByKeyMap(initialComponents), false, Nil)
     new EventIterator(
       eventIteratorFactory
         .takeWhile(!_.isSessionClosed)
         .scanLeft((initHandled, initHandled)):
           case ((_, oldHandled), event) =>
+            println(event)
             try
               val handled2 = invokeEventHandlers(oldHandled, event)
               val handled3 = invokeComponentEventHandlers(handled2, event)
@@ -139,7 +150,7 @@ class RenderedController[M](
                 logger.error("an error occurred while iterating events", t)
                 (oldHandled, oldHandled)
         .map: (oldHandled, newHandled) =>
-          if oldHandled.model != newHandled.model then doRenderChanges(oldHandled, newHandled) else newHandled
+          if oldHandled.model != newHandled.model then doRenderChanges(oldHandled, newHandled) else newHandled.copy(renderedChanges = Nil)
         .flatMap: h =>
           // trick to make sure we take the last state of the model when shouldTerminate=true
           if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
@@ -147,12 +158,12 @@ class RenderedController[M](
     )
 
 object Controller:
-  def apply[M](initialModel: Model[M], modelComponents: M => Seq[UiElement])(using session: ConnectedSession): Controller[M] =
+  def apply[M](initialModel: Model[M], modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
     new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
-  def apply[M](modelComponents: M => Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
+  def apply[M](modelComponents: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
     new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
-  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[Unit]                            =
-    new Controller(session.eventIterator, session.renderChanges, _ => modelComponents, Model.Standard.unitModel, Nil)
+  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[Unit]                       =
+    new Controller(session.eventIterator, session.renderChanges, modelComponents, Model.Standard.unitModel, Nil)
 
 sealed trait ControllerEvent[M]:
   def model: M = handled.model
@@ -166,7 +177,8 @@ case class ControllerClientEvent[M](handled: HandledEvent[M], event: ClientEvent
 case class HandledEvent[M](
     model: M,
     componentsByKey: Map[String, UiElement],
-    shouldTerminate: Boolean
+    shouldTerminate: Boolean,
+    renderedChanges: Seq[UiElement]
 ):
   def terminate: HandledEvent[M]                       = copy(shouldTerminate = true)
   def withShouldTerminate(t: Boolean): HandledEvent[M] = copy(shouldTerminate = t)

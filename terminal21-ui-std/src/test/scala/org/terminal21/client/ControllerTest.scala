@@ -9,18 +9,18 @@ import org.terminal21.collections.SEList
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
 class ControllerTest extends AnyFunSuiteLike:
-  val button             = Button(key = "b1")
+  val button             = Button()
   val buttonClick        = OnClick(button.key)
-  val input              = Input(key = "i1")
+  val input              = Input()
   val inputChange        = OnChange(input.key, "new-value")
-  val checkbox           = Checkbox(key = "c1")
+  val checkbox           = Checkbox()
   val checkBoxChange     = OnChange(checkbox.key, "true")
   given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
 
   def newController[M](
       initialModel: Model[M],
       events: => Seq[CommandEvent],
-      modelComponents: M => Seq[UiElement],
+      modelComponents: Seq[UiElement],
       renderChanges: Seq[UiElement] => Unit = _ => ()
   ): Controller[M] =
     val seList = SEList[CommandEvent]()
@@ -31,11 +31,11 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("will throw an exception if there is a duplicate key"):
     an[IllegalArgumentException] should be thrownBy
-      newController(Model(0), Seq(buttonClick), _ => Seq(button, button)).render().handledEventsIterator
+      newController(Model(0), Seq(buttonClick), Seq(button, button)).render().handledEventsIterator
 
   test("onEvent is called"):
     val model = Model(0)
-    newController(model, Seq(buttonClick), _ => Seq(button))
+    newController(model, Seq(buttonClick), Seq(button))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate else event.handled.withModel(event.model + 1)
       .render()
@@ -45,7 +45,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("onEvent is called for change"):
     val model = Model(0)
-    newController(model, Seq(inputChange), _ => Seq(input))
+    newController(model, Seq(inputChange), Seq(input))
       .onEvent: event =>
         import event.*
         if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
@@ -56,7 +56,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("onEvent not matched for change"):
     val model = Model(0)
-    newController(model, Seq(inputChange), _ => Seq(input))
+    newController(model, Seq(inputChange), Seq(input))
       .onEvent:
         case event: ControllerClickEvent[_] =>
           import event.*
@@ -68,7 +68,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("onEvent is called for change/boolean"):
     val model = Model(0)
-    newController(model, Seq(checkBoxChange), _ => Seq(checkbox))
+    newController(model, Seq(checkBoxChange), Seq(checkbox))
       .onEvent: event =>
         import event.*
         if event.model > 1 then handled.terminate else handled.withModel(event.model + 1)
@@ -79,7 +79,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("onEvent not matches for change/boolean"):
     val model = Model(0)
-    newController(model, Seq(checkBoxChange), _ => Seq(checkbox))
+    newController(model, Seq(checkBoxChange), Seq(checkbox))
       .onEvent:
         case event: ControllerClickEvent[_] =>
           import event.*
@@ -93,7 +93,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("onEvent is called for ClientEvent"):
     val model = Model(0)
-    newController(model, Seq(TestClientEvent(5)), _ => Seq(button))
+    newController(model, Seq(TestClientEvent(5)), Seq(button))
       .onEvent:
         case ControllerClientEvent(handled, event: TestClientEvent) =>
           import event.*
@@ -105,7 +105,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("onEvent when no partial function matches ClientEvent"):
     val model = Model(0)
-    newController(model, Seq(TestClientEvent(5)), _ => Seq(button))
+    newController(model, Seq(TestClientEvent(5)), Seq(button))
       .onEvent:
         case ControllerClickEvent(`checkbox`, handled) =>
           handled.withModel(5).terminate
@@ -119,11 +119,10 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(
       model,
       Seq(buttonClick),
-      _ =>
-        Seq(
-          button.onClick: event =>
-            event.handled.withModel(100).terminate
-        )
+      Seq(
+        button.onClick: event =>
+          event.handled.withModel(100).terminate
+      )
     ).render()
       .handledEventsIterator
       .map(_.model)
@@ -134,11 +133,10 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(
       model,
       Seq(inputChange),
-      _ =>
-        Seq(
-          input.onChange: event =>
-            event.handled.withModel(100).terminate
-        )
+      Seq(
+        input.onChange: event =>
+          event.handled.withModel(100).terminate
+      )
     ).render()
       .handledEventsIterator
       .map(_.model)
@@ -149,11 +147,10 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(
       model,
       Seq(checkBoxChange),
-      _ =>
-        Seq(
-          checkbox.onChange: event =>
-            event.handled.withModel(100).terminate
-        )
+      Seq(
+        checkbox.onChange: event =>
+          event.handled.withModel(100).terminate
+      )
     ).render()
       .handledEventsIterator
       .map(_.model)
@@ -161,7 +158,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("terminate is obeyed and latest model state is iterated"):
     val model = Model(0)
-    newController(model, Seq(buttonClick, buttonClick, buttonClick), _ => Seq(button))
+    newController(model, Seq(buttonClick, buttonClick, buttonClick), Seq(button))
       .onEvent: event =>
         if event.model > 1 then event.handled.terminate.withModel(100) else event.handled.withModel(event.model + 1)
       .render()
@@ -170,20 +167,40 @@ class ControllerTest extends AnyFunSuiteLike:
       .toList should be(List(0, 1, 2, 100))
 
   test("changes are rendered"):
+    given model: Model[Int]               = Model(0)
     var rendered                          = Seq.empty[UiElement]
     def renderer(s: Seq[UiElement]): Unit = rendered = s
-    def components(m: Int)                = Seq(
-      m match
-        case 0 => button
-        case 1 => button.withText("changed")
-    )
+    val but                               = button.onModelChange: (b, m) =>
+      b.withText(s"changed $m")
 
-    newController(Model(0), Seq(buttonClick), components, renderer)
+    val handled = newController(model, Seq(buttonClick), Seq(but), renderer)
       .onEvent: event =>
         event.handled.withModel(event.model + 1).terminate
       .render()
       .handledEventsIterator
-      .map(_.model)
-      .toList should be(List(0, 1))
+      .toList
 
-    rendered should be(Seq(button.withText("changed")))
+    val expected = Seq(but.withText("changed 1"))
+    rendered should be(expected)
+    handled.map(_.renderedChanges)(1) should be(expected)
+
+  test("rendered are cleared"):
+    given model: Model[Int]               = Model(0)
+    var lastRendered                      = Seq.empty[UiElement]
+    def renderer(s: Seq[UiElement]): Unit = lastRendered = s
+    val but                               = button.onModelChange: (b, m) =>
+      if m == 1 then b.withText(s"changed $m") else b
+
+    val handled = newController(model, Seq(buttonClick, checkBoxChange), Seq(but, checkbox), renderer)
+      .onEvent: event =>
+        val h = event.handled.withModel(event.model + 1)
+        if h.model > 1 then h.terminate else h
+      .render()
+      .handledEventsIterator
+      .toList
+
+    lastRendered should be(Nil)
+    val rendered = handled.map(_.renderedChanges)
+    rendered.head should be(Nil)
+    rendered(1) should be(Seq(but.withText("changed 1")))
+    rendered(2) should be(Nil)
