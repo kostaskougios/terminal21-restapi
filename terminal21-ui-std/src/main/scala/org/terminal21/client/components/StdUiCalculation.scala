@@ -15,9 +15,10 @@
 //trait StdUiCalculation[OUT](
 //    name: String,
 //    dataUi: UiElement with HasStyle
-//)(using session: ConnectedSession, model: Model[_], executor: FiberExecutor)
+//)(using session: ConnectedSession, executor: FiberExecutor)
 //    extends Calculation[OUT]
 //    with UiComponent:
+//  import Model.Standard.unitModel
 //  private val running   = new AtomicBoolean(false)
 //  private val currentUi = new AtomicReference(dataUi)
 //
