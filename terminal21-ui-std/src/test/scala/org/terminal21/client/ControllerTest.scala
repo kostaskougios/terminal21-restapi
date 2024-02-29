@@ -259,3 +259,15 @@ class ControllerTest extends AnyFunSuiteLike:
       .render()(using connectedSession)
 
     verify(connectedSession).render(Seq(b.withText("model 5")))
+
+  test("RenderChangesEvent renders changes"):
+    given m: Model[Int] = Model(5)
+
+    val connectedSession = mock[ConnectedSession]
+    val handledEvents    = newController(m, Seq(RenderChangesEvent(Seq(button.withText("changed")))), Seq(button))
+      .render()
+      .handledEventsIterator
+      .toList
+
+    println(handledEvents.map(_.renderedChanges).mkString("\n"))
+    handledEvents(1).renderedChanges should be(Seq(button.withText("changed")))

@@ -27,7 +27,11 @@ class Controller[M](
   def render()(using session: ConnectedSession): RenderedController[M] =
     val elements = applyModelTo(modelComponents)
     session.render(elements)
-    new RenderedController(eventIteratorFactory, initialModel, elements, renderChanges, eventHandlers)
+    new RenderedController(eventIteratorFactory, initialModel, elements, renderChanges, eventHandlers :+ renderChangesEventHandler)
+
+  private def renderChangesEventHandler: PartialFunction[ControllerEvent[M], HandledEvent[M]] =
+    case ControllerClientEvent(h, RenderChangesEvent(changes)) =>
+      h.copy(renderedChanges = h.renderedChanges ++ changes)
 
   def onEvent(handler: PartialFunction[ControllerEvent[M], HandledEvent[M]]) =
     new Controller(
@@ -147,7 +151,7 @@ class RenderedController[M](
         e.withDataStore(dsEmpty) != ne.withDataStore(dsEmpty)
       .map(_._2)
       .toList
-    newHandled.copy(componentsByKey = newHandled.componentsByKey ++ calcComponentsByKeyMap(changed), renderedChanges = changed)
+    newHandled.copy(componentsByKey = newHandled.componentsByKey ++ calcComponentsByKeyMap(changed), renderedChanges = newHandled.renderedChanges ++ changed)
 
   def handledEventsIterator: EventIterator[HandledEvent[M]] =
     val initHandled = HandledEvent(initialModel.value, calcComponentsByKeyMap(initialComponents), false, Nil)
