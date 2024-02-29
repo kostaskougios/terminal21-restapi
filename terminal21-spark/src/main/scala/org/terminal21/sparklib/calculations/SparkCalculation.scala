@@ -46,9 +46,9 @@ trait SparkCalculation[OUT: ReadWriter](name: String)(using executor: FiberExecu
   override protected def calculation(): OUT = calculateOnce(nonCachedCalculation)
 
 abstract class StdUiSparkCalculation[OUT: ReadWriter](
-    val key: String,
+    override val key: String,
     name: String,
     dataUi: UiElement with HasStyle
 )(using ConnectedSession, Model[_], FiberExecutor, SparkSession)
-    extends SparkCalculation[OUT](name)
-    with StdUiCalculation[OUT](key, name, dataUi)
+    extends StdUiCalculation[OUT](key, name, dataUi)
+    with SparkCalculation[OUT](name)

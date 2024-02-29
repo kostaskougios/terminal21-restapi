@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
   * @tparam OUT
   *   the return value of the calculation.
   */
-trait StdUiCalculation[OUT](
+abstract class StdUiCalculation[OUT](
     val key: String,
     name: String,
     dataUi: UiElement with HasStyle,
@@ -69,6 +69,12 @@ trait StdUiCalculation[OUT](
       )
     )
     super.whenResultsNotReady()
+
+  override type This = StdUiCalculation[OUT]
+
+  // probably this class needs redesign
+  override def withKey(key: String): StdUiCalculation[OUT]        = ???
+  override def withDataStore(ds: TypedMap): StdUiCalculation[OUT] = ???
 
   override protected def whenResultsReady(results: OUT): Unit =
     val newDataUi = currentUi.get().withStyle(dataUi.style - "filter")
