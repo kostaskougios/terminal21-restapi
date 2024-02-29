@@ -16,6 +16,8 @@ abstract class UiElement extends AnyElement:
   def withDataStore(ds: TypedMap): This
   def store[V](key: TypedMapKey[V], value: V): This = withDataStore(dataStore + (key -> value))
 
+  /** This handler will be called whenever the model changes. It will also be called with the initial model before the first render()
+    */
   def onModelChange[M](using model: Model[M])(f: (This, M) => This): This =
     store(model.OnModelChangeKey, f.asInstanceOf[model.OnModelChangeFunction])
   def hasModelChangeHandler[M](using model: Model[M]): Boolean            = dataStore.contains(model.OnModelChangeKey)

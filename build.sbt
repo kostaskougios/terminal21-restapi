@@ -141,6 +141,7 @@ lazy val `terminal21-ui-std` = project
     libraryDependencies ++= Seq(
       ScalaTest,
       Mockito,
+      Mockito510,
       Slf4jApi,
       HelidonClient,
       FunctionsCaller,

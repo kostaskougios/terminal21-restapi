@@ -1,7 +1,10 @@
 package org.terminal21.client
 
+import org.mockito.Mockito
+import org.mockito.Mockito.verify
 import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
+import org.scalatestplus.mockito.MockitoSugar.*
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.{Button, Checkbox, QuickTable}
 import org.terminal21.client.components.std.Input
@@ -238,12 +241,24 @@ class ControllerTest extends AnyFunSuiteLike:
           )
         )
       )
-      .onModelChange: (table, m) =>
+      .onModelChange: (table, _) =>
         called.set(true)
         table
-    val handledEvents   = newController(m, Seq(buttonClick), Seq(table))
+    newController(m, Seq(buttonClick), Seq(table))
       .render()
       .handledEventsIterator
-      .toList
+      .lastOption
 
     called.get() should be(true)
+
+  test("applies initial model before rendering"):
+    given m: Model[Int] = Model(5)
+
+    val b = button.onModelChange: (b, m) =>
+      b.withText(s"model $m")
+
+    val connectedSession = mock[ConnectedSession]
+    newController(m, Nil, Seq(b))
+      .render()(using connectedSession)
+
+    verify(connectedSession).render(Seq(b.withText("model 5")))
