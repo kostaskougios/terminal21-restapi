@@ -31,7 +31,7 @@ class ControllerTest extends AnyFunSuiteLike:
       events: => Seq[CommandEvent],
       modelComponents: Seq[UiElement],
       renderChanges: Seq[UiElement] => Unit = _ => ()
-  ): Controller[M] =
+  ): Controller =
     val seList = SEList[CommandEvent]()
     val it     = seList.iterator
     events.foreach(e => seList.add(e))

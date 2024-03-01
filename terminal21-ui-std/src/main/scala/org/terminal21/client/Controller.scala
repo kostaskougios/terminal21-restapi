@@ -13,7 +13,8 @@ import scala.reflect.{ClassTag, classTag}
 
 type EventHandler    = PartialFunction[ControllerEvent[_], Handled[_]]
 type ComponentsByKey = Map[String, UiElement]
-class Controller[M](
+
+class Controller(
     eventIteratorFactory: => Iterator[CommandEvent],
     renderChanges: Seq[UiElement] => Unit,
     modelComponents: Seq[UiElement],
@@ -31,7 +32,7 @@ class Controller[M](
             case x               => x
       .toList
 
-  def render()(using session: ConnectedSession): RenderedController[M] =
+  def render()(using session: ConnectedSession): RenderedController =
     val elements = applyModelTo(modelComponents)
     session.render(elements)
     new RenderedController(eventIteratorFactory, initialModels, elements, renderChanges, eventHandlers :+ renderChangesEventHandler :+ modelChangeEventHandler)
@@ -55,12 +56,12 @@ class Controller[M](
 object Controller:
 //  def apply[M](initialModel: Model[M], modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
 //    new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
-  def apply[M](initialValue: M, modelComponents: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
+  def apply[M](initialValue: M, modelComponents: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller =
     new Controller(session.eventIterator, session.renderChanges, modelComponents, Map(initialModel.asInstanceOf[Model[Any]] -> initialValue), Nil)
-  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[Unit]                                        =
+  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller                                           =
     apply((), modelComponents)(using Model.Standard.unitModel, session)
 
-class RenderedController[M](
+class RenderedController(
     eventIteratorFactory: => Iterator[CommandEvent],
     initialModels: Map[Model[Any], Any],
     initialComponents: Seq[UiElement],
@@ -182,9 +183,9 @@ class RenderedController[M](
       (k.ModelKey, v)
     new TypedMap(m.asInstanceOf[TMMap])
 
-  def handledEventsIterator: EventIterator[HandledEvent[M]] =
+  def handledEventsIterator: EventIterator[HandledEvent] =
     val initHandledEvent =
-      HandledEvent[M](initialModels.keys.toSeq, initialModelsMap, calcComponentsByKeyMap(initialComponents), false, Nil)
+      HandledEvent(initialModels.keys.toSeq, initialModelsMap, calcComponentsByKeyMap(initialComponents), false, Nil)
     new EventIterator(
       eventIteratorFactory
         .takeWhile(!_.isSessionClosed)
@@ -238,7 +239,7 @@ case class Handled[M](
   def terminate: Handled[M]                                  = copy(shouldTerminate = true)
   def withShouldTerminate(t: Boolean): Handled[M]            = copy(shouldTerminate = t)
 
-case class HandledEvent[M](
+case class HandledEvent(
     models: Seq[Model[_]],
     modelValues: TypedMap,
     componentsByKey: ComponentsByKey,
