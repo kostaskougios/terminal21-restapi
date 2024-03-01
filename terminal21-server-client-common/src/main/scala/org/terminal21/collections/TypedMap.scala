@@ -1,5 +1,7 @@
 package org.terminal21.collections
 
+import scala.reflect.{ClassTag, classTag}
+
 type TMMap = Map[TypedMapKey[_], Any]
 
 class TypedMap(protected val m: TMMap):
@@ -23,5 +25,7 @@ object TypedMap:
     val m = Map(kv*)
     new TypedMap(m)
 
-trait TypedMapKey[A]:
+trait TypedMapKey[A: ClassTag]:
   type Of = A
+
+  override def toString = s"${getClass.getSimpleName}[${classTag[A].runtimeClass.getSimpleName}]"

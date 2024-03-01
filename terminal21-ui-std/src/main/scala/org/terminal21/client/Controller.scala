@@ -40,15 +40,12 @@ class Controller(
       initialModelValues,
       elements,
       renderChanges,
-      eventHandlers :+ renderChangesEventHandler :+ modelChangeEventHandler
+      eventHandlers :+ renderChangesEventHandler
     )
 
   private def renderChangesEventHandler: PartialFunction[ControllerEvent[_], Handled[_]] =
     case ControllerClientEvent(h, RenderChangesEvent(changes), _) =>
       h.copy(renderedChanges = h.renderedChanges ++ changes)
-  private def modelChangeEventHandler: PartialFunction[ControllerEvent[_], Handled[_]]   =
-    case ControllerClientEvent(h, ModelChangeEvent(model, newValue), _) =>
-      h.withModel(model, newValue)
 
   def onEvent(handler: EventHandler) =
     new Controller(
@@ -118,6 +115,7 @@ class RenderedController(
     lazy val clickHandlers         = clickHandlersMap(allComponents, h)
     lazy val changeHandlers        = changeHandlersMap(allComponents, h)
     lazy val changeBooleanHandlers = changeBooleanHandlersMap(allComponents, h)
+    println(event.toString + "/" + h.mm)
     event match
       case OnClick(key) if clickHandlers.contains(key)                 =>
         val handlers   = clickHandlers(key)
@@ -137,6 +135,8 @@ class RenderedController(
         val handled    = handlers.foldLeft(h): (handled, handler) =>
           handler(ControllerChangeBooleanEvent(receivedBy, handled, value.toBoolean, handled.model))
         handled
+      case ModelChangeEvent(model, newValue) if model == h.mm          =>
+        h.withModel(model, newValue)
       case _                                                           => h
 
   private def checkForDuplicatesAndThrow(components: Seq[UiElement]): Unit =
@@ -189,16 +189,20 @@ class RenderedController(
       (k.ModelKey, v)
     new TypedMap(m.asInstanceOf[TMMap])
 
+  private def availableModels(componentsByKey: ComponentsByKey): Seq[Model[_]] =
+    (initialModelValues.keys.toList ++ componentsByKey.values.flatMap(_.handledModels).toList).distinct
+
   def handledEventsIterator: EventIterator[HandledEvent] =
-    val initHandledEvent =
-      HandledEvent(initialModelValues.keys.toSeq, initialModelsMap, calcComponentsByKeyMap(initialComponents), false, Nil)
+    val initCompByKeyMap    = calcComponentsByKeyMap(initialComponents)
+    val initAvailableModels = availableModels(initCompByKeyMap)
+    val initHandledEvent    = HandledEvent(initAvailableModels, initialModelsMap, initCompByKeyMap, false, Nil)
     new EventIterator(
       eventIteratorFactory
         .takeWhile(!_.isSessionClosed)
         .scanLeft(initHandledEvent):
-          case (oh, event) =>
+          case (ohEvent, event) =>
             try
-              oh.models.foldLeft(oh):
+              ohEvent.models.foldLeft(ohEvent):
                 case (oldHandledEvent, model) =>
                   val oldHandled                    = oldHandledEvent.toHandled(model).copy(renderedChanges = Nil)
                   val handled2                      = invokeEventHandlers(oldHandled, oldHandledEvent.componentsByKey, event)
@@ -206,7 +210,7 @@ class RenderedController(
                   val (componentsByKey, newHandled) = renderChangesWhenModelChanges(oldHandled, handled3, oldHandledEvent.componentsByKey)
                   if newHandled.renderedChanges.nonEmpty then renderChanges(newHandled.renderedChanges)
                   oldHandledEvent.copy(
-                    modelValues = newHandled.models,
+                    modelValues = newHandled.modelValues,
                     componentsByKey = componentsByKey,
                     shouldTerminate = newHandled.shouldTerminate,
                     renderedChanges = newHandled.renderedChanges
@@ -214,7 +218,7 @@ class RenderedController(
             catch
               case t: Throwable =>
                 logger.error("an error occurred while iterating events", t)
-                oh
+                ohEvent
         .flatMap: h =>
           // trick to make sure we take the last state of the model when shouldTerminate=true
           if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
@@ -234,13 +238,13 @@ case class ControllerClientEvent[M](handled: Handled[M], event: ClientEvent, mod
 
 case class Handled[M](
     mm: Model[M],
-    models: TypedMap,
+    modelValues: TypedMap,
     shouldTerminate: Boolean,
     renderedChanges: Seq[UiElement]
 ):
-  def model: M                                               = models(mm.ModelKey)
-  def withModel(m: M): Handled[M]                            = copy(models = models + (mm.ModelKey -> m))
-  def withModel[A](model: Model[A], newValue: A): Handled[M] = copy(models = models + (model.ModelKey -> newValue))
+  def model: M                                               = modelValues(mm.ModelKey)
+  def withModel(m: M): Handled[M]                            = copy(modelValues = modelValues + (mm.ModelKey -> m))
+  def withModel[A](model: Model[A], newValue: A): Handled[M] = copy(modelValues = modelValues + (model.ModelKey -> newValue))
   def mapModel(f: M => M): Handled[M]                        = withModel(f(model))
   def terminate: Handled[M]                                  = copy(shouldTerminate = true)
   def withShouldTerminate(t: Boolean): Handled[M]            = copy(shouldTerminate = t)
@@ -260,7 +264,7 @@ type OnClickEventHandlerFunction[M]         = ControllerClickEvent[M] => Handled
 type OnChangeEventHandlerFunction[M]        = ControllerChangeEvent[M] => Handled[M]
 type OnChangeBooleanEventHandlerFunction[M] = ControllerChangeBooleanEvent[M] => Handled[M]
 
-class Model[M](name: String):
+class Model[M: ClassTag](name: String):
   type OnModelChangeFunction = (UiElement, M) => UiElement
   object ModelKey         extends TypedMapKey[M]
   object OnModelChangeKey extends TypedMapKey[OnModelChangeFunction]
@@ -270,8 +274,8 @@ class Model[M](name: String):
   override def toString = s"Model($name)"
 
 object Model:
-  def apply[M: ClassTag]: Model[M]     = new Model[M](classTag[M].runtimeClass.getName)
-  def apply[M](name: String): Model[M] = new Model[M](name)
+  def apply[M: ClassTag]: Model[M]               = new Model[M](classTag[M].runtimeClass.getName)
+  def apply[M: ClassTag](name: String): Model[M] = new Model[M](name)
   object Standard:
     given unitModel: Model[Unit]       = Model[Unit]("unit")
     given booleanModel: Model[Boolean] = Model[Boolean]("boolean")

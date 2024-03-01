@@ -32,12 +32,19 @@ class ControllerTest extends AnyFunSuiteLike:
       events: => Seq[CommandEvent],
       modelComponents: Seq[UiElement],
       renderChanges: Seq[UiElement] => Unit = _ => ()
+  ): Controller = newControllerWith(Seq(initialModel -> initialValue), events, modelComponents, renderChanges)
+
+  def newControllerWith(
+      modelValues: Seq[(Model[_], _)],
+      events: => Seq[CommandEvent],
+      modelComponents: Seq[UiElement],
+      renderChanges: Seq[UiElement] => Unit = _ => ()
   ): Controller =
     val seList = SEList[CommandEvent]()
     val it     = seList.iterator
     events.foreach(e => seList.add(e))
     seList.add(CommandEvent.sessionClosed)
-    new Controller(it, renderChanges, modelComponents, Map(initialModel.asInstanceOf[Model[Any]] -> initialValue), Nil)
+    new Controller(it, renderChanges, modelComponents, modelValues.toMap.asInstanceOf[Map[Model[Any], Any]], Nil)
 
   test("will throw an exception if there is a duplicate key"):
     an[IllegalArgumentException] should be thrownBy
@@ -284,7 +291,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("ModelChangeEvent"):
     import Givens.given
-    val handledEvents = newController(stringModel, "v", Seq(ModelChangeEvent(intModel, 6)), Nil).render().handledEventsIterator.toList
+    val handledEvents = newControllerWith(Seq(stringModel -> "v",intModel -> 5), Seq(ModelChangeEvent(intModel, 6)), Nil).render().handledEventsIterator.toList
     handledEvents(1).modelOf(intModel) should be(6)
 
   test("onModelChange for different model"):
