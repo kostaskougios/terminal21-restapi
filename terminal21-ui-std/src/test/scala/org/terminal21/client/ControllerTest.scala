@@ -295,3 +295,13 @@ class ControllerTest extends AnyFunSuiteLike:
     val handledEvents = newController(stringModel, "v", Seq(ModelChangeEvent(intModel, 6)), Seq(b1)).render().handledEventsIterator.toList
 
     handledEvents(1).renderedChanges should be(Seq(b1.withText("changed 6")))
+
+  test("onModelChange when model change triggered by event"):
+    import Givens.given
+    val b1            = Button().onModelChangeRender(using intModel): (b, m) =>
+      b.withText(s"changed $m")
+    val b2            = button.onClick(using intModel): event =>
+      event.handled.mapModel(_ + 1)
+    val handledEvents = newController(intModel, 5, Seq(buttonClick), Seq(b1, b2)).render().handledEventsIterator.toList
+
+    handledEvents(1).renderedChanges should be(Seq(b1.withText("changed 6")))
