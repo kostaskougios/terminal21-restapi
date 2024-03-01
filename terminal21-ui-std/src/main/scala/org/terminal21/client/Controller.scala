@@ -18,12 +18,12 @@ class Controller(
     eventIteratorFactory: => Iterator[CommandEvent],
     renderChanges: Seq[UiElement] => Unit,
     modelComponents: Seq[UiElement],
-    initialModels: Map[Model[Any], Any],
+    initialModelValues: Map[Model[Any], Any],
     eventHandlers: Seq[EventHandler]
 ):
 
   private def applyModelTo(components: Seq[UiElement]): Seq[UiElement] =
-    initialModels
+    initialModelValues
       .flatMap: (m, v) =>
         components.map: e =>
           val ne = if e.hasModelChangeHandler(using m) then e.fireModelChange(using m)(v) else e
@@ -35,7 +35,13 @@ class Controller(
   def render()(using session: ConnectedSession): RenderedController =
     val elements = applyModelTo(modelComponents)
     session.render(elements)
-    new RenderedController(eventIteratorFactory, initialModels, elements, renderChanges, eventHandlers :+ renderChangesEventHandler :+ modelChangeEventHandler)
+    new RenderedController(
+      eventIteratorFactory,
+      initialModelValues,
+      elements,
+      renderChanges,
+      eventHandlers :+ renderChangesEventHandler :+ modelChangeEventHandler
+    )
 
   private def renderChangesEventHandler: PartialFunction[ControllerEvent[_], Handled[_]] =
     case ControllerClientEvent(h, RenderChangesEvent(changes), _) =>
@@ -49,7 +55,7 @@ class Controller(
       eventIteratorFactory,
       renderChanges,
       modelComponents,
-      initialModels,
+      initialModelValues,
       eventHandlers :+ handler
     )
 
@@ -63,7 +69,7 @@ object Controller:
 
 class RenderedController(
     eventIteratorFactory: => Iterator[CommandEvent],
-    initialModels: Map[Model[Any], Any],
+    initialModelValues: Map[Model[Any], Any],
     initialComponents: Seq[UiElement],
     renderChanges: Seq[UiElement] => Unit,
     eventHandlers: Seq[EventHandler]
@@ -179,13 +185,13 @@ class RenderedController(
       )
 
   private def initialModelsMap: TypedMap =
-    val m = initialModels.map: (k, v) =>
+    val m = initialModelValues.map: (k, v) =>
       (k.ModelKey, v)
     new TypedMap(m.asInstanceOf[TMMap])
 
   def handledEventsIterator: EventIterator[HandledEvent] =
     val initHandledEvent =
-      HandledEvent(initialModels.keys.toSeq, initialModelsMap, calcComponentsByKeyMap(initialComponents), false, Nil)
+      HandledEvent(initialModelValues.keys.toSeq, initialModelsMap, calcComponentsByKeyMap(initialComponents), false, Nil)
     new EventIterator(
       eventIteratorFactory
         .takeWhile(!_.isSessionClosed)
