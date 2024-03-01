@@ -163,7 +163,7 @@ class RenderedController(
       newHandled: Handled[A],
       componentsByKey: ComponentsByKey
   ): (ComponentsByKey, Handled[A]) =
-    if oldHandled.model == newHandled.model then (componentsByKey, newHandled)
+    if oldHandled.modelOption == newHandled.modelOption then (componentsByKey, newHandled)
     else
       val changeFunctions =
         for
@@ -243,6 +243,7 @@ case class Handled[M](
     renderedChanges: Seq[UiElement]
 ):
   def model: M                                               = modelValues(mm.ModelKey)
+  def modelOption: Option[M]                                 = modelValues.get(mm.ModelKey)
   def withModel(m: M): Handled[M]                            = copy(modelValues = modelValues + (mm.ModelKey -> m))
   def withModel[A](model: Model[A], newValue: A): Handled[M] = copy(modelValues = modelValues + (model.ModelKey -> newValue))
   def mapModel(f: M => M): Handled[M]                        = withModel(f(model))
