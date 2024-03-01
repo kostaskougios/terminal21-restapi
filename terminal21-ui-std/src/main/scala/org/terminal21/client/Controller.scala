@@ -21,6 +21,14 @@ class Controller(
     initialModelValues: Map[Model[Any], Any],
     eventHandlers: Seq[EventHandler]
 ):
+  def model[M](using model: Model[M])(value: M): Controller =
+    new Controller(
+      eventIteratorFactory,
+      renderChanges,
+      modelComponents,
+      initialModelValues + (model.asInstanceOf[Model[Any]] -> value),
+      eventHandlers
+    )
 
   private def applyModelTo(components: Seq[UiElement]): Seq[UiElement] =
     initialModelValues
