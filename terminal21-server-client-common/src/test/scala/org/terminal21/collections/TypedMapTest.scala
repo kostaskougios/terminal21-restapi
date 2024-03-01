@@ -12,6 +12,15 @@ class TypedMapTest extends AnyFunSuiteLike:
     m(IntKey) should be(5)
     m(StringKey) should be("x")
 
+  test("construct"):
+    val m = TypedMap(IntKey -> 5, StringKey -> "x")
+    m(IntKey) should be(5)
+    m(StringKey) should be("x")
+
+  test("keys"):
+    val m = TypedMap(IntKey -> 5, StringKey -> "x")
+    m.keys.toSet should be(Set(IntKey, StringKey))
+
   test("get"):
     val m = TypedMap.empty + (IntKey -> 5) + (StringKey -> "x")
     m.get(IntKey) should be(Some(5))

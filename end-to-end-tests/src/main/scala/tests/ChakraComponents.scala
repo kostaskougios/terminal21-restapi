@@ -17,7 +17,7 @@ import tests.chakra.*
 
         // react tests reset the session to clear state
         val krButton = Button("reset", text = "Reset state").onClick: event =>
-          event.handled.withModel(_.copy(rerun = true)).terminate
+          event.handled.mapModel(_.copy(rerun = true)).terminate
 
         def components(m: ChakraModel): Seq[UiElement] =
           Overlay.components ++ Forms.components(

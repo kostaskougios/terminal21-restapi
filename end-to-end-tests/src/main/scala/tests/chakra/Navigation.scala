@@ -39,7 +39,7 @@ object Navigation:
       Link(key = "google-link", text = "link-external-google", href = "https://www.google.com/", isExternal = Some(true))
         .onClick: event =>
           import event.*
-          handled.withModel(_.copy(linkStatus = "link-clicked"))
+          handled.mapModel(_.copy(linkStatus = "link-clicked"))
       ,
       clickedLink
     )

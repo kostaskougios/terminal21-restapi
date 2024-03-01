@@ -41,7 +41,7 @@ import org.terminal21.client.components.std.*
           Cookie(name = "std-components-test-cookie", value = "test-cookie-value"),
           CookieReader(key = "cookie-reader", name = "std-components-test-cookie").onChange: event =>
             import event.*
-            handled.withModel(_.copy(cookie = s"Cookie value $newValue"))
+            handled.mapModel(_.copy(cookie = s"Cookie value $newValue"))
           ,
           cookieValue
         )

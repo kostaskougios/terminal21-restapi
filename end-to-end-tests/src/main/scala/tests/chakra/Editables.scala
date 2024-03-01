@@ -17,7 +17,7 @@ object Editables:
       )
       .onChange: event =>
         import event.*
-        handled.withModel(_.copy(editableStatus = s"editable1 newValue = $newValue"))
+        handled.mapModel(_.copy(editableStatus = s"editable1 newValue = $newValue"))
 
     val editable2 = Editable(key = "editable2", defaultValue = "For longer maybe-editable texts\nUse an EditableTextarea\nIt uses a textarea control.")
       .withChildren(
@@ -26,7 +26,7 @@ object Editables:
       )
       .onChange: event =>
         import event.*
-        handled.withModel(_.copy(editableStatus = s"editable2 newValue = $newValue"))
+        handled.mapModel(_.copy(editableStatus = s"editable2 newValue = $newValue"))
 
     Seq(
       commonBox(text = "Editables"),

@@ -6,114 +6,127 @@ import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEv
 import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
 import org.terminal21.client.components.UiElement.HasChildren
 import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
-import org.terminal21.collections.{TypedMap, TypedMapKey}
+import org.terminal21.collections.{TMMap, TypedMap, TypedMapKey}
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
+type EventHandler    = PartialFunction[ControllerEvent[_], Handled[_]]
+type ComponentsByKey = Map[String, UiElement]
 class Controller[M](
     eventIteratorFactory: => Iterator[CommandEvent],
     renderChanges: Seq[UiElement] => Unit,
     modelComponents: Seq[UiElement],
-    initialModel: Model[M],
-    eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
+    initialModels: Map[Model[Any], Any],
+    eventHandlers: Seq[EventHandler]
 ):
 
   private def applyModelTo(components: Seq[UiElement]): Seq[UiElement] =
-    components.map: e =>
-      val ne = if e.hasModelChangeHandler(using initialModel) then e.fireModelChange(using initialModel)(initialModel.value) else e
-      ne match
-        case ch: HasChildren => ch.withChildren(applyModelTo(ch.children)*)
-        case x               => x
+    initialModels
+      .flatMap: (m, v) =>
+        components.map: e =>
+          val ne = if e.hasModelChangeHandler(using m) then e.fireModelChange(using m)(v) else e
+          ne match
+            case ch: HasChildren => ch.withChildren(applyModelTo(ch.children)*)
+            case x               => x
+      .toList
 
   def render()(using session: ConnectedSession): RenderedController[M] =
     val elements = applyModelTo(modelComponents)
     session.render(elements)
-    new RenderedController(eventIteratorFactory, initialModel, elements, renderChanges, eventHandlers :+ renderChangesEventHandler)
+    new RenderedController(eventIteratorFactory, initialModels, elements, renderChanges, eventHandlers :+ renderChangesEventHandler :+ modelChangeEventHandler)
 
-  private def renderChangesEventHandler: PartialFunction[ControllerEvent[M], HandledEvent[M]] =
-    case ControllerClientEvent(h, RenderChangesEvent(changes)) =>
+  private def renderChangesEventHandler: PartialFunction[ControllerEvent[_], Handled[_]] =
+    case ControllerClientEvent(h, RenderChangesEvent(changes), _) =>
       h.copy(renderedChanges = h.renderedChanges ++ changes)
+  private def modelChangeEventHandler: PartialFunction[ControllerEvent[_], Handled[_]]   =
+    case ControllerClientEvent(h, ModelChangeEvent(model, newValue), _) =>
+      h.withModel(model, newValue)
 
-  def onEvent(handler: PartialFunction[ControllerEvent[M], HandledEvent[M]]) =
+  def onEvent(handler: EventHandler) =
     new Controller(
       eventIteratorFactory,
       renderChanges,
       modelComponents,
-      initialModel,
+      initialModels,
       eventHandlers :+ handler
     )
 
 object Controller:
-  def apply[M](initialModel: Model[M], modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
-    new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
-  def apply[M](modelComponents: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
-    new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
-  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[Unit]                       =
-    new Controller(session.eventIterator, session.renderChanges, modelComponents, Model.Standard.unitModel, Nil)
+//  def apply[M](initialModel: Model[M], modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
+//    new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
+  def apply[M](initialValue: M, modelComponents: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller[M] =
+    new Controller(session.eventIterator, session.renderChanges, modelComponents, Map(initialModel.asInstanceOf[Model[Any]] -> initialValue), Nil)
+  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[Unit]                                        =
+    apply((), modelComponents)(using Model.Standard.unitModel, session)
 
 class RenderedController[M](
     eventIteratorFactory: => Iterator[CommandEvent],
-    initialModel: Model[M],
+    initialModels: Map[Model[Any], Any],
     initialComponents: Seq[UiElement],
     renderChanges: Seq[UiElement] => Unit,
-    eventHandlers: Seq[PartialFunction[ControllerEvent[M], HandledEvent[M]]]
+    eventHandlers: Seq[EventHandler]
 ):
-  private val logger                                                                                                 = LoggerFactory.getLogger(getClass)
-  private def clickHandlersMap(h: HandledEvent[M]): Map[String, Seq[OnClickEventHandlerFunction[M]]]                 =
-    h.componentsByKey.values
+  private val logger = LoggerFactory.getLogger(getClass)
+
+  private def invokeEventHandlers[A](initHandled: Handled[A], componentsByKey: ComponentsByKey, event: CommandEvent): Handled[A] =
+    eventHandlers
+      .foldLeft(initHandled): (h, f) =>
+        event match
+          case OnClick(key)         =>
+            val e = ControllerClickEvent(componentsByKey(key), h, h.model)
+            if f.isDefinedAt(e) then f(e).asInstanceOf[Handled[A]] else h
+          case OnChange(key, value) =>
+            val receivedBy = componentsByKey(key)
+            val e          = receivedBy match
+              case _: OnChangeEventHandler.CanHandleOnChangeEvent        => ControllerChangeEvent(receivedBy, h, value, h.model)
+              case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean, h.model)
+            if f.isDefinedAt(e) then f(e).asInstanceOf[Handled[A]] else h
+          case ce: ClientEvent      =>
+            val e = ControllerClientEvent(h, ce, h.model)
+            if f.isDefinedAt(e) then f(e).asInstanceOf[Handled[A]] else h
+          case x                    => throw new IllegalStateException(s"Unexpected state $x")
+
+  private def clickHandlersMap[A](allComponents: Seq[UiElement], h: Handled[A]): Map[String, Seq[OnClickEventHandlerFunction[A]]] =
+    allComponents
       .collect:
-        case e: OnClickEventHandler.CanHandleOnClickEvent if e.dataStore.contains(initialModel.ClickKey) => (e.key, e.dataStore(initialModel.ClickKey))
-      .toMap
-  private def changeHandlersMap(h: HandledEvent[M]): Map[String, Seq[OnChangeEventHandlerFunction[M]]]               =
-    h.componentsByKey.values
-      .collect:
-        case e: OnChangeEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(initialModel.ChangeKey) => (e.key, e.dataStore(initialModel.ChangeKey))
-      .toMap
-  private def changeBooleanHandlersMap(h: HandledEvent[M]): Map[String, Seq[OnChangeBooleanEventHandlerFunction[M]]] =
-    h.componentsByKey.values
-      .collect:
-        case e: OnChangeBooleanEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(initialModel.ChangeBooleanKey) =>
-          (e.key, e.dataStore(initialModel.ChangeBooleanKey))
+        case e: OnClickEventHandler.CanHandleOnClickEvent if e.dataStore.contains(h.mm.ClickKey) => (e.key, e.dataStore(h.mm.ClickKey))
       .toMap
 
-  private def invokeEventHandlers(initHandled: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
-    eventHandlers.foldLeft(initHandled): (h, f) =>
-      event match
-        case OnClick(key)         =>
-          val e = ControllerClickEvent(h.componentsByKey(key), h)
-          if f.isDefinedAt(e) then f(e) else h
-        case OnChange(key, value) =>
-          val receivedBy = h.componentsByKey(key)
-          val e          = receivedBy match
-            case _: OnChangeEventHandler.CanHandleOnChangeEvent        => ControllerChangeEvent(receivedBy, h, value)
-            case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean)
-          if f.isDefinedAt(e) then f(e) else h
-        case ce: ClientEvent      =>
-          val e = ControllerClientEvent(h, ce)
-          if f.isDefinedAt(e) then f(e) else h
-        case x                    => throw new IllegalStateException(s"Unexpected state $x")
+  private def changeHandlersMap[A](allComponents: Seq[UiElement], h: Handled[A]): Map[String, Seq[OnChangeEventHandlerFunction[A]]] =
+    allComponents
+      .collect:
+        case e: OnChangeEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(h.mm.ChangeKey) => (e.key, e.dataStore(h.mm.ChangeKey))
+      .toMap
 
-  private def invokeComponentEventHandlers(h: HandledEvent[M], event: CommandEvent): HandledEvent[M] =
-    lazy val clickHandlers         = clickHandlersMap(h)
-    lazy val changeHandlers        = changeHandlersMap(h)
-    lazy val changeBooleanHandlers = changeBooleanHandlersMap(h)
+  private def changeBooleanHandlersMap[A](allComponents: Seq[UiElement], h: Handled[A]): Map[String, Seq[OnChangeBooleanEventHandlerFunction[A]]] =
+    allComponents
+      .collect:
+        case e: OnChangeBooleanEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(h.mm.ChangeBooleanKey) =>
+          (e.key, e.dataStore(h.mm.ChangeBooleanKey))
+      .toMap
+
+  private def invokeComponentEventHandlers[A](h: Handled[A], componentsByKey: ComponentsByKey, event: CommandEvent): Handled[A] =
+    val allComponents              = componentsByKey.values.toList
+    lazy val clickHandlers         = clickHandlersMap(allComponents, h)
+    lazy val changeHandlers        = changeHandlersMap(allComponents, h)
+    lazy val changeBooleanHandlers = changeBooleanHandlersMap(allComponents, h)
     event match
       case OnClick(key) if clickHandlers.contains(key)                 =>
         val handlers   = clickHandlers(key)
-        val receivedBy = h.componentsByKey(key)
+        val receivedBy = componentsByKey(key)
         val handled    = handlers.foldLeft(h): (handled, handler) =>
-          handler(ControllerClickEvent(receivedBy, handled))
+          handler(ControllerClickEvent(receivedBy, handled, handled.model))
         handled
       case OnChange(key, value) if changeHandlers.contains(key)        =>
         val handlers   = changeHandlers(key)
-        val receivedBy = h.componentsByKey(key)
+        val receivedBy = componentsByKey(key)
         val handled    = handlers.foldLeft(h): (handled, handler) =>
-          handler(ControllerChangeEvent(receivedBy, handled, value))
+          handler(ControllerChangeEvent(receivedBy, handled, value, handled.model))
         handled
       case OnChange(key, value) if changeBooleanHandlers.contains(key) =>
         val handlers   = changeBooleanHandlers(key)
-        val receivedBy = h.componentsByKey(key)
+        val receivedBy = componentsByKey(key)
         val handled    = handlers.foldLeft(h): (handled, handler) =>
-          handler(ControllerChangeBooleanEvent(receivedBy, handled, value.toBoolean))
+          handler(ControllerChangeBooleanEvent(receivedBy, handled, value.toBoolean, handled.model))
         handled
       case _                                                           => h
 
@@ -136,40 +149,63 @@ class RenderedController[M](
       )
     )
 
-  private def renderChangesWhenModelChanges(newHandled: HandledEvent[M]): HandledEvent[M] =
-    val changeFunctions =
-      for
-        e <- newHandled.componentsByKey.values
-        f <- e.dataStore.get(initialModel.OnModelChangeKey)
-      yield (e, f)
+  private def renderChangesWhenModelChanges[A](
+      oldHandled: Handled[A],
+      newHandled: Handled[A],
+      componentsByKey: ComponentsByKey
+  ): (ComponentsByKey, Handled[A]) =
+    if oldHandled.model == newHandled.model then (componentsByKey, newHandled)
+    else
+      val changeFunctions =
+        for
+          e <- componentsByKey.values
+          f <- e.dataStore.get(newHandled.mm.OnModelChangeKey)
+        yield (e, f)
 
-    val dsEmpty = TypedMap.empty
-    val changed = changeFunctions
-      .map: (e, f) =>
-        (e, f(e, newHandled.model))
-      .filter: (e, ne) =>
-        e.withDataStore(dsEmpty) != ne.withDataStore(dsEmpty)
-      .map(_._2)
-      .toList
-    newHandled.copy(componentsByKey = newHandled.componentsByKey ++ calcComponentsByKeyMap(changed), renderedChanges = newHandled.renderedChanges ++ changed)
+      val dsEmpty = TypedMap.empty
+      val changed = changeFunctions
+        .map: (e, f) =>
+          (e, f(e, newHandled.model))
+        .filter: (e, ne) =>
+          e.withDataStore(dsEmpty) != ne.withDataStore(dsEmpty)
+        .map(_._2)
+        .toList
+      (
+        componentsByKey ++ calcComponentsByKeyMap(changed),
+        newHandled.copy(renderedChanges = newHandled.renderedChanges ++ changed)
+      )
+
+  private def initialModelsMap: TypedMap =
+    val m = initialModels.map: (k, v) =>
+      (k.ModelKey, v)
+    new TypedMap(m.asInstanceOf[TMMap])
 
   def handledEventsIterator: EventIterator[HandledEvent[M]] =
-    val initHandled = HandledEvent(initialModel.value, calcComponentsByKeyMap(initialComponents), false, Nil)
+    val initHandledEvent =
+      HandledEvent[M](initialModels.keys.toSeq, initialModelsMap, calcComponentsByKeyMap(initialComponents), false, Nil)
     new EventIterator(
       eventIteratorFactory
         .takeWhile(!_.isSessionClosed)
-        .scanLeft(initHandled):
-          case (oldHandled, event) =>
+        .scanLeft(initHandledEvent):
+          case (oh, event) =>
             try
-              val handled2   = invokeEventHandlers(oldHandled.copy(renderedChanges = Nil), event)
-              val handled3   = invokeComponentEventHandlers(handled2, event)
-              val newHandled = if oldHandled.model != handled3.model then renderChangesWhenModelChanges(handled3) else handled3
-              if newHandled.renderedChanges.nonEmpty then renderChanges(newHandled.renderedChanges)
-              newHandled
+              oh.models.foldLeft(oh):
+                case (oldHandledEvent, model) =>
+                  val oldHandled                    = oldHandledEvent.toHandled(model).copy(renderedChanges = Nil)
+                  val handled2                      = invokeEventHandlers(oldHandled, oldHandledEvent.componentsByKey, event)
+                  val handled3                      = invokeComponentEventHandlers(handled2, oldHandledEvent.componentsByKey, event)
+                  val (componentsByKey, newHandled) = renderChangesWhenModelChanges(oldHandled, handled3, oldHandledEvent.componentsByKey)
+                  if newHandled.renderedChanges.nonEmpty then renderChanges(newHandled.renderedChanges)
+                  oldHandledEvent.copy(
+                    modelValues = newHandled.models,
+                    componentsByKey = componentsByKey,
+                    shouldTerminate = newHandled.shouldTerminate,
+                    renderedChanges = newHandled.renderedChanges
+                  )
             catch
               case t: Throwable =>
                 logger.error("an error occurred while iterating events", t)
-                oldHandled
+                oh
         .flatMap: h =>
           // trick to make sure we take the last state of the model when shouldTerminate=true
           if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
@@ -177,40 +213,57 @@ class RenderedController[M](
     )
 
 sealed trait ControllerEvent[M]:
-  def model: M = handled.model
-  def handled: HandledEvent[M]
+  def model: M
+  def handled: Handled[M]
 
-case class ControllerClickEvent[M](clicked: UiElement, handled: HandledEvent[M])                            extends ControllerEvent[M]
-case class ControllerChangeEvent[M](changed: UiElement, handled: HandledEvent[M], newValue: String)         extends ControllerEvent[M]
-case class ControllerChangeBooleanEvent[M](changed: UiElement, handled: HandledEvent[M], newValue: Boolean) extends ControllerEvent[M]
-case class ControllerClientEvent[M](handled: HandledEvent[M], event: ClientEvent)                           extends ControllerEvent[M]
+case class ControllerClickEvent[M](clicked: UiElement, handled: Handled[M], model: M) extends ControllerEvent[M]
 
-case class HandledEvent[M](
-    model: M,
-    componentsByKey: Map[String, UiElement],
+case class ControllerChangeEvent[M](changed: UiElement, handled: Handled[M], newValue: String, model: M) extends ControllerEvent[M]
+
+case class ControllerChangeBooleanEvent[M](changed: UiElement, handled: Handled[M], newValue: Boolean, model: M) extends ControllerEvent[M]
+case class ControllerClientEvent[M](handled: Handled[M], event: ClientEvent, model: M)                           extends ControllerEvent[M]
+
+case class Handled[M](
+    mm: Model[M],
+    models: TypedMap,
     shouldTerminate: Boolean,
     renderedChanges: Seq[UiElement]
 ):
-  def terminate: HandledEvent[M]                       = copy(shouldTerminate = true)
-  def withShouldTerminate(t: Boolean): HandledEvent[M] = copy(shouldTerminate = t)
-  def withModel(m: M): HandledEvent[M]                 = copy(model = m)
-  def withModel(f: M => M): HandledEvent[M]            = copy(model = f(model))
+  def model: M                                               = models(mm.ModelKey)
+  def withModel(m: M): Handled[M]                            = copy(models = models + (mm.ModelKey -> m))
+  def withModel[A](model: Model[A], newValue: A): Handled[M] = copy(models = models + (model.ModelKey -> newValue))
+  def mapModel(f: M => M): Handled[M]                        = withModel(f(model))
+  def terminate: Handled[M]                                  = copy(shouldTerminate = true)
+  def withShouldTerminate(t: Boolean): Handled[M]            = copy(shouldTerminate = t)
 
-type OnClickEventHandlerFunction[M]         = ControllerClickEvent[M] => HandledEvent[M]
-type OnChangeEventHandlerFunction[M]        = ControllerChangeEvent[M] => HandledEvent[M]
-type OnChangeBooleanEventHandlerFunction[M] = ControllerChangeBooleanEvent[M] => HandledEvent[M]
+case class HandledEvent[M](
+    models: Seq[Model[_]],
+    modelValues: TypedMap,
+    componentsByKey: ComponentsByKey,
+    shouldTerminate: Boolean,
+    renderedChanges: Seq[UiElement]
+):
+  def model[A](using model: Model[A]): A        = modelOf(model)
+  def modelOf[A](model: Model[A]): A            = modelValues(model.ModelKey)
+  def toHandled[A](model: Model[A]): Handled[A] = Handled[A](model, modelValues, shouldTerminate, renderedChanges)
 
-case class Model[M](value: M):
+type OnClickEventHandlerFunction[M]         = ControllerClickEvent[M] => Handled[M]
+type OnChangeEventHandlerFunction[M]        = ControllerChangeEvent[M] => Handled[M]
+type OnChangeBooleanEventHandlerFunction[M] = ControllerChangeBooleanEvent[M] => Handled[M]
+
+class Model[M]:
   type OnModelChangeFunction = (UiElement, M) => UiElement
+  object ModelKey         extends TypedMapKey[M]
   object OnModelChangeKey extends TypedMapKey[OnModelChangeFunction]
   object ClickKey         extends TypedMapKey[Seq[OnClickEventHandlerFunction[M]]]
   object ChangeKey        extends TypedMapKey[Seq[OnChangeEventHandlerFunction[M]]]
   object ChangeBooleanKey extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]
 
 object Model:
+  def apply[M]: Model[M] = new Model[M]
   object Standard:
-    given unitModel: Model[Unit]            = Model(())
-    given booleanFalseModel: Model[Boolean] = Model(false)
-    given booleanTrueModel: Model[Boolean]  = Model(true)
+    given unitModel: Model[Unit]       = Model[Unit]
+    given booleanModel: Model[Boolean] = Model[Boolean]
 
-case class RenderChangesEvent(changes: Seq[UiElement]) extends ClientEvent
+case class RenderChangesEvent(changes: Seq[UiElement])       extends ClientEvent
+case class ModelChangeEvent[M](model: Model[M], newValue: M) extends ClientEvent

@@ -18,12 +18,12 @@ object Forms:
     val email = Input(key = "email", `type` = "email", defaultValue = m.email)
       .onChange: event =>
         import event.*
-        handled.withModel(_.copy(email = newValue, formStatus = s"email input new value = $newValue"))
+        handled.mapModel(_.copy(email = newValue, formStatus = s"email input new value = $newValue"))
 
     val description = Textarea(key = "textarea", placeholder = "Please enter a few things about you", defaultValue = "desc")
       .onChange: event =>
         import event.*
-        handled.withModel(_.copy(formStatus = s"description input new value = $newValue"))
+        handled.mapModel(_.copy(formStatus = s"description input new value = $newValue"))
 
     val select1 = Select(key = "male/female", placeholder = "Please choose")
       .withChildren(
@@ -32,7 +32,7 @@ object Forms:
       )
       .onChange: event =>
         import event.*
-        handled.withModel(_.copy(formStatus = s"select1 input new value = $newValue"))
+        handled.mapModel(_.copy(formStatus = s"select1 input new value = $newValue"))
 
     val select2 =
       Select(key = "select-first-second", defaultValue = "1", bg = Some("tomato"), color = Some("black"), borderColor = Some("yellow")).withChildren(
@@ -44,27 +44,27 @@ object Forms:
     val dob      = Input(key = "dob", `type` = "datetime-local")
       .onChange: event =>
         import event.*
-        handled.withModel(_.copy(formStatus = s"dob = $newValue"))
+        handled.mapModel(_.copy(formStatus = s"dob = $newValue"))
 
     val color = Input(key = "color", `type` = "color")
       .onChange: event =>
         import event.*
-        handled.withModel(_.copy(formStatus = s"color = $newValue"))
+        handled.mapModel(_.copy(formStatus = s"color = $newValue"))
 
     val checkbox2 = Checkbox(key = "cb2", text = "Check 2", defaultChecked = true)
       .onChange: event =>
         import event.*
-        handled.withModel(_.copy(formStatus = s"checkbox2 checked is $newValue"))
+        handled.mapModel(_.copy(formStatus = s"checkbox2 checked is $newValue"))
 
     val checkbox1 = Checkbox(key = "cb1", text = "Check 1")
       .onChange: event =>
         import event.*
-        handled.withModel(_.copy(formStatus = s"checkbox1 checked is $newValue"))
+        handled.mapModel(_.copy(formStatus = s"checkbox1 checked is $newValue"))
 
     val switch1 = Switch(key = "sw1", text = "Switch 1")
       .onChange: event =>
         import event.*
-        handled.withModel(_.copy(formStatus = s"switch1 checked is $newValue"))
+        handled.mapModel(_.copy(formStatus = s"switch1 checked is $newValue"))
     val switch2 = Switch(key = "sw2", text = "Switch 2", defaultChecked = true)
 
     val radioGroup = RadioGroup(key = "radio", defaultValue = "2")
@@ -77,7 +77,7 @@ object Forms:
       )
       .onChange: event =>
         import event.*
-        handled.withModel(_.copy(formStatus = s"radioGroup newValue=$newValue"))
+        handled.mapModel(_.copy(formStatus = s"radioGroup newValue=$newValue"))
 
     Seq(
       commonBox(text = "Forms"),
@@ -136,12 +136,12 @@ object Forms:
         Button(key = "save-button", text = "Save", colorScheme = Some("red"))
           .onClick: event =>
             import event.*
-            handled.withModel(_.copy(formStatus = s"Saved clicked"))
+            handled.mapModel(_.copy(formStatus = s"Saved clicked"))
         ,
         Button(key = "cancel-button", text = "Cancel")
           .onClick: event =>
             import event.*
-            handled.withModel(_.copy(formStatus = s"Cancel clicked"))
+            handled.mapModel(_.copy(formStatus = s"Cancel clicked"))
       ),
       radioGroup,
       status

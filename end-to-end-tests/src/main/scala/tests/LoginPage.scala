@@ -36,7 +36,7 @@ class LoginPage(using session: ConnectedSession):
       import clickEvent.*
       // if the email is invalid, we will not terminate. We also will render an error that will be visible for 2 seconds
       val isValidEmail = model.isValidEmail
-      handled.withModel(_.copy(submitted = isValidEmail, submittedInvalidEmail = !isValidEmail))
+      handled.mapModel(_.copy(submitted = isValidEmail, submittedInvalidEmail = !isValidEmail))
 
   val passwordInput = Input(key = "password", `type` = "password", defaultValue = initialModel.value.pwd)
     .onChange: changeEvent =>

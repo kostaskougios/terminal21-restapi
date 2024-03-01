@@ -20,20 +20,20 @@ object Overlay:
             MenuItem(key = "download-menu", text = "Download menu-download")
               .onClick: event =>
                 import event.*
-                handled.withModel(_.copy(box1 = "'Download' clicked"))
+                handled.mapModel(_.copy(box1 = "'Download' clicked"))
             ,
             MenuItem(key = "copy-menu", text = "Copy").onClick: event =>
               import event.*
-              handled.withModel(_.copy(box1 = "'Copy' clicked"))
+              handled.mapModel(_.copy(box1 = "'Copy' clicked"))
             ,
             MenuItem(key = "paste-menu", text = "Paste").onClick: event =>
               import event.*
-              handled.withModel(_.copy(box1 = "'Paste' clicked"))
+              handled.mapModel(_.copy(box1 = "'Paste' clicked"))
             ,
             MenuDivider(),
             MenuItem(key = "exit-menu", text = "Exit").onClick: event =>
               import event.*
-              handled.withModel(_.copy(box1 = "'Exit' clicked"))
+              handled.mapModel(_.copy(box1 = "'Exit' clicked"))
           )
         ),
         box1

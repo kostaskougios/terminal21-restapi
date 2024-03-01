@@ -1,10 +1,13 @@
 package org.terminal21.collections
 
-class TypedMap(val m: Map[TypedMapKey[_], Any]):
+type TMMap = Map[TypedMapKey[_], Any]
+
+class TypedMap(protected val m: TMMap):
   def +[A](kv: (TypedMapKey[A], A)): TypedMap        = new TypedMap(m + kv)
   def apply[A](k: TypedMapKey[A]): A                 = m(k).asInstanceOf[A]
   def get[A](k: TypedMapKey[A]): Option[A]           = m.get(k).asInstanceOf[Option[A]]
   def getOrElse[A](k: TypedMapKey[A], default: => A) = m.getOrElse(k, default).asInstanceOf[A]
+  def keys: Iterable[TypedMapKey[_]]                 = m.keys
 
   override def hashCode()       = m.hashCode()
   override def equals(obj: Any) = obj match
@@ -15,6 +18,10 @@ class TypedMap(val m: Map[TypedMapKey[_], Any]):
   override def toString              = s"TypedMap(${m.keys.mkString(", ")})"
 
 object TypedMap:
-  def empty = new TypedMap(Map.empty)
+  def empty                             = new TypedMap(Map.empty)
+  def apply(kv: (TypedMapKey[_], Any)*) =
+    val m = Map(kv*)
+    new TypedMap(m)
 
-trait TypedMapKey[A]
+trait TypedMapKey[A]:
+  type Of = A

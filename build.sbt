@@ -1,7 +1,7 @@
 /** This build has different sections for each integration. I.e. an http4s section and a kafka section. These sections are not related to each other, please
   * examine the section you're interested in.
   */
-val scala3Version = "3.3.1"
+val scala3Version = "3.3.3"
 
 ThisBuild / version      := "0.30"
 ThisBuild / organization := "io.github.kostaskougios"

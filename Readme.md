@@ -173,6 +173,7 @@ Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi
 - QuickTabs, QuickFormControl
 - bug fix for old react state re-rendering on new session
 - event iterators allows idiomatic handling of events and overhaul of the event handling for easier testing and easier development of larger apps
+- MVC
 
 ## Version 0.21
 
