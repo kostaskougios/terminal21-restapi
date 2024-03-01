@@ -18,13 +18,12 @@ abstract class UiElement extends AnyElement:
 
   /** This handler will be called whenever the model changes. It will also be called with the initial model before the first render()
     */
-  def onModelChange[M](using model: Model[M])(f: (This, M) => This): This =
-    store(UiElementModelsKey, handledModels :+ model).store(model.OnModelChangeKey, f.asInstanceOf[model.OnModelChangeFunction]).asInstanceOf[This]
-
-  def hasModelChangeHandler[M](using model: Model[M]): Boolean = dataStore.contains(model.OnModelChangeKey)
-  def fireModelChange[M](using model: Model[M])(m: M)          =
-    dataStore(model.OnModelChangeKey).apply(this, m)
-  def handledModels: Seq[Model[_]]                             = dataStore.get(UiElementModelsKey).toSeq.flatten
+  def onModelChangeRender[M](using model: Model[M])(f: (This, M) => This): This =
+    store(UiElementModelsKey, handledModels :+ model).store(model.OnModelChangeRenderKey, f.asInstanceOf[model.OnModelChangeFunction]).asInstanceOf[This]
+  def hasModelChangeRenderHandler[M](using model: Model[M]): Boolean            = dataStore.contains(model.OnModelChangeRenderKey)
+  def fireModelChangeRender[M](using model: Model[M])(m: M)                     =
+    dataStore(model.OnModelChangeRenderKey).apply(this, m)
+  def handledModels: Seq[Model[_]]                                              = dataStore.get(UiElementModelsKey).toSeq.flatten
 
   /** @return
     *   this element along all it's children flattened

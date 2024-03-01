@@ -47,7 +47,7 @@ class ServerStatusPageTest extends AnyFunSuiteLike:
       val table = page.sessionsTable
       val m     = page.initModel.copy(sessions = Seq(session(isOpen = false)))
       table
-        .fireModelChange(m)
+        .fireModelChangeRender(m)
         .flat
         .collectFirst:
           case i: NotAllowedIcon => i

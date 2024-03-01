@@ -8,11 +8,11 @@ import tests.chakra.Common.commonBox
 
 object Navigation:
   def components(using Model[ChakraModel]): Seq[UiElement] =
-    val clickedBreadcrumb                            = Paragraph().onModelChange: (p, m) =>
+    val clickedBreadcrumb                            = Paragraph().onModelChangeRender: (p, m) =>
       p.withText(m.breadcrumbStatus)
     def breadcrumbClicked(m: ChakraModel, t: String) = m.copy(breadcrumbStatus = s"breadcrumb-click: $t")
 
-    val clickedLink = Paragraph().onModelChange: (p, m) =>
+    val clickedLink = Paragraph().onModelChangeRender: (p, m) =>
       p.withText(m.linkStatus)
 
     Seq(

@@ -7,7 +7,7 @@ import tests.chakra.Common.commonBox
 
 object Overlay:
   def components(using Model[ChakraModel]): Seq[UiElement] =
-    val box1 = Box().onModelChange: (b, m) =>
+    val box1 = Box().onModelChangeRender: (b, m) =>
       b.withText(m.box1)
     Seq(
       commonBox(text = "Menus box0001"),

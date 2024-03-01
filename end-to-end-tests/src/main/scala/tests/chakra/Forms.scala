@@ -7,12 +7,12 @@ import tests.chakra.Common.*
 
 object Forms:
   def components(m: ChakraModel)(using Model[ChakraModel]): Seq[UiElement] =
-    val status    = Box().onModelChange: (b, m) =>
+    val status    = Box().onModelChangeRender: (b, m) =>
       b.withText(m.formStatus)
     val okIcon    = CheckCircleIcon(color = Some("green"))
     val notOkIcon = WarningTwoIcon(color = Some("red"))
 
-    val emailRightAddOn = InputRightAddon().onModelChange: (i, m) =>
+    val emailRightAddOn = InputRightAddon().onModelChangeRender: (i, m) =>
       i.withChildren(if m.email.contains("@") then okIcon else notOkIcon)
 
     val email = Input(key = "email", `type` = "email", defaultValue = m.email)

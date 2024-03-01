@@ -64,7 +64,7 @@ class LoginPage(using session: ConnectedSession):
         .withInputGroup(
           InputLeftAddon().withChildren(EmailIcon()),
           emailInput,
-          InputRightAddon().onModelChange: (i, m) =>
+          InputRightAddon().onModelChangeRender: (i, m) =>
             i.withChildren(if m.isValidEmail then okIcon else notOkIcon)
         ),
       QuickFormControl()
@@ -75,7 +75,7 @@ class LoginPage(using session: ConnectedSession):
           passwordInput
         ),
       submitButton,
-      errorsBox.onModelChange: (eb, m) =>
+      errorsBox.onModelChangeRender: (eb, m) =>
         if m.submittedInvalidEmail then eb.withChildren(errorMsgInvalidEmail) else errorsBox
     )
 

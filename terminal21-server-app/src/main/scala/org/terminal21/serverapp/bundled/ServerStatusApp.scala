@@ -58,7 +58,7 @@ class ServerStatusPage(
       event.handled
 
   def jvmTable: UiElement =
-    jvmTableE.onModelChange: (table, m) =>
+    jvmTableE.onModelChangeRender: (table, m) =>
       val runtime = m.runtime
       table.withRows(
         Seq(
@@ -76,7 +76,7 @@ class ServerStatusPage(
     ).withHeaders("Id", "Name", "Is Open", "Actions")
 
   def sessionsTable: UiElement =
-    sessionsTableE.onModelChange: (table, m) =>
+    sessionsTableE.onModelChangeRender: (table, m) =>
       val sessions = m.sessions
       table.withRows(
         sessions.map: session =>

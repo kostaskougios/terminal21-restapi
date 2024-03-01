@@ -26,7 +26,7 @@ class Controller(
     initialModelValues
       .flatMap: (m, v) =>
         components.map: e =>
-          val ne = if e.hasModelChangeHandler(using m) then e.fireModelChange(using m)(v) else e
+          val ne = if e.hasModelChangeRenderHandler(using m) then e.fireModelChangeRender(using m)(v) else e
           ne match
             case ch: HasChildren => ch.withChildren(applyModelTo(ch.children)*)
             case x               => x
@@ -168,7 +168,7 @@ class RenderedController(
       val changeFunctions =
         for
           e <- componentsByKey.values
-          f <- e.dataStore.get(newHandled.mm.OnModelChangeKey)
+          f <- e.dataStore.get(newHandled.mm.OnModelChangeRenderKey)
         yield (e, f)
 
       val dsEmpty = TypedMap.empty
@@ -267,11 +267,11 @@ type OnChangeBooleanEventHandlerFunction[M] = ControllerChangeBooleanEvent[M] =>
 
 class Model[M: ClassTag](name: String):
   type OnModelChangeFunction = (UiElement, M) => UiElement
-  object ModelKey         extends TypedMapKey[M]
-  object OnModelChangeKey extends TypedMapKey[OnModelChangeFunction]
-  object ClickKey         extends TypedMapKey[Seq[OnClickEventHandlerFunction[M]]]
-  object ChangeKey        extends TypedMapKey[Seq[OnChangeEventHandlerFunction[M]]]
-  object ChangeBooleanKey extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]
+  object ModelKey               extends TypedMapKey[M]
+  object OnModelChangeRenderKey extends TypedMapKey[OnModelChangeFunction]
+  object ClickKey               extends TypedMapKey[Seq[OnClickEventHandlerFunction[M]]]
+  object ChangeKey              extends TypedMapKey[Seq[OnChangeEventHandlerFunction[M]]]
+  object ChangeBooleanKey       extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]
   override def toString = s"Model($name)"
 
 object Model:

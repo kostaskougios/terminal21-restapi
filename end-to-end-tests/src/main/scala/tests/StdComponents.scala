@@ -14,9 +14,9 @@ import org.terminal21.client.components.std.*
       given model: Model[Form] = Model(Form("This will reflect what you type in the input", "This will display the value of the cookie"))
 
       def components =
-        val output      = Paragraph().onModelChange: (p, m) =>
+        val output      = Paragraph().onModelChangeRender: (p, m) =>
           p.withText(m.output)
-        val cookieValue = Paragraph().onModelChange: (p, m) =>
+        val cookieValue = Paragraph().onModelChangeRender: (p, m) =>
           p.withText(m.cookie)
         val input       = Input(key = "name", defaultValue = "Please enter your name").onChange: event =>
           import event.*

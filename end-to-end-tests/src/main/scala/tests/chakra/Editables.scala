@@ -7,7 +7,7 @@ import tests.chakra.Common.*
 
 object Editables:
   def components(using Model[ChakraModel]): Seq[UiElement] =
-    val status = Box().onModelChange: (b, m) =>
+    val status = Box().onModelChangeRender: (b, m) =>
       b.withText(m.editableStatus)
 
     val editable1 = Editable(key = "editable1", defaultValue = "Please type here")

@@ -192,7 +192,7 @@ class ControllerTest extends AnyFunSuiteLike:
     import Givens.intModel
     var rendered                          = Seq.empty[UiElement]
     def renderer(s: Seq[UiElement]): Unit = rendered = s
-    val but                               = button.onModelChange: (b, m) =>
+    val but                               = button.onModelChangeRender: (b, m) =>
       b.withText(s"changed $m")
 
     val handled = newController(intModel, 0, Seq(buttonClick), Seq(but), renderer)
@@ -209,7 +209,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("rendered are cleared"):
     import Givens.intModel
-    val but = button.onModelChange: (b, m) =>
+    val but = button.onModelChangeRender: (b, m) =>
       if m == 1 then b.withText(s"changed $m") else b
 
     val handled = newController(intModel, 0, Seq(buttonClick, checkBoxChange), Seq(but, checkbox))
@@ -257,7 +257,7 @@ class ControllerTest extends AnyFunSuiteLike:
           )
         )
       )
-      .onModelChange: (table, _) =>
+      .onModelChangeRender: (table, _) =>
         called.set(true)
         table
     newController(intModel, 0, Seq(buttonClick), Seq(table))
@@ -270,7 +270,7 @@ class ControllerTest extends AnyFunSuiteLike:
   test("applies initial model before rendering"):
     import Givens.intModel
 
-    val b = button.onModelChange: (b, m) =>
+    val b = button.onModelChangeRender: (b, m) =>
       b.withText(s"model $m")
 
     val connectedSession = mock[ConnectedSession]
@@ -296,7 +296,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("onModelChange for different model"):
     import Givens.given
-    val b1 = button.onModelChange(using intModel): (b, m) =>
+    val b1 = button.onModelChangeRender(using intModel): (b, m) =>
       b.withText(s"changed $m")
 
     val handledEvents = newController(stringModel, "v", Seq(ModelChangeEvent(intModel, 6)), Seq(b1)).render().handledEventsIterator.toList
