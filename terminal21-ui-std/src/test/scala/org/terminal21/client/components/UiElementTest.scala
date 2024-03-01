@@ -24,5 +24,5 @@ class UiElementTest extends AnyFunSuiteLike:
 
   test("substituteComponents when children are component"):
     val t = QuickTable(key = "k1")
-    val e = Paragraph().withChildren(t)
-    e.substituteComponents should be(Paragraph().withChildren(Box("k1", children = t.rendered)))
+    val e = Paragraph(key = "p1").withChildren(t)
+    e.substituteComponents should be(Paragraph(key = "p1").withChildren(Box("k1", children = t.rendered)))

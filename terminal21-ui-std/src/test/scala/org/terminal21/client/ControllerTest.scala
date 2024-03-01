@@ -320,3 +320,16 @@ class ControllerTest extends AnyFunSuiteLike:
     val handledEvents = newController(intModel, 5, Seq(buttonClick), Seq(box)).render().handledEventsIterator.toList
 
     handledEvents(1).renderedChanges should be(Seq(b1.withText("changed 6")))
+
+  test("onModelChange hierarchy with component"):
+    import Givens.given
+    val t1  = QuickTable()
+      .onModelChangeRender(using intModel): (table, m) =>
+        table.withRows(Seq(Seq(s"changed $m")))
+    val b2  = button.onClick(using intModel): event =>
+      event.handled.mapModel(_ + 1)
+    val box = Box().withChildren(t1, Paragraph().withChildren(b2))
+
+    val handledEvents = newController(intModel, 5, Seq(buttonClick), Seq(box)).render().handledEventsIterator.toList
+
+    handledEvents(1).renderedChanges should be(Seq(t1.withRows(Seq(Seq(s"changed 6")))))
