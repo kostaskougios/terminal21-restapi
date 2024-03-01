@@ -44,7 +44,7 @@ class Controller(
     )
 
   private def renderChangesEventHandler: PartialFunction[ControllerEvent[_], Handled[_]] =
-    case ControllerClientEvent(h, RenderChangesEvent(changes), _) =>
+    case ControllerClientEvent(h, RenderChangesEvent(changes)) =>
       h.copy(renderedChanges = h.renderedChanges ++ changes)
 
   def onEvent(handler: EventHandler) =
@@ -78,16 +78,16 @@ class RenderedController(
       .foldLeft(initHandled): (h, f) =>
         event match
           case OnClick(key)         =>
-            val e = ControllerClickEvent(componentsByKey(key), h, h.model)
+            val e = ControllerClickEvent(componentsByKey(key), h)
             if f.isDefinedAt(e) then f(e).asInstanceOf[Handled[A]] else h
           case OnChange(key, value) =>
             val receivedBy = componentsByKey(key)
             val e          = receivedBy match
-              case _: OnChangeEventHandler.CanHandleOnChangeEvent        => ControllerChangeEvent(receivedBy, h, value, h.model)
-              case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean, h.model)
+              case _: OnChangeEventHandler.CanHandleOnChangeEvent        => ControllerChangeEvent(receivedBy, h, value)
+              case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean)
             if f.isDefinedAt(e) then f(e).asInstanceOf[Handled[A]] else h
           case ce: ClientEvent      =>
-            val e = ControllerClientEvent(h, ce, h.model)
+            val e = ControllerClientEvent(h, ce)
             if f.isDefinedAt(e) then f(e).asInstanceOf[Handled[A]] else h
           case x                    => throw new IllegalStateException(s"Unexpected state $x")
 
@@ -121,19 +121,19 @@ class RenderedController(
         val handlers   = clickHandlers(key)
         val receivedBy = componentsByKey(key)
         val handled    = handlers.foldLeft(h): (handled, handler) =>
-          handler(ControllerClickEvent(receivedBy, handled, handled.model))
+          handler(ControllerClickEvent(receivedBy, handled))
         handled
       case OnChange(key, value) if changeHandlers.contains(key)        =>
         val handlers   = changeHandlers(key)
         val receivedBy = componentsByKey(key)
         val handled    = handlers.foldLeft(h): (handled, handler) =>
-          handler(ControllerChangeEvent(receivedBy, handled, value, handled.model))
+          handler(ControllerChangeEvent(receivedBy, handled, value))
         handled
       case OnChange(key, value) if changeBooleanHandlers.contains(key) =>
         val handlers   = changeBooleanHandlers(key)
         val receivedBy = componentsByKey(key)
         val handled    = handlers.foldLeft(h): (handled, handler) =>
-          handler(ControllerChangeBooleanEvent(receivedBy, handled, value.toBoolean, handled.model))
+          handler(ControllerChangeBooleanEvent(receivedBy, handled, value.toBoolean))
         handled
       case ModelChangeEvent(model, newValue) if model == h.mm          =>
         h.withModel(model, newValue)
@@ -226,15 +226,15 @@ class RenderedController(
     )
 
 sealed trait ControllerEvent[M]:
-  def model: M
+  def model: M = handled.model
   def handled: Handled[M]
 
-case class ControllerClickEvent[M](clicked: UiElement, handled: Handled[M], model: M) extends ControllerEvent[M]
+case class ControllerClickEvent[M](clicked: UiElement, handled: Handled[M]) extends ControllerEvent[M]
 
-case class ControllerChangeEvent[M](changed: UiElement, handled: Handled[M], newValue: String, model: M) extends ControllerEvent[M]
+case class ControllerChangeEvent[M](changed: UiElement, handled: Handled[M], newValue: String) extends ControllerEvent[M]
 
-case class ControllerChangeBooleanEvent[M](changed: UiElement, handled: Handled[M], newValue: Boolean, model: M) extends ControllerEvent[M]
-case class ControllerClientEvent[M](handled: Handled[M], event: ClientEvent, model: M)                           extends ControllerEvent[M]
+case class ControllerChangeBooleanEvent[M](changed: UiElement, handled: Handled[M], newValue: Boolean) extends ControllerEvent[M]
+case class ControllerClientEvent[M](handled: Handled[M], event: ClientEvent)                           extends ControllerEvent[M]
 
 case class Handled[M](
     mm: Model[M],

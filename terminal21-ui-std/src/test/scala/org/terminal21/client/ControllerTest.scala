@@ -54,8 +54,8 @@ class ControllerTest extends AnyFunSuiteLike:
     import Givens.intModel
     newController(intModel, 0, Seq(buttonClick), Seq(button))
       .onEvent:
-        case ControllerClickEvent[Int @unchecked](_, handled, model) =>
-          if model > 1 then handled.terminate else handled.withModel(model + 1)
+        case ControllerClickEvent[Int @unchecked](_, handled) =>
+          if handled.model > 1 then handled.terminate else handled.withModel(handled.model + 1)
       .render()
       .handledEventsIterator
       .map(_.model)
@@ -65,8 +65,8 @@ class ControllerTest extends AnyFunSuiteLike:
     import Givens.intModel
     newController(intModel, 0, Seq(inputChange), Seq(input))
       .onEvent:
-        case ControllerChangeEvent[Int @unchecked](_, handled, newValue, model) =>
-          if model > 1 then handled.terminate else handled.withModel(model + 1)
+        case ControllerChangeEvent[Int @unchecked](_, handled, newValue) =>
+          if handled.model > 1 then handled.terminate else handled.withModel(handled.model + 1)
       .render()
       .handledEventsIterator
       .map(_.model)
@@ -114,7 +114,7 @@ class ControllerTest extends AnyFunSuiteLike:
     import Givens.intModel
     newController(intModel, 0, Seq(TestClientEvent(5)), Seq(button))
       .onEvent:
-        case ControllerClientEvent[Int @unchecked](handled, event: TestClientEvent, _) =>
+        case ControllerClientEvent[Int @unchecked](handled, event: TestClientEvent) =>
           handled.withModel(event.i).terminate
       .render()
       .handledEventsIterator
@@ -125,7 +125,7 @@ class ControllerTest extends AnyFunSuiteLike:
     import Givens.intModel
     newController(intModel, 0, Seq(TestClientEvent(5)), Seq(button))
       .onEvent:
-        case ControllerClickEvent[Int @unchecked](`checkbox`, handled, _) =>
+        case ControllerClickEvent[Int @unchecked](`checkbox`, handled) =>
           handled.withModel(5).terminate
       .render()
       .handledEventsIterator
@@ -182,7 +182,7 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(intModel, 0, Seq(buttonClick, buttonClick, buttonClick), Seq(button))
       .onEvent:
         case event: ControllerEvent[Int @unchecked] =>
-          if event.model > 1 then event.handled.terminate.withModel(100) else event.handled.withModel(event.model + 1)
+          if event.handled.model > 1 then event.handled.terminate.withModel(100) else event.handled.withModel(event.handled.model + 1)
       .render()
       .handledEventsIterator
       .map(_.model)
@@ -291,7 +291,7 @@ class ControllerTest extends AnyFunSuiteLike:
 
   test("ModelChangeEvent"):
     import Givens.given
-    val handledEvents = newControllerWith(Seq(stringModel -> "v",intModel -> 5), Seq(ModelChangeEvent(intModel, 6)), Nil).render().handledEventsIterator.toList
+    val handledEvents = newControllerWith(Seq(stringModel -> "v", intModel -> 5), Seq(ModelChangeEvent(intModel, 6)), Nil).render().handledEventsIterator.toList
     handledEvents(1).modelOf(intModel) should be(6)
 
   test("onModelChange for different model"):
