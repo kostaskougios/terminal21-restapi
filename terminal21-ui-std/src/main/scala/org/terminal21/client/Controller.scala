@@ -166,7 +166,7 @@ class RenderedController(
       )
     )
 
-  private def renderChangesWhenModelChanges[A](
+  private def changesToRenderWhenModelChanges[A](
       oldHandled: Handled[A],
       newHandled: Handled[A],
       componentsByKey: ComponentsByKey
@@ -215,7 +215,7 @@ class RenderedController(
                   val oldHandled                    = oldHandledEvent.toHandled(model).copy(renderedChanges = Nil)
                   val handled2                      = invokeEventHandlers(oldHandled, oldHandledEvent.componentsByKey, event)
                   val handled3                      = invokeComponentEventHandlers(handled2, oldHandledEvent.componentsByKey, event)
-                  val (componentsByKey, newHandled) = renderChangesWhenModelChanges(oldHandled, handled3, oldHandledEvent.componentsByKey)
+                  val (componentsByKey, newHandled) = changesToRenderWhenModelChanges(oldHandled, handled3, oldHandledEvent.componentsByKey)
                   if newHandled.renderedChanges.nonEmpty then renderChanges(newHandled.renderedChanges)
                   oldHandledEvent.copy(
                     modelValues = newHandled.modelValues,
