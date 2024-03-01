@@ -22,8 +22,8 @@ class ControllerTest extends AnyFunSuiteLike:
   val checkBoxChange     = OnChange(checkbox.key, "true")
   given ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
 
-  val intModel    = Model[Int]
-  val stringModel = Model[String]
+  val intModel    = Model[Int]("int-model")
+  val stringModel = Model[String]("string-model")
 
   def newController[M](
       initialModel: Model[M],

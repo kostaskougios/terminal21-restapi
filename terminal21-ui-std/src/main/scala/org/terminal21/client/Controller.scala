@@ -9,6 +9,8 @@ import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEv
 import org.terminal21.collections.{TMMap, TypedMap, TypedMapKey}
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
+import scala.reflect.{ClassTag, classTag}
+
 type EventHandler    = PartialFunction[ControllerEvent[_], Handled[_]]
 type ComponentsByKey = Map[String, UiElement]
 class Controller[M](
@@ -251,19 +253,21 @@ type OnClickEventHandlerFunction[M]         = ControllerClickEvent[M] => Handled
 type OnChangeEventHandlerFunction[M]        = ControllerChangeEvent[M] => Handled[M]
 type OnChangeBooleanEventHandlerFunction[M] = ControllerChangeBooleanEvent[M] => Handled[M]
 
-class Model[M]:
+class Model[M](name: String):
   type OnModelChangeFunction = (UiElement, M) => UiElement
   object ModelKey         extends TypedMapKey[M]
   object OnModelChangeKey extends TypedMapKey[OnModelChangeFunction]
   object ClickKey         extends TypedMapKey[Seq[OnClickEventHandlerFunction[M]]]
   object ChangeKey        extends TypedMapKey[Seq[OnChangeEventHandlerFunction[M]]]
   object ChangeBooleanKey extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]
+  override def toString = s"Model($name)"
 
 object Model:
-  def apply[M]: Model[M] = new Model[M]
+  def apply[M: ClassTag]: Model[M]     = new Model[M](classTag[M].runtimeClass.getName)
+  def apply[M](name: String): Model[M] = new Model[M](name)
   object Standard:
-    given unitModel: Model[Unit]       = Model[Unit]
-    given booleanModel: Model[Boolean] = Model[Boolean]
+    given unitModel: Model[Unit]       = Model[Unit]("unit")
+    given booleanModel: Model[Boolean] = Model[Boolean]("boolean")
 
 case class RenderChangesEvent(changes: Seq[UiElement])       extends ClientEvent
 case class ModelChangeEvent[M](model: Model[M], newValue: M) extends ClientEvent
