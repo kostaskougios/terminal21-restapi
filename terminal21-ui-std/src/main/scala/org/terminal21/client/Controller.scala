@@ -21,7 +21,7 @@ class Controller(
     initialModelValues: Map[Model[Any], Any],
     eventHandlers: Seq[EventHandler]
 ):
-  def model[M](using model: Model[M])(value: M): Controller =
+  def model[M](model: Model[M], value: M): Controller =
     new Controller(
       eventIteratorFactory,
       renderChanges,
@@ -34,7 +34,7 @@ class Controller(
     initialModelValues
       .flatMap: (m, v) =>
         components.map: e =>
-          val ne = if e.hasModelChangeRenderHandler(using m) then e.fireModelChangeRender(using m)(v) else e
+          val ne = if e.hasModelChangeRenderHandler(m) then e.fireModelChangeRender(m)(v) else e
           ne match
             case ch: HasChildren => ch.withChildren(applyModelTo(ch.children)*)
             case x               => x
@@ -67,10 +67,10 @@ class Controller(
 object Controller:
 //  def apply[M](initialModel: Model[M], modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
 //    new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
-  def apply[M](initialValue: M, modelComponents: Seq[UiElement])(using initialModel: Model[M], session: ConnectedSession): Controller =
-    new Controller(session.eventIterator, session.renderChanges, modelComponents, Map(initialModel.asInstanceOf[Model[Any]] -> initialValue), Nil)
-  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller                                           =
-    apply((), modelComponents)(using Model.Standard.unitModel, session)
+  def apply[M](rootModel: Model[M], initialValue: M, modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller =
+    new Controller(session.eventIterator, session.renderChanges, modelComponents, Map(rootModel.asInstanceOf[Model[Any]] -> initialValue), Nil)
+  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller                                        =
+    apply(Model.Standard.unitModel, (), modelComponents)(using session)
 
 class RenderedController(
     eventIteratorFactory: => Iterator[CommandEvent],
@@ -264,7 +264,7 @@ case class HandledEvent(
     shouldTerminate: Boolean,
     renderedChanges: Seq[UiElement]
 ):
-  def model[A](using model: Model[A]): A        = modelOf(model)
+  def model[A](model: Model[A]): A              = modelOf(model)
   def modelOf[A](model: Model[A]): A            = modelValues(model.ModelKey)
   def toHandled[A](model: Model[A]): Handled[A] = Handled[A](model, modelValues, shouldTerminate, renderedChanges)
 
@@ -285,8 +285,7 @@ object Model:
   def apply[M: ClassTag]: Model[M]               = new Model[M](classTag[M].runtimeClass.getName)
   def apply[M: ClassTag](name: String): Model[M] = new Model[M](name)
   object Standard:
-    given unitModel: Model[Unit]       = Model[Unit]("unit")
-    given booleanModel: Model[Boolean] = Model[Boolean]("boolean")
+    val unitModel: Model[Unit] = Model[Unit]("unit")
 
 case class RenderChangesEvent(changes: Seq[UiElement])       extends ClientEvent
 case class ModelChangeEvent[M](model: Model[M], newValue: M) extends ClientEvent

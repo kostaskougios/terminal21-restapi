@@ -21,14 +21,14 @@ abstract class StdUiCalculation[OUT](
 )(using session: ConnectedSession, executor: FiberExecutor)
     extends Calculation[OUT]
     with UiComponent:
-  import Model.Standard.unitModel
+  private def model     = Model.Standard.unitModel
   private val running   = new AtomicBoolean(false)
   private val currentUi = new AtomicReference(dataUi)
 
   protected def updateUi(dataUi: UiElement & HasStyle) = currentUi.set(dataUi)
 
   lazy val badge  = Badge()
-  lazy val recalc = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick: event =>
+  lazy val recalc = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick(model): event =>
     import event.*
     if running.compareAndSet(false, true) then
       try
