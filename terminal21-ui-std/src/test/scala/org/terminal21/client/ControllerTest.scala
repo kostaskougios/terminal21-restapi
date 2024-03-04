@@ -364,10 +364,9 @@ class ControllerTest extends AnyFunSuiteLike:
     class PeopleComponent(people: Seq[Person]):
       val m = Model[Seq[Person]]("people-model")
 
-      val component = QuickTable()
-        .onModelChangeRender(m): (t, people) =>
-          val peopleComponents = people.map(p => new PersonComponent(p))
-          t.withRows(peopleComponents.map(p => Seq(p.component)))
+      val peopleComponents = people.map(p => new PersonComponent(p))
+      val component        = QuickTable("people")
+        .withRows(peopleComponents.map(p => Seq(p.component)))
 
     val people          = Seq(Person(10, "person 1"), Person(20, "person 2"))
     val peopleComponent = new PeopleComponent(people)
