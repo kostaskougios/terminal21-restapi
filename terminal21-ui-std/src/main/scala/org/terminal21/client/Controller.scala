@@ -101,20 +101,20 @@ class RenderedController(
   private def clickHandlersMap[A](allComponents: Seq[UiElement], h: Handled[A]): Map[String, Seq[OnClickEventHandlerFunction[A]]] =
     allComponents
       .collect:
-        case e: OnClickEventHandler.CanHandleOnClickEvent if e.dataStore.contains(h.mm.ClickKey) => (e.key, e.dataStore(h.mm.ClickKey))
+        case e: OnClickEventHandler.CanHandleOnClickEvent if e.dataStore.contains(h.mm.ClickEventHandlerKey) => (e.key, e.dataStore(h.mm.ClickEventHandlerKey))
       .toMap
 
   private def changeHandlersMap[A](allComponents: Seq[UiElement], h: Handled[A]): Map[String, Seq[OnChangeEventHandlerFunction[A]]] =
     allComponents
       .collect:
-        case e: OnChangeEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(h.mm.ChangeKey) => (e.key, e.dataStore(h.mm.ChangeKey))
+        case e: OnChangeEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(h.mm.ChangeEventHandlerKey) => (e.key, e.dataStore(h.mm.ChangeEventHandlerKey))
       .toMap
 
   private def changeBooleanHandlersMap[A](allComponents: Seq[UiElement], h: Handled[A]): Map[String, Seq[OnChangeBooleanEventHandlerFunction[A]]] =
     allComponents
       .collect:
-        case e: OnChangeBooleanEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(h.mm.ChangeBooleanKey) =>
-          (e.key, e.dataStore(h.mm.ChangeBooleanKey))
+        case e: OnChangeBooleanEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(h.mm.ChangeBooleanEventHandlerKey) =>
+          (e.key, e.dataStore(h.mm.ChangeBooleanEventHandlerKey))
       .toMap
 
   private def invokeComponentEventHandlers[A](h: Handled[A], componentsByKey: ComponentsByKey, event: CommandEvent): Handled[A] =
@@ -275,9 +275,9 @@ class Model[M: ClassTag](name: String):
   type OnModelChangeFunction = (UiElement, M) => UiElement
   object ModelKey               extends TypedMapKey[M]
   object OnModelChangeRenderKey extends TypedMapKey[OnModelChangeFunction]
-  object ClickKey               extends TypedMapKey[Seq[OnClickEventHandlerFunction[M]]]
-  object ChangeKey              extends TypedMapKey[Seq[OnChangeEventHandlerFunction[M]]]
-  object ChangeBooleanKey       extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]
+  object ClickEventHandlerKey               extends TypedMapKey[Seq[OnClickEventHandlerFunction[M]]]
+  object ChangeEventHandlerKey              extends TypedMapKey[Seq[OnChangeEventHandlerFunction[M]]]
+  object ChangeBooleanEventHandlerKey       extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]
   override def toString = s"Model($name)"
 
 object Model:

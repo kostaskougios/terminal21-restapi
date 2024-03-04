@@ -9,21 +9,21 @@ object OnClickEventHandler:
     this: UiElement =>
     if key.isEmpty then throw new IllegalStateException(s"clickables must have a stable key. Error occurred on $this")
     def onClick[M](model: Model[M])(h: OnClickEventHandlerFunction[M]): This =
-      val handlers = dataStore.getOrElse(model.ClickKey, Nil)
-      store(model.ClickKey, handlers :+ h)
+      val handlers = dataStore.getOrElse(model.ClickEventHandlerKey, Nil)
+      store(model.ClickEventHandlerKey, handlers :+ h)
 
 object OnChangeEventHandler:
   trait CanHandleOnChangeEvent:
     this: UiElement =>
     if key.isEmpty then throw new IllegalStateException(s"changeable must have a stable key. Error occurred on $this")
     def onChange[M](model: Model[M])(h: OnChangeEventHandlerFunction[M]): This =
-      val handlers = dataStore.getOrElse(model.ChangeKey, Nil)
-      store(model.ChangeKey, handlers :+ h)
+      val handlers = dataStore.getOrElse(model.ChangeEventHandlerKey, Nil)
+      store(model.ChangeEventHandlerKey, handlers :+ h)
 
 object OnChangeBooleanEventHandler:
   trait CanHandleOnChangeEvent:
     this: UiElement =>
     if key.isEmpty then throw new IllegalStateException(s"changeable must have a stable key. Error occurred on $this")
     def onChange[M](model: Model[M])(h: OnChangeBooleanEventHandlerFunction[M]): This =
-      val handlers = dataStore.getOrElse(model.ChangeBooleanKey, Nil)
-      store(model.ChangeBooleanKey, handlers :+ h)
+      val handlers = dataStore.getOrElse(model.ChangeBooleanEventHandlerKey, Nil)
+      store(model.ChangeBooleanEventHandlerKey, handlers :+ h)
