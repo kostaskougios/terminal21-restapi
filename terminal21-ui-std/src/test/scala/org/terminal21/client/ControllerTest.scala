@@ -307,7 +307,7 @@ class ControllerTest extends AnyFunSuiteLike:
     handledEvents(1).renderedChanges should be(Seq(b1.withText("changed 6")))
 
   test("onModelChange but no change to element"):
-    val b1 = button.onModelChangeRender(intModel): (b, m) =>
+    val b1 = button.onModelChangeRender(intModel): (b, _) =>
       b
 
     val handledEvents = newController(stringModel, "v", Seq(ModelChangeEvent(intModel, 6)), Seq(b1)).render().handledEventsIterator.toList
