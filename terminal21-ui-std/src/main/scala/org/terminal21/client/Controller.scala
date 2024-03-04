@@ -45,6 +45,8 @@ case class Events(event: CommandEvent):
     case OnClick(key) => key == e.key
     case _            => false
 
+  def ifClicked[V](e: UiElement, value: => V): Option[V] = if isClicked(e) then Some(value) else None
+
   def changedValue(e: UiElement): Option[String] = event match
     case OnChange(key, value) if key == e.key => Some(value)
     case _                                    => None
