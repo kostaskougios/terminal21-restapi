@@ -350,27 +350,30 @@ class ControllerTest extends AnyFunSuiteLike:
     handledEvents(1).renderedChanges should be(Seq(t1.withRows(Seq(Seq(s"changed 6")))))
 
   test("onChildModelChange"):
+    case class Events(key: String):
+      def changedValue(e: UiElement): Option[String] = ???
+    case class MV[M](model: M, view: UiElement)
+
     case class Person(id: Int, name: String)
-    class PersonComponent(person: Person):
-      val m         = Model[Person](person)
+    def personComponent(person: Person, events: Events): MV[Person] =
+      val nameInput = Input(s"person-${person.id}", defaultValue = person.name)
       val component = Box()
         .withChildren(
           Text(text = "Name"),
-          Input(s"person-${person.id}", defaultValue = person.name)
-            .onChange(m): event =>
-              import event.*
-              handled.withModel(model.copy(name = newValue))
+          nameInput
         )
-    class PeopleComponent(people: Seq[Person]):
-      val m = Model[Seq[Person]]("people-model", people)
+      MV(
+        person.copy(
+          name = events.changedValue(nameInput).getOrElse(person.name)
+        ),
+        component
+      )
 
-      val peopleComponents = people.map(p => new PersonComponent(p))
+    def peopleComponent(people: Seq[Person], events: Events): MV[Seq[Person]] =
+      val peopleComponents = people.map(p => personComponent(p, events))
       val component        = QuickTable("people")
-        .withRows(peopleComponents.map(p => Seq(p.component)))
+        .withRows(peopleComponents.map(p => Seq(p.view)))
+      MV(peopleComponents.map(_.model), component)
 
-    val people          = Seq(Person(10, "person 1"), Person(20, "person 2"))
-    val peopleComponent = new PeopleComponent(people)
-    val session         = mock[ConnectedSession]
-    newController(peopleComponent.m, people, Nil, Seq(peopleComponent.component))
-      .render()(using session)
-    verify(session).render(Seq(peopleComponent.component.withRows(Nil)))
+    val people = Seq(Person(10, "person 1"), Person(20, "person 2"))
+    val pc     = peopleComponent(people, Events("x"))
