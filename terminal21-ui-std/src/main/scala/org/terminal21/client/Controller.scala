@@ -107,7 +107,8 @@ class RenderedController(
   private def changeHandlersMap[A](allComponents: Seq[UiElement], h: Handled[A]): Map[String, Seq[OnChangeEventHandlerFunction[A]]] =
     allComponents
       .collect:
-        case e: OnChangeEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(h.mm.ChangeEventHandlerKey) => (e.key, e.dataStore(h.mm.ChangeEventHandlerKey))
+        case e: OnChangeEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(h.mm.ChangeEventHandlerKey) =>
+          (e.key, e.dataStore(h.mm.ChangeEventHandlerKey))
       .toMap
 
   private def changeBooleanHandlersMap[A](allComponents: Seq[UiElement], h: Handled[A]): Map[String, Seq[OnChangeBooleanEventHandlerFunction[A]]] =
@@ -208,19 +209,20 @@ class RenderedController(
         .scanLeft(initHandledEvent):
           case (ohEvent, event) =>
             try
-              ohEvent.models.foldLeft(ohEvent):
+              val nhEvent = ohEvent.models.foldLeft(ohEvent):
                 case (oldHandledEvent, model) =>
                   val oldHandled                    = oldHandledEvent.toHandled(model).copy(renderedChanges = Nil)
                   val handled2                      = invokeEventHandlers(oldHandled, oldHandledEvent.componentsByKey, event)
                   val handled3                      = invokeComponentEventHandlers(handled2, oldHandledEvent.componentsByKey, event)
                   val (componentsByKey, newHandled) = changesToRenderWhenModelChanges(oldHandled, handled3, oldHandledEvent.componentsByKey)
-                  if newHandled.renderedChanges.nonEmpty then renderChanges(newHandled.renderedChanges)
                   oldHandledEvent.copy(
                     modelValues = newHandled.modelValues,
                     componentsByKey = componentsByKey,
                     shouldTerminate = newHandled.shouldTerminate,
                     renderedChanges = newHandled.renderedChanges
                   )
+              if nhEvent.renderedChanges.nonEmpty then renderChanges(nhEvent.renderedChanges)
+              nhEvent
             catch
               case t: Throwable =>
                 logger.error("an error occurred while iterating events", t)
@@ -273,11 +275,11 @@ type OnChangeBooleanEventHandlerFunction[M] = ControllerChangeBooleanEvent[M] =>
 
 class Model[M: ClassTag](name: String):
   type OnModelChangeFunction = (UiElement, M) => UiElement
-  object ModelKey               extends TypedMapKey[M]
-  object OnModelChangeRenderKey extends TypedMapKey[OnModelChangeFunction]
-  object ClickEventHandlerKey               extends TypedMapKey[Seq[OnClickEventHandlerFunction[M]]]
-  object ChangeEventHandlerKey              extends TypedMapKey[Seq[OnChangeEventHandlerFunction[M]]]
-  object ChangeBooleanEventHandlerKey       extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]
+  object ModelKey                     extends TypedMapKey[M]
+  object OnModelChangeRenderKey       extends TypedMapKey[OnModelChangeFunction]
+  object ClickEventHandlerKey         extends TypedMapKey[Seq[OnClickEventHandlerFunction[M]]]
+  object ChangeEventHandlerKey        extends TypedMapKey[Seq[OnChangeEventHandlerFunction[M]]]
+  object ChangeBooleanEventHandlerKey extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]
   override def toString = s"Model($name)"
 
 object Model:

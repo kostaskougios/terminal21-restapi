@@ -6,7 +6,7 @@ import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatestplus.mockito.MockitoSugar.*
 import org.terminal21.client.components.UiElement
-import org.terminal21.client.components.chakra.{Box, Button, Checkbox, QuickTable}
+import org.terminal21.client.components.chakra.{Box, Button, Checkbox, QuickTable, Text}
 import org.terminal21.client.components.std.{Input, Paragraph}
 import org.terminal21.collections.SEList
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
@@ -348,3 +348,30 @@ class ControllerTest extends AnyFunSuiteLike:
     val handledEvents = newController(intModel, 5, Seq(buttonClick), Seq(box)).render().handledEventsIterator.toList
 
     handledEvents(1).renderedChanges should be(Seq(t1.withRows(Seq(Seq(s"changed 6")))))
+
+  test("onChildModelChange"):
+    case class Person(id: Int, name: String)
+    class PersonComponent(person: Person):
+      val m         = Model[Person]("person")
+      val component = Box()
+        .withChildren(
+          Text(text = "Name"),
+          Input(s"person-${person.id}", defaultValue = person.name)
+            .onChange(m): event =>
+              import event.*
+              handled.withModel(model.copy(name = newValue))
+        )
+    class PeopleComponent(people: Seq[Person]):
+      val m = Model[Seq[Person]]("people-model")
+
+      val component = QuickTable()
+        .onModelChangeRender(m): (t, people) =>
+          val peopleComponents = people.map(p => new PersonComponent(p))
+          t.withRows(peopleComponents.map(p => Seq(p.component)))
+
+    val people          = Seq(Person(10, "person 1"), Person(20, "person 2"))
+    val peopleComponent = new PeopleComponent(people)
+    val session         = mock[ConnectedSession]
+    newController(peopleComponent.m, people, Nil, Seq(peopleComponent.component))
+      .render()(using session)
+    verify(session).render(Seq(peopleComponent.component.withRows(Nil)))
