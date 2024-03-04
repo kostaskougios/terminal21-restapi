@@ -25,57 +25,57 @@ class AppManager(serverSideSessions: ServerSideSessions, fiberExecutor: FiberExe
 
 class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(using session: ConnectedSession):
   case class ManagerModel(startApp: Option[ServerSideApp] = None)
-  given Model[ManagerModel] = Model(ManagerModel())
 
   def run(): Unit =
     eventsIterator.foreach(_ => ())
 
-  val appRows: Seq[Seq[UiElement]] = apps.map: app =>
-    Seq(
-      Link(key = s"app-${app.name}", text = app.name).onClick: event =>
-        import event.*
-        handled.withModel(model.copy(startApp = Some(app)))
-      ,
-      Text(text = app.description)
+  def appRows(events: Events): Seq[MV[Option[ServerSideApp]]] = apps.map: app =>
+    val link = Link(key = s"app-${app.name}", text = app.name)
+    MV(
+      if events.isClicked(link) then Some(app) else None,
+      Box().withChildren(
+        link,
+        Text(text = app.description)
+      )
     )
 
-  def components: Seq[UiElement] =
+  def components(model: ManagerModel, events: Events): MV[ManagerModel] =
+    val appsMv    = appRows(events)
     val appsTable = QuickTable(
       key = "apps-table",
       caption = Some("Apps installed on the server, click one to run it."),
-      rows = appRows
+      rows = appsMv.map(m => Seq(m.view))
     ).withHeaders("App Name", "Description")
-
-    Seq(
-      Header1(text = "Terminal 21 Manager"),
-      Paragraph(
-        text = """
-                |Here you can run all the installed apps on the server.""".stripMargin
-      ),
-      appsTable,
-      Paragraph().withChildren(
-        Span(text = "Have a question? Please ask at "),
-        Link(
-          key = "discussion-board-link",
-          text = "terminal21's discussion board ",
-          href = "https://github.com/kostaskougios/terminal21-restapi/discussions",
-          color = Some("teal.500"),
-          isExternal = Some(true)
-        ).withChildren(ExternalLinkIcon(mx = Some("2px")))
+    val startApp  = appsMv.map(_.model).find(_.nonEmpty).flatten
+    MV(
+      model.copy(startApp = startApp),
+      Box().withChildren(
+        Header1(text = "Terminal 21 Manager"),
+        Paragraph(
+          text = """
+                    |Here you can run all the installed apps on the server.""".stripMargin
+        ),
+        appsTable,
+        Paragraph().withChildren(
+          Span(text = "Have a question? Please ask at "),
+          Link(
+            key = "discussion-board-link",
+            text = "terminal21's discussion board ",
+            href = "https://github.com/kostaskougios/terminal21-restapi/discussions",
+            color = Some("teal.500"),
+            isExternal = Some(true)
+          ).withChildren(ExternalLinkIcon(mx = Some("2px")))
+        )
       )
     )
 
   def controller: Controller[ManagerModel] =
     Controller(components)
-      .onEvent: event =>
-        import event.*
-        // for every event, reset the startApp so that it doesn't start the same app on each event
-        handled.withModel(model.copy(startApp = None))
 
   def eventsIterator: Iterator[ManagerModel] =
     controller
-      .render()
-      .handledEventsIterator
+      .render(ManagerModel())
+      .iterator
       .map(_.model)
       .tapEach: m =>
         for app <- m.startApp do startApp(app)

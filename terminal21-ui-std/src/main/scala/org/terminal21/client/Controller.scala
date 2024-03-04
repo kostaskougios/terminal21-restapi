@@ -1,292 +1,57 @@
 package org.terminal21.client
 
-import org.slf4j.LoggerFactory
 import org.terminal21.client.collections.EventIterator
-import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
-import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
-import org.terminal21.client.components.UiElement.HasChildren
-import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, OnClickEventHandler, UiElement}
-import org.terminal21.collections.{TMMap, TypedMap, TypedMapKey}
+import org.terminal21.client.components.UiElement
+import org.terminal21.client.components.chakra.Box
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
-import scala.reflect.{ClassTag, classTag}
+type ModelViewMaterialized[M] = (M, Events) => MV[M]
 
-type EventHandler    = PartialFunction[ControllerEvent[_], Handled[_]]
-type ComponentsByKey = Map[String, UiElement]
-
-class Controller(
+class Controller[M](
     eventIteratorFactory: => Iterator[CommandEvent],
     renderChanges: Seq[UiElement] => Unit,
-    modelComponents: Seq[UiElement],
-    initialModelValues: Map[Model[Any], Any],
-    eventHandlers: Seq[EventHandler]
+    materializer: ModelViewMaterialized[M]
 ):
-  def withModel[M](model: Model[M], value: M): Controller =
-    new Controller(
-      eventIteratorFactory,
-      renderChanges,
-      modelComponents,
-      initialModelValues + (model.asInstanceOf[Model[Any]] -> value),
-      eventHandlers
-    )
-
-  private def applyModelTo(components: Seq[UiElement]): Seq[UiElement] =
-    components.map: c =>
-      initialModelValues.foldLeft(c):
-        case (e, (m, v)) =>
-          val ne = if e.hasModelChangeRenderHandler(m) then e.fireModelChangeRender(m)(v) else e
-          ne match
-            case ch: HasChildren => ch.withChildren(applyModelTo(ch.children)*)
-            case x               => x
-
-  def render()(using session: ConnectedSession): RenderedController =
-    val elements = applyModelTo(modelComponents)
-    session.render(elements)
-    new RenderedController(
-      eventIteratorFactory,
-      initialModelValues,
-      elements,
-      renderChanges,
-      eventHandlers :+ renderChangesEventHandler
-    )
-
-  private def renderChangesEventHandler: PartialFunction[ControllerEvent[_], Handled[_]] =
-    case ControllerClientEvent(h, RenderChangesEvent(changes)) =>
-      h.copy(renderedChanges = h.renderedChanges ++ changes)
-
-  def onEvent(handler: EventHandler) =
-    new Controller(
-      eventIteratorFactory,
-      renderChanges,
-      modelComponents,
-      initialModelValues,
-      eventHandlers :+ handler
-    )
+  def render(initialModel: M): RenderedController[M] =
+    val mv = materializer(initialModel, Events.Empty)
+    renderChanges(Seq(mv.view))
+    new RenderedController(eventIteratorFactory, renderChanges, materializer, mv)
 
 object Controller:
-//  def apply[M](initialModel: Model[M], modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller[M] =
-//    new Controller(session.eventIterator, session.renderChanges, modelComponents, initialModel, Nil)
-  def apply[M](rootModel: Model[M], initialValue: M, modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller =
-    new Controller(session.eventIterator, session.renderChanges, modelComponents, Map(rootModel.asInstanceOf[Model[Any]] -> initialValue), Nil)
-  def noModel(modelComponents: Seq[UiElement])(using session: ConnectedSession): Controller                                        =
-    apply(Model.Standard.unitModel, (), modelComponents)(using session)
+  def apply[M](materializer: ModelViewMaterialized[M])(using session: ConnectedSession): Controller[M] =
+    new Controller(session.eventIterator, session.renderChanges, materializer)
 
-class RenderedController(
+  def noModel(components: Seq[UiElement])(using session: ConnectedSession) =
+    apply((Unit, Events) => MV((), Box().withChildren(components*)))
+
+class RenderedController[M](
     eventIteratorFactory: => Iterator[CommandEvent],
-    initialModelValues: Map[Model[Any], Any],
-    initialComponents: Seq[UiElement],
     renderChanges: Seq[UiElement] => Unit,
-    eventHandlers: Seq[EventHandler]
+    materializer: ModelViewMaterialized[M],
+    initialMv: MV[M]
 ):
-  private val logger = LoggerFactory.getLogger(getClass)
+  def iterator: EventIterator[MV[M]] = new EventIterator[MV[M]](
+    eventIteratorFactory
+      .takeWhile(_.isSessionClosed)
+      .scanLeft(initialMv): (mv, e) =>
+        val events = Events(e)
+        val newMv  = materializer(mv.model, events)
+        renderChanges(Seq(newMv.view))
+        newMv
+  )
 
-  private def invokeEventHandlers[A](initHandled: Handled[A], componentsByKey: ComponentsByKey, event: CommandEvent): Handled[A] =
-    eventHandlers
-      .foldLeft(initHandled): (h, f) =>
-        event match
-          case OnClick(key)         =>
-            val e = ControllerClickEvent(componentsByKey(key), h)
-            if f.isDefinedAt(e) then f(e).asInstanceOf[Handled[A]] else h
-          case OnChange(key, value) =>
-            val receivedBy = componentsByKey(key)
-            val e          = receivedBy match
-              case _: OnChangeEventHandler.CanHandleOnChangeEvent        => ControllerChangeEvent(receivedBy, h, value)
-              case _: OnChangeBooleanEventHandler.CanHandleOnChangeEvent => ControllerChangeBooleanEvent(receivedBy, h, value.toBoolean)
-            if f.isDefinedAt(e) then f(e).asInstanceOf[Handled[A]] else h
-          case ce: ClientEvent      =>
-            val e = ControllerClientEvent(h, ce)
-            if f.isDefinedAt(e) then f(e).asInstanceOf[Handled[A]] else h
-          case x                    => throw new IllegalStateException(s"Unexpected state $x")
+case class Events(event: CommandEvent):
+  def isClicked(e: UiElement): Boolean = event match
+    case OnClick(key) => key == e.key
+    case _            => false
 
-  private def clickHandlersMap[A](allComponents: Seq[UiElement], h: Handled[A]): Map[String, Seq[OnClickEventHandlerFunction[A]]] =
-    allComponents
-      .collect:
-        case e: OnClickEventHandler.CanHandleOnClickEvent if e.dataStore.contains(h.mm.ClickEventHandlerKey) => (e.key, e.dataStore(h.mm.ClickEventHandlerKey))
-      .toMap
+  def changedValue(e: UiElement): Option[String] = event match
+    case OnChange(key, value) if key == e.key => Some(value)
+    case _                                    => None
 
-  private def changeHandlersMap[A](allComponents: Seq[UiElement], h: Handled[A]): Map[String, Seq[OnChangeEventHandlerFunction[A]]] =
-    allComponents
-      .collect:
-        case e: OnChangeEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(h.mm.ChangeEventHandlerKey) =>
-          (e.key, e.dataStore(h.mm.ChangeEventHandlerKey))
-      .toMap
+object Events:
+  case object InitialRender extends ClientEvent
 
-  private def changeBooleanHandlersMap[A](allComponents: Seq[UiElement], h: Handled[A]): Map[String, Seq[OnChangeBooleanEventHandlerFunction[A]]] =
-    allComponents
-      .collect:
-        case e: OnChangeBooleanEventHandler.CanHandleOnChangeEvent if e.dataStore.contains(h.mm.ChangeBooleanEventHandlerKey) =>
-          (e.key, e.dataStore(h.mm.ChangeBooleanEventHandlerKey))
-      .toMap
+  val Empty = Events(InitialRender)
 
-  private def invokeComponentEventHandlers[A](h: Handled[A], componentsByKey: ComponentsByKey, event: CommandEvent): Handled[A] =
-    val allComponents              = componentsByKey.values.toList
-    lazy val clickHandlers         = clickHandlersMap(allComponents, h)
-    lazy val changeHandlers        = changeHandlersMap(allComponents, h)
-    lazy val changeBooleanHandlers = changeBooleanHandlersMap(allComponents, h)
-    event match
-      case OnClick(key) if clickHandlers.contains(key)                 =>
-        val handlers   = clickHandlers(key)
-        val receivedBy = componentsByKey(key)
-        val handled    = handlers.foldLeft(h): (handled, handler) =>
-          handler(ControllerClickEvent(receivedBy, handled))
-        handled
-      case OnChange(key, value) if changeHandlers.contains(key)        =>
-        val handlers   = changeHandlers(key)
-        val receivedBy = componentsByKey(key)
-        val handled    = handlers.foldLeft(h): (handled, handler) =>
-          handler(ControllerChangeEvent(receivedBy, handled, value))
-        handled
-      case OnChange(key, value) if changeBooleanHandlers.contains(key) =>
-        val handlers   = changeBooleanHandlers(key)
-        val receivedBy = componentsByKey(key)
-        val handled    = handlers.foldLeft(h): (handled, handler) =>
-          handler(ControllerChangeBooleanEvent(receivedBy, handled, value.toBoolean))
-        handled
-      case ModelChangeEvent(model, newValue) if model == h.mm          =>
-        h.withModel(model, newValue)
-      case _                                                           => h
-
-  private def checkForDuplicatesAndThrow(components: Seq[UiElement]): Unit =
-    val duplicates = components.groupBy(_.key).filter(_._2.size > 1).keys.toSet
-    if duplicates.nonEmpty then
-      val duplicateComponents = components.filter(e => duplicates.contains(e.key))
-      throw new IllegalArgumentException(s"Duplicate(s) found: ${duplicates.mkString(", ")}\nDuplicate components:\n${duplicateComponents.mkString("\n")}")
-
-  private def calcComponentsByKeyMap(components: Seq[UiElement]): Map[String, UiElement] =
-    val flattened = components
-      .flatMap(_.flat)
-    checkForDuplicatesAndThrow(flattened)
-    val all       = flattened
-      .map(c => (c.key, c))
-      .toMap
-    all.withDefault(key =>
-      throw new IllegalArgumentException(
-        s"Component with key=$key is not available. Here are all available components:\n${all.values.map(_.toSimpleString).mkString("\n")}"
-      )
-    )
-
-  private def changesToRenderWhenModelChanges[A](
-      oldHandled: Handled[A],
-      newHandled: Handled[A],
-      componentsByKey: ComponentsByKey
-  ): (ComponentsByKey, Handled[A]) =
-    if oldHandled.modelOption == newHandled.modelOption then (componentsByKey, newHandled)
-    else
-      val changeFunctions =
-        for
-          e <- componentsByKey.values
-          f <- e.dataStore.get(newHandled.mm.OnModelChangeRenderKey)
-        yield (e, f)
-
-      val dsEmpty = TypedMap.empty
-      val changed = changeFunctions
-        .map: (e, f) =>
-          (e, f(e, newHandled.model))
-        .filter: (e, ne) =>
-          e.withDataStore(dsEmpty) != ne.withDataStore(dsEmpty)
-        .map(_._2)
-        .toList
-      (
-        componentsByKey ++ calcComponentsByKeyMap(changed),
-        newHandled.copy(renderedChanges = newHandled.renderedChanges ++ changed)
-      )
-
-  private def initialModelsMap: TypedMap =
-    val m = initialModelValues.map: (k, v) =>
-      (k.ModelKey, v)
-    new TypedMap(m.asInstanceOf[TMMap])
-
-  private def availableModels(componentsByKey: ComponentsByKey): Seq[Model[_]] =
-    (initialModelValues.keys.toList ++ componentsByKey.values.flatMap(_.handledModels).toList).distinct
-
-  def handledEventsIterator: EventIterator[HandledEvent] =
-    val initCompByKeyMap    = calcComponentsByKeyMap(initialComponents)
-    val initAvailableModels = availableModels(initCompByKeyMap)
-    val initHandledEvent    = HandledEvent(initAvailableModels, initialModelsMap, initCompByKeyMap, false, Nil)
-    new EventIterator(
-      eventIteratorFactory
-        .takeWhile(!_.isSessionClosed)
-        .scanLeft(initHandledEvent):
-          case (ohEvent, event) =>
-            try
-              val nhEvent = ohEvent.models.foldLeft(ohEvent):
-                case (oldHandledEvent, model) =>
-                  val oldHandled                    = oldHandledEvent.toHandled(model).copy(renderedChanges = Nil)
-                  val handled2                      = invokeEventHandlers(oldHandled, oldHandledEvent.componentsByKey, event)
-                  val handled3                      = invokeComponentEventHandlers(handled2, oldHandledEvent.componentsByKey, event)
-                  val (componentsByKey, newHandled) = changesToRenderWhenModelChanges(oldHandled, handled3, oldHandledEvent.componentsByKey)
-                  oldHandledEvent.copy(
-                    modelValues = newHandled.modelValues,
-                    componentsByKey = componentsByKey,
-                    shouldTerminate = newHandled.shouldTerminate,
-                    renderedChanges = newHandled.renderedChanges
-                  )
-              if nhEvent.renderedChanges.nonEmpty then renderChanges(nhEvent.renderedChanges)
-              nhEvent
-            catch
-              case t: Throwable =>
-                logger.error("an error occurred while iterating events", t)
-                ohEvent
-        .flatMap: h =>
-          // trick to make sure we take the last state of the model when shouldTerminate=true
-          if h.shouldTerminate then Seq(h.copy(shouldTerminate = false), h) else Seq(h)
-        .takeWhile(!_.shouldTerminate)
-    )
-
-sealed trait ControllerEvent[M]:
-  def model: M = handled.model
-  def handled: Handled[M]
-
-case class ControllerClickEvent[M](clicked: UiElement, handled: Handled[M]) extends ControllerEvent[M]
-
-case class ControllerChangeEvent[M](changed: UiElement, handled: Handled[M], newValue: String) extends ControllerEvent[M]
-
-case class ControllerChangeBooleanEvent[M](changed: UiElement, handled: Handled[M], newValue: Boolean) extends ControllerEvent[M]
-case class ControllerClientEvent[M](handled: Handled[M], event: ClientEvent)                           extends ControllerEvent[M]
-
-case class Handled[M](
-    mm: Model[M],
-    modelValues: TypedMap,
-    shouldTerminate: Boolean,
-    renderedChanges: Seq[UiElement]
-):
-  def model: M                                               = modelValues(mm.ModelKey)
-  def modelOption: Option[M]                                 = modelValues.get(mm.ModelKey)
-  def withModel(m: M): Handled[M]                            = copy(modelValues = modelValues + (mm.ModelKey -> m))
-  def withModel[A](model: Model[A], newValue: A): Handled[M] = copy(modelValues = modelValues + (model.ModelKey -> newValue))
-  def mapModel(f: M => M): Handled[M]                        = withModel(f(model))
-  def terminate: Handled[M]                                  = copy(shouldTerminate = true)
-  def withShouldTerminate(t: Boolean): Handled[M]            = copy(shouldTerminate = t)
-
-case class HandledEvent(
-    models: Seq[Model[_]],
-    modelValues: TypedMap,
-    componentsByKey: ComponentsByKey,
-    shouldTerminate: Boolean,
-    renderedChanges: Seq[UiElement]
-):
-  def model[A](model: Model[A]): A              = modelOf(model)
-  def modelOf[A](model: Model[A]): A            = modelValues(model.ModelKey)
-  def toHandled[A](model: Model[A]): Handled[A] = Handled[A](model, modelValues, shouldTerminate, renderedChanges)
-
-type OnClickEventHandlerFunction[M]         = ControllerClickEvent[M] => Handled[M]
-type OnChangeEventHandlerFunction[M]        = ControllerChangeEvent[M] => Handled[M]
-type OnChangeBooleanEventHandlerFunction[M] = ControllerChangeBooleanEvent[M] => Handled[M]
-
-class Model[M: ClassTag](name: String):
-  type OnModelChangeFunction = (UiElement, M) => UiElement
-  object ModelKey                     extends TypedMapKey[M]
-  object OnModelChangeRenderKey       extends TypedMapKey[OnModelChangeFunction]
-  object ClickEventHandlerKey         extends TypedMapKey[Seq[OnClickEventHandlerFunction[M]]]
-  object ChangeEventHandlerKey        extends TypedMapKey[Seq[OnChangeEventHandlerFunction[M]]]
-  object ChangeBooleanEventHandlerKey extends TypedMapKey[Seq[OnChangeBooleanEventHandlerFunction[M]]]
-  override def toString = s"Model($name)"
-
-object Model:
-  def apply[M: ClassTag]: Model[M]               = new Model[M](classTag[M].runtimeClass.getName)
-  def apply[M: ClassTag](name: String): Model[M] = new Model[M](name)
-  object Standard:
-    val unitModel: Model[Unit] = Model[Unit]("unit")
-
-case class RenderChangesEvent(changes: Seq[UiElement])       extends ClientEvent
-case class ModelChangeEvent[M](model: Model[M], newValue: M) extends ClientEvent
+case class MV[M](model: M, view: UiElement)

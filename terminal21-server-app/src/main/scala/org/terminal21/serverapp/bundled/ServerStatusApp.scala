@@ -25,8 +25,7 @@ class ServerStatusPage(
     sessionsService: ServerSessionsService
 )(using appSession: ConnectedSession, fiberExecutor: FiberExecutor):
   case class StatusModel(runtime: Runtime, sessions: Seq[Session])
-  val initModel            = StatusModel(Runtime.getRuntime, sessionsService.allSessions)
-  given Model[StatusModel] = Model(initModel)
+  val initModel = StatusModel(Runtime.getRuntime, sessionsService.allSessions)
 
   case class Ticker(sessions: Seq[Session]) extends ClientEvent
 
@@ -36,38 +35,38 @@ class ServerStatusPage(
         Thread.sleep(2000)
         appSession.fireEvents(Ticker(sessionsService.allSessions))
 
-    try controller.render().handledEventsIterator.lastOption
+    try controller.render(initModel).iterator.lastOption
     catch case t: Throwable => t.printStackTrace()
 
   private def toMb(v: Long) = s"${v / (1024 * 1024)} MB"
   private val xs            = Some("2xs")
 
   def controller: Controller[StatusModel] =
-    Controller(components).onEvent:
-      case ControllerClientEvent(handled, Ticker(sessions)) =>
-        handled.withModel(handled.model.copy(sessions = sessions))
+    Controller(components)
 
-  def components: Seq[UiElement] =
-    Seq(jvmTable, sessionsTable)
+  def components(model: StatusModel, events: Events): MV[StatusModel] =
+    MV(
+      model,
+      Box().withChildren(
+        jvmTable(model.runtime, events),
+        sessionsTable(model.sessions, events)
+      )
+    )
 
   private val jvmTableE = QuickTable(key = "jvmTable", caption = Some("JVM"))
     .withHeaders("Property", "Value", "Actions")
   private val gcButton  = Button(key = "gc-button", size = xs, text = "Run GC")
-    .onClick: event =>
-      System.gc()
-      event.handled
 
-  def jvmTable: UiElement =
-    jvmTableE.onModelChangeRender: (table, m) =>
-      val runtime = m.runtime
-      table.withRows(
-        Seq(
-          Seq("Free Memory", toMb(runtime.freeMemory()), ""),
-          Seq("Max Memory", toMb(runtime.maxMemory()), ""),
-          Seq("Total Memory", toMb(runtime.totalMemory()), gcButton),
-          Seq("Available processors", runtime.availableProcessors(), "")
-        )
+  def jvmTable(runtime: Runtime, events: Events): UiElement =
+    if events.isClicked(gcButton) then System.gc()
+    jvmTableE.withRows(
+      Seq(
+        Seq("Free Memory", toMb(runtime.freeMemory()), ""),
+        Seq("Max Memory", toMb(runtime.maxMemory()), ""),
+        Seq("Total Memory", toMb(runtime.totalMemory()), gcButton),
+        Seq("Available processors", runtime.availableProcessors(), "")
       )
+    )
 
   private val sessionsTableE =
     QuickTable(
@@ -75,33 +74,29 @@ class ServerStatusPage(
       caption = Some("All sessions")
     ).withHeaders("Id", "Name", "Is Open", "Actions")
 
-  def sessionsTable: UiElement =
-    sessionsTableE.onModelChangeRender: (table, m) =>
-      val sessions = m.sessions
-      table.withRows(
-        sessions.map: session =>
-          Seq(Text(text = session.id), Text(text = session.name), if session.isOpen then CheckIcon() else NotAllowedIcon(), actionsFor(session))
-      )
+  def sessionsTable(sessions: Seq[Session], events: Events): UiElement =
+    sessionsTableE.withRows(
+      sessions.map: session =>
+        Seq(Text(text = session.id), Text(text = session.name), if session.isOpen then CheckIcon() else NotAllowedIcon(), actionsFor(session, events))
+    )
 
-  private def actionsFor(session: Session): UiElement =
+  private def actionsFor(session: Session, events: Events): UiElement =
     if session.isOpen then
+      val closeButton = Button(key = s"close-${session.id}", text = "Close", size = xs)
+        .withLeftIcon(SmallCloseIcon())
+      if events.isClicked(closeButton) then sessionsService.terminateAndRemove(session)
+      val viewButton  = Button(key = s"view-${session.id}", text = "View State", size = xs)
+        .withLeftIcon(ChatIcon())
+      if events.isClicked(viewButton) then
+        serverSideSessions
+          .withNewSession(session.id + "-server-state", s"Server State:${session.id}")
+          .connect: sSession =>
+            new ViewServerStatePage(using sSession).runFor(sessionsService.sessionStateOf(session))
+
       Box().withChildren(
-        Button(key = s"close-${session.id}", text = "Close", size = xs)
-          .withLeftIcon(SmallCloseIcon())
-          .onClick: event =>
-            import event.*
-            sessionsService.terminateAndRemove(session)
-            handled
-        ,
+        closeButton,
         Text(text = " "),
-        Button(key = s"view-${session.id}", text = "View State", size = xs)
-          .withLeftIcon(ChatIcon())
-          .onClick: event =>
-            serverSideSessions
-              .withNewSession(session.id + "-server-state", s"Server State:${session.id}")
-              .connect: sSession =>
-                new ViewServerStatePage(using sSession).runFor(sessionsService.sessionStateOf(session))
-            event.handled
+        viewButton
       )
     else NotAllowedIcon()
 
@@ -136,5 +131,5 @@ class ViewServerStatePage(using session: ConnectedSession):
           keyTreePanel
         )
     )
-    Controller.noModel(components).render()
+    session.render(components)
     session.leaveSessionOpenAfterExiting()
