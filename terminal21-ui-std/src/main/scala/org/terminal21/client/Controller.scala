@@ -32,7 +32,7 @@ class RenderedController[M](
 ):
   def iterator: EventIterator[MV[M]] = new EventIterator[MV[M]](
     eventIteratorFactory
-      .takeWhile(_.isSessionClosed)
+      .takeWhile(!_.isSessionClosed)
       .scanLeft(initialMv): (mv, e) =>
         val events = Events(e)
         val newMv  = materializer(mv.model, events)

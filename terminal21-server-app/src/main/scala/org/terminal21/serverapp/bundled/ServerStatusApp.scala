@@ -46,11 +46,15 @@ class ServerStatusPage(
     Controller(components)
 
   def components(model: StatusModel, events: Events): MV[StatusModel] =
+    val newModel = events.event match
+      case Ticker(sessions) => model.copy(sessions = sessions)
+      case _                => model
+
     MV(
-      model,
+      newModel,
       Box().withChildren(
-        jvmTable(model.runtime, events),
-        sessionsTable(model.sessions, events)
+        jvmTable(newModel.runtime, events),
+        sessionsTable(newModel.sessions, events)
       )
     )
 
@@ -110,7 +114,7 @@ class ViewServerStatePage(using session: ConnectedSession):
       QuickTabs()
         .withTabs("Json")
         .withTabPanels(
-          Seq(Paragraph(text = sj.toString))
+          Seq(Paragraph(text = sj.elements.toString))
         )
     )
     session.render(components)
