@@ -352,7 +352,7 @@ class ControllerTest extends AnyFunSuiteLike:
   test("onChildModelChange"):
     case class Person(id: Int, name: String)
     class PersonComponent(person: Person):
-      val m         = Model[Person]("person")
+      val m         = Model[Person](person)
       val component = Box()
         .withChildren(
           Text(text = "Name"),
@@ -362,7 +362,7 @@ class ControllerTest extends AnyFunSuiteLike:
               handled.withModel(model.copy(name = newValue))
         )
     class PeopleComponent(people: Seq[Person]):
-      val m = Model[Seq[Person]]("people-model")
+      val m = Model[Seq[Person]]("people-model", people)
 
       val peopleComponents = people.map(p => new PersonComponent(p))
       val component        = QuickTable("people")

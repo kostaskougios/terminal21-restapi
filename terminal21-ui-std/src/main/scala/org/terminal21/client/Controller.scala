@@ -14,30 +14,23 @@ import scala.reflect.{ClassTag, classTag}
 type EventHandler    = PartialFunction[ControllerEvent[_], Handled[_]]
 type ComponentsByKey = Map[String, UiElement]
 
-class Controller(
+class Controller[M](
     eventIteratorFactory: => Iterator[CommandEvent],
     renderChanges: Seq[UiElement] => Unit,
-    modelComponents: Seq[UiElement],
+    initialModelValue: M,
+    modelComponents: M => Seq[UiElement],
     initialModelValues: Map[Model[Any], Any],
     eventHandlers: Seq[EventHandler]
 ):
-  def withModel[M](model: Model[M], value: M): Controller =
+  def withModel[M2](model: Model[M2], value: M2): Controller[M] =
     new Controller(
       eventIteratorFactory,
       renderChanges,
+      initialModel,
       modelComponents,
       initialModelValues + (model.asInstanceOf[Model[Any]] -> value),
       eventHandlers
     )
-
-  private def applyModelTo(components: Seq[UiElement]): Seq[UiElement] =
-    components.map: c =>
-      initialModelValues.foldLeft(c):
-        case (e, (m, v)) =>
-          val ne = if e.hasModelChangeRenderHandler(m) then e.fireModelChangeRender(m)(v) else e
-          ne match
-            case ch: HasChildren => ch.withChildren(applyModelTo(ch.children)*)
-            case x               => x
 
   def render()(using session: ConnectedSession): RenderedController =
     val elements = applyModelTo(modelComponents)
@@ -273,7 +266,7 @@ type OnClickEventHandlerFunction[M]         = ControllerClickEvent[M] => Handled
 type OnChangeEventHandlerFunction[M]        = ControllerChangeEvent[M] => Handled[M]
 type OnChangeBooleanEventHandlerFunction[M] = ControllerChangeBooleanEvent[M] => Handled[M]
 
-class Model[M: ClassTag](name: String):
+class Model[M: ClassTag](name: String, initialValue: M):
   type OnModelChangeFunction = (UiElement, M) => UiElement
   object ModelKey                     extends TypedMapKey[M]
   object OnModelChangeRenderKey       extends TypedMapKey[OnModelChangeFunction]
@@ -283,8 +276,8 @@ class Model[M: ClassTag](name: String):
   override def toString = s"Model($name)"
 
 object Model:
-  def apply[M: ClassTag]: Model[M]               = new Model[M](classTag[M].runtimeClass.getName)
-  def apply[M: ClassTag](name: String): Model[M] = new Model[M](name)
+  def apply[M: ClassTag](value: M): Model[M]               = new Model[M](classTag[M].runtimeClass.getName, value)
+  def apply[M: ClassTag](name: String, value: M): Model[M] = new Model[M](name, value)
   object Standard:
     val unitModel: Model[Unit] = Model[Unit]("unit")
 
