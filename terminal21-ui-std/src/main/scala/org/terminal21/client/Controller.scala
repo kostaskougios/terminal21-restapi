@@ -21,7 +21,7 @@ class Controller(
     initialModelValues: Map[Model[Any], Any],
     eventHandlers: Seq[EventHandler]
 ):
-  def model[M](model: Model[M], value: M): Controller =
+  def withModel[M](model: Model[M], value: M): Controller =
     new Controller(
       eventIteratorFactory,
       renderChanges,
@@ -31,14 +31,13 @@ class Controller(
     )
 
   private def applyModelTo(components: Seq[UiElement]): Seq[UiElement] =
-    initialModelValues
-      .flatMap: (m, v) =>
-        components.map: e =>
+    components.map: c =>
+      initialModelValues.foldLeft(c):
+        case (e, (m, v)) =>
           val ne = if e.hasModelChangeRenderHandler(m) then e.fireModelChangeRender(m)(v) else e
           ne match
             case ch: HasChildren => ch.withChildren(applyModelTo(ch.children)*)
             case x               => x
-      .toList
 
   def render()(using session: ConnectedSession): RenderedController =
     val elements = applyModelTo(modelComponents)
@@ -147,7 +146,7 @@ class RenderedController(
       case _                                                           => h
 
   private def checkForDuplicatesAndThrow(components: Seq[UiElement]): Unit =
-    val duplicates = components.map(_.key).groupBy(identity).filter(_._2.size > 1).keys.toSet
+    val duplicates = components.groupBy(_.key).filter(_._2.size > 1).keys.toSet
     if duplicates.nonEmpty then
       val duplicateComponents = components.filter(e => duplicates.contains(e.key))
       throw new IllegalArgumentException(s"Duplicate(s) found: ${duplicates.mkString(", ")}\nDuplicate components:\n${duplicateComponents.mkString("\n")}")

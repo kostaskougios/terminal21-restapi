@@ -36,7 +36,7 @@ class ControllerTest extends AnyFunSuiteLike:
     val it     = seList.iterator
     events.foreach(e => seList.add(e))
     seList.add(CommandEvent.sessionClosed)
-    new Controller(it, renderChanges, modelComponents, Map.empty, Nil).model(initialModel, initialValue)
+    new Controller(it, renderChanges, modelComponents, Map.empty, Nil).withModel(initialModel, initialValue)
 
   test("will throw an exception if there is a duplicate key"):
     an[IllegalArgumentException] should be thrownBy
@@ -130,6 +130,24 @@ class ControllerTest extends AnyFunSuiteLike:
       .handledEventsIterator
       .map(_.model(intModel))
       .toList should be(List(0, 100))
+
+  test("onClick is called for multiple models"):
+    newController(
+      intModel,
+      0,
+      Seq(buttonClick),
+      Seq(
+        button
+          .onClick(intModel): event =>
+            event.handled.withModel(100).terminate
+          .onClick(stringModel): event =>
+            event.handled.withModel("new").terminate
+      )
+    ).withModel(stringModel, "old")
+      .render()
+      .handledEventsIterator
+      .map(h => (h.model(intModel), h.model(stringModel)))
+      .toList should be(List((0, "old"), (100, "new")))
 
   test("onChange is called"):
     newController(
@@ -254,6 +272,20 @@ class ControllerTest extends AnyFunSuiteLike:
 
     verify(connectedSession).render(Seq(b.withText("model 5")))
 
+  test("applies multiple initial model before rendering"):
+    val b = button
+      .onModelChangeRender(intModel): (b, m) =>
+        b.withText(s"model $m")
+      .onModelChangeRender(stringModel): (b, m) =>
+        b.withText(b.text + s" model $m")
+
+    val connectedSession = mock[ConnectedSession]
+    newController(intModel, 5, Nil, Seq(b))
+      .withModel(stringModel, "x")
+      .render()(using connectedSession)
+
+    verify(connectedSession).render(Seq(b.withText("model 5 model x")))
+
   test("RenderChangesEvent renders changes"):
     val handledEvents = newController(intModel, 5, Seq(RenderChangesEvent(Seq(button.withText("changed")))), Seq(button))
       .render()
@@ -263,7 +295,7 @@ class ControllerTest extends AnyFunSuiteLike:
     handledEvents(1).renderedChanges should be(Seq(button.withText("changed")))
 
   test("ModelChangeEvent"):
-    val handledEvents = newController(stringModel, "v", Seq(ModelChangeEvent(intModel, 6)), Nil).model(intModel, 5).render().handledEventsIterator.toList
+    val handledEvents = newController(stringModel, "v", Seq(ModelChangeEvent(intModel, 6)), Nil).withModel(intModel, 5).render().handledEventsIterator.toList
     handledEvents(1).modelOf(intModel) should be(6)
 
   test("onModelChange for different model"):
