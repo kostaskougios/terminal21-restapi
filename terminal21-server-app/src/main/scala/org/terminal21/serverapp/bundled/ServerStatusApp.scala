@@ -4,6 +4,7 @@ import functions.fibers.FiberExecutor
 import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.client.components.std.Paragraph
 import org.terminal21.model.{ClientEvent, Session}
 import org.terminal21.server.Dependencies
 import org.terminal21.server.model.SessionState
@@ -105,30 +106,11 @@ class ViewServerStatePage(using session: ConnectedSession):
   def runFor(state: SessionState): Unit =
     val sj = state.serverJson
 
-    val rootKeyPanel = Seq(
-      QuickTable()
-        .withCaption("Root Keys")
-        .withHeaders("Root Key")
-        .withRows(
-          sj.rootKeys.sorted.map(k => Seq(k))
-        )
-    )
-
-    val keyTreePanel = Seq(
-      QuickTable()
-        .withCaption("Key Tree")
-        .withHeaders("Key", "Component Json", "Children")
-        .withRows(
-          sj.keyTree.toSeq.sortBy(_._1).map((k, v) => Seq(k, sj.elements(k).noSpaces, v.mkString(", ")))
-        )
-    )
-
     val components = Seq(
       QuickTabs()
-        .withTabs("Root Keys", "Key Tree")
+        .withTabs("Json")
         .withTabPanels(
-          rootKeyPanel,
-          keyTreePanel
+          Seq(Paragraph(text = sj.toString))
         )
     )
     session.render(components)

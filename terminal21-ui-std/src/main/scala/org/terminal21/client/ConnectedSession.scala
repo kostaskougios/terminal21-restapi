@@ -109,28 +109,7 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
 
   private def toJson(elementsUn: Seq[UiElement]): ServerJson =
     val elements = elementsUn.map(_.substituteComponents)
-    val flat     = elements.flatMap(_.flat)
     val sj       = ServerJson(
-      elements.map(_.key),
-      flat
-        .map: el =>
-          (
-            el.key,
-            el match
-              case e: UiComponent => encoding.uiElementEncoder(e).deepDropNullValues
-              case e: HasChildren => encoding.uiElementEncoder(e.noChildren).deepDropNullValues
-              case e              => encoding.uiElementEncoder(e).deepDropNullValues
-          )
-        .toMap,
-      flat
-        .map: e =>
-          (
-            e.key,
-            e match
-              case e: UiComponent => e.rendered.map(_.key)
-              case e: HasChildren => e.children.map(_.key)
-              case _              => Nil
-          )
-        .toMap
+      elements.map(e => encoding.uiElementEncoder(e).deepDropNullValues)
     )
     sj

@@ -29,11 +29,12 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
   def run(): Unit =
     eventsIterator.foreach(_ => ())
 
-  def appRows(events: Events): Seq[MV[Option[ServerSideApp]]] = apps.map: app =>
+  private case class TableView(clicked: Option[ServerSideApp], columns: Seq[UiElement])
+  private def appRows(events: Events): Seq[TableView] = apps.map: app =>
     val link = Link(key = s"app-${app.name}", text = app.name)
-    MV(
+    TableView(
       if events.isClicked(link) then Some(app) else None,
-      Box().withChildren(
+      Seq(
         link,
         Text(text = app.description)
       )
@@ -44,9 +45,9 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
     val appsTable = QuickTable(
       key = "apps-table",
       caption = Some("Apps installed on the server, click one to run it."),
-      rows = appsMv.map(m => Seq(m.view))
+      rows = appsMv.map(tv => tv.columns)
     ).withHeaders("App Name", "Description")
-    val startApp  = appsMv.map(_.model).find(_.nonEmpty).flatten
+    val startApp  = appsMv.map(_.clicked).find(_.nonEmpty).flatten
     MV(
       model.copy(startApp = startApp),
       Box().withChildren(
