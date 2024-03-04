@@ -11,8 +11,8 @@ case class QuickTable(
     size: String = "mg",
     style: Map[String, Any] = Map.empty,
     caption: Option[String] = None,
-    headers: Seq[UiElement] = Nil,
-    rows: Seq[Seq[UiElement]] = Nil,
+    headers: Seq[Any] = Nil,
+    rows: Seq[Seq[Any]] = Nil,
     dataStore: TypedMap = TypedMap.empty
 ) extends UiComponent
     with HasStyle:
@@ -25,11 +25,35 @@ case class QuickTable(
   def withCaption(v: String)         = copy(caption = Some(v))
 
   override lazy val rendered: Seq[UiElement] =
-    val head           = Thead(key = subKey("th"), children = Seq(Tr(children = headers.map(h => Th(children = Seq(h))))))
+    val head           = Thead(
+      key = subKey("thead"),
+      children = Seq(
+        Tr(
+          key = subKey("thead-tr"),
+          children = headers.zipWithIndex.map: (h, i) =>
+            Th(
+              key = subKey(s"thead-tr-th-$i"),
+              children = Seq(
+                h match
+                  case u: UiElement => u
+                  case c            => Text(text = c.toString)
+              )
+            )
+        )
+      )
+    )
     val body           = Tbody(
       key = subKey("tb"),
       children = rows.map: row =>
-        Tr(children = row.map(c => Td(children = Seq(c))))
+        Tr(children = row.zipWithIndex.map: (c, i) =>
+          Td(
+            key = subKey(s"tb-th-$i"),
+            children = Seq(
+              c match
+                case u: UiElement => u
+                case c            => Text(text = c.toString)
+            )
+          ))
     )
     val table          = Table(
       key = subKey("t"),
@@ -50,10 +74,7 @@ case class QuickTable(
     * @return
     *   QuickTable
     */
-  def withRows(data: Seq[Seq[Any]]): QuickTable               = copy(rows = data.map(_.map:
-    case u: UiElement => u
-    case c            => Text(text = c.toString)
-  ))
+  def withRows(data: Seq[Seq[Any]]): QuickTable               = copy(rows = data)
   def withRowsElements(data: Seq[Seq[UiElement]]): QuickTable = copy(rows = data)
 
   def caption(text: String): QuickTable                   = copy(caption = Some(text))

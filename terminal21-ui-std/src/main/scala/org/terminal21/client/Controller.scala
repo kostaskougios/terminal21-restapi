@@ -123,7 +123,6 @@ class RenderedController(
     lazy val clickHandlers         = clickHandlersMap(allComponents, h)
     lazy val changeHandlers        = changeHandlersMap(allComponents, h)
     lazy val changeBooleanHandlers = changeBooleanHandlersMap(allComponents, h)
-    println(event.toString + "/" + h.mm)
     event match
       case OnClick(key) if clickHandlers.contains(key)                 =>
         val handlers   = clickHandlers(key)
