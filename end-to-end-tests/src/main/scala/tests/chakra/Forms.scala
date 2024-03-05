@@ -63,7 +63,7 @@ object Forms:
         .changedValue(switch1)
         .map(v => s"switch1 checked is $v") ++ events
         .changedValue(radioGroup)
-        .map(v => s"radioGroup newValue is $v") ++ events
+        .map(v => s"radioGroup newValue=$v") ++ events
         .ifClicked(saveButton, "Saved clicked") ++ events
         .ifClicked(cancelButton, "Cancel clicked")).headOption
         .getOrElse("This will reflect any changes in the form.")
