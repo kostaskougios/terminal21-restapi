@@ -62,6 +62,10 @@ case class Events(event: CommandEvent):
   def changedValue(e: UiElement): Option[String]          = event match
     case OnChange(key, value) if key == e.key => Some(value)
     case _                                    => None
+  def isChangedValue(e: UiElement): Boolean               =
+    event match
+      case OnChange(key, _) => key == e.key
+      case _                => false
 
 object Events:
   case object InitialRender extends ClientEvent
