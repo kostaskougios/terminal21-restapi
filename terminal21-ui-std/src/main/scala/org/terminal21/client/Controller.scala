@@ -40,7 +40,9 @@ class RenderedController[M](
         val newMv  = materializer(mv.model, events)
         renderChanges(newMv.view)
         newMv
-      .takeWhile(_.isTerminate)
+      .flatMap: mv =>
+        if mv.isTerminate then Seq(mv.copy(isTerminate = false), mv) else Seq(mv)
+      .takeWhile(!_.isTerminate)
   )
 
 case class Events(event: CommandEvent):

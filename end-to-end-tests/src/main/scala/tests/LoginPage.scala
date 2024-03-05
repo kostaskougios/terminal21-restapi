@@ -46,6 +46,14 @@ class LoginPage(using session: ConnectedSession):
       .nextOption()
 
   def components(form: LoginForm, events: Events): MV[LoginForm] =
+    println(events.event)
+    val isValidEmail = form.isValidEmail
+    val newForm      = form.copy(
+      email = events.changedValue(emailInput, form.email),
+      pwd = events.changedValue(passwordInput, form.pwd),
+      submitted = events.isClicked(submitButton) && isValidEmail,
+      submittedInvalidEmail = events.isClicked(submitButton) && !isValidEmail
+    )
     val view         = Seq(
       QuickFormControl()
         .withLabel("Email address")
@@ -53,7 +61,7 @@ class LoginPage(using session: ConnectedSession):
         .withInputGroup(
           InputLeftAddon().withChildren(EmailIcon()),
           emailInput,
-          InputRightAddon().withChildren(if form.isValidEmail then okIcon else notOkIcon)
+          InputRightAddon().withChildren(if newForm.isValidEmail then okIcon else notOkIcon)
         ),
       QuickFormControl()
         .withLabel("Password")
@@ -63,14 +71,7 @@ class LoginPage(using session: ConnectedSession):
           passwordInput
         ),
       submitButton,
-      errorsBox.withChildren(if form.submittedInvalidEmail then errorMsgInvalidEmail else errorsBox)
-    )
-    val isValidEmail = form.isValidEmail
-    val newForm      = form.copy(
-      email = events.changedValue(emailInput, form.email),
-      pwd = events.changedValue(passwordInput, form.pwd),
-      submitted = events.isClicked(submitButton) && isValidEmail,
-      submittedInvalidEmail = events.isClicked(submitButton) && !isValidEmail
+      errorsBox.withChildren(if newForm.submittedInvalidEmail then errorMsgInvalidEmail else errorsBox)
     )
     MV(
       newForm,
