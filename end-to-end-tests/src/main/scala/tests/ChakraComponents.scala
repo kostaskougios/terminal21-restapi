@@ -36,7 +36,7 @@ import tests.chakra.*
           MV(
             model,
             elements,
-            m.rerun || model.terminate
+            model.rerun || model.terminate
           )
 
         Controller(components).render(ChakraModel()).iterator.lastOption.map(_.model) match
