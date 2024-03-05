@@ -31,24 +31,25 @@ Sessions
   .withNewSession(s"csv-viewer-$fileName", s"CsvView: $fileName")
   .connect: session =>
     given ConnectedSession = session
-    given Model[Unit] = Model.Standard.unitModel
 
-    Controller(
-      TableContainer()
-        .withChildren(
-          Table(variant = "striped", colorScheme = Some("teal"), size = "mg")
-            .withChildren(
-              TableCaption(text = "Csv file contents"),
-              Tbody(
-                children = csv.map: row =>
-                  Tr(
-                    children = row.map: column =>
-                      Td(text = column)
-                  )
+    Controller
+      .noModel(
+        TableContainer()
+          .withChildren(
+            Table(variant = "striped", colorScheme = Some("teal"), size = "mg")
+              .withChildren(
+                TableCaption(text = "Csv file contents"),
+                Tbody(
+                  children = csv.map: row =>
+                    Tr(
+                      children = row.map: column =>
+                        Td(text = column)
+                    )
+                )
               )
-            )
-        )
-    ).render() // we don't have to process any events here, just let the user view the csv file.
+          )
+      )
+      .render() // we don't have to process any events here, just let the user view the csv file.
     println(s"Now open ${session.uiUrl} to view the UI.")
     // since this is a read-only UI, we can exit the app but leave the session open on the UI for the user to examine the data.
     session.leaveSessionOpenAfterExiting()

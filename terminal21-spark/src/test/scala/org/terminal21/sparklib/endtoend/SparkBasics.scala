@@ -20,7 +20,6 @@ import scala.util.Using
       .connect: session =>
         given ConnectedSession = session
         given SparkSession     = spark
-        given Model[Unit]      = Model.Standard.unitModel
         import scala3encoders.given
         import spark.implicits.*
 

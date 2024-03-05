@@ -16,15 +16,20 @@ class Controller[M](
     renderChanges(mv.view)
     new RenderedController(eventIteratorFactory, renderChanges, materializer, mv)
 
+trait NoModelController:
+  this: Controller[Unit] =>
+  def render(): RenderedController[Unit] = render(())
+
 object Controller:
   def apply[M](materializer: ModelViewMaterialized[M])(using session: ConnectedSession): Controller[M] =
     new Controller(session.eventIterator, session.renderChanges, materializer)
 
-  def noModel(components: Seq[UiElement])(using session: ConnectedSession) =
-    apply((_, _) => MV((), components))
+  def noModel(component: UiElement)(using session: ConnectedSession): Controller[Unit] with NoModelController       = noModel(Seq(component))
+  def noModel(components: Seq[UiElement])(using session: ConnectedSession): Controller[Unit] with NoModelController =
+    new Controller[Unit](session.eventIterator, session.renderChanges, (_, _) => MV((), components)) with NoModelController
 
   def noModel(materializer: Events => Seq[UiElement])(using session: ConnectedSession) =
-    apply((_, events) => MV((), materializer(events)))
+    new Controller[Unit](session.eventIterator, session.renderChanges, (_, events) => MV((), materializer(events))) with NoModelController
 
 class RenderedController[M](
     eventIteratorFactory: => Iterator[CommandEvent],

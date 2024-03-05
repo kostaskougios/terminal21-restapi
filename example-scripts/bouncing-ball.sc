@@ -25,23 +25,24 @@ Sessions
         Ball(x + newDx, y + newDy, newDx, newDy)
     case object Ticker extends ClientEvent
 
-    given Model[Ball] = Model(Ball(50, 50, 8, 8))
+    val initialModel = Ball(50, 50, 8, 8)
 
     println(
       "Files under ~/.terminal21/web will be served under /web . Please place a ball.png file under ~/.terminal21/web/images on the box where the server runs."
     )
-    val ball = Image(src = "/web/images/ball.png").onModelChange: (b, m) =>
-      b.withStyle("position" -> "fixed", "left" -> (m.x + "px"), "top" -> (m.y + "px"))
 
+    def components(ball: Ball, events: Events): MV[Ball] =
+      val b = ball.nextPosition
+      MV(
+        b,
+        Image(src = "/web/images/ball.png").withStyle("position" -> "fixed", "left" -> (b.x + "px"), "top" -> (b.y + "px"))
+      )
     fiberExecutor.submit:
       while !session.isClosed do
         session.fireEvent(Ticker)
         Thread.sleep(1000 / 60)
 
-    Controller(Seq(ball))
-      .onEvent:
-        case ControllerClientEvent(handled, Ticker) =>
-          handled.withModel(handled.model.nextPosition)
-      .render()
-      .handledEventsIterator
+    Controller(components)
+      .render(initialModel)
+      .iterator
       .lastOption

@@ -41,4 +41,4 @@ import org.terminal21.client.components.std.*
           cookieValue
         )
 
-      Controller.noModel(components).render(()).iterator.lastOption
+      Controller.noModel(components).render().iterator.lastOption
