@@ -9,7 +9,7 @@ import org.terminal21.model.SessionOptions
 case class ClickForm(clicked: Boolean)
 
 Sessions
-  .withNewSession("on-click-example", "On Click Handler")
+  .withNewSession("mvc-click-form", "MVC form with a button")
   .connect: session =>
     given ConnectedSession = session
     new ClickPage(ClickForm(false)).run match
@@ -22,16 +22,19 @@ Sessions
   * page for the click form to be displayed. All components are in `components` method. The controller is in the `controller` method and we can run to get the
   * result in the `run` method. We can use these methods in unit tests to test what is rendered and how events are processed respectively.
   */
-class ClickPage(clickForm: ClickForm)(using ConnectedSession):
-  given Model[ClickForm] = Model(clickForm)
+class ClickPage(initialForm: ClickForm)(using ConnectedSession):
+  def run = controller.render(initialForm).iterator.lastOption.map(_.model)
 
-  def run = controller.render().handledEventsIterator.lastOption.map(_.model)
+  def components(form: ClickForm, events: Events): MV[ClickForm] =
+    val button = Button(key = "click-me", text = "Please click me")
+    val updatedForm = form.copy(
+      clicked = events.isClicked(button)
+    )
+    val msg = Paragraph(text = if updatedForm.clicked then "Button clicked!" else "Waiting for user to click the button")
 
-  def components: Seq[UiElement] =
-    val msg = Paragraph(text = "Waiting for user to click the button")
-    val button = Button(text = "Please click me").onClick: event =>
-      import event.*
-      handled.withModel(model.copy(clicked = true)).withRenderChanges(msg.withText("Button clicked")).terminate
-    Seq(msg, button)
+    MV(
+      updatedForm,
+      Seq(msg, button)
+    )
 
   def controller: Controller[ClickForm] = Controller(components)

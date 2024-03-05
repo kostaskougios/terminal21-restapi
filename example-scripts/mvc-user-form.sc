@@ -11,7 +11,7 @@ case class UserForm(
 )
 
 Sessions
-  .withNewSession("on-change-example", "On Change event handler")
+  .withNewSession("mvc-user-form", "MVC example with a user form")
   .connect: session =>
     given ConnectedSession = session
     new UserPage(UserForm("my@email.com", false)).run match
