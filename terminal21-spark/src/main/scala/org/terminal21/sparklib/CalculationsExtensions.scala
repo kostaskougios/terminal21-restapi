@@ -2,7 +2,7 @@ package org.terminal21.sparklib
 
 import functions.fibers.FiberExecutor
 import org.apache.spark.sql.SparkSession
-import org.terminal21.client.{ConnectedSession, Model}
+import org.terminal21.client.*
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.{Keys, UiElement}
 import org.terminal21.sparklib.calculations.{ReadWriter, StdUiSparkCalculation}
@@ -12,7 +12,6 @@ extension [OUT: ReadWriter](ds: OUT)
       toUi: OUT => UiElement & HasStyle
   )(using
       ConnectedSession,
-      Model[_],
       FiberExecutor,
       SparkSession
   ) =

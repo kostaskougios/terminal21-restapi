@@ -1,7 +1,7 @@
 //package org.terminal21.client.components
 //
 //import functions.fibers.FiberExecutor
-//import org.terminal21.client.{ConnectedSession, Model, RenderChangesEvent}
+//import org.terminal21.client.*
 //import org.terminal21.client.components.UiElement.HasStyle
 //import org.terminal21.client.components.chakra.*
 //import org.terminal21.collections.TypedMap
@@ -21,20 +21,19 @@
 //)(using session: ConnectedSession, executor: FiberExecutor)
 //    extends Calculation[OUT]
 //    with UiComponent:
-//  private def model     = Model.Standard.unitModel
 //  private val running   = new AtomicBoolean(false)
 //  private val currentUi = new AtomicReference(dataUi)
 //
 //  protected def updateUi(dataUi: UiElement & HasStyle) = currentUi.set(dataUi)
 //
 //  lazy val badge  = Badge()
-//  lazy val recalc = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon())).onClick(model): event =>
-//    import event.*
-//    if running.compareAndSet(false, true) then
-//      try
-//        reCalculate()
-//      finally running.set(false)
-//    handled
+//  lazy val recalc = Button(text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon()))
+//  // .onClick(model)
+//  //    if running.compareAndSet(false, true) then
+//  //      try
+//  //        reCalculate()
+//  //      finally running.set(false)
+//  //    handled
 //
 //  override lazy val rendered: Seq[UiElement] =
 //    val header = Box(

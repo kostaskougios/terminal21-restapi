@@ -3,7 +3,7 @@ package org.terminal21.sparklib.calculations
 import functions.fibers.FiberExecutor
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.SparkSession
-import org.terminal21.client.{ConnectedSession, Model}
+import org.terminal21.client.*
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.{CachedCalculation, StdUiCalculation, UiComponent, UiElement}
 import org.terminal21.sparklib.util.Environment
@@ -49,6 +49,6 @@ abstract class StdUiSparkCalculation[OUT: ReadWriter](
     override val key: String,
     name: String,
     dataUi: UiElement with HasStyle
-)(using ConnectedSession, Model[_], FiberExecutor, SparkSession)
+)(using ConnectedSession, FiberExecutor, SparkSession)
     extends StdUiCalculation[OUT](key, name, dataUi)
     with SparkCalculation[OUT](name)
