@@ -52,6 +52,8 @@ class RenderedController[M](
       .takeWhile(!_.terminate)
   )
 
+  def run(): Option[M] = iterator.lastOption.map(_.model)
+
 case class Events(event: CommandEvent):
   def isClicked(e: UiElement): Boolean = event match
     case OnClick(key) => key == e.key

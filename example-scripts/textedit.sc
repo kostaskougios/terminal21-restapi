@@ -29,46 +29,41 @@ val file = new File(fileName)
 val contents =
   if file.exists() then FileUtils.readFileToString(file, "UTF-8") else ""
 
-def saveFile(content: String) = FileUtils.writeStringToFile(file, content, "UTF-8")
+def saveFile(content: String) =
+  println(s"Saving file $fileName")
+  FileUtils.writeStringToFile(file, content, "UTF-8")
 
 Sessions
   .withNewSession(s"textedit-$fileName", s"Edit: $fileName")
   .connect: session =>
     given ConnectedSession = session
 
-    case class Edit(content: String, save: Boolean)
+    case class Edit(content: String, savedContent: String, save: Boolean, exit: Boolean)
     // the main editor area.
-    def components(edit: Edit, events: Events) =
+    def components(edit: Edit, events: Events): MV[Edit] =
       val editorTextArea = Textarea(key = "editor", defaultValue = edit.content)
       // This will display a "saved" badge for a second when the user saves the file
-      val status = Badge()
       // This will display an asterisk when the contents of the file are changed in the editor
-      val modified = Badge(colorScheme = Some("red"), text = if edit.content != contents then "*" else "")
       val saveMenu = MenuItem("save-menu", text = "Save")
       val exitMenu = MenuItem("exit-menu", text = "Exit")
-      val updatedEditor = edit.copy(
-        content = events.changedValue(editorTextArea, edit.content)
+      val isSave = events.isClicked(saveMenu)
+      val updatedContent = events.changedValue(editorTextArea, edit.content)
+      val updatedEdit = edit.copy(
+        content = updatedContent,
+        save = isSave,
+        savedContent = if isSave then updatedContent else edit.savedContent,
+        exit = events.isClicked(exitMenu)
       )
-      Seq(
+      val modified = Badge(colorScheme = Some("red"), text = if updatedEdit.content != updatedEdit.savedContent then "*" else "")
+      val status = Badge(text = if updatedEdit.save then "Saved" else "")
+
+      val view = Seq(
         HStack().withChildren(
           Menu().withChildren(
             MenuButton("file-menu", text = "File").withChildren(ChevronDownIcon()),
             MenuList().withChildren(
-              saveMenu
-                .onClick: () =>
-                  saveFile(edit.current.value)
-                  // we'll display a "Saved" badge for 1 second.
-                  Seq(
-                    status.withText("Saved"),
-                    modified.withText("")
-                  ).renderChanges()
-                  // each event handler runs on a new fiber, it is ok to sleep here
-                  Thread.sleep(1000)
-                  status.withText("").renderChanges()
-              ,
+              saveMenu,
               exitMenu
-                .onClick: () =>
-                  exitLatch.countDown()
             )
           ),
           status,
@@ -78,12 +73,19 @@ Sessions
           FormLabel(text = "Editor"),
           InputGroup().withChildren(
             InputLeftAddon().withChildren(EditIcon()),
-            edit
+            editorTextArea
           )
         )
       )
 
+      MV(updatedEdit, view)
+
     println(s"Now open ${session.uiUrl} to view the UI")
-    exitLatch.await()
-    session.clear()
-    Paragraph(text = "Terminated").render()
+    Controller(components)
+      .render(Edit(contents, contents, false, false))
+      .iterator
+      .tapEach: mv =>
+        if mv.model.save then saveFile(mv.model.content)
+      .takeWhile(!_.model.exit)
+      .foreach(_ => ())
+    session.render(Seq(Paragraph(text = "Terminated")))
