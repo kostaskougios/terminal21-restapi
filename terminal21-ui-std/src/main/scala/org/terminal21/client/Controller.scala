@@ -21,7 +21,10 @@ object Controller:
     new Controller(session.eventIterator, session.renderChanges, materializer)
 
   def noModel(components: Seq[UiElement])(using session: ConnectedSession) =
-    apply((Unit, Events) => MV((), components))
+    apply((_, _) => MV((), components))
+
+  def noModel(materializer: Events => Seq[UiElement])(using session: ConnectedSession) =
+    apply((_, events) => MV((), materializer(events)))
 
 class RenderedController[M](
     eventIteratorFactory: => Iterator[CommandEvent],
@@ -47,7 +50,8 @@ case class Events(event: CommandEvent):
 
   def ifClicked[V](e: UiElement, value: => V): Option[V] = if isClicked(e) then Some(value) else None
 
-  def changedValue(e: UiElement): Option[String] = event match
+  def changedValue(e: UiElement, default: String): String = changedValue(e).getOrElse(default)
+  def changedValue(e: UiElement): Option[String]          = event match
     case OnChange(key, value) if key == e.key => Some(value)
     case _                                    => None
 

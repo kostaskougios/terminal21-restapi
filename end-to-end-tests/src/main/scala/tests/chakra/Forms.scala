@@ -44,7 +44,7 @@ object Forms:
     val saveButton   = Button(key = "save-button", text = "Save", colorScheme = Some("red"))
     val cancelButton = Button(key = "cancel-button", text = "Cancel")
     val formStatus   =
-      events
+      (events
         .changedValue(email)
         .map(v => s"email input new value = $v")
         .toSeq ++ events
@@ -65,8 +65,7 @@ object Forms:
         .changedValue(radioGroup)
         .map(v => s"radioGroup newValue is $v") ++ events
         .ifClicked(saveButton, "Saved clicked") ++ events
-        .ifClicked(cancelButton, "Cancel clicked")
-        .headOption
+        .ifClicked(cancelButton, "Cancel clicked")).headOption
         .getOrElse("This will reflect any changes in the form.")
 
     val status = Box(text = formStatus)

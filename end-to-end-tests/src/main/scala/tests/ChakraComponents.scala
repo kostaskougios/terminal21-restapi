@@ -23,7 +23,7 @@ import tests.chakra.*
             m,
             events
           ) ++ Editables.components(
-            m
+            events
           ) ++ Stacks.components ++ Grids.components ++ bcs.view ++ Etc.components ++ MediaAndIcons.components ++ DataDisplay.components ++ Typography.components ++ Feedback.components ++ Disclosure.components ++
             Navigation.components(events) ++ Seq(
               krButton

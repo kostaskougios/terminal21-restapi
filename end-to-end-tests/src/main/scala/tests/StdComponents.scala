@@ -10,17 +10,15 @@ import org.terminal21.client.components.std.*
     .connect: session =>
       given ConnectedSession = session
 
-      case class Form(output: String, cookie: String)
-      given model: Model[Form] = Model(Form("This will reflect what you type in the input", "This will display the value of the cookie"))
+      def components(events: Events) =
+        val input        = Input(key = "name", defaultValue = "Please enter your name")
+        val cookieReader = CookieReader(key = "cookie-reader", name = "std-components-test-cookie")
 
-      def components =
-        val output      = Paragraph().onModelChangeRender: (p, m) =>
-          p.withText(m.output)
-        val cookieValue = Paragraph().onModelChangeRender: (p, m) =>
-          p.withText(m.cookie)
-        val input       = Input(key = "name", defaultValue = "Please enter your name").onChange: event =>
-          import event.*
-          handled.withModel(event.model.copy(output = newValue))
+        val outputMsg = events.changedValue(input, "This will reflect what you type in the input")
+        val output    = Paragraph(text = outputMsg)
+
+        val cookieMsg   = events.changedValue(cookieReader).map(newValue => s"Cookie value $newValue").getOrElse("This will display the value of the cookie")
+        val cookieValue = Paragraph(text = cookieMsg)
 
         Seq(
           Header1(text = "header1 test"),
@@ -39,11 +37,8 @@ import org.terminal21.client.components.std.*
           Paragraph(text = "A Form").withChildren(input),
           output,
           Cookie(name = "std-components-test-cookie", value = "test-cookie-value"),
-          CookieReader(key = "cookie-reader", name = "std-components-test-cookie").onChange: event =>
-            import event.*
-            handled.mapModel(_.copy(cookie = s"Cookie value $newValue"))
-          ,
+          cookieReader,
           cookieValue
         )
 
-      Controller(components).render().handledEventsIterator.lastOption
+      Controller.noModel(components).render(()).iterator.lastOption

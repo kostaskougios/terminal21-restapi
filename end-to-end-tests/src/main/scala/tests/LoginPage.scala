@@ -23,49 +23,37 @@ case class LoginForm(email: String = "my@email.com", pwd: String = "mysecret", s
 /** The login form. Displays an email and password input and a submit button. When run() it will fill in the Login(email,pwd) model.
   */
 class LoginPage(using session: ConnectedSession):
-  private given initialModel: Model[LoginForm] = Model(LoginForm())
-  val okIcon                                   = CheckCircleIcon(color = Some("green"))
-  val notOkIcon                                = WarningTwoIcon(color = Some("red"))
-  val emailInput                               = Input(key = "email", `type` = "email", defaultValue = initialModel.value.email)
-    .onChange: changeEvent =>
-      import changeEvent.*
-      handled.withModel(model.copy(email = newValue))
+  private val initialModel = LoginForm()
+  val okIcon               = CheckCircleIcon(color = Some("green"))
+  val notOkIcon            = WarningTwoIcon(color = Some("red"))
+  val emailInput           = Input(key = "email", `type` = "email", defaultValue = initialModel.email)
 
   val submitButton = Button(key = "submit", text = "Submit")
-    .onClick: clickEvent =>
-      import clickEvent.*
-      // if the email is invalid, we will not terminate. We also will render an error that will be visible for 2 seconds
-      val isValidEmail = model.isValidEmail
-      handled.mapModel(_.copy(submitted = isValidEmail, submittedInvalidEmail = !isValidEmail))
 
-  val passwordInput = Input(key = "password", `type` = "password", defaultValue = initialModel.value.pwd)
-    .onChange: changeEvent =>
-      import changeEvent.*
-      handled.withModel(model.copy(pwd = newValue))
+  val passwordInput = Input(key = "password", `type` = "password", defaultValue = initialModel.pwd)
 
   val errorsBox            = Box()
   val errorMsgInvalidEmail = Paragraph(text = "Invalid Email", style = Map("color" -> "red"))
 
   def run(): Option[LoginForm] =
     controller
-      .render()
-      .handledEventsIterator
+      .render(initialModel)
+      .iterator
       .map(_.model)
       .tapEach: form =>
         println(form)
       .dropWhile(!_.submitted)
       .nextOption()
 
-  def components: Seq[UiElement] =
-    Seq(
+  def components(form: LoginForm, events: Events): MV[LoginForm] =
+    val view         = Seq(
       QuickFormControl()
         .withLabel("Email address")
         .withHelperText("We'll never share your email.")
         .withInputGroup(
           InputLeftAddon().withChildren(EmailIcon()),
           emailInput,
-          InputRightAddon().onModelChangeRender: (i, m) =>
-            i.withChildren(if m.isValidEmail then okIcon else notOkIcon)
+          InputRightAddon().withChildren(if form.isValidEmail then okIcon else notOkIcon)
         ),
       QuickFormControl()
         .withLabel("Password")
@@ -75,34 +63,35 @@ class LoginPage(using session: ConnectedSession):
           passwordInput
         ),
       submitButton,
-      errorsBox.onModelChangeRender: (eb, m) =>
-        if m.submittedInvalidEmail then eb.withChildren(errorMsgInvalidEmail) else errorsBox
+      errorsBox.withChildren(if form.submittedInvalidEmail then errorMsgInvalidEmail else errorsBox)
+    )
+    val isValidEmail = form.isValidEmail
+    val newForm      = form.copy(
+      email = events.changedValue(emailInput, form.email),
+      pwd = events.changedValue(passwordInput, form.pwd),
+      submitted = events.isClicked(submitButton) && isValidEmail,
+      submittedInvalidEmail = events.isClicked(submitButton) && !isValidEmail
+    )
+    MV(
+      newForm,
+      view
     )
 
   def controller: Controller[LoginForm] = Controller(components)
-    .onEvent: event =>
-      import event.*
-      val newModel = model.copy(submittedInvalidEmail = false)
-      handled.withModel(newModel)
 
 class LoggedIn(login: LoginForm)(using session: ConnectedSession):
-  import Model.Standard.booleanFalseModel
   val yesButton = Button(key = "yes-button", text = "Yes")
-    .onClick: e =>
-      e.handled.withModel(true).terminate
 
   val noButton = Button(key = "no-button", text = "No")
-    .onClick: e =>
-      e.handled.withModel(false).terminate
 
   val emailDetails    = Text(text = s"email : ${login.email}")
   val passwordDetails = Text(text = s"password : ${login.pwd}")
 
   def run(): Option[Boolean] =
-    controller.render().handledEventsIterator.lastOption.map(_.model)
+    controller.render(false).iterator.lastOption.map(_.model)
 
-  def components: Seq[UiElement] =
-    Seq(
+  def components(isYes: Boolean, events: Events): MV[Boolean] =
+    val view = Seq(
       Paragraph().withChildren(
         Text(text = "Are your details correct?"),
         NewLine(),
@@ -111,6 +100,11 @@ class LoggedIn(login: LoginForm)(using session: ConnectedSession):
         passwordDetails
       ),
       HStack().withChildren(yesButton, noButton)
+    )
+    MV(
+      events.isClicked(yesButton),
+      view,
+      events.isClicked(yesButton) || events.isClicked(noButton)
     )
 
   /** @return
