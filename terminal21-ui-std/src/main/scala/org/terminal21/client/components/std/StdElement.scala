@@ -90,7 +90,6 @@ case class Input(
     `type`: String = "text",
     defaultValue: String = "",
     style: Map[String, Any] = Map.empty,
-    valueReceived: Option[String] = None, // use value instead
     dataStore: TypedMap = TypedMap.empty
 ) extends StdElement
     with CanHandleOnChangeEvent:
@@ -99,5 +98,4 @@ case class Input(
   def withKey(v: String)                          = copy(key = v)
   def withType(v: String)                         = copy(`type` = v)
   def withDefaultValue(v: String)                 = copy(defaultValue = v)
-  def value                                       = valueReceived.getOrElse(defaultValue)
   override def withDataStore(ds: TypedMap): Input = copy(dataStore = ds)

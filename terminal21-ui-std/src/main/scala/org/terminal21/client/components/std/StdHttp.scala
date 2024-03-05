@@ -40,12 +40,10 @@ case class Cookie(
 case class CookieReader(
     key: String = Keys.nextKey,
     name: String = "cookie.name",
-    value: Option[String] = None, // will be set when/if cookie value is read
     requestId: String = "cookie-read-req",
     dataStore: TypedMap = TypedMap.empty
 ) extends StdHttp
     with CanHandleOnChangeEvent:
   type This = CookieReader
   override def withDataStore(ds: TypedMap): CookieReader = copy(dataStore = ds)
-
-  override def withKey(key: String): CookieReader = copy(key = key)
+  override def withKey(key: String): CookieReader        = copy(key = key)
