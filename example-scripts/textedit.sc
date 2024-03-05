@@ -35,52 +35,53 @@ Sessions
   .withNewSession(s"textedit-$fileName", s"Edit: $fileName")
   .connect: session =>
     given ConnectedSession = session
-    // we will wait till the user clicks the "Exit" menu, this latch makes sure the main thread of the app waits.
-    val exitLatch = new CountDownLatch(1)
+
+    case class Edit(content: String, save: Boolean)
     // the main editor area.
-    val editor = Textarea(defaultValue = contents)
-    // This will display a "saved" badge for a second when the user saves the file
-    val status = Badge()
-    // This will display an asterisk when the contents of the file are changed in the editor
-    val modified = Badge(colorScheme = Some("red"))
-
-    // when the user changes the textarea, we get the new text and we can compare it with the loaded value.
-    editor.onChange: newValue =>
-      modified.withText(if newValue != contents then "*" else "").renderChanges()
-
-    Seq(
-      HStack().withChildren(
-        Menu().withChildren(
-          MenuButton(text = "File").withChildren(ChevronDownIcon()),
-          MenuList().withChildren(
-            MenuItem(text = "Save")
-              .onClick: () =>
-                saveFile(editor.current.value)
-                // we'll display a "Saved" badge for 1 second.
-                Seq(
-                  status.withText("Saved"),
-                  modified.withText("")
-                ).renderChanges()
-                // each event handler runs on a new fiber, it is ok to sleep here
-                Thread.sleep(1000)
-                status.withText("").renderChanges()
-            ,
-            MenuItem(text = "Exit")
-              .onClick: () =>
-                exitLatch.countDown()
-          )
+    def components(edit: Edit, events: Events) =
+      val editorTextArea = Textarea(key = "editor", defaultValue = edit.content)
+      // This will display a "saved" badge for a second when the user saves the file
+      val status = Badge()
+      // This will display an asterisk when the contents of the file are changed in the editor
+      val modified = Badge(colorScheme = Some("red"), text = if edit.content != contents then "*" else "")
+      val saveMenu = MenuItem("save-menu", text = "Save")
+      val exitMenu = MenuItem("exit-menu", text = "Exit")
+      val updatedEditor = edit.copy(
+        content = events.changedValue(editorTextArea, edit.content)
+      )
+      Seq(
+        HStack().withChildren(
+          Menu().withChildren(
+            MenuButton("file-menu", text = "File").withChildren(ChevronDownIcon()),
+            MenuList().withChildren(
+              saveMenu
+                .onClick: () =>
+                  saveFile(edit.current.value)
+                  // we'll display a "Saved" badge for 1 second.
+                  Seq(
+                    status.withText("Saved"),
+                    modified.withText("")
+                  ).renderChanges()
+                  // each event handler runs on a new fiber, it is ok to sleep here
+                  Thread.sleep(1000)
+                  status.withText("").renderChanges()
+              ,
+              exitMenu
+                .onClick: () =>
+                  exitLatch.countDown()
+            )
+          ),
+          status,
+          modified
         ),
-        status,
-        modified
-      ),
-      FormControl().withChildren(
-        FormLabel(text = "Editor"),
-        InputGroup().withChildren(
-          InputLeftAddon().withChildren(EditIcon()),
-          editor
+        FormControl().withChildren(
+          FormLabel(text = "Editor"),
+          InputGroup().withChildren(
+            InputLeftAddon().withChildren(EditIcon()),
+            edit
+          )
         )
       )
-    ).render()
 
     println(s"Now open ${session.uiUrl} to view the UI")
     exitLatch.await()
