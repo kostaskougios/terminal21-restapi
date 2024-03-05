@@ -47,8 +47,8 @@ class RenderedController[M](
         newMv
       .flatMap: mv =>
         // make sure we read the last MV change when terminating
-        if mv.isTerminate then Seq(mv.copy(isTerminate = false), mv) else Seq(mv)
-      .takeWhile(!_.isTerminate)
+        if mv.terminate then Seq(mv.copy(terminate = false), mv) else Seq(mv)
+      .takeWhile(!_.terminate)
   )
 
 case class Events(event: CommandEvent):
@@ -72,7 +72,7 @@ object Events:
 
   val Empty = Events(InitialRender)
 
-case class MV[M](model: M, view: Seq[UiElement], isTerminate: Boolean = false):
-  def terminate: MV[M] = copy(isTerminate = true)
+case class MV[M](model: M, view: Seq[UiElement], terminate: Boolean = false)
+
 object MV:
   def apply[M](model: M, view: UiElement): MV[M] = MV(model, Seq(view))

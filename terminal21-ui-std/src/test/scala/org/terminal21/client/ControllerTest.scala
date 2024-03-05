@@ -1,17 +1,14 @@
 package org.terminal21.client
 
 import org.mockito.Mockito
-import org.mockito.Mockito.verify
 import org.scalatest.funsuite.AnyFunSuiteLike
-import org.scalatest.matchers.should.Matchers.*
 import org.scalatestplus.mockito.MockitoSugar.*
 import org.terminal21.client.components.UiElement
-import org.terminal21.client.components.chakra.{Box, Button, Checkbox, QuickTable, Text}
-import org.terminal21.client.components.std.{Input, Paragraph}
+import org.terminal21.client.components.chakra.*
+import org.terminal21.client.components.std.Input
 import org.terminal21.collections.SEList
-import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
-
-import java.util.concurrent.atomic.AtomicBoolean
+import org.terminal21.model.{CommandEvent, OnChange, OnClick}
+import org.scalatest.matchers.should.Matchers.*
 
 class ControllerTest extends AnyFunSuiteLike:
   val button             = Button("b1")
@@ -55,9 +52,12 @@ class ControllerTest extends AnyFunSuiteLike:
         .withRows(peopleComponents.map(p => Seq(p.view)))
       MV(peopleComponents.map(_.model), component)
 
-    val people = Seq(Person(10, "person 1"), Person(20, "person 2"))
-    val all    = newController(Seq(OnChange("person-10", "changed p10")), peopleComponent)
+    val p1     = Person(10, "person 1")
+    val p2     = Person(20, "person 2")
+    val people = Seq(p1, p2)
+    val mv     = newController(Seq(OnChange("person-10", "changed p10")), peopleComponent)
       .render(people)
       .iterator
-      .toList
-    println(all.mkString("\n"))
+      .lastOption
+      .get
+    mv.model should be(Seq(p1.copy(name = "changed p10"), p2))

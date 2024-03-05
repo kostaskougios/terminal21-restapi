@@ -94,7 +94,7 @@ class CsvEditor(initModel: CsvModel)(using session: ConnectedSession):
     MV(
       newModel,
       view,
-      isTerminate = events.isClicked(saveAndExit) || events.isClicked(exit)
+      isTerminate = newModel.exitWithoutSave || newModel.save
     )
 
   def controller: Controller[CsvModel] = Controller(components)
