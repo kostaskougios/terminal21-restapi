@@ -1,7 +1,8 @@
 package org.terminal21.client
 
 import org.terminal21.client.collections.EventIterator
-import org.terminal21.client.components.UiElement
+import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, UiElement}
+import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
 type ModelViewMaterialized[M] = (M, Events) => MV[M]
@@ -56,13 +57,23 @@ case class Events(event: CommandEvent):
     case OnClick(key) => key == e.key
     case _            => false
 
-  def ifClicked[V](e: UiElement, value: => V): Option[V] = if isClicked(e) then Some(value) else None
+  def ifClicked[V](e: UiElement & CanHandleOnClickEvent, value: => V): Option[V] = if isClicked(e) then Some(value) else None
 
-  def changedValue(e: UiElement, default: String): String = changedValue(e).getOrElse(default)
-  def changedValue(e: UiElement): Option[String]          = event match
+  def changedValue(e: UiElement & OnChangeEventHandler.CanHandleOnChangeEvent, default: String): String = changedValue(e).getOrElse(default)
+  def changedValue(e: UiElement & OnChangeEventHandler.CanHandleOnChangeEvent): Option[String]          = event match
     case OnChange(key, value) if key == e.key => Some(value)
     case _                                    => None
-  def isChangedValue(e: UiElement): Boolean               =
+  def isChangedValue(e: UiElement & OnChangeEventHandler.CanHandleOnChangeEvent): Boolean               =
+    event match
+      case OnChange(key, _) => key == e.key
+      case _                => false
+
+  def changedBooleanValue(e: UiElement & OnChangeBooleanEventHandler.CanHandleOnChangeEvent, default: Boolean): Boolean =
+    changedBooleanValue(e).getOrElse(default)
+  def changedBooleanValue(e: UiElement & OnChangeBooleanEventHandler.CanHandleOnChangeEvent): Option[Boolean]           = event match
+    case OnChange(key, value) if key == e.key => Some(value.toBoolean)
+    case _                                    => None
+  def isChangedBooleanValue(e: UiElement & OnChangeBooleanEventHandler.CanHandleOnChangeEvent): Boolean                 =
     event match
       case OnChange(key, _) => key == e.key
       case _                => false

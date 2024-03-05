@@ -41,7 +41,7 @@ class ControllerTest extends AnyFunSuiteLike:
         )
       MV(
         person.copy(
-          name = events.changedValue(nameInput).getOrElse(person.name)
+          name = events.changedValue(nameInput, person.name)
         ),
         component
       )

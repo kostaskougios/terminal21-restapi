@@ -52,8 +52,8 @@ def toCsvModel(csv: Seq[Seq[String]]) =
 
 class CsvEditor(initModel: CsvModel)(using session: ConnectedSession):
 
-  val saveAndExit = Button(key = "save-exit", text = "Save & Exit")
-  val exit = Button(key = "exit", text = "Exit Without Saving")
+  val saveAndExit = Button("save-exit", text = "Save & Exit")
+  val exit = Button("exit", text = "Exit Without Saving")
 
   def run(): Unit =
     for mv <- controller.render(initModel).iterator.lastOption.filter(_.model.save) // only save if model.save is true
@@ -72,7 +72,7 @@ class CsvEditor(initModel: CsvModel)(using session: ConnectedSession):
         model.copy(csv = model.csv + (coords -> newValue), status = s"Changed value at $coords to $newValue")
       case None => model
 
-    val view = QuickTable(key = "csv-editor", variant = "striped", colorScheme = "teal", size = "mg")
+    val view = QuickTable("csv-editor", variant = "striped", colorScheme = "teal", size = "mg")
       .withCaption("Please edit the csv contents above and click save to save and exit")
       .withRows(tableCells)
 
@@ -94,7 +94,7 @@ class CsvEditor(initModel: CsvModel)(using session: ConnectedSession):
     MV(
       newModel,
       view,
-      isTerminate = newModel.exitWithoutSave || newModel.save
+      terminate = newModel.exitWithoutSave || newModel.save
     )
 
   def controller: Controller[CsvModel] = Controller(components)
@@ -108,7 +108,7 @@ class CsvEditor(initModel: CsvModel)(using session: ConnectedSession):
 
   object CoordsKey extends TypedMapKey[(Int, Int)]
   private def newEditable(x: Int, y: Int, value: String): Editable =
-    Editable(key = s"cell-$x-$y", defaultValue = value)
+    Editable(s"cell-$x-$y", defaultValue = value)
       .withChildren(
         EditablePreview(),
         EditableInput()
