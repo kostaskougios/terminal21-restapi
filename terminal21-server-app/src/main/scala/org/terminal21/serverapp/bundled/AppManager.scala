@@ -31,7 +31,7 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
 
   private case class TableView(clicked: Option[ServerSideApp], columns: Seq[UiElement])
   private def appRows(events: Events): Seq[TableView] = apps.map: app =>
-    val link = Link(key = s"app-${app.name}", text = app.name)
+    val link = Link(s"app-${app.name}", text = app.name)
     TableView(
       if events.isClicked(link) then Some(app) else None,
       Seq(
@@ -50,12 +50,9 @@ class AppManagerPage(apps: Seq[ServerSideApp], startApp: ServerSideApp => Unit)(
     val startApp  = appsMv.map(_.clicked).find(_.nonEmpty).flatten
     MV(
       model.copy(startApp = startApp),
-      Box().withChildren(
+      Seq(
         Header1(text = "Terminal 21 Manager"),
-        Paragraph(
-          text = """
-                    |Here you can run all the installed apps on the server.""".stripMargin
-        ),
+        Paragraph(text = "Here you can run all the installed apps on the server."),
         appsTable,
         Paragraph().withChildren(
           Span(text = "Have a question? Please ask at "),

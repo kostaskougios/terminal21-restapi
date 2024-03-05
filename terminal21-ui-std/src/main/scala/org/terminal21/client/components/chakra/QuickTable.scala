@@ -44,16 +44,19 @@ case class QuickTable(
     )
     val body           = Tbody(
       key = subKey("tb"),
-      children = rows.map: row =>
-        Tr(children = row.zipWithIndex.map: (c, i) =>
-          Td(
-            key = subKey(s"tb-th-$i"),
-            children = Seq(
-              c match
-                case u: UiElement => u
-                case c            => Text(text = c.toString)
+      children = rows.zipWithIndex.map: (row, i) =>
+        Tr(
+          key = subKey(s"tb-tr-$i"),
+          children = row.zipWithIndex.map: (c, i) =>
+            Td(
+              key = subKey(s"tb-th-$i"),
+              children = Seq(
+                c match
+                  case u: UiElement => u
+                  case c            => Text(text = c.toString)
+              )
             )
-          ))
+        )
     )
     val table          = Table(
       key = subKey("t"),
