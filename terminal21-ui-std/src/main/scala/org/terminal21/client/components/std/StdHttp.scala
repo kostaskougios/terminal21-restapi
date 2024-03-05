@@ -1,10 +1,8 @@
 package org.terminal21.client.components.std
 
 import org.terminal21.client.components.OnChangeEventHandler.CanHandleOnChangeEvent
-import org.terminal21.client.ConnectedSession
-import org.terminal21.client.components.{EventHandler, Keys, OnChangeEventHandler, TransientRequest, UiElement}
+import org.terminal21.client.components.{Keys, OnChangeEventHandler, UiElement}
 import org.terminal21.collections.TypedMap
-import org.terminal21.model.OnChange
 
 /** Elements mapping to Http functionality
   */
@@ -29,7 +27,7 @@ case class Cookie(
     value: String = "cookie.value",
     path: Option[String] = None,
     expireDays: Option[Int] = None,
-    requestId: String = TransientRequest.newRequestId(),
+    requestId: String = "cookie-set-req",
     dataStore: TypedMap = TypedMap.empty
 ) extends StdHttp:
   override type This = Cookie
@@ -43,7 +41,7 @@ case class CookieReader(
     key: String = Keys.nextKey,
     name: String = "cookie.name",
     value: Option[String] = None, // will be set when/if cookie value is read
-    requestId: String = TransientRequest.newRequestId(),
+    requestId: String = "cookie-read-req",
     dataStore: TypedMap = TypedMap.empty
 ) extends StdHttp
     with CanHandleOnChangeEvent:
