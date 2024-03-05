@@ -41,6 +41,7 @@ class RenderedController[M](
         renderChanges(newMv.view)
         newMv
       .flatMap: mv =>
+        // make sure we read the last MV change when terminating
         if mv.isTerminate then Seq(mv.copy(isTerminate = false), mv) else Seq(mv)
       .takeWhile(!_.isTerminate)
   )
