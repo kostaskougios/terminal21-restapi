@@ -14,5 +14,5 @@ Sessions
   .connect: session =>
     given ConnectedSession = session
 
-    Controller.noModel(Seq(Paragraph(text = "Hello World!"))).render(())
+    Controller.noModel(Paragraph(text = "Hello World!")).render()
     session.leaveSessionOpenAfterExiting()

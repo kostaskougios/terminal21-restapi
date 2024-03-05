@@ -4,22 +4,19 @@ import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.mathjax.*
 
-// We don't have a model in this simple example, so we will import the standard Unit model
-// for our controller to use.
-import org.terminal21.client.Model.Standard.unitModel
-
 Sessions
   .withNewSession("mathjax", "MathJax Example")
   .andLibraries(MathJaxLib /* note we need to register the MathJaxLib in order to use it */ )
   .connect: session =>
     given ConnectedSession = session
-    Controller(
-      Seq(
-        MathJax(
-          expression = """When \(a \ne 0\), there are two solutions to \(ax^2 + bx + c = 0\) and they are $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$"""
-        ),
-        MathJax(
-          expression = """
+    Controller
+      .noModel(
+        Seq(
+          MathJax(
+            expression = """When \(a \ne 0\), there are two solutions to \(ax^2 + bx + c = 0\) and they are $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$"""
+          ),
+          MathJax(
+            expression = """
           |when \(a \ne 0\), there are two solutions to \(x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\)
           |Aenean vel velit a lacus lacinia pulvinar. Morbi eget ex et tellus aliquam molestie sit amet eu diam.
           |Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tellus enim, tempor non efficitur et, rutrum efficitur metus.
@@ -29,7 +26,8 @@ Sessions
           |Morbi ultrices sem quis nisl convallis, ac cursus nunc condimentum. Orci varius natoque penatibus et magnis dis parturient montes,
           |nascetur ridiculus mus.
           |""".stripMargin
+          )
         )
       )
-    ).render()
+      .render()
     session.leaveSessionOpenAfterExiting()
