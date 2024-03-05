@@ -9,9 +9,6 @@ import org.terminal21.client.components.nivo.*
 import scala.util.Random
 import NivoBarChart.*
 import org.terminal21.model.ClientEvent
-// We don't have a model in this simple example, so we will import the standard Unit model
-// for our controller to use.
-import org.terminal21.client.Model.Standard.unitModel
 
 Sessions
   .withNewSession("nivo-bar-chart", "Nivo Bar Chart")
@@ -19,50 +16,50 @@ Sessions
   .connect: session =>
     given ConnectedSession = session
 
-    val chart = ResponsiveBar(
-      data = createRandomData,
-      keys = Seq("hot dog", "burger", "sandwich", "kebab", "fries", "donut"),
-      indexBy = "country",
-      padding = 0.3,
-      defs = Seq(
-        Defs("dots", "patternDots", "inherit", "#38bcb2", size = Some(4), padding = Some(1), stagger = Some(true)),
-        Defs("lines", "patternLines", "inherit", "#eed312", rotation = Some(-45), lineWidth = Some(6), spacing = Some(10))
-      ),
-      fill = Seq(Fill("dots", Match("fries")), Fill("lines", Match("sandwich"))),
-      axisLeft = Some(Axis(legend = "food", legendOffset = -40)),
-      axisBottom = Some(Axis(legend = "country", legendOffset = 32)),
-      valueScale = Scale(`type` = "linear"),
-      indexScale = Scale(`type` = "band", round = Some(true)),
-      legends = Seq(
-        Legend(
-          dataFrom = "keys",
-          translateX = 120,
-          itemsSpacing = 2,
-          itemWidth = 100,
-          itemHeight = 20,
-          symbolSize = 20,
-          symbolShape = "square"
+    def components(events: Events): Seq[UiElement] =
+      val data = createRandomData
+      val chart = ResponsiveBar(
+        data = data,
+        keys = Seq("hot dog", "burger", "sandwich", "kebab", "fries", "donut"),
+        indexBy = "country",
+        padding = 0.3,
+        defs = Seq(
+          Defs("dots", "patternDots", "inherit", "#38bcb2", size = Some(4), padding = Some(1), stagger = Some(true)),
+          Defs("lines", "patternLines", "inherit", "#eed312", rotation = Some(-45), lineWidth = Some(6), spacing = Some(10))
+        ),
+        fill = Seq(Fill("dots", Match("fries")), Fill("lines", Match("sandwich"))),
+        axisLeft = Some(Axis(legend = "food", legendOffset = -40)),
+        axisBottom = Some(Axis(legend = "country", legendOffset = 32)),
+        valueScale = Scale(`type` = "linear"),
+        indexScale = Scale(`type` = "band", round = Some(true)),
+        legends = Seq(
+          Legend(
+            dataFrom = "keys",
+            translateX = 120,
+            itemsSpacing = 2,
+            itemWidth = 100,
+            itemHeight = 20,
+            symbolSize = 20,
+            symbolShape = "square"
+          )
         )
       )
-    )
-
-    // we'll send new data to our controller every 2 seconds via a custom event
-    case class NewData(data: Seq[Seq[BarDatum]]) extends ClientEvent
-    fiberExecutor.submit:
-      while !session.isClosed do
-        Thread.sleep(2000)
-        session.fireEvent(NewData(createRandomData))
-
-    Controller(
       Seq(
         Paragraph(text = "Various foods.", style = Map("margin" -> 20)),
         chart
       )
-    ).render()
-      .onEvent: // receive the new data and render them
-        case ControllerClientEvent(handled, NewData(data)) =>
-          handled.withRenderChanges(chart.withData(data))
-      .handledEventsIterator
+
+    // we'll send new data to our controller every 2 seconds via a custom event
+    case object Ticker extends ClientEvent
+    fiberExecutor.submit:
+      while !session.isClosed do
+        Thread.sleep(2000)
+        session.fireEvent(Ticker)
+
+    Controller
+      .noModel(components)
+      .render()
+      .iterator
       .lastOption
 
 object NivoBarChart:

@@ -13,8 +13,6 @@ import org.apache.commons.io.FileUtils
 import org.terminal21.client.components.chakra.*
 
 import java.io.File
-import java.util.concurrent.CountDownLatch
-import scala.collection.concurrent.TrieMap
 
 if args.length != 1 then
   throw new IllegalArgumentException(
@@ -34,7 +32,7 @@ Sessions
 
     Controller
       .noModel(
-        TableContainer()
+        TableContainer() // We could use the QuickTable component here, but lets do it a bit more low level with the Chakra components
           .withChildren(
             Table(variant = "striped", colorScheme = Some("teal"), size = "mg")
               .withChildren(
