@@ -1,10 +1,10 @@
 #!/usr/bin/env -S scala-cli project.scala
 
-import org.terminal21.client.*
+import org.terminal21.client.{*, given}
 import org.terminal21.client.components.*
 import org.terminal21.client.components.std.*
 import org.terminal21.client.components.chakra.*
-import org.terminal21.model.SessionOptions
+import org.terminal21.model.{ClientEvent, SessionOptions}
 
 Sessions
   .withNewSession("universe-generation", "Universe Generation Progress")
@@ -12,23 +12,28 @@ Sessions
   .connect: session =>
     given ConnectedSession = session
 
-    val msg = Paragraph(text = "Generating universe ...")
-    val progress = Progress(value = 1)
+    def components(model: Int, events: Events): MV[Int] =
+      val status =
+        if model < 10 then "Generating universe ..."
+        else if model < 30 then "Creating atoms"
+        else if model < 50 then "Big bang!"
+        else if model < 80 then "Inflating"
+        else "Life evolution"
 
-    Seq(msg, progress).render()
+      val msg = Paragraph(text = status)
+      val progress = Progress(value = model)
 
-    for i <- 1 to 100 do
-      val p = progress.withValue(i)
-      val m =
-        if i < 10 then msg
-        else if i < 30 then msg.withText("Creating atoms")
-        else if i < 50 then msg.withText("Big bang!")
-        else if i < 80 then msg.withText("Inflating")
-        else msg.withText("Life evolution")
+      MV(
+        model + 1,
+        Seq(msg, progress)
+      )
 
-      Seq(p, m).renderChanges()
-      Thread.sleep(100)
+    object Ticker extends ClientEvent
+    fiberExecutor.submit:
+      for _ <- 1 to 100 do
+        Thread.sleep(200)
+        session.fireEvent(Ticker)
 
+    Controller(components).render(1).iterator.takeWhile(_.model < 100).foreach(_ => ())
     // clear UI
-    session.clear()
-    Paragraph(text = "Universe ready!").render()
+    session.render(Seq(Paragraph(text = "Universe ready!")))

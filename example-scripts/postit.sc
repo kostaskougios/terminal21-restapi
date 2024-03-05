@@ -20,37 +20,41 @@ Sessions
     new PostItPage().run()
 
 class PostItPage(using ConnectedSession):
-  import org.terminal21.client.Model.Standard.unitModel // we won't use a model for this one
-  def run(): Unit = controller.render().handledEventsIterator.lastOption
+  case class PostIt(message: String = "", messages: List[String] = Nil)
+  def run(): Unit = controller.render(PostIt()).iterator.lastOption
 
-  def components: Seq[UiElement] =
-    val editor = Textarea(placeholder = "Please post your note by clicking here and editing the content")
-    val messages = VStack(align = Some("stretch"))
-    val add = Button(text = "Post It.").onClick: event =>
-      import event.*
-      // add the new msg.
-      // note: editor.value is automatically updated by terminal-ui
-      val currentMessages = messages.current
-      handled.withRenderChanges(
-        currentMessages
-          .addChildren(
-            HStack().withChildren(
-              Image(
-                src = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_Notes_icon.svg/2048px-Apple_Notes_icon.svg.png",
-                boxSize = Some("32px")
-              ),
-              Box(text = editor.current.value)
-            )
-          )
+  def components(model: PostIt, events: Events): MV[PostIt] =
+    val editor = Textarea("postit-message", placeholder = "Please post your note by clicking here and editing the content")
+    val addButton = Button("postit", text = "Post It.")
+
+    val updatedMessages = model.messages ++ events.ifClicked(addButton, model.message)
+    val updatedModel = model.copy(
+      message = events.changedValue(editor, model.message),
+      messages = updatedMessages
+    )
+
+    val messagesVStack = VStack(
+      align = Some("stretch"),
+      children = updatedMessages.map: msg =>
+        HStack().withChildren(
+          Image(
+            src = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_Notes_icon.svg/2048px-Apple_Notes_icon.svg.png",
+            boxSize = Some("32px")
+          ),
+          Box(text = msg)
+        )
+    )
+    MV(
+      updatedModel,
+      Seq(
+        Paragraph(text = "Please type your note below and click 'Post It' to post it so that everyone can view it."),
+        InputGroup().withChildren(
+          InputLeftAddon().withChildren(EditIcon()),
+          editor
+        ),
+        addButton,
+        messagesVStack
       )
-    Seq(
-      Paragraph(text = "Please type your note below and click 'Post It' to post it so that everyone can view it."),
-      InputGroup().withChildren(
-        InputLeftAddon().withChildren(EditIcon()),
-        editor
-      ),
-      add,
-      messages
     )
 
   def controller = Controller(components)
