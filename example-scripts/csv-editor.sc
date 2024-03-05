@@ -65,19 +65,18 @@ class CsvEditor(initModel: CsvModel)(using session: ConnectedSession):
         (0 until model.maxX).map: x =>
           newEditable(x, y, model.csv(x, y))
 
-    val view = QuickTable(variant = "striped", colorScheme = "teal", size = "mg")
+    val newModel = tableCells.flatten.find(events.isChangedValue) match
+      case Some(editable) =>
+        val coords = editable.storedValue(CoordsKey)
+        val newValue = events.changedValue(editable, "error")
+        model.copy(csv = model.csv + (coords -> newValue), status = s"Changed value at $coords to $newValue")
+      case None => model
+
+    val view = QuickTable(key = "csv-editor", variant = "striped", colorScheme = "teal", size = "mg")
       .withCaption("Please edit the csv contents above and click save to save and exit")
       .withRows(tableCells)
 
-    tableCells.flatten.find(events.isChangedValue) match
-      case Some(editable) =>
-        val coords = editable.dataStore(CoordsKey)
-        val newValue = events.changedValue(editable, "error")
-        MV(
-          model.copy(csv = model.csv + (coords -> newValue), status = s"Changed value at $coords to $newValue"),
-          view
-        )
-      case None => MV(model, view)
+    MV(newModel, view)
 
   def components(model: CsvModel, events: Events): MV[CsvModel] =
     val cells = cellsComponent(model, events)
@@ -98,11 +97,7 @@ class CsvEditor(initModel: CsvModel)(using session: ConnectedSession):
       isTerminate = events.isClicked(saveAndExit) || events.isClicked(exit)
     )
 
-  /** @return
-    *   true if the user clicked "Save", false if the user clicked "Exit" or closed the session
-    */
-  def controller: Controller[CsvModel] =
-    Controller(components)
+  def controller: Controller[CsvModel] = Controller(components)
 
   def save(model: CsvModel): Unit =
     val data = (0 until model.maxY).map: y =>

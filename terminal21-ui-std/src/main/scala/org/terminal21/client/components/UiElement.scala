@@ -14,6 +14,7 @@ abstract class UiElement extends AnyElement:
   def dataStore: TypedMap
   def withDataStore(ds: TypedMap): This
   def store[V](key: TypedMapKey[V], value: V): This = withDataStore(dataStore + (key -> value))
+  def storedValue[V](key: TypedMapKey[V]): V        = dataStore(key)
 
   /** @return
     *   this element along all it's children flattened
