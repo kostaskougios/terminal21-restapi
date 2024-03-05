@@ -59,7 +59,7 @@ class CsvEditor(initModel: CsvModel)(using session: ConnectedSession):
     for mv <- controller.render(initModel).iterator.lastOption.filter(_.model.save) // only save if model.save is true
     do save(mv.model)
 
-  def cellsComponent(model: CsvModel, events: Events): MV[CsvModel] =
+  def editorComponent(model: CsvModel, events: Events): MV[CsvModel] =
     val tableCells =
       (0 until model.maxY).map: y =>
         (0 until model.maxX).map: x =>
@@ -79,7 +79,7 @@ class CsvEditor(initModel: CsvModel)(using session: ConnectedSession):
     MV(newModel, view)
 
   def components(model: CsvModel, events: Events): MV[CsvModel] =
-    val cells = cellsComponent(model, events)
+    val cells = editorComponent(model, events)
     val newModel = cells.model.copy(
       save = events.isClicked(saveAndExit),
       exitWithoutSave = events.isClicked(exit)
