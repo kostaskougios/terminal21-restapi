@@ -41,5 +41,3 @@ object StdElementEncoding extends ComponentLib:
     case fe: FrontEndElement => fe.asJson.mapObject(o => o.add("type", "FrontEnd".asJson))
     case _: UiComponent      =>
       throw new IllegalStateException("substitute all components before serializing")
-//      val b: ChakraElement = Box(key = c.key, text = "")
-//      b.asJson.mapObject(o => o.add("type", "Chakra".asJson))

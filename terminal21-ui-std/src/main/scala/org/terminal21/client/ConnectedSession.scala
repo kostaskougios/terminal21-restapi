@@ -1,5 +1,6 @@
 package org.terminal21.client
 
+import io.circe.{Json, JsonNumber, JsonObject}
 import org.terminal21.client.components.UiElement.HasChildren
 import org.terminal21.client.components.chakra.Box
 import org.terminal21.client.components.{UiComponent, UiElement}
@@ -107,9 +108,31 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
       val j = toJson(es)
       sessionsService.setSessionJsonState(session, j) // TODO:changeSessionJsonState
 
+  private def nullEmptyKeysAndDropNulls(j: Json): Json =
+    val folder = new Json.Folder[Json] {
+      def onNull: Json                       = Json.Null
+      def onBoolean(value: Boolean): Json    = Json.fromBoolean(value)
+      def onNumber(value: JsonNumber): Json  = Json.fromJsonNumber(value)
+      def onString(value: String): Json      = Json.fromString(value)
+      def onArray(value: Vector[Json]): Json =
+        Json.fromValues(value.collect {
+          case v if !v.isNull => v.foldWith(this)
+        })
+      def onObject(value: JsonObject): Json  =
+        Json.fromJsonObject(
+          value
+            .filter:
+              case ("key", v) => !v.asString.contains("")
+              case (_, v)     => !v.isNull
+            .mapValues(_.foldWith(this))
+        )
+    }
+
+    j.foldWith(folder)
+
   private def toJson(elementsUn: Seq[UiElement]): ServerJson =
     val elements = elementsUn.map(_.substituteComponents)
     val sj       = ServerJson(
-      elements.map(e => encoding.uiElementEncoder(e).deepDropNullValues)
+      elements.map(e => nullEmptyKeysAndDropNulls(encoding.uiElementEncoder(e)))
     )
     sj
