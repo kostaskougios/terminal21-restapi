@@ -7,39 +7,33 @@ import org.terminal21.client.components.std.Paragraph
 import tests.chakra.Common.commonBox
 
 object Navigation:
-  def components(using Model[ChakraModel]): Seq[UiElement] =
-    val clickedBreadcrumb                            = Paragraph().onModelChangeRender: (p, m) =>
-      p.withText(m.breadcrumbStatus)
-    def breadcrumbClicked(m: ChakraModel, t: String) = m.copy(breadcrumbStatus = s"breadcrumb-click: $t")
+  def components(events: Events): Seq[UiElement] =
+    val bcLink1 = BreadcrumbLink("breadcrumb-home", text = "breadcrumb-home")
+    val bcLink2 = BreadcrumbLink("breadcrumb-link1", text = "breadcrumb1")
+    val bcLink3 = BreadcrumbItem(isCurrentPage = Some(true))
+    val bcLink4 = BreadcrumbLink("breadcrumb-link2", text = "breadcrumb2")
+    val link    = Link(key = "google-link", text = "link-external-google", href = "https://www.google.com/", isExternal = Some(true))
 
-    val clickedLink = Paragraph().onModelChangeRender: (p, m) =>
-      p.withText(m.linkStatus)
+    val bcStatus =
+      (
+        events.ifClicked(bcLink1, "breadcrumb-home").toSeq ++
+          events.ifClicked(bcLink2, "breadcrumb-link1") ++
+          events.ifClicked(bcLink3, "breadcrumb-link2") ++
+          events.ifClicked(bcLink4, "breadcrumb-link2")
+      ).headOption.getOrElse("no-breadcrumb-clicked")
+
+    val clickedBreadcrumb = Paragraph(text = bcStatus)
+    val clickedLink       = Paragraph(text = if events.isClicked(link) then "link-clicked" else "no-link-clicked")
 
     Seq(
       commonBox(text = "Breadcrumbs"),
       Breadcrumb().withChildren(
-        BreadcrumbItem().withChildren(
-          BreadcrumbLink("breadcrumb-home", text = "breadcrumb-home").onClick: event =>
-            import event.*
-            handled.withModel(breadcrumbClicked(model, "breadcrumb-home"))
-        ),
-        BreadcrumbItem().withChildren(
-          BreadcrumbLink("breadcrumb-link1", text = "breadcrumb-link1").onClick: event =>
-            import event.*
-            handled.withModel(breadcrumbClicked(model, "breadcrumb-link1"))
-        ),
-        BreadcrumbItem(isCurrentPage = Some(true)).withChildren(
-          BreadcrumbLink("breadcrumb-link2", text = "breadcrumb-link2").onClick: event =>
-            import event.*
-            handled.withModel(breadcrumbClicked(model, "breadcrumb-link2"))
-        )
+        BreadcrumbItem().withChildren(bcLink1),
+        BreadcrumbItem().withChildren(bcLink2),
+        bcLink3.withChildren(bcLink3)
       ),
       clickedBreadcrumb,
       commonBox(text = "Link"),
-      Link(key = "google-link", text = "link-external-google", href = "https://www.google.com/", isExternal = Some(true))
-        .onClick: event =>
-          import event.*
-          handled.mapModel(_.copy(linkStatus = "link-clicked"))
-      ,
+      link,
       clickedLink
     )

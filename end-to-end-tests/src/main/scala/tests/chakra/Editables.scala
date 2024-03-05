@@ -6,10 +6,7 @@ import org.terminal21.client.components.chakra.*
 import tests.chakra.Common.*
 
 object Editables:
-  def components(using Model[ChakraModel]): Seq[UiElement] =
-    val status = Box().onModelChangeRender: (b, m) =>
-      b.withText(m.editableStatus)
-
+  def components(m: ChakraModel): Seq[UiElement] =
     val editable1 = Editable(key = "editable1", defaultValue = "Please type here")
       .withChildren(
         EditablePreview(),
@@ -27,6 +24,8 @@ object Editables:
       .onChange: event =>
         import event.*
         handled.mapModel(_.copy(editableStatus = s"editable2 newValue = $newValue"))
+
+    val status = Box(text = m.editableStatus)
 
     Seq(
       commonBox(text = "Editables"),

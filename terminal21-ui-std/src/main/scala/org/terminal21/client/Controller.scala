@@ -2,7 +2,6 @@ package org.terminal21.client
 
 import org.terminal21.client.collections.EventIterator
 import org.terminal21.client.components.UiElement
-import org.terminal21.client.components.chakra.Box
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
 type ModelViewMaterialized[M] = (M, Events) => MV[M]
@@ -14,7 +13,7 @@ class Controller[M](
 ):
   def render(initialModel: M): RenderedController[M] =
     val mv = materializer(initialModel, Events.Empty)
-    renderChanges(Seq(mv.view))
+    renderChanges(mv.view)
     new RenderedController(eventIteratorFactory, renderChanges, materializer, mv)
 
 object Controller:
@@ -22,7 +21,7 @@ object Controller:
     new Controller(session.eventIterator, session.renderChanges, materializer)
 
   def noModel(components: Seq[UiElement])(using session: ConnectedSession) =
-    apply((Unit, Events) => MV((), Box().withChildren(components*)))
+    apply((Unit, Events) => MV((), components))
 
 class RenderedController[M](
     eventIteratorFactory: => Iterator[CommandEvent],
@@ -36,8 +35,9 @@ class RenderedController[M](
       .scanLeft(initialMv): (mv, e) =>
         val events = Events(e)
         val newMv  = materializer(mv.model, events)
-        renderChanges(Seq(newMv.view))
+        renderChanges(newMv.view)
         newMv
+      .takeWhile(_.isTerminate)
   )
 
 case class Events(event: CommandEvent):
@@ -56,4 +56,7 @@ object Events:
 
   val Empty = Events(InitialRender)
 
-case class MV[M](model: M, view: UiElement)
+case class MV[M](model: M, view: Seq[UiElement], isTerminate: Boolean = false):
+  def terminate: MV[M] = copy(isTerminate = true)
+object MV:
+  def apply[M](model: M, view: UiElement): MV[M] = MV(model, Seq(view))
