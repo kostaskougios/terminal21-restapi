@@ -24,39 +24,43 @@ Sessions
   * page for the user form to be displayed. All components are in `components` method. The controller is in the `controller` method and we can run to get the
   * result in the `run` method. We can use these methods in unit tests to test what is rendered and how events are processed respectively.
   */
-class UserPage(user: UserForm)(using ConnectedSession):
-  given Model[UserForm] = Model(user) // the Model for our page. This is given so that we can handle events and create the controller.
+class UserPage(initialForm: UserForm)(using ConnectedSession):
 
   /** Runs the form and returns the results
     * @return
     *   if None, the user didn't submit the form (i.e. closed the session), if Some(userForm) the user submitted the form.
     */
   def run: Option[UserForm] =
-    controller.render().handledEventsIterator.lastOption.map(_.model).filter(_.submitted)
+    controller.render(initialForm).iterator.lastOption.map(_.model).filter(_.submitted)
 
   /** @return
     *   all the components that should be rendered for the page
     */
-  def components: Seq[UiElement] =
-    val output = Paragraph(text = "Please modify the email.")
-    val email = Input(`type` = "email", defaultValue = user.email).onChange: event =>
-      import event.*
-      val v = event.newValue
-      handled.withModel(model.copy(email = v)).withRenderChanges(output.withText(s"Email value : $v"))
+  def components(form: UserForm, events: Events): MV[UserForm] =
+    val email = Input(key = "email", `type` = "email", defaultValue = initialForm.email)
+    val submit = Button(key = "submit", text = "Submit")
 
-    Seq(
-      QuickFormControl()
-        .withLabel("Email address")
-        .withInputGroup(
-          InputLeftAddon().withChildren(EmailIcon()),
-          email
-        )
-        .withHelperText("We'll never share your email."),
-      Button(text = "Submit").onClick: event =>
-        import event.*
-        handled.withModel(model.copy(submitted = true)).terminate // mark the form as submitted and terminate the event iteration
-      ,
-      output
+    val updatedForm = form.copy(
+      email = events.changedValue(email, form.email),
+      submitted = events.isClicked(submit)
+    )
+
+    val output = Paragraph(text = if events.isChangedValue(email) then s"Email changed: ${updatedForm.email}" else "Please modify the email.")
+
+    MV(
+      updatedForm,
+      Seq(
+        QuickFormControl()
+          .withLabel("Email address")
+          .withInputGroup(
+            InputLeftAddon().withChildren(EmailIcon()),
+            email
+          )
+          .withHelperText("We'll never share your email."),
+        submit,
+        output
+      ),
+      terminate = events.isClicked(submit)
     )
 
   def controller: Controller[UserForm] = Controller(components)

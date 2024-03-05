@@ -9,9 +9,6 @@ import org.terminal21.client.components.nivo.*
 import scala.util.Random
 import NivoLineChart.*
 import org.terminal21.model.ClientEvent
-// We don't have a model in this simple example, so we will import the standard Unit model
-// for our controller to use.
-import org.terminal21.client.Model.Standard.unitModel
 
 Sessions
   .withNewSession("nivo-line-chart", "Nivo Line Chart")
@@ -19,31 +16,29 @@ Sessions
   .connect: session =>
     given ConnectedSession = session
 
-    val chart = ResponsiveLine(
-      data = createRandomData,
-      yScale = Scale(stacked = Some(true)),
-      axisBottom = Some(Axis(legend = "transportation", legendOffset = 36)),
-      axisLeft = Some(Axis(legend = "count", legendOffset = -40)),
-      legends = Seq(Legend())
-    )
-
-    // we'll send new data to our controller every 2 seconds via a custom event
-    case class NewData(data: Seq[Serie]) extends ClientEvent
-    fiberExecutor.submit:
-      while !session.isClosed do
-        Thread.sleep(2000)
-        session.fireEvent(NewData(createRandomData))
-
-    Controller(
+    def components(events: Events): Seq[UiElement] =
+      val chart = ResponsiveLine(
+        data = createRandomData,
+        yScale = Scale(stacked = Some(true)),
+        axisBottom = Some(Axis(legend = "transportation", legendOffset = 36)),
+        axisLeft = Some(Axis(legend = "count", legendOffset = -40)),
+        legends = Seq(Legend())
+      )
       Seq(
         Paragraph(text = "Means of transportation for various countries", style = Map("margin" -> 20)),
         chart
       )
-    ).render()
-      .onEvent: // receive the new data and render them
-        case ControllerClientEvent(handled, NewData(data)) =>
-          handled.withRenderChanges(chart.withData(data))
-      .handledEventsIterator
+    // we'll send new data to our controller every 2 seconds via a custom event
+    case object Ticker extends ClientEvent
+    fiberExecutor.submit:
+      while !session.isClosed do
+        Thread.sleep(2000)
+        session.fireEvent(Ticker)
+
+    Controller
+      .noModel(components)
+      .render()
+      .iterator
       .lastOption
 
 object NivoLineChart:
