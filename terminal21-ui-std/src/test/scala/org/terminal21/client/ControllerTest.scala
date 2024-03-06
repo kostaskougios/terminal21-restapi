@@ -73,6 +73,30 @@ class ControllerTest extends AnyFunSuiteLike:
     newController(Seq(buttonClick, checkBoxChange), components, renderChanges).render(0).iterator.map(_.model).toList should be(List(1, 2, 3))
     rendered.size should be(3)
 
+  test("events isClicked positive"):
+    def components(m: Boolean, events: Events) = MV(events.isClicked(button), button)
+    newController(Seq(buttonClick), components).render(false).iterator.lastOption.map(_.model) should be(Some(true))
+
+  test("events isClicked negative"):
+    def components(m: Boolean, events: Events) = MV(events.isClicked(button), button)
+    newController(Seq(checkBoxChange), components).render(false).iterator.lastOption.map(_.model) should be(Some(false))
+
+  test("events changedValue positive"):
+    def components(m: String, events: Events) = MV(events.changedValue(input, "x"), button)
+    newController(Seq(inputChange), components).render("").iterator.lastOption.map(_.model) should be(Some("new-value"))
+
+  test("events changedValue negative"):
+    def components(m: String, events: Events) = MV(events.changedValue(input, "x"), button)
+    newController(Seq(buttonClick), components).render("").iterator.lastOption.map(_.model) should be(Some("x"))
+
+  test("events changedBooleanValue positive"):
+    def components(m: Boolean, events: Events) = MV(events.changedBooleanValue(checkbox, false), button)
+    newController(Seq(checkBoxChange), components).render(false).iterator.lastOption.map(_.model) should be(Some(true))
+
+  test("events changedBooleanValue negative"):
+    def components(m: Boolean, events: Events) = MV(events.changedBooleanValue(checkbox, false), button)
+    newController(Seq(buttonClick), components).render(false).iterator.lastOption.map(_.model) should be(Some(false))
+
   test("poc"):
     case class Person(id: Int, name: String)
     def personComponent(person: Person, events: Events): MV[Person] =
