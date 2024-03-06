@@ -7,12 +7,11 @@
   * force re-evaluation by clicking the "Recalculate" buttons in the UI.
   */
 
-// We need these imports
 import org.apache.spark.sql.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.nivo.*
-import org.terminal21.client.{*, given}
+import org.terminal21.client.*
 import org.terminal21.sparklib.*
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -28,21 +27,19 @@ Using.resource(SparkSessions.newSparkSession( /* configure your spark session he
     .connect: session =>
       given ConnectedSession = session
       given SparkSession     = spark
-      given Model[Unit]      = Model.Standard.unitModel
       import scala3encoders.given
       import spark.implicits.*
 
       // lets get a Dataset, the data are random so that when we click refresh we can see the data actually
       // been refreshed.
-      val peopleDS = createPeople
-
-      // We will display the data in a table
-      val peopleTable = QuickTable().withHeaders("Id", "Name", "Age").withCaption("People")
-
-      val peopleTableCalc = peopleDS
-        .sort($"id")
-        .visualize("People sample", peopleTable): data =>
-          peopleTable.withRows(data.take(5).map(p => Seq(p.id, p.name, p.age)))
+      val peopleDS           = createPeople
+      val peopleSample       = Cached("People sample"):
+        peopleDS
+          .sort($"id")
+          .limit(5)
+      val peopleOrderedByAge = Cached("Oldest people"):
+        peopleDS
+          .orderBy($"age".desc)
 
       /** The calculation above uses a directory to store the dataset results. This way we can restart this script without loosing datasets that may take long
         * to calculate, making our script behave more like a notebook. When we click "Recalculate" in the UI, the cache directory is deleted and the dataset is
@@ -50,54 +47,61 @@ Using.resource(SparkSessions.newSparkSession( /* configure your spark session he
         *
         * The key for the cache is "People sample"
         */
-      println(s"Cache path: ${peopleTableCalc.cachePath}")
+      println(s"Cache path: ${peopleSample.cachePath}")
 
-      val oldestPeopleChart = ResponsiveLine(
-        axisBottom = Some(Axis(legend = "Person", legendOffset = 36)),
-        axisLeft = Some(Axis(legend = "Age", legendOffset = -40)),
-        legends = Seq(Legend())
-      )
+      def components(events: Events) =
+        given Events    = events
+        // We will display the data in a table
+        val peopleTable = QuickTable().withHeaders("Id", "Name", "Age").withCaption("People")
 
-      val oldestPeopleChartCalc = peopleDS
-        .orderBy($"age".desc)
-        .visualize("Oldest people", oldestPeopleChart): data =>
-          oldestPeopleChart.withData(
-            Seq(
-              Serie(
-                "Person",
-                data = data.take(5).map(person => Datum(person.name, person.age))
+        val peopleTableCalc = peopleSample.visualize(peopleTable): data =>
+          peopleTable.withRows(data.collect.toList.map(p => Seq(p.id, p.name, p.age)))
+
+        val oldestPeopleChart = ResponsiveLine(
+          axisBottom = Some(Axis(legend = "Person", legendOffset = 36)),
+          axisLeft = Some(Axis(legend = "Age", legendOffset = -40)),
+          legends = Seq(Legend())
+        )
+
+        val oldestPeopleChartCalc = peopleOrderedByAge
+          .visualize(oldestPeopleChart): data =>
+            oldestPeopleChart.withData(
+              Seq(
+                Serie(
+                  "Person",
+                  data = data.take(5).map(person => Datum(person.name, person.age))
+                )
               )
             )
-          )
 
-      val components = Seq(
-        Paragraph(
-          text = """
-          |The spark notebooks can use the `visualise` extension method over a dataframe/dataset. It will cache the dataset by
-          |saving it as a file under /tmp. The `Recalculate` button refreshes the dataset (re-runs it). In this example, the
-          |data are random and so are different each time the `Recalculate` is pressed.
-          |""".stripMargin,
-          style = Map("margin" -> "32px")
-        ),
-        // just make it look a bit more like a proper notebook by adding some fake maths
-        MathJax(
-          expression = """
-                       |The following is total nonsense but it simulates some explanation that would normally be here if we had
-                       |a proper notebook. When \(a \ne 0\), there are two solutions to \(x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\)
-                       |Aenean vel velit a lacus lacinia pulvinar. Morbi eget ex et tellus aliquam molestie sit amet eu diam.
-                       |Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tellus enim, tempor non efficitur et, rutrum efficitur metus.
-                       |Nulla scelerisque, mauris sit amet accumsan iaculis, elit ipsum suscipit lorem, sed fermentum nunc purus non tellus.
-                       |Aenean congue accumsan tempor. \(x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\) maecenas vitae commodo tortor. Aliquam erat volutpat. Etiam laoreet malesuada elit sed vestibulum.
-                       |Etiam consequat congue fermentum. Vivamus dapibus scelerisque ipsum eu tempus. Integer non pulvinar nisi.
-                       |Morbi ultrices sem quis nisl convallis, ac cursus nunc condimentum. Orci varius natoque penatibus et magnis dis parturient montes,
-                       |nascetur ridiculus mus.
-                       |""".stripMargin,
-          style = Map("margin" -> "32px")
-        ),
-        peopleTableCalc,
-        oldestPeopleChartCalc
-      )
-      Controller(components).render().eventsIterator.lastOption
+        Seq(
+          Paragraph(
+            text = """
+            |The spark notebooks can use the `visualise` extension method over a dataframe/dataset. It will cache the dataset by
+            |saving it as a file under /tmp. The `Recalculate` button refreshes the dataset (re-runs it). In this example, the
+            |data are random and so are different each time the `Recalculate` is pressed.
+            |""".stripMargin,
+            style = Map("margin" -> "32px")
+          ),
+          // just make it look a bit more like a proper notebook by adding some fake maths
+          MathJax(
+            expression = """
+                         |The following is total nonsense but it simulates some explanation that would normally be here if we had
+                         |a proper notebook. When \(a \ne 0\), there are two solutions to \(x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\)
+                         |Aenean vel velit a lacus lacinia pulvinar. Morbi eget ex et tellus aliquam molestie sit amet eu diam.
+                         |Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tellus enim, tempor non efficitur et, rutrum efficitur metus.
+                         |Nulla scelerisque, mauris sit amet accumsan iaculis, elit ipsum suscipit lorem, sed fermentum nunc purus non tellus.
+                         |Aenean congue accumsan tempor. \(x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\) maecenas vitae commodo tortor. Aliquam erat volutpat. Etiam laoreet malesuada elit sed vestibulum.
+                         |Etiam consequat congue fermentum. Vivamus dapibus scelerisque ipsum eu tempus. Integer non pulvinar nisi.
+                         |Morbi ultrices sem quis nisl convallis, ac cursus nunc condimentum. Orci varius natoque penatibus et magnis dis parturient montes,
+                         |nascetur ridiculus mus.
+                         |""".stripMargin,
+            style = Map("margin" -> "32px")
+          ),
+          peopleTableCalc,
+          oldestPeopleChartCalc
+        )
+      Controller.noModel(components).render().run()
 
 object SparkNotebook:
   private val names                 = Array("Andy", "Kostas", "Alex", "Andreas", "George", "Jack")

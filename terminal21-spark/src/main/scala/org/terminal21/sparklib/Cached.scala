@@ -49,7 +49,6 @@ class Cached[OUT: ReadWriter](val name: String, outF: => OUT)(using spark: Spark
   def visualize(dataUi: UiElement & HasStyle)(
       toUi: OUT => UiElement & HasStyle
   )(using
-      FiberExecutor,
       SparkSession
   )(using session: ConnectedSession, events: Events) =
     val sc = new SparkCalculation[OUT](s"spark-calc-$name", dataUi, toUi, this)

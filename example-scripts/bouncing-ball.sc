@@ -6,7 +6,7 @@
 // ------------------------------------------------------------------------------
 
 // always import these
-import org.terminal21.client.{*, given}
+import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.model.*
 // use the chakra components for menus, forms etc, https://chakra-ui.com/docs/components
