@@ -50,10 +50,10 @@ val HelidonServerLogging   = "io.helidon.logging"   % "helidon-logging-jul"     
 val LogBack  = "ch.qos.logback" % "logback-classic" % "1.4.14"
 val Slf4jApi = "org.slf4j"      % "slf4j-api"       % "2.0.9"
 
-val SparkSql = ("org.apache.spark" %% "spark-sql" % "3.5.0" % "provided").cross(CrossVersion.for3Use2_13).exclude("org.scala-lang.modules", "scala-xml_2.13")
+val SparkSql = ("org.apache.spark" %% "spark-sql" % "3.5.1" % "provided").cross(CrossVersion.for3Use2_13).exclude("org.scala-lang.modules", "scala-xml_2.13")
 val SparkScala3Fix = Seq(
-  "io.github.vincenzobaz" %% "spark-scala3-encoders" % "0.2.5",
-  "io.github.vincenzobaz" %% "spark-scala3-udf"      % "0.2.5"
+  "io.github.vincenzobaz" %% "spark-scala3-encoders" % "0.2.6",
+  "io.github.vincenzobaz" %% "spark-scala3-udf"      % "0.2.6"
 ).map(_.exclude("org.scala-lang.modules", "scala-xml_2.13"))
 
 // -----------------------------------------------------------------------------------------------

@@ -23,12 +23,10 @@ import scala.util.Using
         import scala3encoders.given
         import spark.implicits.*
 
-        val headers = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate", "timestamp")
-
-        val sortedSourceFilesDS       = Cached("Sorted files"):
-          sortedSourceFiles(sourceFiles()).limit(3)
         val sourceFileCached          = Cached("Code files"):
           sourceFiles().limit(3)
+        val sortedSourceFilesDS       = Cached("Sorted files"):
+          sortedSourceFiles(sourceFiles()).limit(3)
         val sortedSourceFilesDFCached = Cached("Sorted files DF"):
           sourceFiles()
             .sort($"createdDate".asc, $"numOfWords".asc)
@@ -39,9 +37,12 @@ import scala.util.Using
           sourceFiles()
             .sort($"numOfLines".desc)
 
+        println(s"Cached dir: ${sourceFileCached.cachePath}")
         def components(events: Events) =
           println("components() START")
-          given Events         = events
+          given Events = events
+
+          val headers          = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate", "timestamp")
           val sortedFilesTable = QuickTable().withHeaders(headers: _*).caption("Files sorted by createdDate and numOfWords")
           val codeFilesTable   = QuickTable().withHeaders(headers: _*).caption("Unsorted files")
 

@@ -27,6 +27,7 @@ class Cached[OUT: ReadWriter](val name: String, outF: => OUT)(using spark: Spark
 
   def invalidateCache(): Unit =
     FileUtils.deleteDirectory(new File(targetDir))
+    out = None
 
   private def calculateOnce: OUT =
     cache(
@@ -51,8 +52,14 @@ class Cached[OUT: ReadWriter](val name: String, outF: => OUT)(using spark: Spark
       FiberExecutor,
       SparkSession
   )(using session: ConnectedSession, events: Events) =
-    if events.event != TriggerRedraw then startCalc(session)
-    new SparkCalculation[OUT](s"spark-calc-$name", dataUi, toUi, this)
+    val sc = new SparkCalculation[OUT](s"spark-calc-$name", dataUi, toUi, this)
+
+    if events.isClicked(sc.recalc) then
+      invalidateCache()
+      startCalc(session)
+    else if events.event != TriggerRedraw then startCalc(session)
+
+    sc
 
 object Cached:
   def apply[OUT: ReadWriter](name: String)(outF: => OUT)(using spark: SparkSession): Cached[OUT] = new Cached(name, outF)
