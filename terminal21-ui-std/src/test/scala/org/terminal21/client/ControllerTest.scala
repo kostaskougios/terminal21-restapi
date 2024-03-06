@@ -30,6 +30,36 @@ class ControllerTest extends AnyFunSuiteLike:
     seList.add(CommandEvent.sessionClosed)
     new Controller(it, renderChanges, materializer)
 
+  test("renderChanges() not invoked if no UI changed"):
+    def components(m: Int, events: Events) =
+      MV(
+        m + 1,
+        Box().withChildren(button, input, checkbox)
+      )
+
+    var rendered                          = List.empty[Seq[UiElement]]
+    def renderChanges(es: Seq[UiElement]) =
+      rendered = rendered :+ es
+
+    newController(Seq(buttonClick, checkBoxChange), components, renderChanges).render(0).iterator.map(_.model).toList should be(List(1, 2, 3))
+    rendered.size should be(1)
+
+  test("renderChanges() invoked if UI changed"):
+
+    def components(m: Int, events: Events) =
+      MV(
+        m + 1,
+        Box(text = s"m=$m").withChildren(button, input, checkbox)
+      )
+
+    var rendered = List.empty[Seq[UiElement]]
+
+    def renderChanges(es: Seq[UiElement]) =
+      rendered = rendered :+ es
+
+    newController(Seq(buttonClick, checkBoxChange), components, renderChanges).render(0).iterator.map(_.model).toList should be(List(1, 2, 3))
+    rendered.size should be(3)
+
   test("poc"):
     case class Person(id: Int, name: String)
     def personComponent(person: Person, events: Events): MV[Person] =

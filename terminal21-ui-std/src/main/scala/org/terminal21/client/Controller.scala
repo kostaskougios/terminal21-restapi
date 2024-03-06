@@ -45,7 +45,7 @@ class RenderedController[M](
       .scanLeft(initialMv): (mv, e) =>
         val events = Events(e)
         val newMv  = materializer(mv.model, events)
-        renderChanges(newMv.view)
+        if mv.view != newMv.view then renderChanges(newMv.view)
         newMv
       .flatMap: mv =>
         // make sure we read the last MV change when terminating

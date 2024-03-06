@@ -5,7 +5,7 @@ import org.apache.spark.sql.{Dataset, SparkSession}
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.nivo.*
-import org.terminal21.client.{*, given}
+import org.terminal21.client.*
 import org.terminal21.sparklib.*
 import org.terminal21.sparklib.endtoend.model.CodeFile
 import org.terminal21.sparklib.endtoend.model.CodeFile.scanSourceFiles
