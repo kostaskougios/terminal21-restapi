@@ -1,7 +1,7 @@
 package tests
 
 import functions.fibers.Fiber
-import org.terminal21.client.given
+import org.terminal21.client.*
 
 @main def runAll(): Unit =
   Seq(

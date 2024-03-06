@@ -25,27 +25,38 @@ import scala.util.Using
 
         val headers = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate", "timestamp")
 
+        val sortedSourceFilesDS       = Cached("Sorted files"):
+          sortedSourceFiles(sourceFiles()).limit(3)
+        val sourceFileCached          = Cached("Code files"):
+          sourceFiles().limit(3)
+        val sortedSourceFilesDFCached = Cached("Sorted files DF"):
+          sourceFiles()
+            .sort($"createdDate".asc, $"numOfWords".asc)
+            .toDF()
+            .limit(4)
+
+        val sourceFilesSortedByNumOfLinesCached = Cached("Biggest Code Files"):
+          sourceFiles()
+            .sort($"numOfLines".desc)
+
         def components(events: Events) =
           println("components() START")
           given Events         = events
           val sortedFilesTable = QuickTable().withHeaders(headers: _*).caption("Files sorted by createdDate and numOfWords")
           val codeFilesTable   = QuickTable().withHeaders(headers: _*).caption("Unsorted files")
 
-          val sortedSourceFilesDS = sortedSourceFiles(sourceFiles())
-          val sortedCalc          = sortedSourceFilesDS.visualize("Sorted files", sortedFilesTable): results =>
-            val tableRows = results.take(3).toList.map(_.toData)
+          val sortedCalc = sortedSourceFilesDS.visualize(sortedFilesTable): results =>
+            val tableRows = results.collect().map(_.toData).toList
             sortedFilesTable.withRows(tableRows)
 
-          val codeFilesCalculation = sourceFiles().visualize("Code files", codeFilesTable): results =>
-            val dt = results.take(3).toList
+          val codeFilesCalculation = sourceFileCached.visualize(codeFilesTable): results =>
+            val dt = results.collect().toList
             codeFilesTable.withRows(dt.map(_.toData))
 
           val sortedFilesTableDF = QuickTable().withHeaders(headers: _*).caption("Files sorted by createdDate and numOfWords ASC and as DF")
-          val sortedCalcAsDF     = sourceFiles()
-            .sort($"createdDate".asc, $"numOfWords".asc)
-            .toDF()
-            .visualize("Sorted files DF", sortedFilesTableDF): results =>
-              val tableRows = results.take(4).toList
+          val sortedCalcAsDF     = sortedSourceFilesDFCached
+            .visualize(sortedFilesTableDF): results =>
+              val tableRows = results.collect().toList
               sortedFilesTableDF.withRows(tableRows.toUiTable)
 
           val chart = ResponsiveLine(
@@ -60,9 +71,8 @@ import scala.util.Using
             legends = Seq(Legend())
           )
 
-          val sourceFileChart = sourceFiles()
-            .sort($"numOfLines".desc)
-            .visualize("Biggest Code Files", chart): results =>
+          val sourceFileChart = sourceFilesSortedByNumOfLinesCached
+            .visualize(chart): results =>
               val data = results.take(10).map(cf => Datum(StringUtils.substringBeforeLast(cf.name, ".scala"), cf.numOfLines)).toList
               chart.withData(Seq(Serie("Scala", data = data)))
           println("components() RETURNING")

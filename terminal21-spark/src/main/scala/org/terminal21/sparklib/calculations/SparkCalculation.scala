@@ -9,6 +9,7 @@ import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.*
 import org.terminal21.collections.TypedMap
 import org.terminal21.model.ClientEvent
+import org.terminal21.sparklib.Cached
 import org.terminal21.sparklib.calculations.SparkCalculation.TriggerRedraw
 import org.terminal21.sparklib.util.Environment
 
@@ -23,53 +24,22 @@ import java.io.File
   */
 case class SparkCalculation[OUT: ReadWriter](
     key: String,
-    name: String,
     dataUi: UiElement with HasStyle,
     toUi: OUT => UiElement & HasStyle,
-    dataSet: OUT,
+    cached: Cached[OUT],
     dataStore: TypedMap = TypedMap.Empty
 )(using
     spark: SparkSession,
     session: ConnectedSession,
     events: Events
 ) extends UiComponent:
+  def name = cached.name
   override type This = SparkCalculation[OUT]
   override def withKey(key: String): This        = copy(key = key)
   override def withDataStore(ds: TypedMap): This = copy(dataStore = ds)
 
-  private val rw         = implicitly[ReadWriter[OUT]]
-  private val rootFolder = s"${Environment.tmpDirectory}/spark-calculations"
-  private val targetDir  = s"$rootFolder/$name"
-
-  def isCached: Boolean = new File(targetDir).exists()
-  def cachePath: String = targetDir
-
-  private def cache[A](reader: => A, writer: => A): A =
-    if isCached then reader
-    else writer
-
-  def invalidateCache(): Unit =
-    FileUtils.deleteDirectory(new File(targetDir))
-
-  private def calculateOnce(f: => OUT): OUT =
-    cache(
-      rw.read(spark, targetDir), {
-        val ds = f
-        rw.write(targetDir, ds)
-        ds
-      }
-    )
-
-  def runCalculation(): Unit =
-    if events.event != TriggerRedraw then
-      fiberExecutor.submit:
-        println("runCalculation()")
-        val r = calculateOnce(dataSet)
-        println("Redraw")
-        session.fireEvent(TriggerRedraw)
-        r
-  val badge                  = Badge(s"recalc-badge-$name")
-  val recalc                 = Button(s"recalc-button-$name", text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon()))
+  val badge  = Badge(s"recalc-badge-$name")
+  val recalc = Button(s"recalc-button-$name", text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon()))
 
   override def rendered: Seq[UiElement] =
     val header = Box(
@@ -80,8 +50,11 @@ case class SparkCalculation[OUT: ReadWriter](
         HStack(children = Seq(Text(text = name), badge, recalc))
       )
     )
-    val ui     = dataUi
-    println(ui)
+    val ui     = cached.get
+      .map: ds =>
+        toUi(ds)
+      .getOrElse(dataUi)
+
     Seq(header, ui)
 
 object SparkCalculation:
