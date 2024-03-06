@@ -1,6 +1,5 @@
 package org.terminal21.sparklib
 
-import functions.fibers.FiberExecutor
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.SparkSession
 import org.terminal21.client.*

@@ -1,19 +1,13 @@
 package org.terminal21.sparklib.calculations
 
-import functions.fibers.{Fiber, FiberExecutor}
-import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.SparkSession
-import org.terminal21.client.{*, given}
+import org.terminal21.client.components.*
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.client.components.chakra.*
-import org.terminal21.client.components.*
+import org.terminal21.client.*
 import org.terminal21.collections.TypedMap
 import org.terminal21.model.ClientEvent
 import org.terminal21.sparklib.Cached
-import org.terminal21.sparklib.calculations.SparkCalculation.TriggerRedraw
-import org.terminal21.sparklib.util.Environment
-
-import java.io.File
 
 /** A UI component that takes a spark calculation (i.e. a spark query) that results in a Dataset. It caches the results by storing them as parquet into the tmp
   * folder/spark-calculations/$name. Next time the calculation runs it reads the cache if available. A button should allow the user to clear the cache and rerun
