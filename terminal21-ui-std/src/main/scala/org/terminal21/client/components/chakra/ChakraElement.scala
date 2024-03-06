@@ -28,7 +28,7 @@ case class Button(
     isLoading: Option[Boolean] = None,
     isAttached: Option[Boolean] = None,
     spacing: Option[String] = None,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with OnClickEventHandler.CanHandleOnClickEvent:
   type This = Button
@@ -62,7 +62,7 @@ case class ButtonGroup(
     borderColor: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = ButtonGroup
@@ -90,7 +90,7 @@ case class Box(
     style: Map[String, Any] = Map.empty,
     as: Option[String] = None,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Box
@@ -113,7 +113,7 @@ case class HStack(
     align: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = HStack
@@ -130,7 +130,7 @@ case class VStack(
     align: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = VStack
@@ -149,7 +149,7 @@ case class SimpleGrid(
     columns: Int = 2,
     children: Seq[UiElement] = Nil,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = SimpleGrid
@@ -169,7 +169,7 @@ case class Editable(
     defaultValue: String = "",
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren
     with OnChangeEventHandler.CanHandleOnChangeEvent:
@@ -180,19 +180,19 @@ case class Editable(
   def withDefaultValue(v: String)                    = copy(defaultValue = v)
   override def withDataStore(ds: TypedMap): Editable = copy(dataStore = ds)
 
-case class EditablePreview(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.empty) extends ChakraElement:
+case class EditablePreview(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.Empty) extends ChakraElement:
   type This = EditablePreview
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
   override def withDataStore(ds: TypedMap)    = copy(dataStore = ds)
 
-case class EditableInput(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.empty) extends ChakraElement:
+case class EditableInput(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.Empty) extends ChakraElement:
   type This = EditableInput
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
   override def withDataStore(ds: TypedMap)    = copy(dataStore = ds)
 
-case class EditableTextarea(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.empty) extends ChakraElement:
+case class EditableTextarea(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.Empty) extends ChakraElement:
   type This = EditableTextarea
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -205,7 +205,7 @@ case class FormControl(
     as: String = "",
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = FormControl
@@ -222,7 +222,7 @@ case class FormLabel(
     text: String,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = FormLabel
@@ -239,7 +239,7 @@ case class FormHelperText(
     text: String,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = FormHelperText
@@ -259,7 +259,7 @@ case class Input(
     variant: Option[String] = None,
     defaultValue: String = "",
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with OnChangeEventHandler.CanHandleOnChangeEvent:
   type This = Input
@@ -277,7 +277,7 @@ case class InputGroup(
     size: String = "md",
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = InputGroup
@@ -292,7 +292,7 @@ case class InputLeftAddon(
     text: String = "",
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = InputLeftAddon
@@ -307,7 +307,7 @@ case class InputRightAddon(
     text: String = "",
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = InputRightAddon
@@ -325,7 +325,7 @@ case class Checkbox(
     defaultChecked: Boolean = false,
     isDisabled: Boolean = false,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent:
   type This = Checkbox
@@ -344,7 +344,7 @@ case class Radio(
     text: String = "",
     colorScheme: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = Radio
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -359,7 +359,7 @@ case class RadioGroup(
     defaultValue: String = "",
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren
     with OnChangeEventHandler.CanHandleOnChangeEvent:
@@ -379,7 +379,7 @@ case class Center(
     h: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Center
@@ -402,7 +402,7 @@ case class Circle(
     h: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Circle
@@ -425,7 +425,7 @@ case class Square(
     h: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Square
@@ -448,7 +448,7 @@ case class AddIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = AddIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -468,7 +468,7 @@ case class ArrowBackIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ArrowBackIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -488,7 +488,7 @@ case class ArrowDownIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ArrowDownIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -508,7 +508,7 @@ case class ArrowForwardIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ArrowForwardIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -528,7 +528,7 @@ case class ArrowLeftIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ArrowLeftIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -548,7 +548,7 @@ case class ArrowRightIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ArrowRightIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -568,7 +568,7 @@ case class ArrowUpIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ArrowUpIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -588,7 +588,7 @@ case class ArrowUpDownIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ArrowUpDownIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -608,7 +608,7 @@ case class AtSignIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = AtSignIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -628,7 +628,7 @@ case class AttachmentIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = AttachmentIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -648,7 +648,7 @@ case class BellIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = BellIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -668,7 +668,7 @@ case class CalendarIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = CalendarIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -688,7 +688,7 @@ case class ChatIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ChatIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -708,7 +708,7 @@ case class CheckIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = CheckIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -728,7 +728,7 @@ case class CheckCircleIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = CheckCircleIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -748,7 +748,7 @@ case class ChevronDownIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ChevronDownIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -768,7 +768,7 @@ case class ChevronLeftIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ChevronLeftIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -788,7 +788,7 @@ case class ChevronRightIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ChevronRightIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -808,7 +808,7 @@ case class ChevronUpIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ChevronUpIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -828,7 +828,7 @@ case class CloseIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = CloseIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -848,7 +848,7 @@ case class CopyIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = CopyIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -868,7 +868,7 @@ case class DeleteIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = DeleteIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -888,7 +888,7 @@ case class DownloadIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = DownloadIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -908,7 +908,7 @@ case class DragHandleIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = DragHandleIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -928,7 +928,7 @@ case class EditIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = EditIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -948,7 +948,7 @@ case class EmailIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = EmailIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -969,7 +969,7 @@ case class ExternalLinkIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ExternalLinkIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -990,7 +990,7 @@ case class HamburgerIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = HamburgerIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1010,7 +1010,7 @@ case class InfoIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = InfoIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1030,7 +1030,7 @@ case class InfoOutlineIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = InfoOutlineIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1050,7 +1050,7 @@ case class LinkIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = LinkIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1070,7 +1070,7 @@ case class LockIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = LockIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1090,7 +1090,7 @@ case class MinusIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = MinusIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1110,7 +1110,7 @@ case class MoonIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = MoonIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1130,7 +1130,7 @@ case class NotAllowedIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = NotAllowedIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1150,7 +1150,7 @@ case class PhoneIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = PhoneIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1170,7 +1170,7 @@ case class PlusSquareIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = PlusSquareIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1190,7 +1190,7 @@ case class QuestionIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = QuestionIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1210,7 +1210,7 @@ case class QuestionOutlineIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = QuestionOutlineIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1230,7 +1230,7 @@ case class RepeatIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = RepeatIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1250,7 +1250,7 @@ case class RepeatClockIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = RepeatClockIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1270,7 +1270,7 @@ case class SearchIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = SearchIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1290,7 +1290,7 @@ case class Search2Icon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = Search2Icon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1310,7 +1310,7 @@ case class SettingsIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = SettingsIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1330,7 +1330,7 @@ case class SmallAddIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = SmallAddIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1350,7 +1350,7 @@ case class SmallCloseIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = SmallCloseIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1370,7 +1370,7 @@ case class SpinnerIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = SpinnerIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1390,7 +1390,7 @@ case class StarIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = StarIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1410,7 +1410,7 @@ case class SunIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = SunIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1430,7 +1430,7 @@ case class TimeIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = TimeIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1450,7 +1450,7 @@ case class TriangleDownIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = TriangleDownIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1470,7 +1470,7 @@ case class TriangleUpIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = TriangleUpIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1490,7 +1490,7 @@ case class UnlockIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = UnlockIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1510,7 +1510,7 @@ case class UpDownIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = UpDownIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1530,7 +1530,7 @@ case class ViewIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ViewIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1550,7 +1550,7 @@ case class ViewOffIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = ViewOffIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1570,7 +1570,7 @@ case class WarningIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = WarningIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1590,7 +1590,7 @@ case class WarningTwoIcon(
     boxSize: Option[String] = None,
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = WarningTwoIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1611,7 +1611,7 @@ case class Textarea(
     variant: Option[String] = None,
     defaultValue: String = "",
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with OnChangeEventHandler.CanHandleOnChangeEvent:
   type This = Textarea
@@ -1632,7 +1632,7 @@ case class Switch(
     defaultChecked: Boolean = false,
     isDisabled: Boolean = false,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with OnChangeBooleanEventHandler.CanHandleOnChangeEvent:
   type This = Switch
@@ -1654,7 +1654,7 @@ case class Select(
     borderColor: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren
     with OnChangeEventHandler.CanHandleOnChangeEvent:
@@ -1674,7 +1674,7 @@ case class Option_(
     value: String,
     text: String = "",
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = Option_
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1685,7 +1685,7 @@ case class Option_(
 
 /** https://chakra-ui.com/docs/components/table/usage
   */
-case class TableContainer(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.empty)
+case class TableContainer(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.Empty)
     extends ChakraElement
     with HasChildren:
   type This = TableContainer
@@ -1717,7 +1717,7 @@ case class Table(
     colorScheme: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Table
@@ -1729,7 +1729,7 @@ case class Table(
   def withColorScheme(v: Option[String])      = copy(colorScheme = v)
   override def withDataStore(ds: TypedMap)    = copy(dataStore = ds)
 
-case class TableCaption(key: String = Keys.nextKey, text: String = "", style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.empty)
+case class TableCaption(key: String = Keys.nextKey, text: String = "", style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.Empty)
     extends ChakraElement:
   type This = TableCaption
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1737,7 +1737,7 @@ case class TableCaption(key: String = Keys.nextKey, text: String = "", style: Ma
   def withText(v: String)                     = copy(text = v)
   override def withDataStore(ds: TypedMap)    = copy(dataStore = ds)
 
-case class Thead(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.empty)
+case class Thead(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.Empty)
     extends ChakraElement
     with HasChildren:
   type This = Thead
@@ -1746,7 +1746,7 @@ case class Thead(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, sty
   def withKey(v: String)                      = copy(key = v)
   override def withDataStore(ds: TypedMap)    = copy(dataStore = ds)
 
-case class Tbody(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.empty)
+case class Tbody(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.Empty)
     extends ChakraElement
     with HasChildren:
   type This = Tbody
@@ -1755,7 +1755,7 @@ case class Tbody(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, sty
   def withKey(v: String)                      = copy(key = v)
   override def withDataStore(ds: TypedMap)    = copy(dataStore = ds)
 
-case class Tfoot(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.empty)
+case class Tfoot(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.Empty)
     extends ChakraElement
     with HasChildren:
   type This = Tfoot
@@ -1768,7 +1768,7 @@ case class Tr(
     key: String = Keys.nextKey,
     children: Seq[UiElement] = Nil,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Tr
@@ -1783,7 +1783,7 @@ case class Th(
     isNumeric: Boolean = false,
     children: Seq[UiElement] = Nil,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Th
@@ -1800,7 +1800,7 @@ case class Td(
     isNumeric: Boolean = false,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Td
@@ -1813,7 +1813,7 @@ case class Td(
 
 /** https://chakra-ui.com/docs/components/menu/usage
   */
-case class Menu(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, children: Seq[UiElement] = Nil, dataStore: TypedMap = TypedMap.empty)
+case class Menu(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, children: Seq[UiElement] = Nil, dataStore: TypedMap = TypedMap.Empty)
     extends ChakraElement
     with HasChildren:
   type This = Menu
@@ -1829,7 +1829,7 @@ case class MenuButton(
     colorScheme: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = MenuButton
@@ -1841,7 +1841,7 @@ case class MenuButton(
   def withColorScheme(v: Option[String])      = copy(colorScheme = v)
   override def withDataStore(ds: TypedMap)    = copy(dataStore = ds)
 
-case class MenuList(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, children: Seq[UiElement] = Nil, dataStore: TypedMap = TypedMap.empty)
+case class MenuList(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, children: Seq[UiElement] = Nil, dataStore: TypedMap = TypedMap.Empty)
     extends ChakraElement
     with HasChildren:
   type This = MenuList
@@ -1855,7 +1855,7 @@ case class MenuItem(
     style: Map[String, Any] = Map.empty,
     text: String = "",
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren
     with OnClickEventHandler.CanHandleOnClickEvent:
@@ -1866,7 +1866,7 @@ case class MenuItem(
   def withText(v: String)                            = copy(text = v)
   override def withDataStore(ds: TypedMap): MenuItem = copy(dataStore = ds)
 
-case class MenuDivider(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.empty) extends ChakraElement:
+case class MenuDivider(key: String = Keys.nextKey, style: Map[String, Any] = Map.empty, dataStore: TypedMap = TypedMap.Empty) extends ChakraElement:
   type This = MenuDivider
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
@@ -1880,7 +1880,7 @@ case class Badge(
     size: String = "md",
     children: Seq[UiElement] = Nil,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Badge
@@ -1906,7 +1906,7 @@ case class Image(
     boxSize: Option[String] = None,
     borderRadius: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = Image
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1930,7 +1930,7 @@ case class Text(
     casing: Option[String] = None,
     decoration: Option[String] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = Text
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -1951,7 +1951,7 @@ case class Code(
     colorScheme: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Code
@@ -1967,7 +1967,7 @@ case class UnorderedList(
     spacing: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = UnorderedList
@@ -1982,7 +1982,7 @@ case class OrderedList(
     spacing: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = OrderedList
@@ -1997,7 +1997,7 @@ case class ListItem(
     text: String = "",
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = ListItem
@@ -2012,7 +2012,7 @@ case class Alert(
     status: String = "error", // error, success, warning, info
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Alert
@@ -2025,7 +2025,7 @@ case class Alert(
 case class AlertIcon(
     key: String = Keys.nextKey,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = AlertIcon
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -2036,7 +2036,7 @@ case class AlertTitle(
     key: String = Keys.nextKey,
     text: String = "Alert!",
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = AlertTitle
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -2048,7 +2048,7 @@ case class AlertDescription(
     key: String = Keys.nextKey,
     text: String = "Something happened!",
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = AlertDescription
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -2066,7 +2066,7 @@ case class Progress(
     hasStripe: Option[Boolean] = None,
     isIndeterminate: Option[Boolean] = None,
     style: Map[String, Any] = Map.empty,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement:
   type This = Progress
   override def withStyle(v: Map[String, Any]) = copy(style = v)
@@ -2087,7 +2087,7 @@ case class Tooltip(
     fontSize: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Seq(Text("use tooltip.withContent() to set this")),
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Tooltip
@@ -2115,7 +2115,7 @@ case class Tabs(
     isFitted: Option[Boolean] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Tabs
@@ -2135,7 +2135,7 @@ case class TabList(
     key: String = Keys.nextKey,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = TabList
@@ -2155,7 +2155,7 @@ case class Tab(
     _active: Option[Map[String, Any]] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Tab
@@ -2178,7 +2178,7 @@ case class TabPanels(
     key: String = Keys.nextKey,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = TabPanels
@@ -2193,7 +2193,7 @@ case class TabPanel(
     key: String = Keys.nextKey,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = TabPanel
@@ -2213,7 +2213,7 @@ case class Breadcrumb(
     pt: Option[Int] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = Breadcrumb
@@ -2234,7 +2234,7 @@ case class BreadcrumbItem(
     isCurrentPage: Option[Boolean] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren:
   type This = BreadcrumbItem
@@ -2252,7 +2252,7 @@ case class BreadcrumbLink(
     href: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren
     with OnClickEventHandler.CanHandleOnClickEvent:
@@ -2272,7 +2272,7 @@ case class Link(
     color: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     children: Seq[UiElement] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
     with HasChildren
     with OnClickEventHandler.CanHandleOnClickEvent:

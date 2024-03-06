@@ -25,52 +25,58 @@ import scala.util.Using
 
         val headers = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate", "timestamp")
 
-        val sortedFilesTable = QuickTable().withHeaders(headers: _*).caption("Files sorted by createdDate and numOfWords")
-        val codeFilesTable   = QuickTable().withHeaders(headers: _*).caption("Unsorted files")
+        def components(events: Events) =
+          println("components() START")
+          given Events         = events
+          val sortedFilesTable = QuickTable().withHeaders(headers: _*).caption("Files sorted by createdDate and numOfWords")
+          val codeFilesTable   = QuickTable().withHeaders(headers: _*).caption("Unsorted files")
 
-        val sortedSourceFilesDS = sortedSourceFiles(sourceFiles())
-        val sortedCalc          = sortedSourceFilesDS.visualize("Sorted files", sortedFilesTable): results =>
-          val tableRows = results.take(3).toList.map(_.toData)
-          sortedFilesTable.withRows(tableRows)
+          val sortedSourceFilesDS = sortedSourceFiles(sourceFiles())
+          val sortedCalc          = sortedSourceFilesDS.visualize("Sorted files", sortedFilesTable): results =>
+            val tableRows = results.take(3).toList.map(_.toData)
+            sortedFilesTable.withRows(tableRows)
 
-        val codeFilesCalculation = sourceFiles().visualize("Code files", codeFilesTable): results =>
-          val dt = results.take(3).toList
-          codeFilesTable.withRows(dt.map(_.toData))
+          val codeFilesCalculation = sourceFiles().visualize("Code files", codeFilesTable): results =>
+            val dt = results.take(3).toList
+            codeFilesTable.withRows(dt.map(_.toData))
 
-        val sortedFilesTableDF = QuickTable().withHeaders(headers: _*).caption("Files sorted by createdDate and numOfWords ASC and as DF")
-        val sortedCalcAsDF     = sourceFiles()
-          .sort($"createdDate".asc, $"numOfWords".asc)
-          .toDF()
-          .visualize("Sorted files DF", sortedFilesTableDF): results =>
-            val tableRows = results.take(4).toList
-            sortedFilesTableDF.withRows(tableRows.toUiTable)
+          val sortedFilesTableDF = QuickTable().withHeaders(headers: _*).caption("Files sorted by createdDate and numOfWords ASC and as DF")
+          val sortedCalcAsDF     = sourceFiles()
+            .sort($"createdDate".asc, $"numOfWords".asc)
+            .toDF()
+            .visualize("Sorted files DF", sortedFilesTableDF): results =>
+              val tableRows = results.take(4).toList
+              sortedFilesTableDF.withRows(tableRows.toUiTable)
 
-        val chart = ResponsiveLine(
-          data = Seq(
-            Serie(
-              "Scala",
-              data = Nil
-            )
-          ),
-          axisBottom = Some(Axis(legend = "Class", legendOffset = 36)),
-          axisLeft = Some(Axis(legend = "Number of Lines", legendOffset = -40)),
-          legends = Seq(Legend())
-        )
+          val chart = ResponsiveLine(
+            data = Seq(
+              Serie(
+                "Scala",
+                data = Nil
+              )
+            ),
+            axisBottom = Some(Axis(legend = "Class", legendOffset = 36)),
+            axisLeft = Some(Axis(legend = "Number of Lines", legendOffset = -40)),
+            legends = Seq(Legend())
+          )
 
-        val sourceFileChart = sourceFiles()
-          .sort($"numOfLines".desc)
-          .visualize("Biggest Code Files", chart): results =>
-            val data = results.take(10).map(cf => Datum(StringUtils.substringBeforeLast(cf.name, ".scala"), cf.numOfLines)).toList
-            chart.withData(Seq(Serie("Scala", data = data)))
-
-        Controller(
+          val sourceFileChart = sourceFiles()
+            .sort($"numOfLines".desc)
+            .visualize("Biggest Code Files", chart): results =>
+              val data = results.take(10).map(cf => Datum(StringUtils.substringBeforeLast(cf.name, ".scala"), cf.numOfLines)).toList
+              chart.withData(Seq(Serie("Scala", data = data)))
+          println("components() RETURNING")
           Seq(
             codeFilesCalculation,
             sortedCalc,
             sortedCalcAsDF,
             sourceFileChart
           )
-        ).render().handledEventsIterator.lastOption
+
+        Controller
+          .noModel(components)
+          .render()
+          .run()
 
 def sourceFiles()(using spark: SparkSession) =
   import scala3encoders.given

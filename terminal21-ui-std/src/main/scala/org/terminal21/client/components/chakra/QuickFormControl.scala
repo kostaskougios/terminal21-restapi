@@ -10,7 +10,7 @@ case class QuickFormControl(
     label: Option[String] = None,
     inputGroup: Seq[UiElement] = Nil,
     helperText: Option[String] = None,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends UiComponent
     with HasStyle:
   type This = QuickFormControl

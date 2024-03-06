@@ -56,11 +56,11 @@ object Forms:
         .map(v => s"dob = $v") ++ events
         .changedValue(color)
         .map(v => s"color = $v") ++ events
-        .changedValue(checkbox2)
+        .changedBooleanValue(checkbox2)
         .map(v => s"checkbox2 checked is $v") ++ events
-        .changedValue(checkbox1)
+        .changedBooleanValue(checkbox1)
         .map(v => s"checkbox1 checked is $v") ++ events
-        .changedValue(switch1)
+        .changedBooleanValue(switch1)
         .map(v => s"switch1 checked is $v") ++ events
         .changedValue(radioGroup)
         .map(v => s"radioGroup newValue=$v") ++ events

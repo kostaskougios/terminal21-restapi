@@ -13,7 +13,7 @@ case class MathJax(
     // expression should be like """ text \( asciimath \) text""", i.e. """When \(a \ne 0\), there are two solutions to \(ax^2 + bx + c = 0\)"""
     expression: String = """fill in the expression as per https://asciimath.org/""",
     style: Map[String, Any] = Map.empty, // Note: some of the styles are ignored by mathjax lib
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends MathJaxElement
     with HasStyle:
   type This = MathJax

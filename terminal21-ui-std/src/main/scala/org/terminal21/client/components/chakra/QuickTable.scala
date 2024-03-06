@@ -13,7 +13,7 @@ case class QuickTable(
     caption: Option[String] = None,
     headers: Seq[Any] = Nil,
     rows: Seq[Seq[Any]] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends UiComponent
     with HasStyle:
   type This = QuickTable

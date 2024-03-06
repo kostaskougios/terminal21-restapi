@@ -9,7 +9,7 @@ case class QuickTabs(
     style: Map[String, Any] = Map.empty,
     tabs: Seq[String | Seq[UiElement]] = Nil,
     tabPanels: Seq[Seq[UiElement]] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends UiComponent
     with HasStyle:
   type This = QuickTabs

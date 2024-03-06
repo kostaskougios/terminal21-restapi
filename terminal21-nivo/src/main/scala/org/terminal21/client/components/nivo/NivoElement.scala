@@ -30,7 +30,7 @@ case class ResponsiveLine(
     pointLabelYOffset: Int = -12,
     useMesh: Boolean = true,
     legends: Seq[Legend] = Nil,
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends NivoElement:
   type This = ResponsiveLine
   override def withStyle(v: Map[String, Any]): ResponsiveLine = copy(style = v)
@@ -61,7 +61,7 @@ case class ResponsiveBar(
     axisLeft: Option[Axis] = Some(Axis(legend = "x", legendOffset = -40)),
     legends: Seq[Legend] = Nil,
     ariaLabel: String = "Chart Label",
-    dataStore: TypedMap = TypedMap.empty
+    dataStore: TypedMap = TypedMap.Empty
 ) extends NivoElement:
   type This = ResponsiveBar
   override def withStyle(v: Map[String, Any]): ResponsiveBar = copy(style = v)

@@ -20,7 +20,7 @@ class TypedMap(protected val m: TMMap):
   override def toString              = s"TypedMap(${m.keys.mkString(", ")})"
 
 object TypedMap:
-  def empty                             = new TypedMap(Map.empty)
+  val Empty                             = new TypedMap(Map.empty)
   def apply(kv: (TypedMapKey[_], Any)*) =
     val m = Map(kv*)
     new TypedMap(m)
