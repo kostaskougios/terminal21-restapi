@@ -30,6 +30,14 @@ class ControllerTest extends AnyFunSuiteLike:
     seList.add(CommandEvent.sessionClosed)
     new Controller(it, renderChanges, materializer)
 
+  test("model updated"):
+    def components(m: Int, events: Events) = MV(m + 1, Box())
+    newController(Seq(buttonClick), components).render(0).iterator.map(_.model).toList should be(List(1, 2))
+
+  test("view updated"):
+    def components(m: Int, events: Events) = MV(m + 1, Box(text = m.toString))
+    newController(Seq(buttonClick), components).render(0).iterator.map(_.view).toList should be(Seq(Seq(Box(text = "0")), Seq(Box(text = "1"))))
+
   test("renderChanges() not invoked if no UI changed"):
     def components(m: Int, events: Events) =
       MV(
@@ -41,7 +49,7 @@ class ControllerTest extends AnyFunSuiteLike:
     def renderChanges(es: Seq[UiElement]) =
       rendered = rendered :+ es
 
-    newController(Seq(buttonClick, checkBoxChange), components, renderChanges).render(0).iterator.map(_.model).toList should be(List(1, 2, 3))
+    newController(Seq(buttonClick, checkBoxChange, inputChange), components, renderChanges).render(0).iterator.map(_.model).toList should be(List(1, 2, 3, 4))
     rendered.size should be(1)
 
   test("renderChanges() invoked if UI changed"):
