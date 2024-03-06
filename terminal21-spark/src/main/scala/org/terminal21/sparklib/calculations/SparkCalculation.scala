@@ -80,7 +80,7 @@ case class SparkCalculation[OUT: ReadWriter](
         HStack(children = Seq(Text(text = name), badge, recalc))
       )
     )
-    val ui     = out.map(toUi).getOrElse(dataUi)
+    val ui     = dataUi
     println(ui)
     Seq(header, ui)
 
