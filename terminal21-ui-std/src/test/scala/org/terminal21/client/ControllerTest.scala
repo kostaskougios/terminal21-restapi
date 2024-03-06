@@ -34,6 +34,11 @@ class ControllerTest extends AnyFunSuiteLike:
     def components(m: Int, events: Events) = MV(m + 1, Box())
     newController(Seq(buttonClick), components).render(0).iterator.map(_.model).toList should be(List(1, 2))
 
+  test("model when terminated"):
+    def components(m: Int, events: Events) =
+      MV(100, Seq(Box()), terminate = true)
+    newController(Seq(buttonClick), components).render(0).iterator.map(_.model).toList should be(List(100))
+
   test("view updated"):
     def components(m: Int, events: Events) = MV(m + 1, Box(text = m.toString))
     newController(Seq(buttonClick), components).render(0).iterator.map(_.view).toList should be(Seq(Seq(Box(text = "0")), Seq(Box(text = "1"))))
