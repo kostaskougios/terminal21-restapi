@@ -39,7 +39,6 @@ import scala.util.Using
 
         println(s"Cached dir: ${sourceFileCached.cachePath}")
         def components(events: Events) =
-          println("components() START")
           given Events = events
 
           val headers          = Seq("id", "name", "path", "numOfLines", "numOfWords", "createdDate", "timestamp")
@@ -76,7 +75,6 @@ import scala.util.Using
             .visualize(chart): results =>
               val data = results.take(10).map(cf => Datum(StringUtils.substringBeforeLast(cf.name, ".scala"), cf.numOfLines)).toList
               chart.withData(Seq(Serie("Scala", data = data)))
-          println("components() RETURNING")
           Seq(
             codeFilesCalculation,
             sortedCalc,

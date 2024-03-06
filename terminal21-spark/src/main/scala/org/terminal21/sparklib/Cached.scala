@@ -4,6 +4,7 @@ import functions.fibers.FiberExecutor
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.SparkSession
 import org.terminal21.client.*
+import org.terminal21.client.Events.InitialRender
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.UiElement.HasStyle
 import org.terminal21.sparklib.calculations.SparkCalculation.TriggerRedraw
@@ -40,6 +41,7 @@ class Cached[OUT: ReadWriter](val name: String, outF: => OUT)(using spark: Spark
 
   @volatile private var out                              = Option.empty[OUT]
   private def startCalc(session: ConnectedSession): Unit =
+    println("startCalc()")
     fiberExecutor.submit:
       out = Some(calculateOnce)
       session.fireEvent(TriggerRedraw)
@@ -57,8 +59,7 @@ class Cached[OUT: ReadWriter](val name: String, outF: => OUT)(using spark: Spark
     if events.isClicked(sc.recalc) then
       invalidateCache()
       startCalc(session)
-    else if events.event != TriggerRedraw then startCalc(session)
-
+    else if events.isInitialRender then startCalc(session)
     sc
 
 object Cached:

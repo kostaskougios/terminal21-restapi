@@ -1,5 +1,6 @@
 package org.terminal21.client
 
+import org.terminal21.client.Events.InitialRender
 import org.terminal21.client.collections.EventIterator
 import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEventHandler, UiElement}
 import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
@@ -79,6 +80,8 @@ case class Events(event: CommandEvent):
     event match
       case OnChange(key, _) => key == e.key
       case _                => false
+
+  def isInitialRender: Boolean = event == InitialRender
 
 object Events:
   case object InitialRender extends ClientEvent

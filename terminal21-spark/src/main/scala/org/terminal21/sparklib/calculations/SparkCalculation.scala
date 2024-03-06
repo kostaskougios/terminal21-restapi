@@ -38,7 +38,6 @@ case class SparkCalculation[OUT: ReadWriter](
   override def withKey(key: String): This        = copy(key = key)
   override def withDataStore(ds: TypedMap): This = copy(dataStore = ds)
 
-  val badge  = Badge(s"recalc-badge-$name")
   val recalc = Button(s"recalc-button-$name", text = "Recalculate", size = Some("sm"), leftIcon = Some(RepeatIcon()))
 
   override def rendered: Seq[UiElement] =
@@ -47,7 +46,12 @@ case class SparkCalculation[OUT: ReadWriter](
       bg = "green",
       p = 4,
       children = Seq(
-        HStack(children = Seq(Text(text = name), badge, recalc))
+        HStack().withChildren(
+          Text(text = name),
+          if events.isClicked(recalc) then Badge(text = "Recalculating...")
+          else if events.isInitialRender then Badge(text = "Initializing...")
+          else recalc
+        )
       )
     )
     val ui     = cached.get
