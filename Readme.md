@@ -123,7 +123,7 @@ can be used for things like:
 
 # Available UI Components
 
-Standard html elements
+Standard html elements like paragraphs, headers,  cookies etc
 [Std](docs/std.md)
 
 Generic components for buttons, menus, forms, text, grids, tables:
