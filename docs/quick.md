@@ -32,3 +32,17 @@ QuickTabs()
 
 ```
 
+## QuickFormControl
+
+Simplifies creating forms.
+
+```scala
+QuickFormControl()
+  .withLabel("Email address")
+  .withHelperText("We'll never share your email.")
+  .withInputGroup(
+    InputLeftAddon().withChildren(EmailIcon()),
+    emailInput,
+    InputRightAddon().withChildren(CheckCircleIcon())
+  )
+```
