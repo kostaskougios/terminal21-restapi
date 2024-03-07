@@ -1,7 +1,6 @@
 package tests
 
 import org.terminal21.client.*
-import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.std.Paragraph
 import tests.chakra.*

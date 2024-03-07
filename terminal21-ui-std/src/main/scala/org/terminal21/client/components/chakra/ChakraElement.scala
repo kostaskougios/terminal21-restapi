@@ -121,7 +121,9 @@ case class HStack(
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
   def withSpacing(v: Option[String])          = copy(spacing = v)
+  def withSpacing(v: String)                  = copy(spacing = Some(v))
   def withAlign(v: Option[String])            = copy(align = v)
+  def withAlign(v: String)                    = copy(align = Some(v))
   override def withDataStore(ds: TypedMap)    = copy(dataStore = ds)
 
 case class VStack(
@@ -138,7 +140,9 @@ case class VStack(
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
   def withSpacing(v: Option[String])          = copy(spacing = v)
+  def withSpacing(v: String)                  = copy(spacing = Some(v))
   def withAlign(v: Option[String])            = copy(align = v)
+  def withAlign(v: String)                    = copy(align = Some(v))
   override def withDataStore(ds: TypedMap)    = copy(dataStore = ds)
 
 case class SimpleGrid(

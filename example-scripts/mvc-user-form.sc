@@ -5,10 +5,10 @@ import org.terminal21.client.components.*
 import org.terminal21.client.components.std.Paragraph
 import org.terminal21.client.components.chakra.*
 
-case class UserForm(
-    email: String, // the email
-    submitted: Boolean // true if user clicks the submit button, false otherwise
-)
+// ------------------------------------------------------------------------------
+// MVC demo with an email form
+// Run with ./mvc-user-form.sc
+// ------------------------------------------------------------------------------
 
 Sessions
   .withNewSession("mvc-user-form", "MVC example with a user form")
@@ -19,6 +19,12 @@ Sessions
         println(s"Submitted: $submittedUser")
       case None =>
         println("User closed session without submitting the form")
+
+/** Our model for the form */
+case class UserForm(
+    email: String, // the email
+    submitted: Boolean // true if user clicks the submit button, false otherwise
+)
 
 /** One nice way to structure the code (that simplifies testing too) is to create a class for every page in the user interface. In this instance, we create a
   * page for the user form to be displayed. All components are in `components` method. The controller is in the `controller` method and we can run to get the
@@ -60,7 +66,7 @@ class UserPage(initialForm: UserForm)(using ConnectedSession):
         submit,
         output
       ),
-      terminate = events.isClicked(submit)
+      terminate = updatedForm.submitted // terminate the form when the submit button is clicked
     )
 
   def controller: Controller[UserForm] = Controller(components)

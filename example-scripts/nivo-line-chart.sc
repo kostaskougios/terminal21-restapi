@@ -1,5 +1,10 @@
 #!/usr/bin/env -S scala-cli project.scala
 
+// ------------------------------------------------------------------------------
+// Nivo line chart demo, animated !
+// Run with ./nivo-line-chart.sc
+// ------------------------------------------------------------------------------
+
 import org.terminal21.client.*
 import org.terminal21.client.fiberExecutor
 import org.terminal21.client.components.*
@@ -38,8 +43,7 @@ Sessions
     Controller
       .noModel(components)
       .render()
-      .iterator
-      .lastOption
+      .run()
 
 object NivoLineChart:
   def createRandomData: Seq[Serie] =

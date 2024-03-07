@@ -1,5 +1,10 @@
 #!/usr/bin/env -S scala-cli project.scala
 
+// ------------------------------------------------------------------------------
+// Render some maths on screen for demo purposes.
+// Run with ./mathjax.sc
+// ------------------------------------------------------------------------------
+
 import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.mathjax.*
@@ -30,4 +35,5 @@ Sessions
         )
       )
       .render()
+    // since this is a read-only UI, we can exit the app but leave the session open on the UI for the user to examine the data.
     session.leaveSessionOpenAfterExiting()

@@ -1,5 +1,10 @@
 #!/usr/bin/env -S scala-cli project.scala
 
+// ------------------------------------------------------------------------------
+// Nivo bar chart demo, animated !
+// Run with ./nivo-bar-chart.sc
+// ------------------------------------------------------------------------------
+
 import org.terminal21.client.*
 import org.terminal21.client.fiberExecutor
 import org.terminal21.client.components.*
@@ -59,8 +64,7 @@ Sessions
     Controller
       .noModel(components)
       .render()
-      .iterator
-      .lastOption
+      .run()
 
 object NivoBarChart:
   def createRandomData: Seq[Seq[BarDatum]] =

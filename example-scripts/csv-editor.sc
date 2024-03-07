@@ -2,9 +2,9 @@
 
 // ------------------------------------------------------------------------------
 // A quick and dirty csv file editor for small csv files.
+// Run with : ./csv-editor -- csv-file-path
 // ------------------------------------------------------------------------------
 
-// always import these
 import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.collections.TypedMapKey
@@ -25,7 +25,7 @@ val fileName = args(0)
 val file = new File(fileName)
 val contents =
   if file.exists() then FileUtils.readFileToString(file, "UTF-8")
-  else "type,damage points,hit points\nmage,10dp,20hp\nwarrior,20dp,30hp"
+  else "type,damage points,hit points\nmage,10dp,20hp\nwarrior,20dp,30hp" // a simple csv for demo purposes
 
 val csv = toCsvModel(contents.split("\n").map(_.split(",").toSeq).toSeq)
 
@@ -34,10 +34,10 @@ Sessions
   .connect: session =>
     given ConnectedSession = session
     println(s"Now open ${session.uiUrl} to view the UI")
-    val editor = new CsvEditor(csv)
+    val editor = new CsvEditorPage(csv)
     editor.run()
 
-/** Our model. If the user clicks "Save", we'll set `save` to true and store the csv data into `csv`
+/** Our model. It stores the csv data as a Map of (x,y) coordinates -> value.
   */
 case class CsvModel(save: Boolean, exitWithoutSave: Boolean, csv: Map[(Int, Int), String], maxX: Int, maxY: Int, status: String = "Please edit the file.")
 def toCsvModel(csv: Seq[Seq[String]]) =
@@ -50,7 +50,10 @@ def toCsvModel(csv: Seq[Seq[String]]) =
     .toMap
   CsvModel(false, false, m, maxX, maxY)
 
-class CsvEditor(initModel: CsvModel)(using session: ConnectedSession):
+/** A nice approach to coding UI's is to create Page classes for every UI page. In this instance we need a page for our csv editor. The components function can
+  * be easily tested if we want to test what is rendered and how it changes the model when events occur.
+  */
+class CsvEditorPage(initModel: CsvModel)(using session: ConnectedSession):
 
   val saveAndExit = Button("save-exit", text = "Save & Exit")
   val exit = Button("exit", text = "Exit Without Saving")
@@ -108,9 +111,12 @@ class CsvEditor(initModel: CsvModel)(using session: ConnectedSession):
 
   object CoordsKey extends TypedMapKey[(Int, Int)]
   private def newEditable(x: Int, y: Int, value: String): Editable =
-    Editable(s"cell-$x-$y", defaultValue = value)
+    Editable(s"cell-$x-$y", defaultValue = value) // note: anything receiving events should have a unique key, in this instance s"cell-$x-$y"
       .withChildren(
         EditablePreview(),
         EditableInput()
       )
-      .store(CoordsKey, (x, y))
+      .store(
+        CoordsKey,
+        (x, y)
+      ) // every UiElement has a store where we can store arbitrary data. Here we store the coordinates for the value this editable will edit

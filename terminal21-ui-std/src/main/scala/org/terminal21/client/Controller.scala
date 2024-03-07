@@ -121,23 +121,71 @@ case class Events(event: CommandEvent):
     case OnClick(key) => key == e.key
     case _            => false
 
+  /** If an element is clicked this results in Some(value), otherwise None
+    * @param e
+    *   the element
+    * @param value
+    *   the value
+    * @tparam V
+    *   value type
+    * @return
+    *   Some(value) if e is clicked, None if not
+    */
   def ifClicked[V](e: UiElement & CanHandleOnClickEvent, value: => V): Option[V] = if isClicked(e) then Some(value) else None
 
+  /** @param e
+    *   an editable element (like input)
+    * @param default
+    *   the default value
+    * @return
+    *   the new value of the editable (as received by an OnChange event) or the default value if the element's value didn't change
+    */
   def changedValue(e: UiElement & OnChangeEventHandler.CanHandleOnChangeEvent, default: String): String = changedValue(e).getOrElse(default)
-  def changedValue(e: UiElement & OnChangeEventHandler.CanHandleOnChangeEvent): Option[String]          = event match
+
+  /** @param e
+    *   an editable element (like input) that can receive OnChange events
+    * @return
+    *   Some(newValue) if the element received an OnChange event, None if not
+    */
+  def changedValue(e: UiElement & OnChangeEventHandler.CanHandleOnChangeEvent): Option[String] = event match
     case OnChange(key, value) if key == e.key => Some(value)
     case _                                    => None
-  def isChangedValue(e: UiElement & OnChangeEventHandler.CanHandleOnChangeEvent): Boolean               =
+
+  /** @param e
+    *   an editable element (like input)
+    * @return
+    *   true if the value of the element has changed, false if not
+    */
+  def isChangedValue(e: UiElement & OnChangeEventHandler.CanHandleOnChangeEvent): Boolean =
     event match
       case OnChange(key, _) => key == e.key
       case _                => false
 
+  /** @param e
+    *   an editable element with boolean value (like checkbox)
+    * @param default
+    *   the value to return if the element wasn't changed
+    * @return
+    *   the element's changed value or the default if the element didn't change
+    */
   def changedBooleanValue(e: UiElement & OnChangeBooleanEventHandler.CanHandleOnChangeEvent, default: Boolean): Boolean =
     changedBooleanValue(e).getOrElse(default)
-  def changedBooleanValue(e: UiElement & OnChangeBooleanEventHandler.CanHandleOnChangeEvent): Option[Boolean]           = event match
+
+  /** @param e
+    *   an editable element with boolean value (like checkbox)
+    * @return
+    *   Some(value) if the element changed or None if not
+    */
+  def changedBooleanValue(e: UiElement & OnChangeBooleanEventHandler.CanHandleOnChangeEvent): Option[Boolean] = event match
     case OnChange(key, value) if key == e.key => Some(value.toBoolean)
     case _                                    => None
-  def isChangedBooleanValue(e: UiElement & OnChangeBooleanEventHandler.CanHandleOnChangeEvent): Boolean                 =
+
+  /** @param e
+    *   an editable element with boolean value (like checkbox)
+    * @return
+    *   true if the element changed or false if not
+    */
+  def isChangedBooleanValue(e: UiElement & OnChangeBooleanEventHandler.CanHandleOnChangeEvent): Boolean =
     event match
       case OnChange(key, _) => key == e.key
       case _                => false

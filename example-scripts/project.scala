@@ -6,3 +6,5 @@
 //> using dep io.github.kostaskougios::terminal21-mathjax:0.30
 
 //> using dep commons-io:commons-io:2.15.1
+
+//> using javaOpt -Xmx128m
