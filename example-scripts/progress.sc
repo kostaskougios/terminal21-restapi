@@ -40,7 +40,7 @@ Sessions
         session.fireEvent(Ticker)
 
     Controller(components)
-      .render(1)
+      .render(1) // render takes the initial model value, in this case our model is the progress as an Int between 0 and 100. We start with 1 and increment it in the components function
       .iterator
       .takeWhile(_.model < 100) // terminate when model == 100
       .foreach(_ => ()) // and run it

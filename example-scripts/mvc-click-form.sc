@@ -45,7 +45,7 @@ class ClickPage(initialForm: ClickForm)(using ConnectedSession):
     MV(
       updatedForm,
       Seq(msg, button),
-      terminate = updatedForm.clicked // terminate the event iteration by the controller
+      terminate = updatedForm.clicked // terminate the event iteration
     )
 
   def controller: Controller[ClickForm] = Controller(components)

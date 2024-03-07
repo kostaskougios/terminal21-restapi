@@ -15,5 +15,5 @@ Sessions
     given ConnectedSession = session
 
     Controller.noModel(Paragraph(text = "Hello World!")).render()
-    // since this is a read-only UI, we can exit the app but leave the session open on the UI for the user to examine the data.
+    // since this is a read-only UI, we can exit the app but leave the session open for the user to examine the page.
     session.leaveSessionOpenAfterExiting()

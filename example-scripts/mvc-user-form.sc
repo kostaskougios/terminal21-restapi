@@ -37,21 +37,21 @@ class UserPage(initialForm: UserForm)(using ConnectedSession):
     *   if None, the user didn't submit the form (i.e. closed the session), if Some(userForm) the user submitted the form.
     */
   def run: Option[UserForm] =
-    controller.render(initialForm).iterator.lastOption.map(_.model).filter(_.submitted)
+    controller.render(initialForm).run().filter(_.submitted)
 
   /** @return
     *   all the components that should be rendered for the page
     */
   def components(form: UserForm, events: Events): MV[UserForm] =
-    val email = Input(key = "email", `type` = "email", defaultValue = initialForm.email)
-    val submit = Button(key = "submit", text = "Submit")
+    val emailInput = Input(key = "email", `type` = "email", defaultValue = initialForm.email)
+    val submitButton = Button(key = "submit", text = "Submit")
 
     val updatedForm = form.copy(
-      email = events.changedValue(email, form.email),
-      submitted = events.isClicked(submit)
+      email = events.changedValue(emailInput, form.email),
+      submitted = events.isClicked(submitButton)
     )
 
-    val output = Paragraph(text = if events.isChangedValue(email) then s"Email changed: ${updatedForm.email}" else "Please modify the email.")
+    val output = Paragraph(text = if events.isChangedValue(emailInput) then s"Email changed: ${updatedForm.email}" else "Please modify the email.")
 
     MV(
       updatedForm,
@@ -60,10 +60,10 @@ class UserPage(initialForm: UserForm)(using ConnectedSession):
           .withLabel("Email address")
           .withInputGroup(
             InputLeftAddon().withChildren(EmailIcon()),
-            email
+            emailInput
           )
           .withHelperText("We'll never share your email."),
-        submit,
+        submitButton,
         output
       ),
       terminate = updatedForm.submitted // terminate the form when the submit button is clicked
