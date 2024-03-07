@@ -1,6 +1,7 @@
 package org.terminal21.serverapp.bundled
 
 import functions.fibers.FiberExecutor
+import io.circe.Json
 import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
@@ -107,14 +108,41 @@ class ServerStatusPage(
 
 class ViewServerStatePage(using session: ConnectedSession):
 
+  private val firstStyle                          = Map("margin" -> "24px")
+  def jsonToTable(depth: Int, j: Json): UiElement =
+    j.fold(
+      jsonNull = Text(text = "null"),
+      jsonBoolean = b => Text(text = b.toString),
+      jsonNumber = n => Text(text = n.toString),
+      jsonString = s => Text(text = s),
+      jsonArray = arr => if arr.isEmpty then Text(text = "<empty>") else Box().withChildren(arr.map(a => jsonToTable(depth + 1, a))*),
+      jsonObject = o => {
+        val keyValues = o.toList
+        if keyValues.isEmpty then Text(text = "<empty>")
+        else
+          Table(style = if depth == 1 then firstStyle else Map.empty).withChildren(
+            Tbody(children = keyValues.map: (k, v) =>
+              Tr()
+                .withBg("blackAlpha.500")
+                .withChildren(
+                  Td(text = k),
+                  Td().withChildren(jsonToTable(depth + 1, v))
+                ))
+          )
+      }
+    )
+
   def runFor(state: SessionState): Unit =
     val sj = state.serverJson
 
     val components = Seq(
       QuickTabs()
-        .withTabs("Json")
-        .withTabPanels(
-          Seq(Paragraph(text = sj.elements.toString))
+        .withTabs("Hierarchy", "Json")
+        .withTabPanelsSimple(
+          Box().withChildren(sj.elements.map(j => jsonToTable(1, j))*),
+          Paragraph().withChildren(
+            sj.elements.map(e => Text(text = e.toString))*
+          )
         )
     )
     session.render(components)

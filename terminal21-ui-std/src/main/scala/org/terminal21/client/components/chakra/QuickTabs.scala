@@ -14,8 +14,9 @@ case class QuickTabs(
     with HasStyle:
   type This = QuickTabs
 
-  def withTabs(tabs: String | Seq[UiElement]*): QuickTabs  = copy(tabs = tabs)
-  def withTabPanels(tabPanels: Seq[UiElement]*): QuickTabs = copy(tabPanels = tabPanels)
+  def withTabs(tabs: String | Seq[UiElement]*): QuickTabs   = copy(tabs = tabs)
+  def withTabPanels(tabPanels: Seq[UiElement]*): QuickTabs  = copy(tabPanels = tabPanels)
+  def withTabPanelsSimple(tabPanels: UiElement*): QuickTabs = copy(tabPanels = tabPanels.map(e => Seq(e)))
 
   override lazy val rendered =
     Seq(

@@ -1771,6 +1771,7 @@ case class Tfoot(key: String = Keys.nextKey, children: Seq[UiElement] = Nil, sty
 case class Tr(
     key: String = Keys.nextKey,
     children: Seq[UiElement] = Nil,
+    bg: Option[String] = None,
     style: Map[String, Any] = Map.empty,
     dataStore: TypedMap = TypedMap.Empty
 ) extends ChakraElement
@@ -1779,6 +1780,8 @@ case class Tr(
   override def withChildren(cn: UiElement*)   = copy(children = cn)
   override def withStyle(v: Map[String, Any]) = copy(style = v)
   def withKey(v: String)                      = copy(key = v)
+  def withBg(v: Option[String])               = copy(bg = v)
+  def withBg(v: String)                       = copy(bg = Some(v))
   override def withDataStore(ds: TypedMap)    = copy(dataStore = ds)
 
 case class Th(

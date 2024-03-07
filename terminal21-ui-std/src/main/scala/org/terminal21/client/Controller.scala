@@ -6,6 +6,10 @@ import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEv
 import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
+/** The initial function passed on to a controller in order to create the MVC iterator.
+  * @tparam M
+  *   the type of the model
+  */
 type ModelViewFunction[M] = (M, Events) => MV[M]
 
 /** Controller manages the changes in the model by receiving events. Also the rendering of the view (which is UiElements).
