@@ -449,3 +449,44 @@ val output = Paragraph(text = if events.isChangedValue(emailInput) then s"Email 
 When we update the model, we set `email = events.changedValue(emailInput, form.email)`. If the event was an `OnChange` event for our `emailInput`, this will set the email
 to the changed value. If not it will revert back to the `form.email`, effectively leaving the email unchanged.
 
+## Creating reusable UI components.
+
+When we create user interfaces, often we want to reuse our own components. 
+
+For instance we may want a component that asks the name of a `Person`. But we want to also be able
+to add this component inside another component that is a table of `Seq[Person]` which lists all people and allows the user
+to edit them.
+
+With terminal21, a component is just a function. It would normally take a model and `Events` but not necessarily, i.e. there can
+be components that don't have to process events. Also the return
+value is up to us, usually we would need to return at least a `UiElement` like `Paragraph` but many times return the updated model too.
+The component that renders a page should return `MV[Model]` but the rest of the components can return what they see fit.
+
+Let's see the `Person` example. Here we have 2 components, `personComponent` that asks for the name of a particular `Person` and
+`peopleComponent` that renders a table with a Seq[Person], using the `personComponent`. 
+
+```scala
+case class Person(id: Int, name: String)
+def personComponent(person: Person, events: Events): MV[Person] =
+  val nameInput = Input(s"person-${person.id}", defaultValue = person.name)
+  val component = Box()
+    .withChildren(
+      Text(text = "Name"),
+      nameInput
+    )
+  MV(
+    person.copy(
+      name = events.changedValue(nameInput, person.name)
+    ),
+    component
+  )
+
+def peopleComponent(people: Seq[Person], events: Events): MV[Seq[Person]] =
+  val peopleComponents = people.map(p => personComponent(p, events))
+  val component        = QuickTable("people")
+    .withRows(peopleComponents.map(p => Seq(p.view)))
+  MV(peopleComponents.map(_.model), component)
+```
+
+`personComponent` take a `Person` model, renders an input box for the person's name and also if there is a change event for this input it updates the model accordingly.
+Now `peopleComponent` creates a table and each row contains the `personComponent`. The `Seq[Person]` model is updated accordingly depending on changes propagating from `personComponent`.
