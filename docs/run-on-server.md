@@ -21,15 +21,12 @@ See for example the [default terminal21 apps](../terminal21-server-app/src/main/
 Now make sure your app is included in the server's classpath and then pass it as an argument to `start()`, i.e. with this `scala-cli` script:
 
 ```scala
-//> using jvm "21"
-//> using scala 3
-//> using javaOpt -Xmx128m
-//> using dep io.github.kostaskougios::terminal21-server-app:$VERSION
+//> ...
 //> using dep MY_APP_DEP
 
 import org.terminal21.server.Terminal21Server
 
-Terminal21Server.start(apps=Seq(new MyServerApp))
+Terminal21Server.start(apps = Seq(new MyServerApp))
 ```
 
 Now start the server and the app should be available in the app list of terminal21.
