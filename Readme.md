@@ -79,23 +79,24 @@ Let's create a simple hello world script in scala-cli that uses terminal21 serve
 ```scala
 import org.terminal21.client.*
 import org.terminal21.client.components.*
+// std components like Paragraph, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala
+import org.terminal21.client.components.std.*
 
-Sessions.withNewSession("hello-world", "Hello World Example"): session =>
+Sessions
+  .withNewSession("hello-world", "Hello World Example")
+  .connect: session =>
   given ConnectedSession = session
-  Seq(
-    Paragraph(text = "Hello World!")
-  ).render()
-  session.waitTillUserClosesSession()
+
+  Controller.noModel(Paragraph(text = "Hello World!")).render()
+  // since this is a read-only UI, we can exit the app but leave the session open on the UI for the user to examine the data.
+  session.leaveSessionOpenAfterExiting()
 ```
 
 If we run this, then we can point our browser to the server, and we will see this UI:
 
 ![hello world ui](docs/images/hello-world.png)
 
-The script will wait until the user clicks the close button, which then will invalidate the
-session it has with the server and terminate the app. 
-
-![hello world ui](docs/images/hello-world-terminated.png)
+The script will wait until the user clicks the close button and then the script will terminate.
 
 # Usecases
 
