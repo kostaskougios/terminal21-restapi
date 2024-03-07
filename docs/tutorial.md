@@ -252,16 +252,7 @@ Controller(components)
 ```
 
 Thats it. We have a progress bar that displays different messages depending on the stage of our universe creation. And our code would
-also be easily testable. The `components` is just a function that returns the model and the UI components, so we can easily assert what
-is rendered based on the model value and if the model is updated correctly based on events. A nicer way to structure each page of
-our user interface would be to have it in a class with a `components` and a `controller` function. That class would be easily testable,
-see the following classes if you would like to find out more. It is an app with 2 pages, a login and loggedin page:
-
-[LoginPage & LoggedInPage](../end-to-end-tests/src/main/scala/tests/LoginPage.scala)
-
-[LoginPageTest](../end-to-end-tests/src/test/scala/tests/LoginPageTest.scala)
-
-[LoggedInTest](../end-to-end-tests/src/test/scala/tests/LoggedInTest.scala)
+also be easily testable. More on tests later on.
 
 ## Handling clicks
 
@@ -503,3 +494,19 @@ def peopleComponent(people: Seq[Person], events: Events): MV[Seq[Person]] =
 
 `personComponent` take a `Person` model, renders an input box for the person's name and also if there is a change event for this input it updates the model accordingly.
 Now `peopleComponent` creates a table and each row contains the `personComponent`. The `Seq[Person]` model is updated accordingly depending on changes propagating from `personComponent`.
+
+## Testing
+
+So far we have seen that structuring our code to a `components`, `controller` and `run()` method allows us to test them easily.
+
+The `components` is just a function that returns the model and the UI components, so we can easily assert what
+is rendered based on the model value and if the model is updated correctly based on events. Terminal21's UI components
+are just case classes that can easily be compared.
+
+If you would like to find out more please see this 2 page app, a login and loggedin page, along with their tests:
+
+[LoginPage & LoggedInPage](../end-to-end-tests/src/main/scala/tests/LoginPage.scala)
+
+[LoginPageTest](../end-to-end-tests/src/test/scala/tests/LoginPageTest.scala)
+
+[LoggedInTest](../end-to-end-tests/src/test/scala/tests/LoggedInTest.scala)
