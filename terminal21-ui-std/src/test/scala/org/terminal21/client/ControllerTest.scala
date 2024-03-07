@@ -1,14 +1,12 @@
 package org.terminal21.client
 
-import org.mockito.Mockito
 import org.scalatest.funsuite.AnyFunSuiteLike
-import org.scalatestplus.mockito.MockitoSugar.*
+import org.scalatest.matchers.should.Matchers.*
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.std.Input
 import org.terminal21.collections.SEList
 import org.terminal21.model.{CommandEvent, OnChange, OnClick}
-import org.scalatest.matchers.should.Matchers.*
 
 class ControllerTest extends AnyFunSuiteLike:
   val button             = Button("b1")
@@ -21,14 +19,14 @@ class ControllerTest extends AnyFunSuiteLike:
 
   def newController[M](
       events: Seq[CommandEvent],
-      materializer: ModelViewMaterialized[M],
+      mvFunction: ModelViewFunction[M],
       renderChanges: Seq[UiElement] => Unit = _ => ()
   ): Controller[M] =
     val seList = SEList[CommandEvent]()
     val it     = seList.iterator
     events.foreach(e => seList.add(e))
     seList.add(CommandEvent.sessionClosed)
-    new Controller(it, renderChanges, materializer)
+    new Controller(it, renderChanges, mvFunction)
 
   test("model updated"):
     def components(m: Int, events: Events) = MV(m + 1, Box())

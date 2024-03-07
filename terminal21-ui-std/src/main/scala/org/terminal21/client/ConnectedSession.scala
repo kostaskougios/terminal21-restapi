@@ -72,6 +72,10 @@ class ConnectedSession(val session: Session, encoding: UiElementEncoding, val se
   def fireChangeEvent(e: UiElement, newValue: String): Unit = fireEvent(CommandEvent.onChange(e, newValue))
   def fireSessionClosedEvent(): Unit                        = fireEvent(CommandEvent.sessionClosed)
 
+  /** @return
+    *   A new event iterator. There can be many event iterators on the same time and each of them iterates events only from after the time it was created. The
+    *   iterator blocks while waiting to receive an event.
+    */
   def eventIterator: Iterator[CommandEvent] = events.iterator
 
   /** Waits until at least 1 event iterator was created for the current page. Useful for testing purposes if i.e. one thread runs the main loop and gets an

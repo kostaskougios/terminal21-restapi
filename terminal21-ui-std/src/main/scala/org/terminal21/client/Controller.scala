@@ -6,39 +6,92 @@ import org.terminal21.client.components.{OnChangeBooleanEventHandler, OnChangeEv
 import org.terminal21.client.components.OnClickEventHandler.CanHandleOnClickEvent
 import org.terminal21.model.{ClientEvent, CommandEvent, OnChange, OnClick}
 
-type ModelViewMaterialized[M] = (M, Events) => MV[M]
+type ModelViewFunction[M] = (M, Events) => MV[M]
 
+/** Controller manages the changes in the model by receiving events. Also the rendering of the view (which is UiElements).
+  *
+  * @tparam M
+  *   the type of the model
+  */
 class Controller[M](
     eventIteratorFactory: => Iterator[CommandEvent],
     renderChanges: Seq[UiElement] => Unit,
-    materializer: ModelViewMaterialized[M]
+    modelViewFunction: ModelViewFunction[M]
 ):
+  /** Sends the initialModel along with an InitialRender event to the modelViewFunction and renders the resulting UI.
+    * @param initialModel
+    *   the initial state of the model
+    * @return
+    *   a RenderedController. Call run() or iterator on that.
+    */
   def render(initialModel: M): RenderedController[M] =
-    val mv = materializer(initialModel, Events.Empty)
+    val mv = modelViewFunction(initialModel, Events.Empty)
     renderChanges(mv.view)
-    new RenderedController(eventIteratorFactory, renderChanges, materializer, mv)
+    new RenderedController(eventIteratorFactory, renderChanges, modelViewFunction, mv)
 
 trait NoModelController:
   this: Controller[Unit] =>
   def render(): RenderedController[Unit] = render(())
 
 object Controller:
-  def apply[M](materializer: ModelViewMaterialized[M])(using session: ConnectedSession): Controller[M] =
-    new Controller(session.eventIterator, session.renderChanges, materializer)
+  /** Call this for a full blown model-view-controller
+    * @param modelViewFunction
+    *   a function (M, Events) => MV[M] which should process the events and render Seq[UiElement]
+    * @param session
+    *   the ConnectedSession
+    * @tparam M
+    *   the type of the model
+    * @return
+    *   Controller[M], call render(initialModel) and then iterator or run()
+    */
+  def apply[M](modelViewFunction: ModelViewFunction[M])(using session: ConnectedSession): Controller[M] =
+    new Controller(session.eventIterator, session.renderChanges, modelViewFunction)
 
-  def noModel(component: UiElement)(using session: ConnectedSession): Controller[Unit] with NoModelController       = noModel(Seq(component))
+  /** Call this id you just want to render some information UI that won't receive events.
+    * @param component
+    *   a single component (and it's children) to be rendered
+    * @param session
+    *   ConnectedSession
+    * @return
+    *   the controller.
+    */
+  def noModel(component: UiElement)(using session: ConnectedSession): Controller[Unit] with NoModelController = noModel(Seq(component))
+
+  /** Call this id you just want to render some information UI that won't receive events.
+    * @param components
+    *   components to be rendered
+    * @param session
+    *   ConnectedSession
+    * @return
+    *   the controller.
+    */
   def noModel(components: Seq[UiElement])(using session: ConnectedSession): Controller[Unit] with NoModelController =
     new Controller[Unit](session.eventIterator, session.renderChanges, (_, _) => MV((), components)) with NoModelController
 
-  def noModel(materializer: Events => Seq[UiElement])(using session: ConnectedSession) =
+  /** Call this if you have no model but still want to receive events. I.e. a form with just an "Ok" button
+    *
+    * @param materializer
+    *   a function that will be called initially to render the UI and whenever there is an event to render any changes to the UI
+    * @param session
+    *   ConnectedSession
+    * @return
+    *   the controller.
+    */
+  def noModel(materializer: Events => Seq[UiElement])(using session: ConnectedSession): Controller[Unit] with NoModelController =
     new Controller[Unit](session.eventIterator, session.renderChanges, (_, events) => MV((), materializer(events))) with NoModelController
 
 class RenderedController[M](
     eventIteratorFactory: => Iterator[CommandEvent],
     renderChanges: Seq[UiElement] => Unit,
-    materializer: ModelViewMaterialized[M],
+    materializer: ModelViewFunction[M],
     initialMv: MV[M]
 ):
+  /** @return
+    *   A new event iterator. There can be many event iterators on the same time and each of them iterates events only from after the time it was created. The
+    *   iterator blocks while waiting to receive an event.
+    *
+    * Normally a single iterator is required and most of the time it is better done by the #run() method below.
+    */
   def iterator: EventIterator[MV[M]] = new EventIterator[MV[M]](
     eventIteratorFactory
       .takeWhile(!_.isSessionClosed)
@@ -53,8 +106,16 @@ class RenderedController[M](
       .takeWhile(!_.terminate)
   )
 
+  /** Gets an iterator and run the event processing.
+    * @return
+    *   The last value of the model or None if the user closed the session.
+    */
   def run(): Option[M] = iterator.lastOption.map(_.model)
 
+/** Wraps an event and has useful methods to process it.
+  * @param event
+  *   CommandEvent (like clicks, changed values, ClientEvent etc)
+  */
 case class Events(event: CommandEvent):
   def isClicked(e: UiElement): Boolean = event match
     case OnClick(key) => key == e.key
@@ -88,6 +149,16 @@ object Events:
 
   val Empty = Events(InitialRender)
 
+/** The ModelViewFunction should return this, which contains the changes to the model, the changed view and if the event iteration should terminate.
+  * @param model
+  *   the value of the model after processing the event
+  * @param view
+  *   the value of the view after processing the event
+  * @param terminate
+  *   if true, the event iteration will terminate
+  * @tparam M
+  *   the type of the model
+  */
 case class MV[M](model: M, view: Seq[UiElement], terminate: Boolean = false)
 
 object MV:
