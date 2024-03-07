@@ -16,7 +16,20 @@ This tutorial will use `scala-cli` but the same applies for `sbt` or `mill` proj
 have `scala-cli` installed on your box, you're good to go, there are no other requirements to run terminal21 scripts. Jdk and
 dependencies will be downloaded by `scala-cli` for us.
 
-All example code is under `example-scripts` of this repo, feel free to checkout the repo and run them.
+All example code is under `example-scripts` of this repo, feel free to checkout the repo and run them:
+
+```shell
+git clone https://github.com/kostaskougios/terminal21-restapi.git
+cd terminal21-restapi/example-scripts
+
+# start the server
+./server.sc
+# ... it will download dependencies & jdk and start the server. Point your browser to http://localhost:8080/ui/
+
+# Open an other terminal window and
+./hello-world.sc
+# Have a look at your browser now.
+```
 
 ## Starting the terminal21 server
 
