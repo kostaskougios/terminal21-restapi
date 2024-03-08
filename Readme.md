@@ -160,14 +160,6 @@ the state in the client scripts.
 
 ![architecture](docs/images/terminal21-architecture.png)
 
-# Mutability
-
-terminal21 ui components are immutable from v0.20. Use `component.withX(...).renderChanges()` to modify a component
-and render it. Note that the original `component` is not changed.
-
-Also, when getting a value of i.e. an Input, use `myInput.current.value`. `current` makes sure we read the component with
-all changes that may have occurred at the browser and all the changes we did on our script.
-
 # Need help?
 
 Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi/discussions) of the project to post any questions, comments or ideas.
