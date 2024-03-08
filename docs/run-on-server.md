@@ -16,7 +16,7 @@ class MyServerApp extends ServerSideApp:
   ... your app code ...
 ```
 
-See for example the [default terminal21 apps](../terminal21-server-app/src/main/scala/org/terminal21/serverapp/bundled).
+See for example the [terminal21 settings app](../terminal21-server-app/src/main/scala/org/terminal21/serverapp/bundled/SettingsApp.scala).
 
 Now make sure your app is included in the server's classpath and then pass it as an argument to `start()`, i.e. with this `scala-cli` script:
 
