@@ -146,7 +146,7 @@ Spark:
 User applications can run on the terminal21 server so that they are always available. The api is the same but a bit of extra wiring is required
 for the terminal21 server to be able to use them.
 
-See [running apps on the server][docs/run-on-server.md]
+See [running apps on the server](docs/run-on-server.md)
 
 # Architecture
 
