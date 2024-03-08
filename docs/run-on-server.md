@@ -1,6 +1,6 @@
 # Running applications on the server
 
-To create an app that runs on the server, implement the `ServerSideApp` trait and then pass your implementation to the `start()` method of the server:
+To create an app that runs on the server, implement the `ServerSideApp` trait (from `io.github.kostaskougios::terminal21-server-app`) and then pass your implementation to the `start()` method of the server:
 
 ```scala
 class MyServerApp extends ServerSideApp:
