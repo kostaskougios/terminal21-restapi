@@ -12,52 +12,30 @@ import org.terminal21.ui.std.ServerJson
 
 class ConnectedSessionTest extends AnyFunSuiteLike:
 
-  test("default event handlers are invoked before user handlers"):
+  test("event iterator"):
     given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
-    val editable                             = Editable()
-    editable.onChange: newValue =>
-      editable.current.value should be(newValue)
-
-    connectedSession.render(editable)
-    connectedSession.fireEvent(OnChange(editable.key, "new value"))
+    val editable                             = Editable(key = "ed")
+    val it                                   = connectedSession.eventIterator
+    val event1                               = OnChange(editable.key, "v1")
+    val event2                               = OnChange(editable.key, "v2")
+    connectedSession.fireEvent(event1)
+    connectedSession.fireEvent(event2)
+    connectedSession.clear()
+    it.toList should be(
+      List(
+        event1,
+        event2
+      )
+    )
 
   test("to server json"):
     val (sessionService, connectedSession) = ConnectedSessionMock.newConnectedSessionAndSessionServiceMock
-
-    val p1    = Paragraph(text = "p1")
-    val span1 = Span(text = "span1")
-    connectedSession.render(p1.withChildren(span1))
-    connectedSession.render()
+    val span1                              = Span("sk", text = "span1")
+    val p1                                 = Paragraph("pk", text = "p1").withChildren(span1)
+    connectedSession.render(Seq(p1.withChildren(span1)))
     verify(sessionService).setSessionJsonState(
       connectedSession.session,
       ServerJson(
-        Seq(p1.key),
-        Map(p1.key -> encoder(p1.withChildren()), span1.key -> encoder(span1)),
-        Map(p1.key -> Seq(span1.key), span1.key             -> Nil)
+        Seq(encoder(p1).deepDropNullValues)
       )
     )
-
-  test("renderChanges changes state on server"):
-    val (sessionService, connectedSession) = ConnectedSessionMock.newConnectedSessionAndSessionServiceMock
-
-    val p1    = Paragraph(text = "p1")
-    val span1 = Span(text = "span1")
-    connectedSession.render(p1)
-    connectedSession.renderChanges(p1.withChildren(span1))
-    verify(sessionService).changeSessionJsonState(
-      connectedSession.session,
-      ServerJson(
-        Seq(p1.key),
-        Map(p1.key -> encoder(p1.withChildren()), span1.key -> encoder(span1)),
-        Map(p1.key -> Seq(span1.key), span1.key             -> Nil)
-      )
-    )
-
-  test("renderChanges updates current version of component"):
-    given connectedSession: ConnectedSession = ConnectedSessionMock.newConnectedSessionMock
-
-    val p1    = Paragraph(text = "p1")
-    val span1 = Span(text = "span1")
-    connectedSession.render(p1)
-    connectedSession.renderChanges(p1.withChildren(span1))
-    p1.current.children should be(Seq(span1))

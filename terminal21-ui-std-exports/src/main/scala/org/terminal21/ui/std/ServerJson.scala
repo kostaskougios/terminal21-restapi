@@ -1,18 +1,11 @@
 package org.terminal21.ui.std
 
 import io.circe.Json
+import org.slf4j.LoggerFactory
 
 case class ServerJson(
-    rootKeys: Seq[String],
-    elements: Map[String, Json],
-    keyTree: Map[String, Seq[String]]
-):
-  def include(j: ServerJson): ServerJson =
-    ServerJson(
-      rootKeys,
-      elements ++ j.elements,
-      keyTree ++ j.keyTree
-    )
+    elements: Seq[Json]
+)
 
 object ServerJson:
-  val Empty = ServerJson(Nil, Map.empty, Map.empty)
+  val Empty = ServerJson(Nil)

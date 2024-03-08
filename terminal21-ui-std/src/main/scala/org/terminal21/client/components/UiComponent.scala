@@ -1,7 +1,5 @@
 package org.terminal21.client.components
 
-import org.terminal21.client.components.UiElement.HasChildren
-
 /** A UiComponent is a UI element that is composed of a seq of other ui elements
   */
 trait UiComponent extends UiElement:
@@ -9,3 +7,5 @@ trait UiComponent extends UiElement:
   // keys of any sub-elements the component has.
   def rendered: Seq[UiElement]
   override def flat = Seq(this) ++ rendered.flatMap(_.flat)
+
+  protected def subKey(suffix: String): String = key + "-" + suffix

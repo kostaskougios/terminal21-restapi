@@ -1,7 +1,7 @@
 package org.terminal21.client
 
 import org.mockito.Mockito.mock
-import org.terminal21.client.components.{StdElementEncoding, UiElementEncoding}
+import org.terminal21.client.json.{StdElementEncoding, UiElementEncoding}
 import org.terminal21.model.CommonModelBuilders.session
 import org.terminal21.ui.std.SessionsService
 

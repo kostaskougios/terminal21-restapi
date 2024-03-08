@@ -1,12 +1,11 @@
 package tests.chakra
 
-import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
 import tests.chakra.Common.commonBox
 
 object Feedback:
-  def components(using session: ConnectedSession): Seq[UiElement] =
+  def components: Seq[UiElement] =
     Seq(
       commonBox(text = "Alerts"),
       VStack().withChildren(

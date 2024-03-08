@@ -79,27 +79,28 @@ Let's create a simple hello world script in scala-cli that uses terminal21 serve
 ```scala
 import org.terminal21.client.*
 import org.terminal21.client.components.*
+// std components like Paragraph, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala
+import org.terminal21.client.components.std.*
 
-Sessions.withNewSession("hello-world", "Hello World Example"): session =>
+Sessions
+  .withNewSession("hello-world", "Hello World Example")
+  .connect: session =>
   given ConnectedSession = session
-  Seq(
-    Paragraph(text = "Hello World!")
-  ).render()
-  session.waitTillUserClosesSession()
+
+  Controller.noModel(Paragraph(text = "Hello World!")).render()
+  // since this is a read-only UI, we can exit the app but leave the session open on the UI for the user to examine the data.
+  session.leaveSessionOpenAfterExiting()
 ```
 
 If we run this, then we can point our browser to the server, and we will see this UI:
 
 ![hello world ui](docs/images/hello-world.png)
 
-The script will wait until the user clicks the close button, which then will invalidate the
-session it has with the server and terminate the app. 
-
-![hello world ui](docs/images/hello-world-terminated.png)
+The script will wait until the user clicks the close button and then the script will terminate.
 
 # Usecases
 
-Due to it's client-server architecture, terminal21 gives a UI to scripts running i.e. on servers without a desktop environment and
+Due to its client-server architecture, terminal21 gives a UI to scripts running i.e. on servers without a desktop environment and
 can be used for things like:
 - creating text file editors which run on desktop-less servers but still allows us to edit the text file on our browser, see [textedit.sc](example-scripts/textedit.sc)
 
@@ -122,7 +123,7 @@ can be used for things like:
 
 # Available UI Components
 
-Standard html elements
+Standard html elements like paragraphs, headers,  cookies etc
 [Std](docs/std.md)
 
 Generic components for buttons, menus, forms, text, grids, tables:
@@ -139,6 +140,14 @@ Maths:
 
 Spark:
 [Spark](docs/spark.md)
+
+# Apps running on server
+
+User applications can run on the terminal21 server so that they are always available. The api is the same but a bit of extra wiring is required
+for the terminal21 server to be able to use them.
+
+See [running apps on the server][docs/run-on-server.md]
+
 # Architecture
 
 Terminal21 consist of :
@@ -156,7 +165,7 @@ the state in the client scripts.
 terminal21 ui components are immutable from v0.20. Use `component.withX(...).renderChanges()` to modify a component
 and render it. Note that the original `component` is not changed.
 
-Also when getting a value of i.e. an Input, use `myInput.current.value`. `current` makes sure we read the component with
+Also, when getting a value of i.e. an Input, use `myInput.current.value`. `current` makes sure we read the component with
 all changes that may have occurred at the browser and all the changes we did on our script.
 
 # Need help?
@@ -164,6 +173,17 @@ all changes that may have occurred at the browser and all the changes we did on 
 Please use the [discussions](https://github.com/kostaskougios/terminal21-restapi/discussions) of the project to post any questions, comments or ideas.
 
 # Changelog
+
+## Version 0.30
+
+- apps can now run on the server + server management bundled apps
+- Cookie setter and reader.
+- session builders refactoring for more flexible creation of sessions
+- QuickTabs, QuickFormControl
+- bug fix for old react state re-rendering on new session
+- event iterators allows idiomatic handling of events and overhaul of the event handling for easier testing and easier development of larger apps
+- MVC
+
 ## Version 0.21
 
 - more std and chakra components like Alert, Progress, Tooltip, Tabs.

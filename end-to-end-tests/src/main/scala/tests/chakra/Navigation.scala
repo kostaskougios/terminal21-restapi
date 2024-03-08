@@ -1,36 +1,38 @@
 package tests.chakra
 
-import org.terminal21.client.ConnectedSession
+import org.terminal21.client.*
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.std.Paragraph
 import tests.chakra.Common.commonBox
 
 object Navigation:
-  def components(using session: ConnectedSession): Seq[UiElement] =
-    val clickedBreadcrumb                  = Paragraph(text = "no-breadcrumb-clicked")
-    def breadcrumbClicked(t: String): Unit =
-      clickedBreadcrumb.withText(s"breadcrumb-click: $t").renderChanges()
+  def components(events: Events): Seq[UiElement] =
+    val bcLinkHome = BreadcrumbLink("breadcrumb-home", text = "breadcrumb-home")
+    val bcLink1    = BreadcrumbLink("breadcrumb-link1", text = "breadcrumb1")
+    val bcCurrent  = BreadcrumbItem(isCurrentPage = Some(true))
+    val bcLink2    = BreadcrumbLink("breadcrumb-link2", text = "breadcrumb2")
+    val link       = Link(key = "google-link", text = "link-external-google", href = "https://www.google.com/", isExternal = Some(true))
 
-    val clickedLink = Paragraph(text = "no-link-clicked")
+    val bcStatus =
+      (
+        events.ifClicked(bcLinkHome, "breadcrumb-click: breadcrumb-home").toSeq ++
+          events.ifClicked(bcLink1, "breadcrumb-click: breadcrumb-link1") ++
+          events.ifClicked(bcLink2, "breadcrumb-click: breadcrumb-link2")
+      ).headOption.getOrElse("no-breadcrumb-clicked")
+
+    val clickedBreadcrumb = Paragraph(text = bcStatus)
+    val clickedLink       = Paragraph(text = if events.isClicked(link) then "link-clicked" else "no-link-clicked")
 
     Seq(
       commonBox(text = "Breadcrumbs"),
       Breadcrumb().withChildren(
-        BreadcrumbItem().withChildren(
-          BreadcrumbLink(text = "breadcrumb-home").onClick(() => breadcrumbClicked("breadcrumb-home"))
-        ),
-        BreadcrumbItem().withChildren(
-          BreadcrumbLink(text = "breadcrumb-link1").onClick(() => breadcrumbClicked("breadcrumb-link1"))
-        ),
-        BreadcrumbItem(isCurrentPage = Some(true)).withChildren(
-          BreadcrumbLink(text = "breadcrumb-link2").onClick(() => breadcrumbClicked("breadcrumb-link2"))
-        )
+        BreadcrumbItem().withChildren(bcLinkHome),
+        BreadcrumbItem().withChildren(bcLink1),
+        bcCurrent.withChildren(bcLink2)
       ),
       clickedBreadcrumb,
       commonBox(text = "Link"),
-      Link(text = "link-external-google", href = "https://www.google.com/", isExternal = Some(true))
-        .onClick: () =>
-          clickedLink.withText("link-clicked").renderChanges(),
+      link,
       clickedLink
     )

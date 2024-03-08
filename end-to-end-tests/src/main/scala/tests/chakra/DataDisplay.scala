@@ -1,22 +1,21 @@
 package tests.chakra
 
-import org.terminal21.client.ConnectedSession
 import org.terminal21.client.components.UiElement
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.std.NewLine
 import tests.chakra.Common.*
 
 object DataDisplay:
-  def components(using session: ConnectedSession): Seq[UiElement] =
-    val headAndFoot = Tr().withChildren(
+  def components: Seq[UiElement] =
+    def headAndFoot = Tr().withChildren(
       Th(text = "To convert"),
       Th(text = "into"),
       Th(text = "multiply by", isNumeric = true)
     )
     val quickTable1 = QuickTable()
-      .headers("id", "name")
+      .withHeaders("id", "name")
       .caption("Quick Table Caption")
-      .rows(
+      .withRows(
         Seq(
           Seq(1, "Kostas"),
           Seq(2, "Andreas")
@@ -30,7 +29,7 @@ object DataDisplay:
         Badge(text = "badge 3", size = "lg", colorScheme = Some("green")),
         Badge(text = "badge 4", variant = Some("outline"), colorScheme = Some("tomato")),
         Badge(text = "badge 4").withChildren(
-          Button(text = "test")
+          Button("test", text = "test")
         )
       ),
       commonBox(text = "Quick Tables"),

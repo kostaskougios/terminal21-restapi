@@ -12,7 +12,7 @@ import java.nio.file.Path
 
 object Routes:
   private val logger                                                      = LoggerFactory.getLogger(getClass)
-  def register(dependencies: Dependencies, rb: HttpRouting.Builder): Unit =
+  def register(dependencies: ServerBeans, rb: HttpRouting.Builder): Unit =
     import dependencies.*
     SessionsServiceReceiverFactory.newJsonSessionsServiceHelidonRoutes(sessionsService).routes(rb)
 
@@ -34,7 +34,7 @@ object Routes:
     rb.register("/ui", staticContent)
     rb.register("/web", publicContent)
 
-  def ws(dependencies: Dependencies): WsRouting.Builder =
+  def ws(dependencies: ServerBeans): WsRouting.Builder =
     val b = WsRouting.builder
     b.endpoint("/ui/sessions", dependencies.sessionsWebSocket)
       .endpoint("/api/command-ws", dependencies.commandWebSocket.commandWebSocketListener.listener)

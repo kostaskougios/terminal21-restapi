@@ -1,86 +1,107 @@
 #!/usr/bin/env -S scala-cli --restart project.scala
 
-/**
- * note we use the --restart param for scala-cli. This means every time we change this file, scala-cli will terminate
- * and rerun it with the changes. This way we get the notebook feel when we use spark scripts.
- *
- * terminal21 spark lib caches datasets by storing them into disk. This way complex queries won't have to be re-evaluated
- * on each restart of the script. We can force re-evaluation by clicking the "Recalculate" buttons in the UI.
- */
+/** note we use the --restart param for scala-cli. This means every time we change this file, scala-cli will terminate and rerun it with the changes. This way
+  * we get the notebook feel when we use spark scripts.
+  *
+  * terminal21 spark lib caches datasets by storing them into disk. This way complex queries won't have to be re-evaluated on each restart of the script. We can
+  * force re-evaluation by clicking the "Recalculate" buttons in the UI.
+  */
 
-// We need these imports
 import org.apache.spark.sql.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.chakra.*
 import org.terminal21.client.components.nivo.*
-import org.terminal21.client.{*, given}
+import org.terminal21.client.*
 import org.terminal21.sparklib.*
 
 import java.util.concurrent.atomic.AtomicInteger
-import scala.util.Random
+import scala.util.{Random, Using}
 import SparkNotebook.*
 import org.terminal21.client.components.mathjax.{MathJax, MathJaxLib}
+import org.terminal21.client.components.std.Paragraph
 
-SparkSessions.newTerminal21WithSparkSession(SparkSessions.newSparkSession(/* configure your spark session here */), "spark-notebook", "Spark Notebook", NivoLib, MathJaxLib): (spark, session) =>
-  given ConnectedSession = session
-  given SparkSession     = spark
-  import scala3encoders.given
-  import spark.implicits.*
+Using.resource(SparkSessions.newSparkSession( /* configure your spark session here */ )): spark =>
+  Sessions
+    .withNewSession("spark-notebook", "Spark Notebook")
+    .andLibraries(NivoLib, MathJaxLib)
+    .connect: session =>
+      given ConnectedSession = session
+      given SparkSession     = spark
+      import scala3encoders.given
+      import spark.implicits.*
 
-  // lets get a Dataset, the data are random so that when we click refresh we can see the data actually
-  // been refreshed.
-  val peopleDS = createPeople
+      // lets get a Dataset, the data are random so that when we click refresh we can see the data actually
+      // been refreshed.
+      val peopleDS           = createPeople
+      val peopleSample       = Cached("People sample"):
+        peopleDS
+          .sort($"id")
+          .limit(5)
+      val peopleOrderedByAge = Cached("Oldest people"):
+        peopleDS
+          .orderBy($"age".desc)
 
-  // We will display the data in a table
-  val peopleTable = QuickTable().headers("Id", "Name", "Age").caption("People")
+      /** The calculation above uses a directory to store the dataset results. This way we can restart this script without loosing datasets that may take long
+        * to calculate, making our script behave more like a notebook. When we click "Recalculate" in the UI, the cache directory is deleted and the dataset is
+        * re-evaluated. If the Dataset schema changes, please click "Recalculate" or manually delete this folder.
+        *
+        * The key for the cache is "People sample"
+        */
+      println(s"Cache path: ${peopleSample.cachePath}")
 
-  val peopleTableCalc = peopleDS.sort($"id").visualize("People sample", peopleTable): data =>
-    peopleTable.rows(data.take(5).map(p => Seq(p.id, p.name, p.age)))
+      def components(events: Events) =
+        given Events    = events
+        // We will display the data in a table
+        val peopleTable = QuickTable().withHeaders("Id", "Name", "Age").withCaption("People")
 
-  /** The calculation above uses a directory to store the dataset results. This way we can restart this script without loosing datasets that may take long to
-    * calculate, making our script behave more like a notebook. When we click "Recalculate" in the UI, the cache directory is deleted and the dataset is
-    * re-evaluated. If the Dataset schema changes, please click "Recalculate" or manually delete this folder.
-    *
-    * The key for the cache is "People sample"
-    */
-  println(s"Cache path: ${peopleTableCalc.cachePath}")
+        val peopleTableCalc = peopleSample.visualize(peopleTable): data =>
+          peopleTable.withRows(data.collect.toList.map(p => Seq(p.id, p.name, p.age)))
 
-  val oldestPeopleChart = ResponsiveLine(
-    axisBottom = Some(Axis(legend = "Person", legendOffset = 36)),
-    axisLeft = Some(Axis(legend = "Age", legendOffset = -40)),
-    legends = Seq(Legend())
-  )
-
-  val oldestPeopleChartCalc = peopleDS
-    .orderBy($"age".desc)
-    .visualize("Oldest people", oldestPeopleChart): data =>
-      oldestPeopleChart.withData(Seq(
-        Serie(
-          "Person",
-          data = data.take(5).map(person => Datum(person.name, person.age))
+        val oldestPeopleChart = ResponsiveLine(
+          axisBottom = Some(Axis(legend = "Person", legendOffset = 36)),
+          axisLeft = Some(Axis(legend = "Age", legendOffset = -40)),
+          legends = Seq(Legend())
         )
-      ))
 
-  Seq(
-    // just make it look a bit more like a proper notebook by adding some fake maths
-    MathJax(
-      expression = """
-                     |The following is total nonsense but it simulates some explanation that would normally be here if we had
-                     |a proper notebook. When \(a \ne 0\), there are two solutions to \(x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\)
-                     |Aenean vel velit a lacus lacinia pulvinar. Morbi eget ex et tellus aliquam molestie sit amet eu diam.
-                     |Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tellus enim, tempor non efficitur et, rutrum efficitur metus.
-                     |Nulla scelerisque, mauris sit amet accumsan iaculis, elit ipsum suscipit lorem, sed fermentum nunc purus non tellus.
-                     |Aenean congue accumsan tempor. \(x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\) maecenas vitae commodo tortor. Aliquam erat volutpat. Etiam laoreet malesuada elit sed vestibulum.
-                     |Etiam consequat congue fermentum. Vivamus dapibus scelerisque ipsum eu tempus. Integer non pulvinar nisi.
-                     |Morbi ultrices sem quis nisl convallis, ac cursus nunc condimentum. Orci varius natoque penatibus et magnis dis parturient montes,
-                     |nascetur ridiculus mus.
-                     |""".stripMargin
-    ),
-    peopleTableCalc,
-    oldestPeopleChartCalc
-  ).render()
+        val oldestPeopleChartCalc = peopleOrderedByAge
+          .visualize(oldestPeopleChart): data =>
+            oldestPeopleChart.withData(
+              Seq(
+                Serie(
+                  "Person",
+                  data = data.take(5).map(person => Datum(person.name, person.age))
+                )
+              )
+            )
 
-  session.waitTillUserClosesSession()
+        Seq(
+          Paragraph(
+            text = """
+            |The spark notebooks can use the `visualise` extension method over a dataframe/dataset. It will cache the dataset by
+            |saving it as a file under /tmp. The `Recalculate` button refreshes the dataset (re-runs it). In this example, the
+            |data are random and so are different each time the `Recalculate` is pressed.
+            |""".stripMargin,
+            style = Map("margin" -> "32px")
+          ),
+          // just make it look a bit more like a proper notebook by adding some fake maths
+          MathJax(
+            expression = """
+                         |The following is total nonsense but it simulates some explanation that would normally be here if we had
+                         |a proper notebook. When \(a \ne 0\), there are two solutions to \(x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\)
+                         |Aenean vel velit a lacus lacinia pulvinar. Morbi eget ex et tellus aliquam molestie sit amet eu diam.
+                         |Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tellus enim, tempor non efficitur et, rutrum efficitur metus.
+                         |Nulla scelerisque, mauris sit amet accumsan iaculis, elit ipsum suscipit lorem, sed fermentum nunc purus non tellus.
+                         |Aenean congue accumsan tempor. \(x = {-b \pm \sqrt{b^2-4ac} \over 2a}.\) maecenas vitae commodo tortor. Aliquam erat volutpat. Etiam laoreet malesuada elit sed vestibulum.
+                         |Etiam consequat congue fermentum. Vivamus dapibus scelerisque ipsum eu tempus. Integer non pulvinar nisi.
+                         |Morbi ultrices sem quis nisl convallis, ac cursus nunc condimentum. Orci varius natoque penatibus et magnis dis parturient montes,
+                         |nascetur ridiculus mus.
+                         |""".stripMargin,
+            style = Map("margin" -> "32px")
+          ),
+          peopleTableCalc,
+          oldestPeopleChartCalc
+        )
+      Controller.noModel(components).render().run()
 
 object SparkNotebook:
   private val names                 = Array("Andy", "Kostas", "Alex", "Andreas", "George", "Jack")

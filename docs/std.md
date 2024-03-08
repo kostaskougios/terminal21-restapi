@@ -31,3 +31,18 @@ Header1(text = "Welcome to the std components demo/test")
     input.onChange: newValue =>
       output.withText(newValue).renderChanges()
 ```
+
+### Cookies
+
+Set a cookie:
+
+```scala
+Cookie(name = "cookie-name", value = "cookie value")
+```
+
+Read a cookie:
+
+```scala
+val cookieReader = CookieReader(key = "cookie-reader", name = "cookie-name")
+val cookieValue   = events.changedValue(cookieReader)
+```

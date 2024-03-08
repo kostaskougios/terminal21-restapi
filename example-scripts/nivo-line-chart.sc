@@ -1,5 +1,10 @@
 #!/usr/bin/env -S scala-cli project.scala
 
+// ------------------------------------------------------------------------------
+// Nivo line chart demo, animated !
+// Run with ./nivo-line-chart.sc
+// ------------------------------------------------------------------------------
+
 import org.terminal21.client.*
 import org.terminal21.client.fiberExecutor
 import org.terminal21.client.components.*
@@ -8,32 +13,40 @@ import org.terminal21.client.components.nivo.*
 
 import scala.util.Random
 import NivoLineChart.*
+import org.terminal21.model.ClientEvent
 
-Sessions.withNewSession("nivo-line-chart", "Nivo Line Chart", NivoLib /* note we need to register the NivoLib in order to use it */ ): session =>
-  given ConnectedSession = session
+Sessions
+  .withNewSession("nivo-line-chart", "Nivo Line Chart")
+  .andLibraries(NivoLib /* note we need to register the NivoLib in order to use it */ )
+  .connect: session =>
+    given ConnectedSession = session
 
-  val chart = ResponsiveLine(
-    data = createRandomData,
-    yScale = Scale(stacked = Some(true)),
-    axisBottom = Some(Axis(legend = "transportation", legendOffset = 36)),
-    axisLeft = Some(Axis(legend = "count", legendOffset = -40)),
-    legends = Seq(Legend())
-  )
+    def components(events: Events): Seq[UiElement] =
+      val chart = ResponsiveLine(
+        data = createRandomData,
+        yScale = Scale(stacked = Some(true)),
+        axisBottom = Some(Axis(legend = "transportation", legendOffset = 36)),
+        axisLeft = Some(Axis(legend = "count", legendOffset = -40)),
+        legends = Seq(Legend())
+      )
+      Seq(
+        Paragraph(text = "Means of transportation for various countries", style = Map("margin" -> 20)),
+        chart
+      )
+    // we'll send new data to our controller every 2 seconds via a custom event
+    case object Ticker extends ClientEvent
+    fiberExecutor.submit:
+      while !session.isClosed do
+        Thread.sleep(2000)
+        session.fireEvent(Ticker)
 
-  Seq(
-    Paragraph(text = "Means of transportation for various countries", style = Map("margin" -> 20)),
-    chart
-  ).render()
-
-  fiberExecutor.submit:
-    while !session.isClosed do
-      Thread.sleep(2000)
-      chart.withData(createRandomData).renderChanges()
-
-  session.waitTillUserClosesSession()
+    Controller
+      .noModel(components)
+      .render()
+      .run()
 
 object NivoLineChart:
-  def createRandomData: Seq[Serie]    =
+  def createRandomData: Seq[Serie] =
     Seq(
       dataFor("Japan"),
       dataFor("France"),

@@ -9,17 +9,31 @@ For a glimpse on what can be done with terminal21, please have a look at the [te
 Terminal21 is not meant as a way to create websites. It is rather meant to give UI's to the odd jobs that has to be 
 performed by scripts and where it would require a lot of effort to create a dedicated web server with a UI. It is perfect
 for scripting for i.e. those internal odd tasks that have to be performed at your workplace or even for things you would
-like to do on your box. And you won't have to write a single line of html or javascript.
+like to do on your box or even maybe to present some code of yours running with a UI rather than a powerpoint
+presentation. And you won't have to write a single line of html or javascript.
 
 This tutorial will use `scala-cli` but the same applies for `sbt` or `mill` projects that use the terminal21 libraries. If you
 have `scala-cli` installed on your box, you're good to go, there are no other requirements to run terminal21 scripts. Jdk and
 dependencies will be downloaded by `scala-cli` for us.
 
-All example code is under `example-scripts` of this repo, feel free to check the repo and run them.
+All example code is under `example-scripts` of this repo, feel free to checkout the repo and run them:
+
+```shell
+git clone https://github.com/kostaskougios/terminal21-restapi.git
+cd terminal21-restapi/example-scripts
+
+# start the server
+./server.sc
+# ... it will download dependencies & jdk and start the server. Point your browser to http://localhost:8080/ui/
+
+# Open an other terminal window and
+./hello-world.sc
+# Have a look at your browser now.
+```
 
 ## Starting the terminal21 server
 
-The easiest way to start the terminal21 server is to have a `scala-cli` script on the box where the server will run.
+The easiest way to start the terminal21 server is to have a `scala-cli` script on the box where the server will run:
 
 [server.sc](../example-scripts/server.sc)
 
@@ -28,6 +42,7 @@ The easiest way to start the terminal21 server is to have a `scala-cli` script o
 
 //> using jvm "21"
 //> using scala 3
+//> using javaOpt -Xmx128m
 //> using dep io.github.kostaskougios::terminal21-server:_VERSION_
 
 import org.terminal21.server.Terminal21Server
@@ -60,16 +75,24 @@ To do this we can create a [hello-world.sc](../example-scripts/hello-world.sc) i
 
 ```scala
 #!/usr/bin/env -S scala-cli project.scala
+// ------------------------------------------------------------------------------
+// Hello world with terminal21.
+// Run with ./hello-world.sc
+// ------------------------------------------------------------------------------
 
 import org.terminal21.client.*
 import org.terminal21.client.components.*
+// std components like Paragraph, https://github.com/kostaskougios/terminal21-restapi/blob/main/terminal21-ui-std/src/main/scala/org/terminal21/client/components/StdElement.scala
 import org.terminal21.client.components.std.*
 
-Sessions.withNewSession("hello-world", "Hello World Example"): session =>
-  given ConnectedSession = session
+Sessions
+  .withNewSession("hello-world", "Hello World Example")
+  .connect: session =>
+    given ConnectedSession = session
 
-  Paragraph(text = "Hello World!").render()
-  session.leaveSessionOpenAfterExiting()
+    Controller.noModel(Paragraph(text = "Hello World!")).render()
+    // since this is a read-only UI, we can exit the app but leave the session open for the user to examine the page.
+    session.leaveSessionOpenAfterExiting()
 ```
 
 The first line, `#!/usr/bin/env -S scala-cli project.scala`, makes our script runnable from the command line.
@@ -89,21 +112,24 @@ Next it creates a session. Each session has a unique id (globally unique across 
 title, "Hello World Example", that will be displayed on the browser.
 
 ```scala
-Sessions.withNewSession("hello-world", "Hello World Example"): session =>
-  ...
+Sessions
+  .withNewSession("hello-world", "Hello World Example")
+  .connect: session =>
+    ...
 ```
 
 ![hello-world](images/hello-world.png)
 
-Next is the actual user interface, in this example just a paragraph with a "Hello World!":
+Next is the actual user interface, in this example just a paragraph with a "Hello World!". In order for it to be rendered, we
+quickly construct a Controller (terminal21 uses an MVC architecture idiomatic to scala, more on this later on):
 
 ```scala
-Paragraph(text = "Hello World!").render()
+Controller.noModel(Paragraph(text = "Hello World!")).render()
 ```
 
-The `render()` method sends the UI to the server which in turn sends it to the terminal21 UI so that it is rendered.
+The `render()` method sends the UI components to the server which in turn sends it to the terminal21 react frontend so that it is rendered.
 
-Finally because this is just a presentation script (we don't expect any feedback from the user), we can terminate it but
+Finally, because this is just a presentation script (we don't expect any feedback from the user), we can terminate it but
 inform terminal21 we want to leave the session open so that the user has a chance to see it.
 
 ```scala
@@ -125,126 +151,215 @@ the progress bar and also give an informative message regarding which stage of t
 ```scala
 #!/usr/bin/env -S scala-cli project.scala
 
-import org.terminal21.client.*
+// ------------------------------------------------------------------------------
+// Universe creation progress bar demo
+// Run with ./progress.sc
+// ------------------------------------------------------------------------------
+
+import org.terminal21.client.{*, given}
 import org.terminal21.client.components.*
 import org.terminal21.client.components.std.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.model.{ClientEvent, SessionOptions}
 
-Sessions.withNewSession("universe-generation", "Universe Generation Progress"): session =>
-  given ConnectedSession = session
+Sessions
+  .withNewSession("universe-generation", "Universe Generation Progress")
+  .connect: session =>
+    given ConnectedSession = session
 
-  val msg = Paragraph(text = "Generating universe ...")
-  val progress = Progress(value = 1)
+    def components(model: Int, events: Events): MV[Int] =
+      val status =
+        if model < 10 then "Generating universe ..."
+        else if model < 30 then "Creating atoms"
+        else if model < 50 then "Big bang!"
+        else if model < 80 then "Inflating"
+        else "Life evolution"
 
-  Seq(msg, progress).render()
+      val msg = Paragraph(text = status)
+      val progress = Progress(value = model)
 
-  for i <- 1 to 100 do
-    val p = progress.withValue(i)
-    val m =
-      if i < 10 then msg
-      else if i < 30 then msg.withText("Creating atoms")
-      else if i < 50 then msg.withText("Big bang!")
-      else if i < 80 then msg.withText("Inflating")
-      else msg.withText("Life evolution")
+      MV(
+        model + 1,
+        Seq(msg, progress)
+      )
 
-    Seq(p, m).renderChanges()
-    Thread.sleep(100)
+    // send a ticker to update the progress bar
+    object Ticker extends ClientEvent
+    fiberExecutor.submit:
+      for _ <- 1 to 100 do
+        Thread.sleep(200)
+        session.fireEvent(Ticker)
 
-  // clear UI
-  session.clear()
-  Paragraph(text = "Universe ready!").render()
+    Controller(components)
+      .render(1)
+      .iterator
+      .takeWhile(_.model < 100) // terminate when model == 100
+      .foreach(_ => ()) // and run it
+    // clear UI
+    session.render(Seq(Paragraph(text = "Universe ready!")))
+    session.leaveSessionOpenAfterExiting()
 ```
 
-Here we create a paragraph and a progress bar.
+We start by declaring our components into a function:
+```scala
+def components(model: Int, events: Events): MV[Int]
+```
+This kind of function is the standard way to create reusable UI components in terminal21. It takes the model (the progress so far as an Int between 0 and 100),
+`Events` which holds any event that was received and returns with a model-view class `MV[Int]` because our model is an `Int`. The top-level component of a page
+must have this signature (there are variations but it has to return an `MV`) but sub-components can be any functions with any number of arguments or return type. More on that later.
+
+We then create a paragraph and a progress bar.
 
 ```scala
-  val msg = Paragraph(text = "Generating universe ...")
-  val progress = Progress(value = 1)
+  val msg = Paragraph(text = status)
+  val progress = Progress(value = model)
 ```
 
-Then we render them for the first time on screen. When we want to add a new element to the UI, we use the `render()` method. When
-we want to update an existing element we use the `renderChanges()` method.
+Finally, we return the changed model and view:
 
 ```scala
-  Seq(msg, progress).render()
+  MV(
+    model + 1,
+    Seq(msg, progress)
+  )
 ```
 
-Then we have our main loop where the calculations occur. We just use a `Thread.sleep` to simulate that some important task is being calculated. And we
-update the progress bar and the message in our paragraph.
-```scala
-val p = progress.withValue(i)
-val m = ... msg.withText("Creating atoms") ...
-```
-
-Note the `e.withX()` methods. Those help us change a value on a UI element. We get a copy of the UI element which we can render as an update:
-
-```scala
-Seq(p, m).renderChanges()
-```
-
-Finally, when the universe is ready, we just clear the UI and render a paragraph before we exit.
+Ok we got our component, but how does it know when to update the progress and increase the model by 1?
+For that we need to send it a custom event. The `components` function is called once when we call the
+`render()` method on the controller and once for each event received. Since we don't have any UI component
+that may send an event, we will send it ourselfs in a separate fiber:
 
 ```scala
-session.clear()
-Paragraph(text = "Universe ready!").render()
+// send a ticker to update the progress bar
+object Ticker extends ClientEvent
+fiberExecutor.submit:
+  for _ <- 1 to 100 do
+    Thread.sleep(200)
+    session.fireEvent(Ticker)
 ```
+
+Remember the `events: Events` in our `components` function? This will contain the `Ticker` event, but it is of no use, so
+the components function ignores it.
+
+Now we can create the `Controller` and iterate through all events:
+
+```scala
+Controller(components)
+  .render(1) // render takes the initial model value, in this case our model is the progress as an Int between 0 and 100. We start with 1 and increment it in the components function
+  .iterator // this is a blocking iterator with events. If there is no event it will block.
+  .takeWhile(_.model < 100) // terminate when model == 100
+  .foreach(_ => ()) // and run it
+```
+
+Thats it. We have a progress bar that displays different messages depending on the stage of our universe creation. And our code would
+also be easily testable. More on tests later on.
+
 ## Handling clicks
 
-Some UI elements allow us to attach an `onClick` handler. When the user clicks the element, our scala code runs.
+Some UI elements like `Button` are clickable. When the user clicks the element, our controller gets an OnClick event.
 
-Let's see for example [on-click.sc](../example-scripts/on-click.sc). We will create a paragraph and a button. When the
+Let's see for example [mvc-click-form.sc](../example-scripts/mvc-click-form.sc). We will create a paragraph and a button. When the
 user clicks the button, the paragraph text will change and the script will exit.
+
+We will create the Page class we mentioned previously, makes it more structured and easier to test. 
 
 ```scala
 #!/usr/bin/env -S scala-cli project.scala
 
+// ------------------------------------------------------------------------------
+// MVC demo that handles a button click
+// Run with ./mvc-click-form.sc
+// ------------------------------------------------------------------------------
+
 import org.terminal21.client.*
 import org.terminal21.client.components.*
 import org.terminal21.client.components.std.*
 import org.terminal21.client.components.chakra.*
+import org.terminal21.model.SessionOptions
 
-Sessions.withNewSession("on-click-example", "On Click Handler"): session =>
-  given ConnectedSession = session
+Sessions
+  .withNewSession("mvc-click-form", "MVC form with a button")
+  .connect: session =>
+    given ConnectedSession = session
+    new ClickPage(ClickForm(false)).run() match
+      case None        => // the user closed the app
+      case Some(model) => println(s"model = $model")
 
-  @volatile var exit = false
-  val msg = Paragraph(text = "Waiting for user to click the button")
-  val button = Button(text = "Please click me").onClick: () =>
-    msg.withText("Button clicked.").renderChanges()
-    exit = true
+    Thread.sleep(1000) // wait a bit so that the user can see the change in the UI
 
-  Seq(msg, button).render()
+/** Our model
+  *
+  * @param clicked
+  *   will be set to true when the button is clicked
+  */
+case class ClickForm(clicked: Boolean)
 
-  session.waitTillUserClosesSessionOr(exit)
+/** One nice way to structure the code (that simplifies testing too) is to create a class for every page in the user interface. In this instance, we create a
+  * page for the click form to be displayed. All components are in `components` method. The controller is in the `controller` method and we can run to get the
+  * result in the `run` method. We can use these methods in unit tests to test what is rendered and how events are processed respectively.
+  */
+class ClickPage(initialForm: ClickForm)(using ConnectedSession):
+  def run(): Option[ClickForm] = controller.render(initialForm).run()
+
+  def components(form: ClickForm, events: Events): MV[ClickForm] =
+    val button = Button(key = "click-me", text = "Please click me")
+    val updatedForm = form.copy(
+      clicked = events.isClicked(button)
+    )
+    val msg = Paragraph(text = if updatedForm.clicked then "Button clicked!" else "Waiting for user to click the button")
+
+    MV(
+      updatedForm,
+      Seq(msg, button),
+      terminate = updatedForm.clicked // terminate the event iteration
+    )
+
+  def controller: Controller[ClickForm] = Controller(components)
 ```
 
-First we create the paragraph and button. We attach an `onClick` handler on the button:
+We create the paragraph and button. Components like the `Button` that receive events must have a unique key, so we set that to "click-me":
 
 ```scala
-  val button = Button(text = "Please click me").onClick: () =>
-    msg.withText("Button clicked.").renderChanges()
-    exit = true
+val button = Button(key = "click-me", text = "Please click me")
+val msg = Paragraph(text = if updatedForm.clicked then "Button clicked!" else "Waiting for user to click the button")
 ```
-Here we change the paragraph text and also update `exit` to `true`.
 
-Our script waits until var `exit` becomes true and then terminates.
+If the button is clicked, we update our model accordingly:
 
 ```scala
-session.waitTillUserClosesSessionOr(exit)
+val updatedForm = form.copy(
+  clicked = events.isClicked(button)
+)
 ```
 
-Now if we run it with `./on-click.sc` and click the button, the script will terminate.
+Finally we return the `MV` with our model and view. Note that we inform the controller we want to terminate the event iteration when the button is clicked:
+
+```scala
+MV(
+  updatedForm,
+  Seq(msg, button),
+  terminate = updatedForm.clicked // terminate the event iteration
+)
+```
+
+We are good now to run our page:
+```scala
+  def run(): Option[ClickForm] = controller.render(initialForm).run()
+```
+
+The controller renders the form with an initial model of `initialForm`. This effectively just calls our `def components(form: ClickForm, events: Events)` with
+an `InitialRender` event and form=initialForm. And then sends the resulting view to the terminal21 server.
+
+Now if we run it with `./on-click.sc` and click the button, the script will terminate with an updated message in the paragraph.
 
 ## Reading updated values
 
-Some UI element values, like input boxes, can be changed by the user. We can read the changed value at any point of our
-code or install an onChange handler so that we read the value as soon as the user changes it.
+Some UI element values, like input boxes, can be changed by the user. We can read the changed value and update our model accordingly.
 
-Let's see how we can just read the value. The following script will create an email input box and a button. Whenever
-the button is pressed, it will read the email and create a new paragraph with the email value.
+Lets create a form with an inputbox where the user can enter his/her email and a submit button. Lets follow our Page & Form class approach, it may make
+our code a bit longer but also more structured and easier to test.
 
-[read-changed-value.sc](../example-scripts/read-changed-value.sc)
-
-![read-value](images/tutorial/read-value.png)
+[mvc-user-form.sc](../example-scripts/mvc-user-form.sc)
 
 ```scala
 #!/usr/bin/env -S scala-cli project.scala
@@ -254,88 +369,144 @@ import org.terminal21.client.components.*
 import org.terminal21.client.components.std.Paragraph
 import org.terminal21.client.components.chakra.*
 
-Sessions.withNewSession("read-changed-value-example", "Read Changed Value"): session =>
-  given ConnectedSession = session
+// ------------------------------------------------------------------------------
+// MVC demo with an email form
+// Run with ./mvc-user-form.sc
+// ------------------------------------------------------------------------------
 
-  val email = Input(`type` = "email", value = "my@email.com")
-  val output = Box()
+Sessions
+  .withNewSession("mvc-user-form", "MVC example with a user form")
+  .connect: session =>
+    given ConnectedSession = session
+    new UserPage(UserForm("my@email.com", false)).run match
+      case Some(submittedUser) =>
+        println(s"Submitted: $submittedUser")
+      case None =>
+        println("User closed session without submitting the form")
 
-  Seq(
-    FormControl().withChildren(
-      FormLabel(text = "Email address"),
-      InputGroup().withChildren(
-        InputLeftAddon().withChildren(EmailIcon()),
-        email
+/** Our model for the form */
+case class UserForm(
+    email: String, // the email
+    submitted: Boolean // true if user clicks the submit button, false otherwise
+)
+
+/** One nice way to structure the code (that simplifies testing too) is to create a class for every page in the user interface. In this instance, we create a
+  * page for the user form to be displayed. All components are in `components` method. The controller is in the `controller` method and we can run to get the
+  * result in the `run` method. We can use these methods in unit tests to test what is rendered and how events are processed respectively.
+  */
+class UserPage(initialForm: UserForm)(using ConnectedSession):
+
+  /** Runs the form and returns the results
+    * @return
+    *   if None, the user didn't submit the form (i.e. closed the session), if Some(userForm) the user submitted the form.
+    */
+  def run: Option[UserForm] =
+    controller.render(initialForm).run().filter(_.submitted)
+
+  /** @return
+    *   all the components that should be rendered for the page
+    */
+  def components(form: UserForm, events: Events): MV[UserForm] =
+    val emailInput = Input(key = "email", `type` = "email", defaultValue = initialForm.email)
+    val submitButton = Button(key = "submit", text = "Submit")
+
+    val updatedForm = form.copy(
+      email = events.changedValue(emailInput, form.email),
+      submitted = events.isClicked(submitButton)
+    )
+
+    val output = Paragraph(text = if events.isChangedValue(emailInput) then s"Email changed: ${updatedForm.email}" else "Please modify the email.")
+
+    MV(
+      updatedForm,
+      Seq(
+        QuickFormControl()
+          .withLabel("Email address")
+          .withInputGroup(
+            InputLeftAddon().withChildren(EmailIcon()),
+            emailInput
+          )
+          .withHelperText("We'll never share your email."),
+        submitButton,
+        output
       ),
-      FormHelperText(text = "We'll never share your email.")
+      terminate = updatedForm.submitted // terminate the form when the submit button is clicked
+    )
+
+  def controller: Controller[UserForm] = Controller(components)
+```
+
+The important bit is here:
+
+```scala
+val emailInput = Input(key = "email", `type` = "email", defaultValue = initialForm.email)
+val submitButton = Button(key = "submit", text = "Submit")
+
+val updatedForm = form.copy(
+  email = events.changedValue(emailInput, form.email),
+  submitted = events.isClicked(submitButton)
+)
+
+val output = Paragraph(text = if events.isChangedValue(emailInput) then s"Email changed: ${updatedForm.email}" else "Please modify the email.")
+```
+
+When we update the model, we set `email = events.changedValue(emailInput, form.email)`. If the event was an `OnChange` event for our `emailInput`, this will set the email
+to the changed value. If not it will revert back to the `form.email`, effectively leaving the email unchanged.
+
+## Creating reusable UI components.
+
+When we create user interfaces, often we want to reuse our own components. 
+
+For instance we may want a component that asks the name of a `Person`. But we want to also be able
+to add this component inside another component that is a table of `Seq[Person]` which lists all people and allows the user
+to edit them.
+
+With terminal21, a component is just a function. It would normally take a model and `Events` but not necessarily, i.e. there can
+be components that don't have to process events. Also the return
+value is up to us, usually we would need to return at least a `UiElement` like `Paragraph` but many times return the updated model too.
+The component that renders a page should return `MV[Model]` but the rest of the components can return what they see fit.
+
+Let's see the `Person` example. Here we have 2 components, `personComponent` that asks for the name of a particular `Person` and
+`peopleComponent` that renders a table with a Seq[Person], using the `personComponent`. 
+
+```scala
+case class Person(id: Int, name: String)
+def personComponent(person: Person, events: Events): MV[Person] =
+  val nameInput = Input(s"person-${person.id}", defaultValue = person.name)
+  val component = Box()
+    .withChildren(
+      Text(text = "Name"),
+      nameInput
+    )
+  MV(
+    person.copy(
+      name = events.changedValue(nameInput, person.name)
     ),
-    Button(text = "Read Value").onClick: () =>
-      val value = email.current.value
-      output.current.addChildren(Paragraph(text = s"The value now is $value")).renderChanges()
-    ,
-    output
-  ).render()
+    component
+  )
 
-  session.waitTillUserClosesSession()
+def peopleComponent(people: Seq[Person], events: Events): MV[Seq[Person]] =
+  val peopleComponents = people.map(p => personComponent(p, events))
+  val component        = QuickTable("people")
+    .withRows(peopleComponents.map(p => Seq(p.view)))
+  MV(peopleComponents.map(_.model), component)
 ```
 
-The important bit is this:
+`personComponent` take a `Person` model, renders an input box for the person's name and also if there is a change event for this input it updates the model accordingly.
+Now `peopleComponent` creates a table and each row contains the `personComponent`. The `Seq[Person]` model is updated accordingly depending on changes propagating from `personComponent`.
 
-```scala
-    Button(text = "Read Value").onClick: () =>
-      val value = email.current.value
-      output.current.addChildren(Paragraph(text = s"The value now is $value")).renderChanges()
-```
+## Testing
 
-When the button is clicked, we get the current state of the `email` input box via `email.current`. And then get it's value, `email.current.value`.
+So far we have seen that structuring our code to a `components`, `controller` and `run()` method allows us to test them easily.
 
-Also in order to append a new paragraph to the `output`, we get the current state of it (which includes any previous paragraphs we have added) and then
-add a paragraph as a new child. Then we render the changes of `output` which includes the paragraphs.
+The `components` is just a function that returns the model and the UI components, so we can easily assert what
+is rendered based on the model value and if the model is updated correctly based on events. Terminal21's UI components
+are just case classes that can easily be compared.
 
-We can now give it a try: `./read-changed-value.sc`
+If you would like to find out more please see this 2 page app, a login and loggedin page, along with their tests:
 
-We can also add an `onChange` event handler on our input box and get the value whenever the user changes it.
+[LoginPage & LoggedInPage](../end-to-end-tests/src/main/scala/tests/LoginPage.scala)
 
-[on-change.sc](../example-scripts/on-change.sc)
+[LoginPageTest](../end-to-end-tests/src/test/scala/tests/LoginPageTest.scala)
 
-```scala
-#!/usr/bin/env -S scala-cli project.scala
-
-import org.terminal21.client.*
-import org.terminal21.client.components.*
-import org.terminal21.client.components.std.Paragraph
-import org.terminal21.client.components.chakra.*
-
-Sessions.withNewSession("on-change-example", "On Change event handler"): session =>
-  given ConnectedSession = session
-
-  val output = Paragraph(text = "Please modify the email.")
-  val email = Input(`type` = "email", value = "my@email.com").onChange: v =>
-    output.withText(s"Email value : $v").renderChanges()
-
-  Seq(
-    FormControl().withChildren(
-      FormLabel(text = "Email address"),
-      InputGroup().withChildren(
-        InputLeftAddon().withChildren(EmailIcon()),
-        email
-      ),
-      FormHelperText(text = "We'll never share your email.")
-    ),
-    output
-  ).render()
-
-  session.waitTillUserClosesSession()
-```
-
-The important bit are these lines:
-
-```scala
-  val output = Paragraph(text = "Please modify the email.")
-  val email = Input(`type` = "email", value = "my@email.com").onChange: v =>
-    output.withText(s"Email value : $v").renderChanges()
-```
-
-For the `Input` box, we add an `onChange` handler that gets the new value as `v`. We then use the value to update the paragraph.
-
-This script can be run as `./on-change.sc`.
+[LoggedInTest](../end-to-end-tests/src/test/scala/tests/LoggedInTest.scala)

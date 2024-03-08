@@ -1,42 +1,45 @@
 package org.terminal21.client.components
 
-import org.terminal21.client.{ConnectedSession, EventHandler}
+import org.terminal21.client.components.UiElement.HasChildren
+import org.terminal21.client.components.chakra.Box
+import org.terminal21.collections.{TypedMap, TypedMapKey}
 
-trait UiElement:
+abstract class UiElement extends AnyElement:
+  type This <: UiElement
+
   def key: String
+  def withKey(key: String): This
+  def findKey(key: String): UiElement = flat.find(_.key == key).get
+
+  def dataStore: TypedMap
+  def withDataStore(ds: TypedMap): This
+  def store[V](key: TypedMapKey[V], value: V): This = withDataStore(dataStore + (key -> value))
+  def storedValue[V](key: TypedMapKey[V]): V        = dataStore(key)
+
+  /** @return
+    *   this element along all it's children flattened
+    */
   def flat: Seq[UiElement] = Seq(this)
 
-  def render()(using session: ConnectedSession): Unit =
-    session.render(this)
+  def substituteComponents: UiElement =
+    this match
+      case c: UiComponent  => Box(key = c.key, text = "", children = c.rendered.map(_.substituteComponents), dataStore = c.dataStore)
+      case ch: HasChildren => ch.withChildren(ch.children.map(_.substituteComponents)*)
+      case _               => this
 
-  /** Renders any changes for this element and it's children (if any). The element must previously have been added to the session.
-    */
-  def renderChanges()(using session: ConnectedSession): Unit =
-    session.renderChanges(this)
+  def toSimpleString: String = s"${getClass.getSimpleName}($key)"
 
 object UiElement:
-  def allDeep(elements: Seq[UiElement]): Seq[UiElement] =
-    elements ++ elements
-      .collect:
-        case hc: HasChildren[_] => allDeep(hc.children)
-      .flatten
-
-  trait Current[A <: UiElement]:
+  trait HasChildren:
     this: UiElement =>
-    def current(using session: ConnectedSession): A = session.currentState(this.asInstanceOf[A])
-
-  trait HasChildren[A <: UiElement]:
-    this: A =>
     def children: Seq[UiElement]
-    override def flat: Seq[UiElement]  = Seq(this) ++ children.flatMap(_.flat)
-    def withChildren(cn: UiElement*): A
-    def noChildren: A                  = withChildren()
-    def addChildren(cn: UiElement*): A = withChildren(children ++ cn: _*)
+    override def flat: Seq[UiElement]     = Seq(this) ++ children.flatMap(_.flat)
+    def withChildren(cn: UiElement*): This
+    def noChildren: This                  = withChildren()
+    def addChildren(cn: UiElement*): This = withChildren(children ++ cn: _*)
 
-  trait HasEventHandler:
-    def defaultEventHandler(session: ConnectedSession): EventHandler
-
-  trait HasStyle[A <: UiElement]:
+  trait HasStyle:
+    this: UiElement =>
     def style: Map[String, Any]
-    def withStyle(v: Map[String, Any]): A
-    def withStyle(vs: (String, Any)*): A = withStyle(vs.toMap)
+    def withStyle(v: Map[String, Any]): This
+    def withStyle(vs: (String, Any)*): This = withStyle(vs.toMap)

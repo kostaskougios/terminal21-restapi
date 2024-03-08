@@ -31,13 +31,19 @@ class ServerSessionsService extends SessionsService:
 
   override def terminateSession(session: Session): Unit =
     val state = sessions.getOrElse(session, throw new IllegalArgumentException(s"Session ${session.id} doesn't exist"))
+    if session.options.alwaysOpen then throw new IllegalArgumentException("Can't terminate a session that should be always open")
     state.eventsNotificationRegistry.notifyAll(SessionClosed("-"))
     sessions -= session
     sessions += session.close -> state.close
     sessionChangeNotificationRegistry.notifyAll(allSessions)
+    if (session.options.closeTabWhenTerminated) removeSession(session.close)
 
-  override def createSession(id: String, name: String): Session =
-    val s     = Session(id, name, UUID.randomUUID().toString, true)
+  def terminateAndRemove(session: Session): Unit =
+    terminateSession(session)
+    removeSession(session.close)
+
+  override def createSession(id: String, name: String, sessionOptions: SessionOptions): Session =
+    val s     = Session(id, name, UUID.randomUUID().toString, true, sessionOptions)
     logger.info(s"Creating session $s")
     sessions.keys.toList.foreach(s => if s.id == id then sessions.remove(s))
     val state = SessionState(ServerJson.Empty, new NotificationRegistry)
@@ -56,14 +62,15 @@ class ServerSessionsService extends SessionsService:
     val newV = oldV.withNewState(newStateJson)
     sessions += session -> newV
     sessionStateChangeNotificationRegistry.notifyAll((session, newV, None))
-    logger.info(s"Session $session new state $newStateJson")
+    logger.debug(s"Session $session new state $newStateJson")
 
   override def changeSessionJsonState(session: Session, change: ServerJson): Unit =
-    val oldV = sessions(session)
-    val newV = oldV.withNewState(oldV.serverJson.include(change))
-    sessions += session -> newV
-    sessionStateChangeNotificationRegistry.notifyAll((session, newV, Some(change)))
-    logger.info(s"Session $session change $change")
+    ???
+//    val oldV = sessions(session)
+//    val newV = oldV.withNewState(oldV.serverJson.include(change))
+//    sessions += session -> newV
+//    sessionStateChangeNotificationRegistry.notifyAll((session, newV, Some(change)))
+//    logger.debug(s"Session $session change $change")
 
   def triggerUiEvent(event: UiEvent): Unit =
     val e = event match
@@ -79,4 +86,4 @@ class ServerSessionsService extends SessionsService:
     state.eventsNotificationRegistry.add(listener)
 
 trait ServerSessionsServiceBeans:
-  val sessionsService: ServerSessionsService = new ServerSessionsService
+  lazy val sessionsService: ServerSessionsService = new ServerSessionsService
