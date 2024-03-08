@@ -1,11 +1,11 @@
 # Quick classes
 
 There are some UI components, like tables, that require a lot of elements: TableContainer, TBody, Tr, Th etc. `Quick*` classes 
-simplify creation of this components.
+simplify creation of these components.
 
 ## QuickTable
 
-This class helps creating tables quickly.
+This class helps create tables quickly.
 
 ```scala
 val conversionTable = QuickTable().headers("To convert", "into", "multiply by")
