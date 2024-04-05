@@ -5,6 +5,6 @@
 //> using dep io.github.kostaskougios::terminal21-nivo:0.30
 //> using dep io.github.kostaskougios::terminal21-mathjax:0.30
 
-//> using dep commons-io:commons-io:2.15.1
+//> using dep commons-io:commons-io:2.16.0
 
 //> using javaOpt -Xmx128m
